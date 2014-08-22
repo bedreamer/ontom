@@ -4,15 +4,15 @@
 #define XML_IO_SIZE   4*1024  // 4K
 
 struct ajax_xml_struct {
-	// ¶¯Ì¬Éú³ÉµÄXMLÎÄ¼ş³¤¶È£¬ ×î³¤Îª31×Ö½Ú
+	// åŠ¨æ€ç”Ÿæˆçš„XMLæ–‡ä»¶é•¿åº¦ï¼Œ æœ€é•¿ä¸º31å­—èŠ‚
 	char xml_name[32];
-	// Éú³ÉµÄXMLÎÄ¼ş³¤¶È
+	// ç”Ÿæˆçš„XMLæ–‡ä»¶é•¿åº¦
 	unsigned int  xml_len;
-	// XML»º³åÇø£¬×î´óÎª4K
+	// XMLç¼“å†²åŒºï¼Œæœ€å¤§ä¸º4K
 	char iobuff[XML_IO_SIZE];
 };
 
-// Éú³ÉxmlÎÄ¼ş
+// ç”Ÿæˆxmlæ–‡ä»¶
 int ajax_gen_xml(struct ajax_xml_struct *thiz);
 
 #endif /*_AJAX_DEF_INCLUDED_H*/

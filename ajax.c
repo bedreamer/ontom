@@ -5,19 +5,20 @@
 #include "ajax.h"
 #include "error.h"
 
+// 生成xml文件，并返回文件大小，头部由调用者生成
 int ajax_version_xml_proc(struct ajax_xml_struct *);
 
 struct xml_generator {
-	// xml �ļ���
+	// xml 文件名
 	char * xml_name;
-	// xml ���ɹ��̵�ַ
+	// xml 生成过程地址
 	int (*xml_gen_proc)(struct ajax_xml_struct *);
 }xmls[]={
 	{"version.xml", ajax_version_xml_proc},
 	{"", NULL}
 };
 
-// ����xml�ļ�
+// 生成xml文件
 int ajax_gen_xml(struct ajax_xml_struct *thiz)
 {
 	if ( thiz == NULL ) return ERR_WRONG_PARAM;
@@ -33,7 +34,7 @@ int ajax_gen_xml(struct ajax_xml_struct *thiz)
 	}
 }
 
-// ����version.xml
+// 生成version.xml
 int ajax_version_xml_proc(struct ajax_xml_struct *thiz)
 {
 	return ERR_OK;

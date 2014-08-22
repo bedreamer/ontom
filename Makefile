@@ -203,6 +203,9 @@ compiler_lex_make_all:
 compiler_lex_clean:
 compiler_clean: 
 
+ut: config.c log.c unit_test.c
+	gcc -g -o $@ $^
+
 ####### Compile
 
 mongoose.o: mongoose.c mongoose.h
