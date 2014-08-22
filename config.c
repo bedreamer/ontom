@@ -14,10 +14,14 @@ CONFIG_DOMAIN_BEGIN
 // ! 下面这一项需要在初始化时手动设置
 {"workingroot", 				C_STRING,	yes,	C_VALID,	.cuv.n=0,		{"/usr/bin/"}},
 {"default_cfg", 				C_STRING,	yes,	C_VALID,	.cuv.n=0,		{"ontom.cfg"}},
-{"xmlsrv_port",					C_INT,		no,		C_INVALID,	.cuv.i=9989,	{"9989"}},
+{"xmlsrv_port",					C_INT,		no,		C_INVALID,	.cuv.i=8081,	{"8081"}},
 {"version_xml", 				C_STRING,	no,		C_INVALID,	.cuv.n=0,		{"version.xml"}},
 {"socket_config", 				C_BOOL,		no,		C_INVALID,  .cuv.b=true,    {"TRUE"}},
 {"socket_config_port", 			C_INT,		no,		C_INVALID,  .cuv.i=9990,    {"9990"}},
+{"version_httpd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
+{"version_browser",             C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
+{"version_tomd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
+{"version_godd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
@@ -46,7 +50,7 @@ int config_initlize(const char *cfgfile)
 	char fbuf[256];
 
 	if ( cfgfile == NULL ) {
-		thiz = config_search("/ontom/default_cfg");
+        thiz = config_search("default_cfg");
 		if ( thiz == NULL ) {
 			log_printf(WRN, 
 				"not give config-file,"
