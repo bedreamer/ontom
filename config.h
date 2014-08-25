@@ -47,8 +47,8 @@ struct config_struct {
 	char config_type;
 
 	// 数据是否来自配置文件
-	// 有些系统值，默认不需要进行配置
-	bool config_system;
+    // 有些用户配置项，默认不需要进行配置
+    bool config_user;
 
 	// 配置数据状态,
 	// 0 -- 初始状态，无效
@@ -74,7 +74,7 @@ struct config_struct {
 /*配置数据初始化, 从配置文件读入配置数据*/
 int config_initlize(const char *cfgfile);
 /*同步配置数据, 将配置数据写入配置文件*/
-int config_writeout(const char *cfgfile);
+int config_writeout();
 /*读取配置数据*/
 const char *config_read(const char *name);
 /*修改配置数据, 只能修改数据值，不能修改数据类型.*/

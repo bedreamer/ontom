@@ -50,24 +50,28 @@ int ajax_gen_xml(struct ajax_xml_struct *thiz)
 // 返回当前交易信息 deal.xml
 int ajax_deal_xml_proc(struct ajax_xml_struct *thiz)
 {
+    log_printf(DBG, "get into %s", __FUNCTION__);
     return ERR_ERR;
 }
 
 // 返回充电状态信息 chargestatus.xml
 int ajax_charge_status_xml_proc(struct ajax_xml_struct  *thiz)
 {
+    log_printf(DBG, "get into %s", __FUNCTION__);
     return ERR_ERR;
 }
 
 // 返回电池状态信息 batterystatus.xml
 int ajax_battery_status_xml_proc(struct ajax_xml_struct  *thiz)
 {
+    log_printf(DBG, "get into %s", __FUNCTION__);
     return ERR_ERR;
 }
 
 // 返回告警信息 alarm.xml
 int ajax_alarm_xml_proc(struct ajax_xml_struct  *thiz)
 {
+    log_printf(DBG, "get into %s", __FUNCTION__);
     return ERR_ERR;
 }
 
@@ -93,7 +97,8 @@ int ajax_version_xml_proc(struct ajax_xml_struct *thiz)
 }
 
 // 操作认证 autheticate.xml
-int ajax_autheticate_xml_proc(struct ajax_xml_struct *)
+int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
 {
+    log_printf(DBG, "get into %s", __FUNCTION__);
     return ERR_OK;
 }

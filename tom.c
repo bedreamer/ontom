@@ -36,10 +36,25 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
             mg_write(conn, thiz.iobuff, thiz.xml_len);
             log_printf(DBG, "done");
         } else {
-            mg_printf(conn, "HTTP/1.1 404 HTTP\r\n"
-                "Server: thttpd/2.21b PHP/20030920\r\n"
-                "Access-Control-Allow-Origin: *\r\n"
-                "\r\n"
+            mg_printf(conn,
+                      "HTTP/1.1 404 Not Found\r\n"
+                      "Date: Fri, 22 Aug 2014 06:38:28 GMT\r\n"
+                      "Server: Apache\r\n"
+                      "Access-Control-Allow-Origin: *\r\n"
+                      "Keep-Alive: timeout=3\r\n"
+                      "Connection: Keep-Alive\r\n"
+                      "Content-Type: text/html\r\n"
+                      "Content-Length: 328\r\n"
+                      "\r\n"
+                      "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n"
+                      "<html><head>\r\n"
+                      "<title>404 Not Found</title>\r\n"
+                      "</head><body>\r\n"
+                      "<h1>Not Found</h1>\r\n"
+                      "<p>The requested URL /version.xml was not found on this server.</p>\r\n"
+                      "<p>Additionally, a 404 Not Found\r\n"
+                      "error was encountered while trying to use an ErrorDocument to handle the request.</p>\r\n"
+                      "</body></html>\r\n\r\n"
             );
         }
         result = MG_TRUE;
@@ -50,19 +65,98 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
   return result;
 }
 
+// xml 服务线程
+// 提供xml文件输出，设置参数输入服务
+static void *thread_xml_service(void *arg)
+{
+    int *done = (int *)arg;
+    int mydone = 0;
+    struct mg_server *server;
+    if ( done == NULL ) done = &mydone;
+
+    log_printf(INF, "%s running...", __FUNCTION__);
+    server = mg_create_server(NULL, ev_handler);
+    mg_set_option(server, "listening_port", "8081");
+
+    printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
+    for (; ! *done; ) {
+        mg_poll_server(server, 1000);
+    }
+    mg_destroy_server(&server);
+
+    log_printf(INF, "%s exit.", __FUNCTION__);
+    return NULL;
+}
+
+// bms 服务线程
+// 提供bms通信服务
+static void *thread_bms_service(void *arg)
+{
+    int *done = (int *)arg;
+    int mydone = 0;
+    if ( done == NULL ) done = &mydone;
+    log_printf(INF, "%s running...", __FUNCTION__);
+
+    while ( ! *done ) {
+        usleep(5000);
+    }
+}
+
+// 串口通信 服务线程
+// 提供串口通信服务
+static void *thread_uart_service(void *arg)
+{
+    int *done = (int *)arg;
+    int mydone = 0;
+    if ( done == NULL ) done = &mydone;
+    log_printf(INF, "%s running...", __FUNCTION__);
+
+    while ( ! *done ) {
+        usleep(5000);
+    }
+}
+
 int main()
 {
-	struct mg_server *server;
+    const char *user_cfg = NULL;
+    pthread_t tid = 0;
+    int thread_done[ 3 ] = {0};
+    char buff[32];
 
-    config_initlize("cfg.fg");
-    server = mg_create_server(NULL, ev_handler);
-	mg_set_option(server, "listening_port", "8081");
+    // 读取配置文件的顺序必须是
+    // 1. 系统配置文件
+    // 2. 用户参数配置文件
+    // 需要注意的是，用户配置数据和用户配置数据可以有相同的配置项
+    // 但优先级最高的是用户配置数据，如果某个配置项同时出现在系统配置
+    // 和用户配置中，那么系统最终采用的值将是用户配置数据中的值
+    // 因此这里需要注意的是：
+    // * 有两个配置文件是一种冗余设计
+    // * 非必要的情况下，分别将系统配置和用户配置分开存储到两个文件中
+    config_initlize("ontom.cfg");
+    user_cfg = config_read("user_config_file");
+    if ( user_cfg == NULL ) {
+        log_printf(WRN, "not gave user config file,"
+                   "use 'user.cfg' by default.");
+        user_cfg = "user.cfg";
+    }
+    config_initlize(user_cfg);
 
-	printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
-	for (;;) {
-		mg_poll_server(server, 1000);
-	}
-	mg_destroy_server(&server);
+    pthread_create( & tid, NULL, thread_xml_service, &thread_done[0]);
+    sprintf(buff, "%d", tid);
+    config_write("thread_xml_server_id", buff);
+    pthread_create( & tid, NULL, thread_bms_service, &thread_done[1]);
+    sprintf(buff, "%d", tid);
+    config_write("thread_bms_server_id", buff);
+    pthread_create( & tid, NULL, thread_uart_service, &thread_done[2]);
+    sprintf(buff, "%d", tid);
+    config_write("thread_uart_server_id", buff);
+
+#if CONFIG_DEBUG_CONFIG >= 1
+    config_print();
+#endif
+    for ( ;; ) {
+        sleep(1);
+    }
 
 	return 0;
 }
