@@ -6,6 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <net/if.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+
+#include <linux/can.h>
+#include <linux/can/raw.h>
 #include "mongoose.h"
 #include "ajax.h"
 #include "config.h"
@@ -95,10 +102,107 @@ static void *thread_bms_service(void *arg)
     int *done = (int *)arg;
     int mydone = 0;
     if ( done == NULL ) done = &mydone;
-    log_printf(INF, "%s running...", __FUNCTION__);
 
+    int s;
+    struct sockaddr_can addr;
+    struct ifreq ifr;
+    struct can_frame frame;
+    s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    int nbytes;
+
+    strcpy(ifr.ifr_name, "can0" );
+    ioctl(s, SIOCGIFINDEX, &ifr);
+
+    addr.can_family = PF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+    log_printf(INF, "%s RX:TX = %X:%X",
+               __FUNCTION__,
+               addr.can_addr.tp.rx_id,
+               addr.can_addr.tp.tx_id);
+
+    bind(s, (struct sockaddr *)&addr, sizeof(addr));
+
+    log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
     while ( ! *done ) {
-        usleep(5000);
+        frame.can_id  = 0x123 | CAN_EFF_FLAG;
+        frame.can_dlc = 2;
+        frame.data[0] = 0x11;
+        frame.data[1] = 0x22;
+
+        nbytes = write(s, &frame, sizeof(struct can_frame));
+
+        log_printf(DBG, "TX---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
+                    frame.can_id,
+                    frame.can_dlc,
+                    frame.data[0],
+                    frame.data[1],
+                    frame.data[2],
+                    frame.data[3],
+                    frame.data[4],
+                    frame.data[5],
+                    frame.data[6],
+                    frame.data[7]
+                );
+        sleep(3);
+    }
+}
+
+// bms 服务线程
+// 提供bms通信服务
+static void *thread_bms1_service(void *arg)
+{
+    int *done = (int *)arg;
+    int mydone = 0;
+    if ( done == NULL ) done = &mydone;
+
+    int s;
+    struct sockaddr_can addr;
+    struct ifreq ifr;
+    int nbytes;
+    s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+
+    strcpy(ifr.ifr_name, "can1" );
+    ioctl(s, SIOCGIFINDEX, &ifr);
+
+    addr.can_family = PF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    log_printf(INF, "%s RX:TX = %X:%X",
+               __FUNCTION__,
+               addr.can_addr.tp.rx_id,
+               addr.can_addr.tp.tx_id);
+    bind(s, (struct sockaddr *)&addr, sizeof(addr));
+    log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
+    while ( ! *done ) {
+        struct can_frame frame = {0};
+        nbytes = read(s, &frame, sizeof(struct can_frame));
+
+        if (nbytes < 0) {
+                log_printf(DBG, "can raw socket read");
+                sleep(1);
+                continue;
+        }
+
+        /* paranoid check ... */
+        if (nbytes < sizeof(struct can_frame)) {
+                log_printf(DBG, "read: incomplete CAN frame\n");
+                sleep(1);
+                continue;
+        }
+
+        log_printf(DBG, "RX---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
+                    frame.can_id,
+                    frame.can_dlc,
+                    frame.data[0],
+                    frame.data[1],
+                    frame.data[2],
+                    frame.data[3],
+                    frame.data[4],
+                    frame.data[5],
+                    frame.data[6],
+                    frame.data[7]
+                );
+        sleep(1);
     }
 }
 
@@ -120,7 +224,7 @@ int main()
 {
     const char *user_cfg = NULL;
     pthread_t tid = 0;
-    int thread_done[ 3 ] = {0};
+    int thread_done[ 4 ] = {0};
     char buff[32];
 
     // 读取配置文件的顺序必须是
@@ -147,7 +251,9 @@ int main()
     pthread_create( & tid, NULL, thread_bms_service, &thread_done[1]);
     sprintf(buff, "%d", tid);
     config_write("thread_bms_server_id", buff);
-    pthread_create( & tid, NULL, thread_uart_service, &thread_done[2]);
+    pthread_create( & tid, NULL, thread_bms1_service, &thread_done[2]);
+    config_write("thread_bms1_server_id", buff);
+    pthread_create( & tid, NULL, thread_uart_service, &thread_done[3]);
     sprintf(buff, "%d", tid);
     config_write("thread_uart_server_id", buff);
 

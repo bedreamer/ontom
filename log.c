@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include "log.h"
 
 int log_printf(unsigned int level, const char *fmt, ...)
 {
@@ -11,9 +12,21 @@ int log_printf(unsigned int level, const char *fmt, ...)
 	vsnprintf(buff, sizeof(buff), fmt, ap);
 	va_end(ap);
 
-	if ( level <= 3 ) {
-		return printf("%s->%s\n", lvlstr[level], buff);
-	} else {
-		return printf("%s\n", buff);
-	}
+    switch (level) {
+    case INF:
+        printf("\033[32m[INF]\033[0m %s\n", buff);
+        break;
+    case WRN:
+        printf("\033[33m[WRN]\033[0m %s\n", buff);
+        break;
+    case ERR:
+        printf("\033[31m[ERR]\033[0m %s\n", buff);
+        break;
+    case DBG:
+        printf("\033[34m[DBG]\033[0m %s\n", buff);
+        break;
+    default:
+        return printf("%s\n", buff);
+        break;
+    }
 }

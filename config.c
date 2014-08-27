@@ -1,10 +1,39 @@
-/*
+/**************************************************************************
  * 配置接口
  * All rights reserved Hangzhou Power Equipment Co., Ltd.
  * author: LiJie
  * email:  bedreamer@163.com
  * 2014-08-22
-*/
+ *
+ * 配置文件语法：
+ * ==================
+ * 配置文件语法基本遵循LINUX系统中的配置文件格式，配置项基本格式为：
+ *     A=B
+ * A的正则表达式为 [a-zA-Z_]{1,32}, 也就是由字母，下划线组成的字符串
+ * 且长度不超过32字节。
+ * A必须顶格写起，否则视为语法错误。
+ * B可以是任意非空格开头的字符串，在‘=’ 和 B 之间全部的空格将被忽略。
+ * 暂定B的有效长度最长为127字节。
+ * 以 ';', '#' 开头的行将被视为注释行。
+ * 如下是一个配置文件例子，纵向边框为 '+'
+ *
+ * +-----------------------------------------------------------------------
+ * +# 因为开始字符为‘#’，所以这是个注释行
+ * +;  因为开始字符为‘;’，所以也是个注释行
+ * +  # 行开头只接受的表达式为 [a-zA-Z_]， 因此这行有语法错误 
+ * +# 下面这几行是正确的配置写法
+ * +config_item=198888
+ * +_config_item=    199999
+ * +_config_=asdfasdfas231$&%^$^%*21f
+ * +# 下面的写法是错的
+ * +; 配置项名称和'='之间不能有空格
+ * +config_item =123123
+ * +; 开始字符不能是空格
+ * +  config_item=123123
+ * +; 配置项名称只接受下划线和字母 
+ * +8987_a=fasdf
+ * +------------------------------------------------------------------------
+ *******************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -17,7 +46,7 @@ static char *value_system[] = {"NO", "YES", "N/A"};
 static char *value_status[] = {"INVALID", "VALID", "MODIFY", "N/A"};
 //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 CONFIG_DOMAIN_BEGIN
-//数据名称                      |数据类型| 用户配置项？|nnn数据状态|   数据默认值|		数据值
+//数据名称                   |数据类型| 用户配置项？|nnn数据状态|数据默认值|	数据值
 // ! 下面这一项需要在初始化时手动设置
 {"xmlsrv_port",					C_INT,		no,		C_INVALID,	.cuv.i=8081,	{"8081"}},
 {"socket_config", 				C_BOOL,		no,		C_INVALID,  .cuv.b=true,    {"TRUE"}},
@@ -30,7 +59,7 @@ CONFIG_DOMAIN_BEGIN
 {"system_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
 // 系统参数不应该出现在配置文件中, 仅供程序内部使用
-{"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"thread_xml_server_id",        C                _INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_bms_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 用户配置数据
