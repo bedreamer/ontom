@@ -79,6 +79,46 @@ int config_writeout();
 const char *config_read(const char *name);
 /*修改配置数据, 只能修改数据值，不能修改数据类型.*/
 const char *config_write(const char *name, const char *value);
+// 套接字传递的数据包格式
+struct socket_config_request {
+    // 用户名
+    char config_username[8];
+    // 密码
+    char config_passwd[16];
+    // 操作类型
+    unsigned int config_cmd;
+    #define CONFIG_RD       0xAA  // 读变量
+    #define CONFIG_WR       0x55  // 写变量
+    // 变量名
+    unsigned char config_item_name[32];
+    // 变量索引，变量名为空时使用
+    unsigned int  config_item_index;
+    // 变量索引号
+    unsigned char config_item_type;
+    // 配置值
+    unsigned char config_item_value[CONFIG_MAX_VALUE];
+};
+// 套接字传递的数据包格式
+struct socket_config_ack {
+    // 操作类型
+    unsigned int config_cmd;
+    // 操作结果, 0: 成功， 其他： 失败
+    unsigned int config_result;
+    // 配置项名称
+    char config_name[32];
+    // 配置项类型,
+    char config_type;
+    // 数据是否来自配置文件
+    // 有些用户配置项，默认不需要进行配置
+    bool config_user;
+    // 配置数据状态,
+    char config_status;
+    // 配置项值，统一使用字符存储，使用时按类型转换
+    char config_value[CONFIG_MAX_VALUE];
+};
+/*套接字配置服务程序*/
+void *config_drive_service(void *arg);
+
 #if CONFIG_DEBUG_CONFIG >= 1
 /*打印配置数据*/
 void config_print();

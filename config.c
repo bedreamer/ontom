@@ -51,6 +51,9 @@ CONFIG_DOMAIN_BEGIN
 {"xmlsrv_port",					C_INT,		no,		C_INVALID,	.cuv.i=8081,	{"8081"}},
 {"socket_config", 				C_BOOL,		no,		C_INVALID,  .cuv.b=true,    {"TRUE"}},
 {"socket_config_port", 			C_INT,		no,		C_INVALID,  .cuv.i=9990,    {"9990"}},
+{"socket_config_autheticate", 	C_BOOL,     no,		C_INVALID,  .cuv.n=0,       {"TRUE"}},
+{"socket_config_username", 		C_STRING,	no,		C_INVALID,  .cuv.n=0,       {"god"}},
+{"socket_config_passwd", 		C_STRING,	no,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"version_httpd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"version_browser",             C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"version_tomd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
@@ -59,9 +62,10 @@ CONFIG_DOMAIN_BEGIN
 {"system_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
 // 系统参数不应该出现在配置文件中, 仅供程序内部使用
-{"thread_xml_server_id",        C                _INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_bms_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 用户配置数据
 {"charge_pile_serial",          C_STRING,  yes,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"price",                       C_FLOAT,   yes,     C_INVALID,  .cuv.f=0.0f,    {"0.0"}},
@@ -398,6 +402,99 @@ const char *config_write(const char *name, const char *value)
 
 	return thiz->config_value;
 }
+
+/*套接字配置服务程序*/
+void *config_drive_service(void *arg)
+{
+    int ok = 1;
+    int srv_port;
+    char *pport = config_read("socket_config_port");
+    int s_config = -1;
+    int need_autheticate = 0, good_request = 0;
+    struct sockaddr_in si_me, si_other;
+    struct socket_config_request request;
+    struct socket_config_ack ack;
+    const char * autheticate, *username, *passwd;
+
+    srv_port = atoi(pport);
+    if ( srv_port <= 2048 ) {
+        log_printf(ERR, "socket config service port %d invalid. abort!",
+                   srv_port);
+        goto thread_die;
+    }
+
+    s_config = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if ( -1 == s_config ) {
+        log_printf(ERR, "create socket confige server faile!");
+        goto thread_die;
+    }
+
+    // zero out the structure
+    memset((char *) &si_me, 0, sizeof(si_me));
+
+    si_me.sin_family = AF_INET;
+    si_me.sin_port = htons(srv_port);
+    si_me.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    //bind socket to port
+    if( bind(s_config , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
+        log_printf(ERR, "bind to port %d faile, abort.", srv_port);
+        goto thread_die;
+    }
+
+    while ( ok ) {
+        usleep(5000);
+        recv_len = recvfrom(s_config, &request,
+                 sizeof(struct socket_config_request),
+                 0, (struct sockaddr *) &si_other, &slen);
+        if ( recv_len <= 0 ) continue;
+
+        request.config_username[ 8 ] = '\0';
+        request.config_passwd[15] = '0';
+        request.config_item_name[31] = '\0';
+        request.config_item_value[127] = '\0';
+
+        need_autheticate = 0;
+        autheticate = config_read("socket_config_autheticate");
+        if ( strcmp( autheticate, "TRUE") || strcmp( autheticate, "true") ) {
+            need_autheticate = 1;
+            username = config_read("socket_config_username");
+            passwd = config_read("socket_config_passwd");
+        }
+        if ( need_autheticate ) {
+            if ( strcmp(username, request.config_username) == 0 &&
+                 strcmp(passwd, request.config_passwd ) == 0 ) {
+                good_request = 1;
+            } else {
+                good_request = 0;
+            }
+        }
+bad_request:
+        if ( good_request  <= 0 ) {
+            //now reply to server socket/the client with the same data
+            memset(&ack, 0, sizeof(struct socket_config_ack));
+            ack.config_cmd = request.config_cmd;
+            ack.config_result = 404;
+            recv_len = sendto(s_config, &ack, sizeof(struct socket_config_ack), 0,
+                       (struct sockaddr*) &si_other, slen);
+            continue;
+        }
+        if ( request.config_cmd == CONFIG_RD ) {
+        } else if ( request.config_cmd == CONFIG_WR ) {
+        } else goto bad_request;
+
+        //now reply to server socket/the client with the same data
+        recv_len = sendto(s_config, &ack, sizeof(struct socket_config_ack), 0,
+                   (struct sockaddr*) &si_other, slen);
+    }
+
+thread_die:
+    if ( s_config != -1  ) {
+        close(s_config);
+    }
+    return NULL;
+}
+
 
 #if CONFIG_DEBUG_CONFIG >= 1
 /*打印配置数据*/

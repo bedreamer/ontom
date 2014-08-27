@@ -220,11 +220,18 @@ static void *thread_uart_service(void *arg)
     }
 }
 
+// 套接字配置服务线程
+// 提供套接字配置，查询服务
+static void *thread_config_service(void *arg)
+{
+    return config_drive_sevice(arg);
+}
+
 int main()
 {
     const char *user_cfg = NULL;
     pthread_t tid = 0;
-    int thread_done[ 4 ] = {0};
+    int thread_done[ 5 ] = {0};
     char buff[32];
 
     // 读取配置文件的顺序必须是
@@ -244,6 +251,15 @@ int main()
         user_cfg = "user.cfg";
     }
     config_initlize(user_cfg);
+
+    // 检查是否需要开启SOCKET端的配置服务器以接受网络端的配置
+    user_cfg = config_read("socket_config");
+    if ( strcmp(user_cfg, "TURE") ||
+         strcmp(user_cfg, "true") ) {
+        pthread_create( & tid, NULL, thread_config_service, NULL);
+        sprintf(buff, "%d", tid);
+        config_write("thread_config_server_id", buff);
+    }
 
     pthread_create( & tid, NULL, thread_xml_service, &thread_done[0]);
     sprintf(buff, "%d", tid);
