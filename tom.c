@@ -131,7 +131,7 @@ static void *thread_bms_service(void *arg)
 
         nbytes = write(s, &frame, sizeof(struct can_frame));
 
-        log_printf(DBG, "TX---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
+        /*(DBG, "TX---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
                     frame.can_id,
                     frame.can_dlc,
                     frame.data[0],
@@ -142,7 +142,7 @@ static void *thread_bms_service(void *arg)
                     frame.data[5],
                     frame.data[6],
                     frame.data[7]
-                );
+                );*/
         sleep(3);
     }
 }
@@ -190,7 +190,7 @@ static void *thread_bms1_service(void *arg)
                 continue;
         }
 
-        log_printf(DBG, "RX---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
+        /*log_printf(DBG, "RX---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
                     frame.can_id,
                     frame.can_dlc,
                     frame.data[0],
@@ -201,7 +201,7 @@ static void *thread_bms1_service(void *arg)
                     frame.data[5],
                     frame.data[6],
                     frame.data[7]
-                );
+                );*/
         sleep(1);
     }
 }
@@ -224,7 +224,7 @@ static void *thread_uart_service(void *arg)
 // 提供套接字配置，查询服务
 static void *thread_config_service(void *arg)
 {
-    return config_drive_sevice(arg);
+    return config_drive_service(arg);
 }
 
 int main()

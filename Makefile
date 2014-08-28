@@ -206,6 +206,9 @@ compiler_clean:
 ut: config.c log.c unit_test.c
 	gcc -g -o $@ $^
 
+onconfig: onconfig.c
+	$(CC) $(CFLAGS) $(INCPATH) -o $@ $^
+
 ####### Compile
 
 mongoose.o: mongoose.c mongoose.h

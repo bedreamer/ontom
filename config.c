@@ -37,6 +37,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <sys/types.h>  /* system data type definitions */
+#include <sys/socket.h> /* socket specific definitions */
+#include <netinet/in.h> /* INET constants and stuff */
+#include <arpa/inet.h>  /* IP address conversion stuff */
 #include "config.h"
 #include "error.h"
 #include "log.h"
@@ -268,7 +272,7 @@ const char *config_read(const char *name)
 	thiz = config_search(name);
 	if ( thiz == NULL ) return NULL;
 	
-	if ( thiz->config_status == C_INVALID ) {
+    if ( thiz->config_status == C_INVALID && thiz->config_user == no ) {
 		log_printf(WRN, "read uninitialized config-item [%s] use default %s", 
 			name, thiz->config_value ? thiz->config_value : "<NULL>");
 	}
@@ -284,7 +288,7 @@ const char *config_write(const char *name, const char *value)
 
 	if ( NULL == name ) return NULL;
 
-	thiz = config_search(name);
+    thiz = config_search(name);
 	if ( thiz == NULL ) return NULL;
 
 #if 0
@@ -414,7 +418,9 @@ void *config_drive_service(void *arg)
     struct sockaddr_in si_me, si_other;
     struct socket_config_request request;
     struct socket_config_ack ack;
-    const char * autheticate, *username, *passwd;
+    const char * autheticate, *username, *passwd, *value;
+    struct config_struct *thiz;
+    int recv_len, slen;
 
     srv_port = atoi(pport);
     if ( srv_port <= 2048 ) {
@@ -444,19 +450,21 @@ void *config_drive_service(void *arg)
 
     while ( ok ) {
         usleep(5000);
+        slen = sizeof(si_other);
+        memset(&ack, 0, sizeof(ack));
         recv_len = recvfrom(s_config, &request,
                  sizeof(struct socket_config_request),
                  0, (struct sockaddr *) &si_other, &slen);
         if ( recv_len <= 0 ) continue;
 
-        request.config_username[ 8 ] = '\0';
+        request.config_username[ 7 ] = '\0';
         request.config_passwd[15] = '0';
         request.config_item_name[31] = '\0';
         request.config_item_value[127] = '\0';
 
         need_autheticate = 0;
         autheticate = config_read("socket_config_autheticate");
-        if ( strcmp( autheticate, "TRUE") || strcmp( autheticate, "true") ) {
+        if ( 0 == strcmp( autheticate, "TRUE") || 0 == strcmp( autheticate, "true") ) {
             need_autheticate = 1;
             username = config_read("socket_config_username");
             passwd = config_read("socket_config_passwd");
@@ -466,26 +474,106 @@ void *config_drive_service(void *arg)
                  strcmp(passwd, request.config_passwd ) == 0 ) {
                 good_request = 1;
             } else {
+                ack.config_result = 300;
                 good_request = 0;
+                log_printf(INF, "autheticate faile, user: %s, passwd: %s",
+                           request.config_username, request.config_passwd);
+                goto bad_request;
             }
         }
+
+        if ( request.config_cmd != CONFIG_RD &&
+             request.config_cmd != CONFIG_WR ) {
+            ack.config_result = 505;
+            good_request = 0;
+            goto bad_request;
+        }
+
+        thiz = NULL;
+        // 读配置数据可以使用索引或是数据名，数据名优先
+        if ( request.config_item_name[0] != '\0' ) {
+            thiz = config_search(request.config_item_name);
+        }
+
+        if ( request.config_cmd == CONFIG_RD ) {
+            if ( thiz == NULL ) {
+                if ( request.config_item_index >=
+                     sizeof(configs)/sizeof(struct config_struct)) {
+                    ack.config_result = 404;
+                    good_request = 0;
+                    goto bad_request;
+                } else {
+                    thiz = &configs[ request.config_item_index ];
+                }
+            }
+            if ( thiz->config_name == NULL ) {
+                ack.config_result = 404;
+                good_request = 0;
+                log_printf(DBG, "read the last config item.");
+                goto bad_request;
+            }
+            ack.config_cmd = CONFIG_RD;
+            ack.config_result = 0;
+            strncpy(ack.config_name, thiz->config_name, 31);
+            ack.config_name[31] = '\0';
+            ack.config_status = thiz->config_status;
+            ack.config_type = thiz->config_type;
+            ack.config_user = thiz->config_user;
+            strncpy(ack.config_value, thiz->config_value, 127);
+            ack.config_value[127] = '\0';
+        }
+        if ( request.config_cmd == CONFIG_WR ) {
+            if ( thiz == NULL ) {
+                ack.config_result = 404;
+                log_printf(DBG, "not found %s to write",
+                           request.config_item_name);
+                good_request = 0;
+                goto bad_request;
+            }
+            if ( thiz->config_type != request.config_item_type ) {
+                ack.config_result = 404;
+                log_printf(DBG, "type conflict.");
+                good_request = 0;
+                goto bad_request;
+            }
+            request.config_item_value[ 127 ] = '\0';
+            request.config_item_name[ 31 ] = '\0';
+            value =
+             config_write(request.config_item_name, request.config_item_value);
+            if ( NULL == value ) {
+                ack.config_result = 303;
+                good_request = 0;
+                log_printf(DBG, "write value faile.");
+                goto bad_request;
+            }
+            ack.config_cmd = CONFIG_WR;
+            ack.config_result = 0;
+            strncpy(ack.config_name, thiz->config_name, 31);
+            ack.config_name[31] = '\0';
+            ack.config_status = thiz->config_status;
+            ack.config_type = thiz->config_type;
+            ack.config_user = thiz->config_user;
+            strncpy(ack.config_value, thiz->config_value, 127);
+            ack.config_value[127] = '\0';
+        }
+        recv_len = sendto(s_config, &ack, sizeof(struct socket_config_ack),
+                          0, (struct sockaddr*) &si_other, slen);
+        //log_printf(DBG, "send %d bytes", recv_len);
+        continue;
 bad_request:
+        log_printf(DBG, "bad request.user: %s, passwd: %s, name:%s, give: %s",
+                   request.config_username, request.config_passwd,
+                   request.config_item_name, request.config_item_value);
         if ( good_request  <= 0 ) {
             //now reply to server socket/the client with the same data
-            memset(&ack, 0, sizeof(struct socket_config_ack));
             ack.config_cmd = request.config_cmd;
-            ack.config_result = 404;
-            recv_len = sendto(s_config, &ack, sizeof(struct socket_config_ack), 0,
-                       (struct sockaddr*) &si_other, slen);
+            if ( ack.config_result == 0 ) {
+                ack.config_result = 500;
+            }
+            recv_len = sendto(s_config, &ack, sizeof(struct socket_config_ack),
+                              0, (struct sockaddr*) &si_other, slen);
             continue;
         }
-        if ( request.config_cmd == CONFIG_RD ) {
-        } else if ( request.config_cmd == CONFIG_WR ) {
-        } else goto bad_request;
-
-        //now reply to server socket/the client with the same data
-        recv_len = sendto(s_config, &ack, sizeof(struct socket_config_ack), 0,
-                   (struct sockaddr*) &si_other, slen);
     }
 
 thread_die:
