@@ -56,8 +56,6 @@ CONFIG_DOMAIN_BEGIN
 {"socket_config", 				C_BOOL,		no,		C_INVALID,  .cuv.b=true,    {"TRUE"}},
 {"socket_config_port", 			C_INT,		no,		C_INVALID,  .cuv.i=9990,    {"9990"}},
 {"socket_config_autheticate", 	C_BOOL,     no,		C_INVALID,  .cuv.n=0,       {"TRUE"}},
-{"socket_config_username", 		C_STRING,	no,		C_INVALID,  .cuv.n=0,       {"god"}},
-{"socket_config_passwd", 		C_STRING,	no,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"version_httpd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"version_browser",             C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"version_tomd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
@@ -65,12 +63,14 @@ CONFIG_DOMAIN_BEGIN
 {"manual_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
 {"system_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
-// 系统参数不应该出现在配置文件中, 仅供程序内部使用
+// 系统参数不应该出现在配置文件中, 仅供程序内部使用, 不公开
 {"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_bms_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 用户配置数据
+{"socket_config_username", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
+{"socket_config_passwd", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"charge_pile_serial",          C_STRING,  yes,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"price",                       C_FLOAT,   yes,     C_INVALID,  .cuv.f=0.0f,    {"0.0"}},
 CONFIG_DOMAIN_END

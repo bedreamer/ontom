@@ -228,7 +228,7 @@ int main(int argc, char**argv)
        requst.config_username[7] = '\0';
        strncpy(requst.config_passwd, passwd, 15);
        requst.config_passwd[15] = '\0';
-       printf("config_item_name: %s:%s\n",requst.config_item_name, name);
+       //printf("config_item_name: %s:%s\n",requst.config_item_name, name);
        sendto(sockfd, &requst, sizeof(requst),0,
               (struct sockaddr *)&servaddr,sizeof(servaddr));
        n=recvfrom(sockfd, &ack, sizeof(ack), 0, NULL, NULL);
