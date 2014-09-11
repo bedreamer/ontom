@@ -65,7 +65,8 @@ CONFIG_DOMAIN_BEGIN
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
 // 系统参数不应该出现在配置文件中, 仅供程序内部使用, 不公开
 {"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
-{"thread_bms_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"thread_bms_write_service",    C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"thread_bms_read_service",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 用户配置数据

@@ -13,26 +13,35 @@
  * 充电任务描述
  */
 struct charge_task {
-    /* 充电任务编号，唯一
-       充电编号由时间构成，由系统自动生成, 共计32位
-       charge_sn
-          [26:31]: 年（1975年-2039年）
-          [22:25]: 月（1-12）
-          [17:21]: 日(1-31)
-          [12:16]: 时（0-23）
-          [6:11]: 分（0-59）
-          [0:5]:  秒（0-59）
+    /* 充电任务编号，唯一，创建充电任务的那一刻
     */
-    unsigned int charge_sn;
-    // 充电起始时间，位定义同charge_sn
-    unsigned int charge_begin;
-    // 充电结束时间，位定义同charge_sn
-    unsigned int charge_stop;
+    time_t charge_sn;
+    // 充电起始时戳， 闭合充电开关的那一刻
+    time_t charge_begin_timestamp;
+    // 充电结束时戳， 断开充电开关的那一刻
+    time_t charge_stop_timestamp;
+    // 转为实施状态时的时戳, 执行实施函数的那一刻
+    time_t charge_implemention_timestamp;
+    // BMS握手成功的时戳, 接收到第一次BRM的时刻
+    time_t charge_bms_establish_timestamp;
+    #define INVALID_TIMESTAMP  0xFFFFFFFF // 无效时戳，初始化时默认赋值
 
     // 充电结果
     unsigned int charge_result;
+    // 充电阶段
+    unsigned int charge_stage;
+    #define CHARGE_INVALID      0x00 // 充电状态无效，可能是在初始化或者析构
+    #define CHARGE_HANDSHACKING 0x01 // 充电握手
+    #define CHARGE_CONFIGURE    0x02 // 充电配置
+    #define CHARGE_CHARGING     0x03 // 充电
+    #define CHARGE_DONE         0x04 // 充电结束
 };
 
-
+// 创建充电任务
+struct charge_task * charge_task_create(void);
+// 实施充电任务
+void charge_task_implemention(struct charge_task *thiz);
+// 析构充电任务
+void charge_task_destroy(struct charge_task *thiz);
 
 #endif /*_CHARGE_INCLUDED_H_*/

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <time.h>
 #include <net/if.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -95,9 +96,9 @@ static void *thread_xml_service(void *arg)
     return NULL;
 }
 
-// bms 服务线程
+// bms 通信 写 服务线程
 // 提供bms通信服务
-static void *thread_bms_service(void *arg)
+static void *thread_bms_write_service(void *arg)
 {
     int *done = (int *)arg;
     int mydone = 0;
@@ -152,9 +153,9 @@ static void *thread_bms_service(void *arg)
     }
 }
 
-// bms 服务线程
+// bms 通信 读 服务线程
 // 提供bms通信服务
-static void *thread_bms1_service(void *arg)
+static void *thread_bms_read_service(void *arg)
 {
     int *done = (int *)arg;
     int mydone = 0;
@@ -172,9 +173,7 @@ static void *thread_bms1_service(void *arg)
 
     addr.can_family = PF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
-    log_printf(INF, "%s RX:TX = %X:%X",
-               __FUNCTION__,
-               addr.can_addr.tp.rx_id,
+    log_printf(INF, "%s RX:TX = %X:%X", __FUNCTION__, addr.can_addr.tp.rx_id,
                addr.can_addr.tp.tx_id);
 
     bind(s, (struct sockaddr *)&addr, sizeof(addr));
@@ -226,6 +225,11 @@ static void *thread_config_service(void *arg)
     return config_drive_service(arg);
 }
 
+static void ontom_timer_sig()
+{
+
+}
+
 int main()
 {
     const char *user_cfg = NULL;
@@ -263,11 +267,11 @@ int main()
     pthread_create( & tid, NULL, thread_xml_service, &thread_done[0]);
     sprintf(buff, "%d", tid);
     config_write("thread_xml_server_id", buff);
-    pthread_create( & tid, NULL, thread_bms_service, &thread_done[1]);
+    pthread_create( & tid, NULL, thread_bms_write_service, &thread_done[1]);
     sprintf(buff, "%d", tid);
-    config_write("thread_bms_server_id", buff);
-    pthread_create( & tid, NULL, thread_bms1_service, &thread_done[2]);
-    config_write("thread_bms1_server_id", buff);
+    config_write("thread_bms_write_service", buff);
+    pthread_create( & tid, NULL, thread_bms_read_service, &thread_done[2]);
+    config_write("thread_bms_read_service", buff);
     pthread_create( & tid, NULL, thread_uart_service, &thread_done[3]);
     sprintf(buff, "%d", tid);
     config_write("thread_uart_server_id", buff);
