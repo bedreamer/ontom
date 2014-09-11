@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <unistd.h>
 #include <sys/types.h>  /* system data type definitions */
 #include <sys/socket.h> /* socket specific definitions */
 #include <netinet/in.h> /* INET constants and stuff */
@@ -199,11 +200,11 @@ int main(int argc, char**argv)
        requst.config_cmd = cmd;
        requst.config_item_index = 0;
        requst.config_item_type = 0;
-       strncpy(requst.config_item_name, name, 31);
+       strncpy((char*)requst.config_item_name, name, 31);
        requst.config_item_name[31] = '\0';
-       strncpy(requst.config_username, username, 7);
+       strncpy((char*)requst.config_username, username, 7);
        requst.config_username[7] = '\0';
-       strncpy(requst.config_passwd, passwd, 15);
+       strncpy((char*)requst.config_passwd, passwd, 15);
        requst.config_passwd[15] = '\0';
        sendto(sockfd, &requst, sizeof(requst),0,
               (struct sockaddr *)&servaddr,sizeof(servaddr));
@@ -218,15 +219,15 @@ int main(int argc, char**argv)
        requst.config_item_index = 0;
        requst.config_item_type = type;
 
-       strncpy(requst.config_item_name, name, 31);
+       strncpy((char*)requst.config_item_name, name, 31);
        requst.config_item_name[31] = '\0';
 
-       strncpy(requst.config_item_value, value, 127);
+       strncpy((char*)requst.config_item_value, value, 127);
        requst.config_item_value[127] = '\0';
 
-       strncpy(requst.config_username, username, 7);
+       strncpy((char*)requst.config_username, username, 7);
        requst.config_username[7] = '\0';
-       strncpy(requst.config_passwd, passwd, 15);
+       strncpy((char*)requst.config_passwd, passwd, 15);
        requst.config_passwd[15] = '\0';
        //printf("config_item_name: %s:%s\n",requst.config_item_name, name);
        sendto(sockfd, &requst, sizeof(requst),0,
@@ -280,7 +281,7 @@ int main(int argc, char**argv)
        fprintf(stdout, "\t-H, --HOST: host ip address.\n");
        fprintf(stdout, "\t-P, --port: host port.\n");
        fprintf(stdout, "\t--noecho: no result echo.\n");
-       fprintf(stdout, "AUTHOR:\n\tLiJie <bedreamer@163.com> 2014-08-28\n");
+       fprintf(stdout, "AUTHOR:\n\tLiJie <bedreamer@163.com> %s\n", __DATE__);
        break;
    }
 

@@ -28,6 +28,7 @@ struct charge_task * charge_task_create(void)
 
     log_printf(INF, "charge task created, serial number: %08X",
                thiz->charge_sn);
+    // 必须在一开始就设置该值，保证唯一性
     thiz->charge_sn = time();
     return thiz;
 }
@@ -42,4 +43,17 @@ void charge_task_implemention(struct charge_task *thiz)
 // 析构充电任务
 void charge_task_destroy(struct charge_task *thiz)
 {
+}
+
+// 充电任务服务线程
+void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
+{
+    int *done = (int *)arg;
+    int mydone = 0;
+    if ( done == NULL ) done = &mydone;
+    log_printf(INF, "%s running...", __FUNCTION__);
+
+    while ( ! *done ) {
+        usleep(5000);
+    }
 }

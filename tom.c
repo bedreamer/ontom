@@ -19,194 +19,17 @@
 #include "config.h"
 #include "error.h"
 #include "log.h"
-
-static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
-    int result = MG_FALSE, err;
-    struct ajax_xml_struct thiz = {0};
-    thiz.xml_conn = conn;
-    if (ev == MG_REQUEST) {
-        log_printf(DBG, "%s", conn->uri);
-        strncpy(thiz.xml_name, conn->uri, 31);
-        err = ajax_gen_xml( & thiz );
-        if ( err == ERR_OK ) {
-            log_printf(DBG, "prepare...");
-            mg_printf(conn,
-                      "HTTP/1.1 200 HTTP\r\n"
-                      "Server: thttpd/2.21b PHP/20030920\r\n"
-                      "Access-Control-Allow-Origin: *\r\n"
-                      "Content-Type: text/xml\r\n"
-                      "Date: Wed, 20 Aug 2014 03:29:12 GMT\r\n"
-                      "Last-Modified: Tue, 19 Aug 2014 09:23:50 GMT\r\n"
-                      "Accept-Ranges: bytes\r\n"
-                      "Content-Length: %d\r\n"
-                      "Connection: keep-alive\r\n"
-                      "\r\n", thiz.xml_len);
-            mg_write(conn, thiz.iobuff, thiz.xml_len);
-            log_printf(DBG, "done");
-        } else {
-            mg_printf(conn,
-                      "HTTP/1.1 404 Not Found\r\n"
-                      "Date: Fri, 22 Aug 2014 06:38:28 GMT\r\n"
-                      "Server: Apache\r\n"
-                      "Access-Control-Allow-Origin: *\r\n"
-                      "Keep-Alive: timeout=3\r\n"
-                      "Connection: Keep-Alive\r\n"
-                      "Content-Type: text/html\r\n"
-                      "Content-Length: 328\r\n"
-                      "\r\n"
-                      "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n"
-                      "<html><head>\r\n"
-                      "<title>404 Not Found</title>\r\n"
-                      "</head><body>\r\n"
-                      "<h1>Not Found</h1>\r\n"
-                      "<p>The requested URL /version.xml was not found on this server.</p>\r\n"
-                      "<p>Additionally, a 404 Not Found\r\n"
-                      "error was encountered while trying to use an ErrorDocument to handle the request.</p>\r\n"
-                      "</body></html>\r\n\r\n"
-            );
-        }
-        result = MG_TRUE;
-    } else if (ev == MG_AUTH) {
-        result = MG_TRUE;
-    }
-
-  return result;
-}
-
-// xml 服务线程
-// 提供xml文件输出，设置参数输入服务
-static void *thread_xml_service(void *arg)
-{
-    int *done = (int *)arg;
-    int mydone = 0;
-    struct mg_server *server;
-    if ( done == NULL ) done = &mydone;
-
-    log_printf(INF, "%s running...", __FUNCTION__);
-    server = mg_create_server(NULL, ev_handler);
-    mg_set_option(server, "listening_port", "8081");
-
-    printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
-    for (; ! *done; ) {
-        mg_poll_server(server, 1000);
-    }
-    mg_destroy_server(&server);
-
-    log_printf(INF, "%s exit.", __FUNCTION__);
-    return NULL;
-}
-
-// bms 通信 写 服务线程
-// 提供bms通信服务
-static void *thread_bms_write_service(void *arg)
-{
-    int *done = (int *)arg;
-    int mydone = 0;
-    if ( done == NULL ) done = &mydone;
-
-    int s, ti = 0;
-    struct sockaddr_can addr;
-    struct ifreq ifr;
-    struct can_frame frame;
-    s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    int nbytes;
-
-    strcpy(ifr.ifr_name, "can0" );
-    ioctl(s, SIOCGIFINDEX, &ifr);
-
-    addr.can_family = PF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
-    log_printf(INF, "%s RX:TX = %X:%X",
-               __FUNCTION__,
-               addr.can_addr.tp.rx_id,
-               addr.can_addr.tp.tx_id);
-
-    bind(s, (struct sockaddr *)&addr, sizeof(addr));
-
-    log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
-    while ( ! *done ) {
-        frame.can_id  = 0x188 | CAN_EFF_FLAG;
-        frame.can_dlc = 5;
-        frame.data[0] = 0x11;
-        frame.data[1] = 0x11;
-        frame.data[2] = 0x11;
-        frame.data[3] = 0x11;
-        frame.data[4] = 0x11;
-        frame.data[5] = 0x11;
-
-        nbytes = write(s, &frame, sizeof(struct can_frame));
-
-        log_printf(DBG, "TX%d---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
-                    ti++,
-                    frame.can_id,
-                    nbytes,
-                    frame.data[0],
-                    frame.data[1],
-                    frame.data[2],
-                    frame.data[3],
-                    frame.data[4],
-                    frame.data[5],
-                    frame.data[6],
-                    frame.data[7]
-                );
-        usleep(90000);
-    }
-}
-
-// bms 通信 读 服务线程
-// 提供bms通信服务
-static void *thread_bms_read_service(void *arg)
-{
-    int *done = (int *)arg;
-    int mydone = 0;
-    if ( done == NULL ) done = &mydone;
-
-    int s, ti = 0;
-    struct sockaddr_can addr;
-    struct ifreq ifr;
-    struct can_frame frame;
-    s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    int nbytes;
-
-    strcpy(ifr.ifr_name, "can0" );
-    ioctl(s, SIOCGIFINDEX, &ifr);
-
-    addr.can_family = PF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
-    log_printf(INF, "%s RX:TX = %X:%X", __FUNCTION__, addr.can_addr.tp.rx_id,
-               addr.can_addr.tp.tx_id);
-
-    bind(s, (struct sockaddr *)&addr, sizeof(addr));
-
-    log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
-    while ( ! *done ) {
-        frame.can_id  = 0x133 | CAN_EFF_FLAG;
-        frame.can_dlc = 2;
-        frame.data[0] = 0x02;
-        frame.data[1] = 0x02;
-
-        nbytes = write(s, &frame, sizeof(struct can_frame));
-
-        log_printf(DBG, "TX%d---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
-                    ti++,
-                    frame.can_id,
-                    nbytes,
-                    frame.data[0],
-                    frame.data[1],
-                    frame.data[2],
-                    frame.data[3],
-                    frame.data[4],
-                    frame.data[5],
-                    frame.data[6],
-                    frame.data[7]
-                );
-        usleep(90000);
-    }
-}
+extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
+extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;
+extern void * thread_bms_read_service(void *) ___THREAD_ENTRY___;
+extern void * thread_measure_service(void *) ___THREAD_ENTRY___;
+extern void * thread_charger_service(void *) ___THREAD_ENTRY___;
+extern void * thread_backgroud_service(void *) ___THREAD_ENTRY___;
+extern void * thread_charge_task_service(void *) ___THREAD_ENTRY___;
 
 // 串口通信 服务线程
 // 提供串口通信服务
-static void *thread_uart_service(void *arg)
+void *thread_measure_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
@@ -218,13 +41,33 @@ static void *thread_uart_service(void *arg)
     }
 }
 
-// 套接字配置服务线程
-// 提供套接字配置，查询服务
-static void *thread_config_service(void *arg)
+// 充电机通信服务线程
+void *thread_charger_service(void *arg) ___THREAD_ENTRY___
 {
-    return config_drive_service(arg);
+    int *done = (int *)arg;
+    int mydone = 0;
+    if ( done == NULL ) done = &mydone;
+    log_printf(INF, "%s running...", __FUNCTION__);
+
+    while ( ! *done ) {
+        usleep(5000);
+    }
 }
 
+// 后台通信服务线程
+void *thread_backgroud_service(void *arg) ___THREAD_ENTRY___
+{
+    int *done = (int *)arg;
+    int mydone = 0;
+    if ( done == NULL ) done = &mydone;
+    log_printf(INF, "%s running...", __FUNCTION__);
+
+    while ( ! *done ) {
+        usleep(5000);
+    }
+}
+
+// 定时器
 static void ontom_timer_sig()
 {
 
@@ -234,8 +77,9 @@ int main()
 {
     const char *user_cfg = NULL;
     pthread_t tid = 0;
-    int thread_done[ 5 ] = {0};
+    int thread_done[ 7 ] = {0};
     char buff[32];
+    int errcode = 0, ret;
 
     // 读取配置文件的顺序必须是
     // 1. 系统配置文件
@@ -259,29 +103,96 @@ int main()
     user_cfg = config_read("socket_config");
     if ( strcmp(user_cfg, "TURE") ||
          strcmp(user_cfg, "true") ) {
-        pthread_create( & tid, NULL, thread_config_service, NULL);
+        pthread_create( & tid, NULL, config_drive_service, NULL);
         sprintf(buff, "%d", tid);
         config_write("thread_config_server_id", buff);
     }
 
-    pthread_create( & tid, NULL, thread_xml_service, &thread_done[0]);
-    sprintf(buff, "%d", tid);
-    config_write("thread_xml_server_id", buff);
-    pthread_create( & tid, NULL, thread_bms_write_service, &thread_done[1]);
-    sprintf(buff, "%d", tid);
-    config_write("thread_bms_write_service", buff);
-    pthread_create( & tid, NULL, thread_bms_read_service, &thread_done[2]);
-    config_write("thread_bms_read_service", buff);
-    pthread_create( & tid, NULL, thread_uart_service, &thread_done[3]);
-    sprintf(buff, "%d", tid);
-    config_write("thread_uart_server_id", buff);
+    // mongoose 线程，用来处理AJAX请求，解析由客户提交的请求，返回应答的xml文件或其他数据
+    ret = pthread_create( & tid, NULL, thread_xml_service, &thread_done[0]);
+    if ( 0 != ret ) {
+        errcode  = 0x1000;
+        log_printf(ERR,
+                   "mongoose service start up.                     FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "mongoose service start up.                         DONE.");
+
+    // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
+    ret = pthread_create( & tid, NULL, thread_bms_write_service,
+                          &thread_done[1]);
+    if ( 0 != ret ) {
+        errcode  = 0x1001;
+        log_printf(ERR,
+                   "CAN-BUS reader start up.                       FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "CAN-BUS reader start up.                           DONE.");
+
+    // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
+    ret = pthread_create( & tid, NULL, thread_bms_read_service,
+                          &thread_done[2]);
+    if ( 0 != ret ) {
+        errcode  = 0x1002;
+        log_printf(ERR,
+                   "CAN-BUS writer start up.                       FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "CAN-BUS writer start up.                           DONE.");
+
+    // 串口服务线程，和读卡器，采样盒，电能表进行数据交换，测量
+    ret = pthread_create( & tid, NULL, thread_measure_service, &thread_done[3]);
+    if ( 0 != ret ) {
+        errcode  = 0x1003;
+        log_printf(ERR,
+                   "EX-measure service start up.                   FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "EX-measure service start up.                       DONE.");
+
+    // 串口服务线程，和充电机进行通信
+    ret = pthread_create( & tid, NULL, thread_charger_service,
+                          &thread_done[4]);
+    if ( 0 != ret ) {
+        errcode  = 0x1004;
+        log_printf(ERR,
+                   "charger service start up.                      FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "charger service start up.                          DONE.");
+
+    // 后台通信线程
+    ret = pthread_create( & tid, NULL, thread_backgroud_service,
+                          &thread_done[5]);
+    if ( 0 != ret ) {
+        errcode  = 0x1004;
+        log_printf(ERR,
+                   "backgroud service start up.                    FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "backgroud service start up.                        DONE.");
+
+    // 充电线程，负责充电逻辑
+    ret = pthread_create( & tid, NULL, thread_charge_task_service,
+                          &thread_done[6]);
+    if ( 0 != ret ) {
+        errcode  = 0x1005;
+        log_printf(ERR,
+                   "charge service start up.                       FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "charge service start up.                           DONE.");
+
 
 #if CONFIG_DEBUG_CONFIG >= 1
     config_print();
 #endif
+    // 主循环中放置看门狗代码
     for ( ;; ) {
         sleep(1);
     }
-
-	return 0;
+    return 0;
+die:
+    log_printf(ERR, "going to die. system aborted!");
+    return errcode;
 }

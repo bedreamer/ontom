@@ -44,9 +44,9 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = mongoose.c \
-		tom.c ajax.c bms.c config.c log.c
+		tom.c ajax.c bms.c config.c log.c charge.c
 OBJECTS       = mongoose.o \
-		tom.o ajax.o bms.o config.o log.o
+		tom.o ajax.o bms.o config.o log.o charge.o
 DIST          = ../qt-4.8.2-arm/mkspecs/common/unix.conf \
 		../qt-4.8.2-arm/mkspecs/common/linux.conf \
 		../qt-4.8.2-arm/mkspecs/common/gcc-base.conf \
@@ -206,8 +206,11 @@ compiler_clean:
 ut: config.c log.c unit_test.c
 	gcc -g -o $@ $^
 
-onconfig: onconfig.c
+onconfig-arm: onconfig.c
 	$(CC) $(CFLAGS) $(INCPATH) -o $@ $^
+
+onconfig-i386: onconfig.c
+	gcc -o $@ $^
 
 ####### Compile
 
