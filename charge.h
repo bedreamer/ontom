@@ -10,7 +10,43 @@
 #define _CHARGE_INCLUDED_H_
 
 #include "bms.h"
-#define INVALID_TIMESTAMP  0x00000000 // 无效时戳，初始化时默认赋值， 用于time_t默认值
+// 无效时戳，初始化时默认赋值， 用于time_t默认值
+#define INVALID_TIMESTAMP  0x00000000
+
+/* 卡信息
+ * 三个阶段分别用三个缓冲区来存储卡号的目的是
+ * 为了可以用某些特殊的卡，也就是万能卡号实现终止充电任务中的操作
+ * 例如：
+ *  使用卡号为 7667987878 的普通卡号触发了充电任务和确认充电
+ *  可以使用   8888888888 的管理员卡进行终止充电操作
+ *  另外，该冗余设计可以在UI 界面进行刷卡问询时，通过判定卡号是否一致
+ *  来进行出错提示。
+ */
+struct user_card {
+    // 触发任务时的卡号
+    char begin_card_sn[64];
+    // 触发充电任务时的刷卡时戳
+    time_t begin_timestamp;
+    // UI界面确认刷卡时戳
+    time_t begin_synced;
+
+    // 确认充电时的卡号
+    char confirm_card_sn[64];
+    // 确认充电任务的刷卡时戳
+    time_t confirm_timestamp;
+    // UI界面确认刷卡时戳
+    time_t confirm_synced;
+
+    // 终止充电时的卡号
+    char end_card_sn[64];
+    // 终止充电任务的刷卡时戳
+    time_t end_timestamp;
+    // UI界面确认刷卡时戳
+    time_t end_synced;
+
+    // 卡私有信息
+    void *private;
+};
 
 // 充电扩展测量结果
 struct charge_ex_measure {
@@ -27,23 +63,19 @@ struct charge_ex_measure {
     double wet_degree;
 };
 
-// 充电阶段定义
-typedef enum {
-    CHARGE_STAGE_INVALID      =0x00, // 充电状态无效，可能是在初始化或者析构
-    CHARGE_STAGE_HANDSHACKING =0x01, // 充电握手
-    CHARGE_STAGE_CONFIGURE    =0x02, // 充电配置
-    CHARGE_STAGE_CHARGING     =0x03, // 充电
-    CHARGE_STAGE_DONE         =0x04 // 充电结束
-}CHARGE_STAGE;
-
 // 充电计费模式
 typedef enum {
-    CHARGE_MODE_INVALID    =0x00,  // 无效充电模式，默认值
-    CHARGE_MODE_AS_AUTO    =0x01,  // 自动充电
-    CHARGE_MODE_AS_MONEY   =0x02,  // 按金额充电
-    CHARGE_MODE_AS_TIME    =0x03,  // 按时间充电
-    CHARGE_MODE_AS_CAP     =0x04  // 按容量充电
-}CHARGE_MODE;
+    // 无效充电模式，默认值
+    CHARGE_MODE_INVALID    =0x00,
+    // 自动充电
+    CHARGE_MODE_AS_AUTO    =0x01,
+    // 按金额充电
+    CHARGE_MODE_AS_MONEY   =0x02,
+    // 按时间充电
+    CHARGE_MODE_AS_TIME    =0x03,
+    // 按容量充电
+    CHARGE_MODE_AS_CAP     =0x04
+}BILLING_MODE;
 
 // 充电任务 状态
 typedef enum {
@@ -61,16 +93,31 @@ typedef enum {
     CHARGE_STAT_READY        =0x05,
     // 充电阶段
     CHARGE_STAT_CHARGING     =0x06,
+    // 充电结束阶段
+    CHARGE_STAT_DONE         =0x07,
     // 充电异常退出
     CHARGE_STAT_EXCEPTION    =0xFF
 }CHARGE_TASK_STAT;
+
+// 充电阶段定义
+typedef enum {
+    // 充电状态无效，可能是在初始化或者析构
+    CHARGE_STAGE_INVALID      =0x00,
+    // 充电握手
+    CHARGE_STAGE_HANDSHACKING =0x01,
+    // 充电配置
+    CHARGE_STAGE_CONFIGURE    =0x02,
+    // 充电
+    CHARGE_STAGE_CHARGING     =0x03,
+    // 充电结束
+    CHARGE_STAGE_DONE         =0x04
+}CHARGE_STAGE;
 
 /*
  * 充电任务描述
  */
 struct charge_task {
-    /* 充电任务编号，唯一，创建充电任务的那一刻
-    */
+    // 充电任务编号，唯一，创建充电任务的那一刻
     time_t charge_sn;
     // 充电起始时戳， 闭合充电开关的那一刻
     time_t charge_begin_timestamp;
@@ -82,17 +129,14 @@ struct charge_task {
     time_t charge_bms_establish_timestamp;
 
     // 任务状态
-    CHARGE_TASK_STAT charge_task_state;
-
-    // 充电结果
-    unsigned int charge_result;
-    // 充电阶段
+    CHARGE_TASK_STAT charge_task_stat;
+    // 充电任务所处阶段
     CHARGE_STAGE charge_stage;
 
-    // 充电模式
+    // 充电计费
     struct {
-        // 充电方式
-        CHARGE_MODE mode;
+        // 计费方式
+        BILLING_MODE mode;
         union {
             // 设定充电金额, 0 - 9999
             double set_money;
@@ -100,8 +144,17 @@ struct charge_task {
             unsigned int set_time;
             // 设定充电目标容量, 0 - 100
             unsigned int set_cap;
-        };
-    }charge_mode;
+        }option;
+    }charge_billing;
+
+    /* 刷卡信息
+     * 该结构主要包含若干卡信息，最基本的信息是卡号
+     * 正常充电需要刷卡三次，
+     * 第一次： 触发系统开始一个新的充电任务
+     * 第二次： 确认实施充电任务
+     * 第三次： 终止充电任务并计费
+     */
+    struct user_card card;
 
     // 扩展测量值
     struct charge_ex_measure *ex_measure;
@@ -114,6 +167,10 @@ struct charge_task {
     struct pgn1536_BCP bms_config_info;
     // BMS当前充电需求信息
     struct pgn4096_BCL bms_charge_need_now;
+    // BMS 电池充电总状态信息
+    //struct pgn4352_BCS bms_all_battery_status;
+    // BMS 动力蓄电池状态信息
+    //struct pgn4864_BSM bms_battery_status;
 };
 
 // 创建充电任务

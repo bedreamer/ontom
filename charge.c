@@ -8,6 +8,9 @@
 #include "log.h"
 #include "error.h"
 
+// 充电任务结构
+struct charge_task *task = NULL;
+
 // 创建充电任务
 struct charge_task * charge_task_create(void)
 {
@@ -20,7 +23,8 @@ struct charge_task * charge_task_create(void)
     }
 
     memset(thiz, 0, sizeof(struct charge_task));
-    thiz->charge_stage = CHARGER_INVALID;
+    thiz->charge_sn = INVALID_TIMESTAMP;
+    thiz->charge_stage = CHARGE_STAGE_INVALID;
     thiz->charge_begin_timestamp = INVALID_TIMESTAMP;
     thiz->charge_implemention_timestamp = INVALID_TIMESTAMP;
     thiz->charge_bms_establish_timestamp = INVALID_TIMESTAMP;
@@ -28,8 +32,6 @@ struct charge_task * charge_task_create(void)
 
     log_printf(INF, "charge task created, serial number: %08X",
                thiz->charge_sn);
-    // 必须在一开始就设置该值，保证唯一性
-    thiz->charge_sn = time();
     return thiz;
 }
 
@@ -45,6 +47,16 @@ void charge_task_destroy(struct charge_task *thiz)
 {
 }
 
+// 等待首次刷卡，触发创建充电任务事件
+static inline void wait_for_triger_charge_task(struct charge_task *thiz)
+{
+    while ( thiz->card.begin_timestamp == INVALID_TIMESTAMP ||
+            thiz->card.begin_synced == INVALID_TIMESTAMP ) {
+        // 休眠 500 微秒
+        usleep(500);
+    }
+}
+
 // 充电任务服务线程
 void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
@@ -53,7 +65,23 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     if ( done == NULL ) done = &mydone;
     log_printf(INF, "%s running...", __FUNCTION__);
 
+    task = charge_task_create();
+    if ( task == NULL ) {
+        log_printf(ERR, "default task struct create faile, panic!");
+        while ( ! *done ) {
+            sleep(1);
+        }
+        return NULL;
+    }
+
     while ( ! *done ) {
+        // 等待刷卡触发充电任务
+        wait_for_triger_charge_task(task);
         usleep(5000);
     }
+
+    if ( task ) {
+        charge_task_destroy( task );
+    }
+    return NULL;
 }

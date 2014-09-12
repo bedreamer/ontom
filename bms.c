@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <malloc.h>
 #include <net/if.h>
 #include <sys/types.h>
@@ -53,7 +54,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         frame.data[5] = 0x11;
 
         nbytes = write(s, &frame, sizeof(struct can_frame));
-
+#if 0
         log_printf(DBG, "TX%d---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
                     ti++,
                     frame.can_id,
@@ -67,6 +68,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                     frame.data[6],
                     frame.data[7]
                 );
+#endif
         usleep(90000);
     }
 }
@@ -104,7 +106,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         frame.data[1] = 0x02;
 
         nbytes = write(s, &frame, sizeof(struct can_frame));
-
+#if 0
         log_printf(DBG, "TX%d---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
                     ti++,
                     frame.can_id,
@@ -118,6 +120,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     frame.data[6],
                     frame.data[7]
                 );
+#endif
         usleep(90000);
     }
 }

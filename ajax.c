@@ -14,12 +14,14 @@ int ajax_battery_status_xml_proc(struct ajax_xml_struct *);
 int ajax_alarm_xml_proc(struct ajax_xml_struct *);
 int ajax_version_xml_proc(struct ajax_xml_struct *);
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
+int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz);
+int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz);
 
 struct xml_generator {
 	// xml 文件名
 	char * xml_name;
 	// xml 生成过程地址
-	int (*xml_gen_proc)(struct ajax_xml_struct *);
+    int (*xml_gen_proc)(struct ajax_xml_struct *);
 }xmls[]={
     {"/deal.xml",               ajax_deal_xml_proc},
     {"/chargestatus.xml",       ajax_charge_status_xml_proc},
@@ -27,6 +29,8 @@ struct xml_generator {
     {"/alarm.xml",              ajax_alarm_xml_proc},
     {"/version.xml",            ajax_version_xml_proc},
     {"/autheticate.xml",        ajax_autheticate_xml_proc},
+    {"/querycard.xml",          ajax_query_card_xml_proc},
+    {"/confirm.xml",            ajax_confirm_charge_xml_proc},
     {"", NULL}
 };
 
@@ -35,16 +39,96 @@ int ajax_gen_xml(struct ajax_xml_struct *thiz)
 {
 	if ( thiz == NULL ) return ERR_WRONG_PARAM;
 	else {
-		struct xml_generator *cursor = xmls;
+        static struct xml_generator *cursor = xmls;
+
+        if ( cursor->xml_gen_proc == NULL )
+            cursor = xmls;
+
+        if ( 0 == strcmp(thiz->xml_name, cursor->xml_name) )
+            return cursor->xml_gen_proc(thiz);
+
+        cursor = xmls;
 
         for ( ; cursor->xml_gen_proc ; cursor ++ ) {
-            log_printf(DBG, "%s", cursor->xml_name);
-            if ( ! strstr(thiz->xml_name, cursor->xml_name) ) continue;
+            log_printf(DBG, "%s:%s", thiz->xml_name, cursor->xml_name);
+            if ( 0 != strcmp(thiz->xml_name, cursor->xml_name) ) continue;
             return cursor->xml_gen_proc(thiz);
 		}
 
 		return ERR_FUN_FAILE;
 	}
+}
+
+/* 充电刷卡事件查询
+ * 不同的使用阶段需要检查不同的字段
+ * <start>..</start>:
+ *    刷卡触发充电服务响应。 可以是自动或是选择充电方式后获得
+ * <confirm>..</confirm>:
+ *    充电服务触发后确认开始充电服务。即将开始计费
+ * <settle_accounts>..</settle_accounts>:
+ *    结账刷卡。达到结束充电条件后触发。
+ *               首页/按金钱/按时间/按容量充电页面
+ *  UI ------- GET /querycard.xml?mode=auto ------->>> ontom   没有刷卡
+ *  or UI ---- GET /querycard.xml?mode=asmoney ---->>> ontom   没有刷卡
+ *  or UI ---- GET /querycard.xml?mode=astime ----->>> ontom   没有刷卡
+ *  or UI ---- GET /querycard.xml?mode=ascap ------>>> ontom   没有刷卡
+ *  UI <<<--------RETURN /querycard.xml -------------- ontom   没有刷卡
+ *  UI ------- GET /querycard.xml?mode=auto ------->>> ontom   刷   卡
+ *  or UI ---- GET /querycard.xml?mode=asmoney ---->>> ontom   刷   卡
+ *  or UI ---- GET /querycard.xml?mode=astime ----->>> ontom   刷   卡
+ *  or UI ---- GET /querycard.xml?mode=ascap ------>>> ontom   刷   卡
+ *  UI <<<---------RETURN /querycard.xml ------------- ontom   有 刷卡
+ *  UI ----GET /querycard.xml?start=yes&bm=auto --->>> ontom   有 刷卡
+ *                    页面跳转至充电确认页面
+ */
+int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
+{
+    thiz->xml_len = sprintf(thiz->iobuff,
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n"
+        "<tom>\r\n"
+        "<start>\r\n"
+        "  <valid>yes</valid>\r\n"
+        "  <cardid>12345678</cardid>\r\n"
+        "  <remaind>4567.9</remaind>\r\n"
+        "</start>\r\n"
+        "<confirm>\r\n"
+        "  <valid>no</valid>\r\n"
+        "  <cardid>FFFFFFFF</cardid>\r\n"
+        "  <remaind>FFFFFFFF</remaind>\r\n"
+        "</confirm>\r\n"
+        "<settle_accounts>\r\n"
+        "  <valid>no</valid>\r\n"
+        "  <cardid>FFFFFFFF</cardid>\r\n"
+        "  <remaind>FFFFFFFF</remaind>\r\n"
+        "  <god>no</god>\r\n"
+        "  <timeout>no</timeout>\r\n"
+        "</settle_accounts>\r\n"
+        "</tom>\r\n"
+        "\r\n" );
+    return ERR_OK;
+}
+
+/* 充电确认
+ * 最先获得刷卡事件的应该是监控程序，而非UI程序
+ * 因此在这里需要注意一下：
+ * 确认充电应该在监控程序探测到正常的刷卡事件，并且UI程序主动获取到该事件后
+ * 再次由UI程序发送开始充电命令
+ *
+ *                      充电确认页面
+ *  UI --------- GET /confirm.xml?start=no ------->>> ontom  没有刷卡  没有开始充电
+ *  UI <<<----------RETURN /confirm.xml ------------- ontom  没有刷卡  没有开始充电
+ *  UI --------- GET /confirm.xml?start=no ------->>> ontom  刷卡     没有开始充电
+ *  UI <<<----------RETURN /confirm.xml ------------- ontom  有刷卡    没有开始充电
+ *  UI ----GET /confirm.xml?start=yes&bm=auto ---->>> ontom  有刷卡    开始自动充电
+ *  or UI ---GET /confirm.xml?start=yes&bm=money-->>> ontom  有刷卡    开始按金钱充电
+ *  or UI ---GET /confirm.xml?start=yes&bm=time -->>> ontom  有刷卡    开始时间充电
+ *  or UI ---GET /confirm.xml?start=yes&bm=cap --->>> ontom  有刷卡    开始容量充电
+ *  UI <<<----------RETURN /confirm.xml ------------- ontom  有刷卡    开始充电
+ *                    页面跳转至充电页面
+ */
+int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz)
+{
+    return ERR_ERR;
 }
 
 // 返回当前交易信息 deal.xml
@@ -142,11 +226,10 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
                       "<title>404 Not Found</title>\r\n"
                       "</head><body>\r\n"
                       "<h1>Not Found</h1>\r\n"
-                      "<p>The requested URL /version.xml was not found on this server.</p>\r\n"
+                      "<p>The requested URL was not found on this server.</p>\r\n"
                       "<p>Additionally, a 404 Not Found\r\n"
                       "error was encountered while trying to use an ErrorDocument to handle the request.</p>\r\n"
-                      "</body></html>\r\n\r\n"
-            );
+                      "</body></html>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
         }
         result = MG_TRUE;
     } else if (ev == MG_AUTH) {
@@ -169,7 +252,7 @@ void *thread_xml_service(void *arg) ___THREAD_ENTRY___
     server = mg_create_server(NULL, ev_handler);
     mg_set_option(server, "listening_port", "8081");
 
-    printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
+    //printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
     for (; ! *done; ) {
         mg_poll_server(server, 1000);
     }
