@@ -63,7 +63,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     int *done = (int *)arg;
     int mydone = 0;
     if ( done == NULL ) done = &mydone;
-    log_printf(INF, "%s running...", __FUNCTION__);
+    log_printf(INF, "%s running...sizeof(struct charge_task)=%d",
+               __FUNCTION__,
+               sizeof(struct charge_task));
 
     task = charge_task_create();
     if ( task == NULL ) {

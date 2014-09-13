@@ -6,6 +6,7 @@
 #include "config.h"
 #include "error.h"
 #include "log.h"
+#include "mongoose.h"
 
 // 生成xml文件，并返回文件大小，头部由调用者生成
 int ajax_deal_xml_proc(struct ajax_xml_struct *);
@@ -83,28 +84,55 @@ int ajax_gen_xml(struct ajax_xml_struct *thiz)
  */
 int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
 {
+    char mode[8 + 1] = {0}, start[8 + 1] = {0};
+    const char *begin = config_read("begin_card_sn");
+    const char *confirm = config_read("confirm_card_sn");
+    const char *settle = config_read("end_card_sn");
+    const char *godcard = config_read("super_card_sn");
+    const char *yes_or_no[] = {"no", "yes"};
+    int begin_valid = 1, confirm_valid = 1, settle_valid = 1;
+    int super = 0, timeout = 0;
+
+    if ( 0 == strcmp(begin, "N/A") ) begin_valid = 0;
+    if ( 0 == strcmp(confirm, "N/A") ) confirm_valid = 0;
+    if ( 0 == strcmp(settle, "N/A") ) settle_valid = 0;
+
+    if ( 0 == strcmp(godcard, "N/A") ) super = 0;
+    else if ( 0 == strcmp(settle, godcard) ) super = 1;
+
     thiz->xml_len = sprintf(thiz->iobuff,
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n"
         "<tom>\r\n"
         "<start>\r\n"
-        "  <valid>yes</valid>\r\n"
-        "  <cardid>12345678</cardid>\r\n"
+        "  <valid>%s</valid>\r\n"
+        "  <cardid>%s</cardid>\r\n"
         "  <remaind>4567.9</remaind>\r\n"
         "</start>\r\n"
         "<confirm>\r\n"
-        "  <valid>no</valid>\r\n"
-        "  <cardid>FFFFFFFF</cardid>\r\n"
+        "  <valid>%s</valid>\r\n"
+        "  <cardid>%s</cardid>\r\n"
         "  <remaind>FFFFFFFF</remaind>\r\n"
         "</confirm>\r\n"
         "<settle_accounts>\r\n"
-        "  <valid>no</valid>\r\n"
-        "  <cardid>FFFFFFFF</cardid>\r\n"
+        "  <valid>%s</valid>\r\n"
+        "  <cardid>%s</cardid>\r\n"
         "  <remaind>FFFFFFFF</remaind>\r\n"
-        "  <god>no</god>\r\n"
-        "  <timeout>no</timeout>\r\n"
+        "  <god>%s</god>\r\n"
+        "  <timeout>%s</timeout>\r\n"
         "</settle_accounts>\r\n"
         "</tom>\r\n"
-        "\r\n" );
+        "\r\n",
+        yes_or_no[ begin_valid ], begin,
+        yes_or_no[ confirm_valid ], confirm,
+        yes_or_no[ settle_valid ], settle,
+        yes_or_no[ super ], yes_or_no[ timeout ]
+        );
+
+    mg_get_var(thiz->xml_conn, "mode", mode, 8);
+    mg_get_var(thiz->xml_conn, "start", start, 8);
+
+    log_printf(DBG, "card.xml?mode=<%s>&start=<%s>", mode, start);
+
     return ERR_OK;
 }
 

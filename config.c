@@ -69,7 +69,15 @@ CONFIG_DOMAIN_BEGIN
 {"thread_bms_read_service",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+   // 开始充电任务的刷卡卡号
+{"begin_card_sn",               C_STRING,   no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+   // 确认充电的刷卡卡号
+{"confirm_card_sn",             C_STRING,   no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+   // 终止充电的刷卡卡号
+{"end_card_sn",                 C_STRING,   no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 用户配置数据
+   // 超级卡序列号
+{"super_card_sn",               C_STRING,  yes,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"socket_config_username", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"socket_config_passwd", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"charge_pile_serial",          C_STRING,  yes,     C_INVALID,  .cuv.n=0,       {"N/A"}},
