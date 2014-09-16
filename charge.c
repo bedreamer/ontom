@@ -77,6 +77,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                sizeof(struct charge_task));
 
     //task = charge_task_create();
+    task->charge_task_stat = CHARGE_STAT_TRIGER_PEDDING;
     if ( task == NULL ) {
         log_printf(ERR, "default task struct create faile, panic!");
         while ( ! *done ) {
