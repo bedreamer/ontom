@@ -113,7 +113,7 @@ static inline int xml_gen_system_error(char *buff)
 {
     static int magic = 0;
 
-    if ( magic % 3 == 0 ) {
+    if ( magic++ % 3 == 0 ) {
         return sprintf(buff,
                        "<error>\r\n"
                        " <total>\r\n"
@@ -199,7 +199,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     else if ( 0 == strcmp(settle, godcard) ) super = 1;
 
     thiz->xml_len = sprintf(thiz->iobuff,
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
         "<tom>\r\n"
         "<triger>\r\n"
         "  <valid>%s</valid>\r\n"
@@ -379,7 +379,7 @@ int ajax_alarm_xml_proc(struct ajax_xml_struct  *thiz)
 int ajax_version_xml_proc(struct ajax_xml_struct *thiz)
 {
     thiz->xml_len = sprintf(thiz->iobuff,
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n"
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
         "<VERSION>"
         "<THTTPD>%s</THTTPD>"
         "<BROWSER>%s</BROWSER>"
