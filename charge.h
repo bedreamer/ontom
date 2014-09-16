@@ -69,15 +69,17 @@ struct charge_ex_measure {
 // 充电计费模式
 typedef enum {
     // 无效充电模式，默认值
-    CHARGE_MODE_INVALID    =0x00,
+    BILLING_MODE_INVALID    =0x00,
     // 自动充电
-    CHARGE_MODE_AS_AUTO    =0x01,
+    BILLING_MODE_AS_AUTO    =0x01,
     // 按金额充电
-    CHARGE_MODE_AS_MONEY   =0x02,
+    BILLING_MODE_AS_MONEY   =0x02,
     // 按时间充电
-    CHARGE_MODE_AS_TIME    =0x03,
+    BILLING_MODE_AS_TIME    =0x03,
     // 按容量充电
-    CHARGE_MODE_AS_CAP     =0x04
+    BILLING_MODE_AS_CAP     =0x04,
+    // 自由充电，不需要刷卡
+    BILLING_MODE_AS_FREE    =0x05
 }BILLING_MODE;
 
 // 充电任务 状态
@@ -182,5 +184,8 @@ struct charge_task * charge_task_create(void);
 void charge_task_implemention(struct charge_task *thiz);
 // 析构充电任务
 void charge_task_destroy(struct charge_task *thiz);
+// 重置充电任务
+void charge_task_reset(struct charge_task *thiz);
+extern charge_task *task;
 
 #endif /*_CHARGE_INCLUDED_H_*/

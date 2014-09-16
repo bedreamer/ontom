@@ -8,8 +8,10 @@
 #include "log.h"
 #include "error.h"
 
+struct charge_task tom;
+
 // 充电任务结构
-struct charge_task *task = NULL;
+struct charge_task *task = &tom;
 
 // 创建充电任务
 struct charge_task * charge_task_create(void)
@@ -47,6 +49,12 @@ void charge_task_destroy(struct charge_task *thiz)
 {
 }
 
+// 重置充电任务
+// 重新初始化充电任务
+void charge_task_reset(struct charge_task *thiz)
+{
+}
+
 // 等待首次刷卡，触发创建充电任务事件
 static inline void wait_for_triger_charge_task(struct charge_task *thiz)
 {
@@ -67,7 +75,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                __FUNCTION__,
                sizeof(struct charge_task));
 
-    task = charge_task_create();
+    //task = charge_task_create();
     if ( task == NULL ) {
         log_printf(ERR, "default task struct create faile, panic!");
         while ( ! *done ) {
@@ -82,8 +90,5 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         usleep(5000);
     }
 
-    if ( task ) {
-        charge_task_destroy( task );
-    }
     return NULL;
 }

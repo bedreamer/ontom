@@ -6,6 +6,7 @@
 #include "config.h"
 #include "error.h"
 #include "log.h"
+#include "charge.h"
 #include "mongoose.h"
 
 // 生成xml文件，并返回文件大小，头部由调用者生成
@@ -81,9 +82,28 @@ int ajax_gen_xml(struct ajax_xml_struct *thiz)
  *  UI <<<---------RETURN /querycard.xml ------------- ontom   有 刷卡
  *  UI ----GET /querycard.xml?start=yes&bm=auto --->>> ontom   有 刷卡
  *                    页面跳转至充电确认页面
+ * 完整的定量充电刷卡流程如下：
+ * UI定时向ontom发送 GET /qerycard.xml请求，并附带当前的请求模式（自动，按金额，时间，容量）
+ * ontom返回当前的刷卡状态，如果有刷卡，则返回刷卡卡号，卡内余额等信息，没有则返回卡号为 N/A.
+ *
+ * UI 根据ontom返回的xml判定刷卡卡号是否有效，例如：
+ *  自动模式下收到有效刷卡卡号后下一次请求URL为：
+ *  GET /querycard.xml?mode=auto&triger=valid
+ * 如果是按条件充电则现需要设定有效参数，并被ontom接受，因此，可以按如方式发送请求：
+ *  GET /querycard.xml?mode=asmoney&money=100.0 或者
+ *  GET /querycard.xml?mode=astime&time=503 或者
+ *  GET /querycard.xml?mode=ascap&cap=89
+ * 按上述方式发送请求收到querycard.xml后需要解析<param_accept>字段， 若该字段为yes,
+ * 则表示ontom接受该设置请求，否则需要修改设置值，此时也可以刷卡，但不能触发triger字段设为valid
+ * 当收到querycard.xml 解析的param_accept字段为yes后方可，根据刷卡的ID设定triger 是否为
+ * valid, 当解析出param_accept字段为yes后，发送的请求可以如下：
+ *  GET /querycard.xml?mode=asmoney&money=100.9&triger=valid 或者
+ *  GET /querycard.xml?mode=astime&time=102&triger=valid 或者
+ *  GET /querycard.xml?mode=ascap&cap=98&triger=valid
  */
 int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
 {
+#if 0
     char mode[8 + 1] = {0}, start[8 + 1] = {0};
     const char *begin = config_read("begin_card_sn");
     const char *confirm = config_read("confirm_card_sn");
@@ -103,11 +123,11 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len = sprintf(thiz->iobuff,
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n"
         "<tom>\r\n"
-        "<start>\r\n"
+        "<triger>\r\n"
         "  <valid>%s</valid>\r\n"
         "  <cardid>%s</cardid>\r\n"
         "  <remaind>4567.9</remaind>\r\n"
-        "</start>\r\n"
+        "</triger>\r\n"
         "<confirm>\r\n"
         "  <valid>%s</valid>\r\n"
         "  <cardid>%s</cardid>\r\n"
@@ -134,6 +154,93 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     log_printf(DBG, "card.xml?mode=<%s>&start=<%s>", mode, start);
 
     return ERR_OK;
+#else
+    // 充电模式声明
+    char mode[ 8 + 1 ] = {0};
+    // 刷卡是否有效
+    char triger[ 8 + 1 ] = {0}, confirm[ 8 + 1 ] = {0}, endding[ 8 + 1 ] = {0};
+    // 制定模式下的参数
+    char themoney[ 8 + 1 ] = {0}, thetime[ 8 + 1 ] = {0}, thecap[ 8 + 1 ] ={0};
+    // 刷卡有效
+    char cardvalid = 0;
+    // 输出缓冲指针
+    char *output = thiz->iobuff;
+    // 当前输出缓冲长度
+    int output_len = 0;
+
+    mg_get_var(thiz->xml_conn, "mode", mode, 8);
+    mg_get_var(thiz->xml_conn, "triger", triger, 8);
+    mg_get_var(thiz->xml_conn, "confirm", confirm, 8);
+    mg_get_var(thiz->xml_conn, "end", endding, 8);
+
+    if (  0 == strcmp("valid", triger) )
+        cardvalid = 1;
+    if ( 0 == strcmp("valid", confirm) )
+        cardvalid = 1;
+    if ( 0 == strcmp("valid", end) )
+        cardvalid = 1;
+
+    output_len += sprintf(&output[output_len], "<start>\r\n");
+    if ( 0 == strcmp("auto", mode) ) {
+        task->charge_billing.mode = BILLING_MODE_AS_AUTO;
+    } else if ( 0 == strcmp("asmoney", mode) ) {
+        task->charge_billing.mode = BILLING_MODE_AS_MONEY;
+        if ( mg_get_var(thiz->xml_conn, "money", themoney, 8) ) {
+            double cash = atof(themoney);
+            // 已经刷过卡了，现在做参数检查，直到参数检查成功
+            output_len += sprintf(&output[output_len], "<asmoney>\r\n");
+            output_len += sprintf(&output[output_len],
+                                  "<triger></triger>\r\n");
+            output_len += sprintf(&output[output_len],
+                                  "<confirm></confirm>\r\n");
+            output_len += sprintf(&output[output_len],
+                                  "<settle></settle>\r\n");
+            if ( cash > 0.0f && cash < 999.99f ) {
+                task->charge_billing.option.set_money = cash;
+                output_len += sprintf(&output[output_len],
+                                      "<param_accept>yes</param_accept>\r\n");
+            } else {
+                // 给定了一个错误的参数，不能进入下一步操作, 返回提示信息
+                output_len += sprintf(&output[output_len],
+                                      "<param_accept>no</param_accept>\r\n");
+            }
+            output_len += sprintf(&output[output_len],
+                                  "</asmoney>\r\n");
+        } else {
+            // 只做了普通的查询，说明没有收到过刷卡事件
+        }
+    } else if ( 0 == strcmp("astime", mode) ) {
+        task->charge_billing.mode = BILLING_MODE_AS_TIME;
+        if ( mg_get_var(thiz->xml_conn, "time", thetime, 8) ) {
+            unsigned int minits = atoi(thetime);
+            // 已经刷过卡了，现在做参数检查，直到参数检查成功
+            if ( minits > 0 && minits <= 600 ) {
+                task->charge_billing.option.set_time = minits;
+            } else {
+                // 给定了一个错误的参数，不能进入下一步操作, 返回提示信息
+            }
+        } else {
+            // 只做了普通的查询，说明没有收到过刷卡事件
+        }
+    } else if ( 0 == strcmp("ascap", mode) ) {
+        task->charge_billing.mode = BILLING_MODE_AS_CAP;
+        if ( mg_get_var(thiz->xml_conn, "cap", thecap, 8) ) {
+            unsigned int caps = atoi(thecap);
+            // 已经刷过卡了，现在做参数检查，直到参数检查成功
+            if ( caps > 0 && caps <= 100 ) {
+                task->charge_billing.option.set_cap = caps;
+            } else {
+                // 给定了一个错误的参数，不能进入下一步操作, 返回提示信息
+            }
+        } else {
+            // 只做了普通的查询，说明没有收到过刷卡事件
+        }
+    } else {
+        // 如果出现不需要刷卡就能充电的需求，可以在这里作相应处理
+    }
+     output_len += sprintf(&output[output_len], "</start>\r\n");
+     thiz->xml_len = output_len;
+#endif
 }
 
 /* 充电确认
