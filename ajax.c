@@ -240,41 +240,55 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     // 制定模式下的参数
     char themoney[ 8 + 1 ] = {0}, thetime[ 8 + 1 ] = {0}, thecap[ 8 + 1 ] ={0};
     // 刷卡有效
-    char cardvalid = 0;
+    enum {CARD_INVALID = 0,     // 无效刷卡
+          CARD_TRIGER_VALID=1,  // 触发书卡有效
+          CARD_CONFIRM_VALID=2, // 确认充电刷卡有效
+          CARD_SETTLE_VALID=3   // 结账刷卡有效
+    } cardvalid;
     // 输出缓冲指针
     char *output = thiz->iobuff;
     // 当前输出缓冲长度
     int output_len = 0;
+    // 参数错误标识
+    int wrongparam = 0;
+
+    cardvalid = CARD_INVALID;
 
     mg_get_var(thiz->xml_conn, "mode", mode, 8);
     mg_get_var(thiz->xml_conn, "triger", triger, 8);
     mg_get_var(thiz->xml_conn, "confirm", confirm, 8);
     mg_get_var(thiz->xml_conn, "end", endding, 8);
 
+    // 需要在URL中避免同时出现triger, confirm, endding 参数字段
     if (  0 == strcmp("valid", triger) )
-        cardvalid = 1;
+        cardvalid = CARD_TRIGER_VALID;
     if ( 0 == strcmp("valid", confirm) )
-        cardvalid = 1;
+        cardvalid = CARD_CONFIRM_VALID;
     if ( 0 == strcmp("valid", endding) )
-        cardvalid = 1;
+        cardvalid = CARD_SETTLE_VALID;
 
     output_len += sprintf(&output[output_len],
          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start>\r\n");
     output_len += xml_gen_system_error(&output[output_len]);
 
     if ( 0 == strcmp("auto", mode) ) {
+        output_len += sprintf(&output[output_len], "<auto>\r\n");
+        output_len += xml_gen_triger_card(&output[output_len]);
+        output_len += xml_gen_confirm_card(&output[output_len]);
+        output_len += xml_gen_settle_card(&output[output_len]);
+
         task->charge_billing.mode = BILLING_MODE_AS_AUTO;
+        output_len += sprintf(&output[output_len], "</auto>\r\n");
     } else if ( 0 == strcmp("asmoney", mode) ) {
+        output_len += sprintf(&output[output_len], "<asmoney>\r\n");
+        output_len += xml_gen_triger_card(&output[output_len]);
+        output_len += xml_gen_confirm_card(&output[output_len]);
+        output_len += xml_gen_settle_card(&output[output_len]);
+
         task->charge_billing.mode = BILLING_MODE_AS_MONEY;
         if ( mg_get_var(thiz->xml_conn, "money", themoney, 8) ) {
             double cash = atof(themoney);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
-            output_len += sprintf(&output[output_len], "<asmoney>\r\n");
-
-            output_len += xml_gen_triger_card(&output[output_len]);
-            output_len += xml_gen_confirm_card(&output[output_len]);
-            output_len += xml_gen_settle_card(&output[output_len]);
-
             if ( cash > 0.0f && cash < 999.99f ) {
                 task->charge_billing.option.set_money = cash;
                 output_len += sprintf(&output[output_len],
@@ -283,38 +297,70 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
                 // 给定了一个错误的参数，不能进入下一步操作, 返回提示信息
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>no</param_accept>\r\n");
+                wrongparam = 1;
+                log_printf(WRN,
+                           "wrong money=<%s> fetched. repect 0.01 ~ 999.99",
+                           themoney);
             }
-            output_len += sprintf(&output[output_len],
-                                  "</asmoney>\r\n");
         } else {
             // 只做了普通的查询，说明没有收到过刷卡事件
+            log_printf(INF, "emputy query, do nothing.");
         }
+        output_len += sprintf(&output[output_len], "</asmoney>\r\n");
     } else if ( 0 == strcmp("astime", mode) ) {
+        output_len += sprintf(&output[output_len], "<astime>\r\n");
+        output_len += xml_gen_triger_card(&output[output_len]);
+        output_len += xml_gen_confirm_card(&output[output_len]);
+        output_len += xml_gen_settle_card(&output[output_len]);
+
         task->charge_billing.mode = BILLING_MODE_AS_TIME;
         if ( mg_get_var(thiz->xml_conn, "time", thetime, 8) ) {
             unsigned int minits = atoi(thetime);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( minits > 0 && minits <= 600 ) {
                 task->charge_billing.option.set_time = minits;
+                output_len += sprintf(&output[output_len],
+                                      "<param_accept>yes</param_accept>\r\n");
             } else {
                 // 给定了一个错误的参数，不能进入下一步操作, 返回提示信息
+                output_len += sprintf(&output[output_len],
+                                      "<param_accept>no</param_accept>\r\n");
+                wrongparam = 1;
+                log_printf(WRN,"wrong time=<%s> fetched. repect 1 ~ 600",
+                           thetime);
             }
         } else {
             // 只做了普通的查询，说明没有收到过刷卡事件
+            log_printf(INF, "emputy query, do nothing.");
         }
+        output_len += sprintf(&output[output_len], "</asmoney>\r\n");
     } else if ( 0 == strcmp("ascap", mode) ) {
+        output_len += sprintf(&output[output_len], "<ascap>\r\n");
+        output_len += xml_gen_triger_card(&output[output_len]);
+        output_len += xml_gen_confirm_card(&output[output_len]);
+        output_len += xml_gen_settle_card(&output[output_len]);
+
         task->charge_billing.mode = BILLING_MODE_AS_CAP;
         if ( mg_get_var(thiz->xml_conn, "cap", thecap, 8) ) {
             unsigned int caps = atoi(thecap);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( caps > 0 && caps <= 100 ) {
                 task->charge_billing.option.set_cap = caps;
+                output_len += sprintf(&output[output_len],
+                                      "<param_accept>yes</param_accept>\r\n");
             } else {
                 // 给定了一个错误的参数，不能进入下一步操作, 返回提示信息
+                output_len += sprintf(&output[output_len],
+                                      "<param_accept>no</param_accept>\r\n");
+                wrongparam = 1;
+                log_printf(WRN,"wrong cap=<%s> fetched. repect 1 ~ 100",
+                           thecap);
             }
         } else {
             // 只做了普通的查询，说明没有收到过刷卡事件
+            log_printf(INF, "emputy query, do nothing.");
         }
+        output_len += sprintf(&output[output_len], "</ascap>\r\n");
     } else {
         // 如果出现不需要刷卡就能充电的需求，可以在这里作相应处理
     }
