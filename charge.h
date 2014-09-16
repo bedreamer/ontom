@@ -85,21 +85,25 @@ typedef enum {
 // 充电任务 状态
 typedef enum {
     // 无效任务状态
-    CHAEGE_STAT_INVALID      =0x00,
+    CHARGE_STAT_INVALID             =0x00,
     // 空闲等待,界面停止于充电模式选择界面
-    CHARGE_STAT_WAITING      =0x01,
+    CHARGE_STAT_TRIGER_PEDDING      =0x01,
     // 刷卡准备, 于自动模式下已经刷卡，或者手动选择了充电计费模式
-    CHARGE_STAT_PREPARE      =0x02,
+    //CHARGE_STAT_PREPARE      =0x02,
     // 充电确认, 刷卡完成，进行充电确认等待
-    CHARGE_STAT_CONFIRM      =0x03,
+    CHARGE_STAT_CONFIRM_PEDDING     =0x03,
     // BMS 连接等待, 已经确认充电
     CHARGE_STAT_WAIT_BMS     =0x04,
     // BMS 已经连接，我收拾别完成，进行充电参数配置
     CHARGE_STAT_READY        =0x05,
     // 充电阶段
     CHARGE_STAT_CHARGING     =0x06,
-    // 充电结束阶段
+    // 充电结束阶段, 断开接触器
     CHARGE_STAT_DONE         =0x07,
+    // 计费阶段, 等待刷卡付费阶段
+    CHARGE_STAT_BILLING_PEDDING     =0x08,
+    // 充电任务退出阶段，日志记录，清理
+    CHARGE_STAT_EXIT                =0x09,
     // 充电异常退出
     CHARGE_STAT_EXCEPTION    =0xFF
 }CHARGE_TASK_STAT;

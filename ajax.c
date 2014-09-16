@@ -80,11 +80,11 @@ static inline int xml_gen_triger_card(char *buff)
 static inline int xml_gen_confirm_card(char *buff)
 {
     return sprintf(buff,
-                   "<triger>\r\n"
+                   "<confirm>\r\n"
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
                    "  <remaind>%f</remaind>\r\n"
-                   "</triger>\r\n",
+                   "</confirm>\r\n",
                    "11111222",
                    "yes",
                    2453.87f
@@ -95,12 +95,12 @@ static inline int xml_gen_confirm_card(char *buff)
 static inline int xml_gen_settle_card(char *buff)
 {
     return sprintf(buff,
-                   "<triger>\r\n"
+                   "<settle>\r\n"
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
                    "  <super>%s</super>\r\n"
                    "  <remaind>%f</remaind>\r\n"
-                   "</triger>\r\n",
+                   "</settle>\r\n",
                    "11111222",
                    "yes",
                    "no",
@@ -240,10 +240,11 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     // 制定模式下的参数
     char themoney[ 8 + 1 ] = {0}, thetime[ 8 + 1 ] = {0}, thecap[ 8 + 1 ] ={0};
     // 刷卡有效
-    enum {CARD_INVALID = 0,     // 无效刷卡
-          CARD_TRIGER_VALID=1,  // 触发书卡有效
-          CARD_CONFIRM_VALID=2, // 确认充电刷卡有效
-          CARD_SETTLE_VALID=3,   // 结账刷卡有效
+    enum {
+          CARD_INVALID = 0x00,      // 无效刷卡
+          CARD_TRIGER_VALID=0x01|0x80,   // 触发书卡有效
+          CARD_CONFIRM_VALID=0x02|0x80,  // 确认充电刷卡有效
+          CARD_SETTLE_VALID=0x03|0x80,   // 结账刷卡有效
           CARD_TRIGER_INVALID=4, // 触发刷卡无效, 标识否定刷卡
           CARD_CONFIRM_INVALID=5,// 确认充电刷卡无效, 标识否定刷卡
           CARD_SETTLE_INVALID=6  // 结账刷卡无效, 标识否定刷卡
@@ -263,6 +264,8 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     mg_get_var(thiz->xml_conn, "end", endding, 8);
 
     // 需要在URL中避免同时出现triger, confirm, endding 参数字段
+    // 若出现[triger|confirm|endding]=valid则表示参数检查也是没有错误的
+    // 在充电过程中，URL中可以不带参数选项，仅仅进行状态查询即可
     if (  0 == strcmp("valid", triger) )
         cardvalid = CARD_TRIGER_VALID;
     if ( 0 == strcmp("invalid", triger) )
@@ -320,7 +323,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
                                       "<param_accept>no</param_accept>\r\n");
                 wrongparam = 1;
                 log_printf(WRN,
-                           "wrong money=<%s> fetched. repect 0.01 ~ 999.99",
+                           "wrong money=<%s> fetched. respect 0.01 ~ 999.99",
                            themoney);
             }
         } else {
@@ -347,7 +350,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>no</param_accept>\r\n");
                 wrongparam = 1;
-                log_printf(WRN,"wrong time=<%s> fetched. repect 1 ~ 600",
+                log_printf(WRN,"wrong time=<%s> fetched. respect 1 ~ 600",
                            thetime);
             }
         } else {
@@ -374,7 +377,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>no</param_accept>\r\n");
                 wrongparam = 1;
-                log_printf(WRN,"wrong cap=<%s> fetched. repect 1 ~ 100",
+                log_printf(WRN,"wrong cap=<%s> fetched. respect 1 ~ 100",
                            thecap);
             }
         } else {
@@ -387,6 +390,71 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     }
      output_len += sprintf(&output[output_len], "</start>\r\n");
      thiz->xml_len = output_len;
+
+     // 充电任务，状态机转移
+     switch ( cardvalid ) {
+     case CARD_TRIGER_VALID:    // 触发刷卡有效, 充电任务触发
+         // 前驱充电任务必须是充电任务触发等待状态，
+         // 考虑到该事件可能会重复出现，所以
+         if ( task->charge_task_stat == CHARGE_STAT_TRIGER_PEDDING ) {
+             // 条件符合，状态机发生转移, 进入充电确认等待阶段
+             task->charge_task_stat = CHARGE_STAT_CONFIRM_PEDDING;
+             log_printf(INF, "charge task trigered, wait to confirm.");
+         } else if ( task->charge_task_stat == CHARGE_STAT_CONFIRM_PEDDING ) {
+             // 重入问题，可以忽略
+             // ...
+         } else {
+             log_printf(ERR, "charge task status machine crashed, errcode=100!!!!");
+         }
+         break;
+     case CARD_CONFIRM_VALID:   // 确认充电刷卡有效, 充电准备触发
+         // 前驱充电任务必须是确认等待状态
+         if ( task->charge_task_stat == CHARGE_STAT_CONFIRM_PEDDING ) {
+            task->charge_task_stat = CHARGE_STAT_WAIT_BMS;
+            log_printf(INF, "charge task confirmed, wait to BMS establish.");
+         } else if ( task->charge_task_stat == CHARGE_STAT_WAIT_BMS ) {
+             // 重入问题，可以忽略
+             // ...
+         } else {
+             log_printf(ERR, "charge task status machine crashed, errcode=101!!!!");
+         }
+         break;
+     case CARD_SETTLE_VALID:    // 结账刷卡有效, 充电结账触发
+         // 前驱充电任务必须是充电计费等待阶段
+         if ( task->charge_task_stat == CHARGE_STAT_BILLING_PEDDING ) {
+            task->charge_task_stat = CHARGE_STAT_EXIT;
+            log_printf(INF, "charge task settled, charge task will exit normally.");
+         } else if ( task->charge_task_stat == CHARGE_STAT_BILLING_PEDDING ) {
+             // 重入问题，可以忽略
+             // ...
+         } else {
+             log_printf(ERR, "charge task status machine crashed, errcode=102!!!!");
+         }
+         break;
+     case CARD_TRIGER_INVALID:  // 触发刷卡无效, 标识否定刷卡
+         // 充电桩被禁用，或是所刷卡被冻结
+         log_printf(WRN, "charger disabled or card freezed!");
+         break;
+     case CARD_CONFIRM_INVALID: // 确认充电刷卡无效, 标识否定刷卡
+         // 必须在充电确认状态时，才有效
+         if ( task->charge_task_stat == CHARGE_STAT_CONFIRM_PEDDING ) {
+            // 做出错处理
+             log_printf(WRN, "invalid card information. confirm failed.");
+         } else {
+             log_printf(ERR, "charge task status machine crashed, errcode=103!!!!");
+         }
+         break;
+     case CARD_SETTLE_INVALID:  // 结账刷卡无效, 标识否定刷卡
+         // 必须在充电结账时才有效
+         if ( task->charge_task_stat == CHARGE_STAT_BILLING_PEDDING ) {
+            // 做响应出错处理
+             log_printf(WRN, "invalid card information. settle failed.");
+         } else {
+             log_printf(ERR, "charge task status machine crashed, errcode=104!!!!");
+         }
+         break;
+     }
+
      return ERR_OK;
 #endif
 }
