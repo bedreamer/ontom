@@ -560,7 +560,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
                       "Connection: keep-alive\r\n"
                       "\r\n", thiz.xml_len);
             mg_write(conn, thiz.iobuff, thiz.xml_len);
-            log_printf(DBG, "done");
+            log_printf(DBG, "done %d", thiz.xml_len);
         } else {
             mg_printf(conn,
                       "HTTP/1.1 404 Not Found\r\n"
