@@ -186,6 +186,6 @@ void charge_task_implemention(struct charge_task *thiz);
 void charge_task_destroy(struct charge_task *thiz);
 // 重置充电任务
 void charge_task_reset(struct charge_task *thiz);
-extern charge_task *task;
+extern struct charge_task *task;
 
 #endif /*_CHARGE_INCLUDED_H_*/
