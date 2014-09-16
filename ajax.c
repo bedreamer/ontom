@@ -177,7 +177,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
         cardvalid = 1;
     if ( 0 == strcmp("valid", confirm) )
         cardvalid = 1;
-    if ( 0 == strcmp("valid", end) )
+    if ( 0 == strcmp("valid", endding) )
         cardvalid = 1;
 
     output_len += sprintf(&output[output_len], "<start>\r\n");
