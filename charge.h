@@ -27,25 +27,25 @@
  */
 struct user_card {
     // 触发任务时的卡号
-    char begin_card_sn[64];
+    char triger_card_sn[64];
     // 触发充电任务时的刷卡时戳
-    time_t begin_timestamp;
+    time_t triger_timestamp;
     // UI界面确认刷卡时戳
-    time_t begin_synced;
+    time_t triger_synced_timestamp;
 
     // 确认充电时的卡号
     char confirm_card_sn[64];
     // 确认充电任务的刷卡时戳
     time_t confirm_timestamp;
     // UI界面确认刷卡时戳
-    time_t confirm_synced;
+    time_t confirm_synced_timestamp;
 
     // 终止充电时的卡号
     char end_card_sn[64];
     // 终止充电任务的刷卡时戳
     time_t end_timestamp;
     // UI界面确认刷卡时戳
-    time_t end_synced;
+    time_t end_synced_timestamp;
 
     // 卡私有信息
     void *private;

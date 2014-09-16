@@ -118,7 +118,7 @@ static inline int xml_gen_system_error(char *buff)
                        "<error>\r\n"
                        " <total>\r\n"
                        "   <fault>3</fault>\r\n"
-                       "   <worning>0</worning>\r\n"
+                       "   <warning>0</warning>\r\n"
                        " </total>\r\n"
                        " <fault>\r\n"
                        "    <e0>\r\n"
@@ -243,7 +243,10 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     enum {CARD_INVALID = 0,     // 无效刷卡
           CARD_TRIGER_VALID=1,  // 触发书卡有效
           CARD_CONFIRM_VALID=2, // 确认充电刷卡有效
-          CARD_SETTLE_VALID=3   // 结账刷卡有效
+          CARD_SETTLE_VALID=3,   // 结账刷卡有效
+          CARD_TRIGER_INVALID=4, // 触发刷卡无效, 标识否定刷卡
+          CARD_CONFIRM_INVALID=5,// 确认充电刷卡无效, 标识否定刷卡
+          CARD_SETTLE_INVALID=6  // 结账刷卡无效, 标识否定刷卡
     } cardvalid;
     // 输出缓冲指针
     char *output = thiz->iobuff;
@@ -262,13 +265,20 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     // 需要在URL中避免同时出现triger, confirm, endding 参数字段
     if (  0 == strcmp("valid", triger) )
         cardvalid = CARD_TRIGER_VALID;
+    if ( 0 == strcmp("invalid", triger) )
+        cardvalid = CARD_TRIGER_INVALID;
     if ( 0 == strcmp("valid", confirm) )
         cardvalid = CARD_CONFIRM_VALID;
+    if ( 0 == strcmp("invalid", confirm) )
+        cardvalid = CARD_CONFIRM_INVALID;
     if ( 0 == strcmp("valid", endding) )
         cardvalid = CARD_SETTLE_VALID;
+    if ( 0 == strcmp("invalid", endding) )
+        cardvalid = CARD_SETTLE_INVALID;
 
     output_len += sprintf(&output[output_len],
          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start>\r\n");
+    // 首先生成系统错误，警告列表
     output_len += xml_gen_system_error(&output[output_len]);
 
     if ( 0 == strcmp("auto", mode) ) {
@@ -279,6 +289,17 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
 
         task->charge_billing.mode = BILLING_MODE_AS_AUTO;
         output_len += sprintf(&output[output_len], "</auto>\r\n");
+
+        if ( CARD_TRIGER_VALID == cardvalid ) {
+            // 触发充电任务，充电任务状态机设置为准备状态
+        } else if ( CARD_CONFIRM_VALID == cardvalid ) {
+            // 充电任务状态机设置为就绪状态
+        } else if ( CARD_SETTLE_VALID == cardvalid ) {
+            // 充电结束，结账刷卡
+        } else {
+            // 刷卡无效
+        }
+
     } else if ( 0 == strcmp("asmoney", mode) ) {
         output_len += sprintf(&output[output_len], "<asmoney>\r\n");
         output_len += xml_gen_triger_card(&output[output_len]);

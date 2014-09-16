@@ -16,7 +16,7 @@ struct charge_task *task = &tom;
 // 创建充电任务
 struct charge_task * charge_task_create(void)
 {
-    struct charge_task *thiz =
+/*    struct charge_task *thiz =
             (struct charge_task*)malloc(sizeof(struct charge_task));
 
     if ( NULL == thiz ) {
@@ -35,6 +35,7 @@ struct charge_task * charge_task_create(void)
     log_printf(INF, "charge task created, serial number: %08X",
                thiz->charge_sn);
     return thiz;
+    */
 }
 
 // 实施充电任务
