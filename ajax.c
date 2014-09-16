@@ -61,6 +61,84 @@ int ajax_gen_xml(struct ajax_xml_struct *thiz)
 	}
 }
 
+// 生成触发充电任务的卡信息
+static inline int xml_gen_triger_card(char *buff)
+{
+    return sprintf(buff,
+                   "<triger>\r\n"
+                   "  <cardid>%s</cardid>\r\n"
+                   "  <valid>%s</valid>\r\n"
+                   "  <remaind>%f</remaind>\r\n"
+                   "</triger>\r\n",
+                   "11111222",
+                   "yes",
+                   2453.87f
+    );
+}
+
+// 生成触发充电任务的卡信息
+static inline int xml_gen_confirm_card(char *buff)
+{
+    return sprintf(buff,
+                   "<triger>\r\n"
+                   "  <cardid>%s</cardid>\r\n"
+                   "  <valid>%s</valid>\r\n"
+                   "  <remaind>%f</remaind>\r\n"
+                   "</triger>\r\n",
+                   "11111222",
+                   "yes",
+                   2453.87f
+    );
+}
+
+// 生成触发充电任务的卡信息
+static inline int xml_gen_settle_card(char *buff)
+{
+    return sprintf(buff,
+                   "<triger>\r\n"
+                   "  <cardid>%s</cardid>\r\n"
+                   "  <valid>%s</valid>\r\n"
+                   "  <super>%s</super>\r\n"
+                   "  <remaind>%f</remaind>\r\n"
+                   "</triger>\r\n",
+                   "11111222",
+                   "yes",
+                   "no",
+                   2453.87f
+    );
+}
+
+// 生成系统故障
+static inline int xml_gen_system_error(char *buff)
+{
+    static int magic = 0;
+
+    if ( magic % 3 == 0 ) {
+        return sprintf(buff,
+                       "<error>\r\n"
+                       " <total>\r\n"
+                       "   <fault>3</fault>\r\n"
+                       "   <worning>0</worning>\r\n"
+                       " </total>\r\n"
+                       " <fault>\r\n"
+                       "    <e0>\r\n"
+                       "       <code>998</code>\r\n"
+                       "       <comment>BMS not ready.</code>\r\n"
+                       "    </e0>\r\n"
+                       "    <e1>\r\n"
+                       "       <code>997</code>\r\n"
+                       "       <comment>Charger not ready.</code>\r\n"
+                       "    </e1>\r\n"
+                       "    <e2>\r\n"
+                       "       <code>999</code>\r\n"
+                       "       <comment>Connection fault.</code>\r\n"
+                       "    </e2>\r\n"
+                       " </fault>\r\n"
+                       "</error>\r\n"
+                       );
+    } else return 0;
+}
+
 /* 充电刷卡事件查询
  * 不同的使用阶段需要检查不同的字段
  * <start>..</start>:
@@ -182,6 +260,8 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
 
     output_len += sprintf(&output[output_len],
          "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n<start>\r\n");
+    output_len += xml_gen_system_error(&output[output_len]);
+
     if ( 0 == strcmp("auto", mode) ) {
         task->charge_billing.mode = BILLING_MODE_AS_AUTO;
     } else if ( 0 == strcmp("asmoney", mode) ) {
@@ -190,12 +270,11 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
             double cash = atof(themoney);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             output_len += sprintf(&output[output_len], "<asmoney>\r\n");
-            output_len += sprintf(&output[output_len],
-                                  "<triger>N/A</triger>\r\n");
-            output_len += sprintf(&output[output_len],
-                                  "<confirm>N/A</confirm>\r\n");
-            output_len += sprintf(&output[output_len],
-                                  "<settle>N/A</settle>\r\n");
+
+            output_len += xml_gen_triger_card(&output[output_len]);
+            output_len += xml_gen_confirm_card(&output[output_len]);
+            output_len += xml_gen_settle_card(&output[output_len]);
+
             if ( cash > 0.0f && cash < 999.99f ) {
                 task->charge_billing.option.set_money = cash;
                 output_len += sprintf(&output[output_len],
