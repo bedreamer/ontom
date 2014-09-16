@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "log.h"
+#include "config.h"
 
 int log_printf(unsigned int level, const char *fmt, ...)
 {
 	char buff[256]={0};
 	va_list ap;
 	char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
-	
+
 	va_start(ap, fmt);
 	vsnprintf(buff, sizeof(buff), fmt, ap);
 	va_end(ap);

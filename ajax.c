@@ -292,17 +292,6 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
 
         task->charge_billing.mode = BILLING_MODE_AS_AUTO;
         output_len += sprintf(&output[output_len], "</auto>\r\n");
-
-        if ( CARD_TRIGER_VALID == cardvalid ) {
-            // 触发充电任务，充电任务状态机设置为准备状态
-        } else if ( CARD_CONFIRM_VALID == cardvalid ) {
-            // 充电任务状态机设置为就绪状态
-        } else if ( CARD_SETTLE_VALID == cardvalid ) {
-            // 充电结束，结账刷卡
-        } else {
-            // 刷卡无效
-        }
-
     } else if ( 0 == strcmp("asmoney", mode) ) {
         output_len += sprintf(&output[output_len], "<asmoney>\r\n");
         output_len += xml_gen_triger_card(&output[output_len]);
@@ -396,6 +385,11 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
      case CARD_TRIGER_VALID:    // 触发刷卡有效, 充电任务触发
          // 前驱充电任务必须是充电任务触发等待状态，
          // 考虑到该事件可能会重复出现，所以
+         if ( wrongparam ) {
+             log_printf(ERR, "gave a wrong param, system might be hacked.");
+             log_printf(WRN, "ues auto mode instead");
+             // change to auto mode.
+         }
          if ( task->charge_task_stat == CHARGE_STAT_TRIGER_PEDDING ) {
              // 条件符合，状态机发生转移, 进入充电确认等待阶段
              task->charge_task_stat = CHARGE_STAT_CONFIRM_PEDDING;
@@ -409,6 +403,11 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
          break;
      case CARD_CONFIRM_VALID:   // 确认充电刷卡有效, 充电准备触发
          // 前驱充电任务必须是确认等待状态
+         if ( wrongparam ) {
+             log_printf(ERR, "gave a wrong param, system might be hacked.");
+             log_printf(WRN, "ues auto mode instead");
+             // change to auto mode.
+         }
          if ( task->charge_task_stat == CHARGE_STAT_CONFIRM_PEDDING ) {
             task->charge_task_stat = CHARGE_STAT_WAIT_BMS;
             log_printf(INF, "charge task confirmed, wait to BMS establish.");
