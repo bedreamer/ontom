@@ -59,8 +59,8 @@ void charge_task_reset(struct charge_task *thiz)
 // 等待首次刷卡，触发创建充电任务事件
 static inline void wait_for_triger_charge_task(struct charge_task *thiz)
 {
-    while ( thiz->card.begin_timestamp == INVALID_TIMESTAMP ||
-            thiz->card.begin_synced == INVALID_TIMESTAMP ) {
+    while ( thiz->card.triger_timestamp == INVALID_TIMESTAMP ||
+            thiz->card.triger_synced_timestamp == INVALID_TIMESTAMP ) {
         // 休眠 500 微秒
         usleep(500);
     }
