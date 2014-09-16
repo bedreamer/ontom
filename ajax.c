@@ -259,7 +259,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
         cardvalid = 1;
 
     output_len += sprintf(&output[output_len],
-         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n<start>\r\n");
+         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start>\r\n");
     output_len += xml_gen_system_error(&output[output_len]);
 
     if ( 0 == strcmp("auto", mode) ) {
