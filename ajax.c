@@ -240,6 +240,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     }
      output_len += sprintf(&output[output_len], "</start>\r\n");
      thiz->xml_len = output_len;
+     return ERR_OK;
 #endif
 }
 
