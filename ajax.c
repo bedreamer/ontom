@@ -180,7 +180,8 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     if ( 0 == strcmp("valid", endding) )
         cardvalid = 1;
 
-    output_len += sprintf(&output[output_len], "<start>\r\n");
+    output_len += sprintf(&output[output_len],
+         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n<start>\r\n");
     if ( 0 == strcmp("auto", mode) ) {
         task->charge_billing.mode = BILLING_MODE_AS_AUTO;
     } else if ( 0 == strcmp("asmoney", mode) ) {
@@ -190,11 +191,11 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             output_len += sprintf(&output[output_len], "<asmoney>\r\n");
             output_len += sprintf(&output[output_len],
-                                  "<triger></triger>\r\n");
+                                  "<triger>N/A</triger>\r\n");
             output_len += sprintf(&output[output_len],
-                                  "<confirm></confirm>\r\n");
+                                  "<confirm>N/A</confirm>\r\n");
             output_len += sprintf(&output[output_len],
-                                  "<settle></settle>\r\n");
+                                  "<settle>N/A</settle>\r\n");
             if ( cash > 0.0f && cash < 999.99f ) {
                 task->charge_billing.option.set_money = cash;
                 output_len += sprintf(&output[output_len],
