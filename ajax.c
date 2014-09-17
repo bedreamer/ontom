@@ -541,13 +541,13 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
     mg_get_var(thiz->xml_conn, "passwd", passwd, 46);
     mg_get_var(thiz->xml_conn, "reason", reason, 16);
 
-    if ( strcmp(reason, "user_setting") == 0 ) {
+    if ( strcmp(reason, "user") == 0 ) {
         sprintf(passwd_const, "%s%s%s",
                 solt_head, config_read("manual_passwd") ,solt_tail);
-    } else if ( strcmp(reason, "system_setting") == 0 ) {
+    } else if ( strcmp(reason, "system") == 0 ) {
         sprintf(passwd_const, "%s%s%s",
                 solt_head, config_read("system_passwd") ,solt_tail);
-    } else if ( strcmp(reason, "manufacturer_config") == 0 ) {
+    } else if ( strcmp(reason, "manufacturer") == 0 ) {
         sprintf(passwd_const, "%s%s%s",
                 solt_head, config_read("manufacturer_passwd") ,solt_tail);
     } else {
@@ -562,12 +562,15 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
 
     thiz->xml_len = sprintf(thiz->iobuff,
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
-        "<start>"
-        "  <ok>%s</ok>"
+        "<start>\r\n"
+        "  <ok>%s</ok>\r\n"
         "</start>\r\n"
         "\r\n",
-        auth_ok && param_check_ok ? "yes" : "no"
+        auth_ok && param_check_ok ? "permit" : "reject"
     );
+
+    log_printf(INF, "for %s autheticate result: %s",
+               reason, auth_ok && param_check_ok ? "permit" : "reject")
 
     return ERR_OK;
 }
