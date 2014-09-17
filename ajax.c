@@ -70,9 +70,9 @@ static inline int xml_gen_triger_card(char *buff)
                    "  <valid>%s</valid>\r\n"
                    "  <remaind>%.2f</remaind>\r\n"
                    "</triger>\r\n",
-                   "11111222",
+                   config_read("triger_card_sn"),
                    "yes",
-                   2453.87f
+                   config_read("card_remaind_money")
     );
 }
 
@@ -85,9 +85,9 @@ static inline int xml_gen_confirm_card(char *buff)
                    "  <valid>%s</valid>\r\n"
                    "  <remaind>%.2f</remaind>\r\n"
                    "</confirm>\r\n",
-                   "11111322",
+                   config_read("confirm_card_sn"),
                    "yes",
-                   2453.87f
+                   config_read("card_remaind_money")
     );
 }
 
@@ -101,10 +101,10 @@ static inline int xml_gen_settle_card(char *buff)
                    "  <super>%s</super>\r\n"
                    "  <remaind>%.2f</remaind>\r\n"
                    "</settle>\r\n",
-                   "11111222",
+                   config_read("settle_card_sn"),
                    "yes",
                    "no",
-                   2453.87f
+                   config_read("card_remaind_money")
     );
 }
 
