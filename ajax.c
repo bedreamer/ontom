@@ -559,6 +559,7 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
     if ( strcmp(passwd, passwd_const) != 0 ) {
         auth_ok = 0;
     }
+    log_printf(DBG, "%s<===>%s", passwd, passwd_const);
 
     thiz->xml_len = sprintf(thiz->iobuff,
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
