@@ -76,7 +76,7 @@ static inline int xml_gen_triger_card(char *buff)
     );
 }
 
-// 生成触发充电任务的卡信息
+// 生成确认充电任务的卡信息
 static inline int xml_gen_confirm_card(char *buff)
 {
     return sprintf(buff,
@@ -85,13 +85,13 @@ static inline int xml_gen_confirm_card(char *buff)
                    "  <valid>%s</valid>\r\n"
                    "  <remaind>%f</remaind>\r\n"
                    "</confirm>\r\n",
-                   "11111222",
+                   "11111322",
                    "yes",
                    2453.87f
     );
 }
 
-// 生成触发充电任务的卡信息
+// 生成结账任务的卡信息
 static inline int xml_gen_settle_card(char *buff)
 {
     return sprintf(buff,
@@ -542,7 +542,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
     struct ajax_xml_struct thiz = {0};
     thiz.xml_conn = conn;
     if (ev == MG_REQUEST) {
-        log_printf(DBG, "%s", conn->uri);
+        log_printf(DBG, "%s %s", conn->uri, conn->query_string);
         strncpy(thiz.xml_name, conn->uri, 31);
         err = ajax_gen_xml( & thiz );
         if ( err == ERR_OK ) {
