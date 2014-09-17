@@ -533,7 +533,42 @@ int ajax_version_xml_proc(struct ajax_xml_struct *thiz)
 // 操作认证 autheticate.xml
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
 {
-    log_printf(DBG, "get into %s", __FUNCTION__);
+    int auth_ok = 1, param_check_ok = 1;
+    char passwd[46] = {0}, passwd_const[46] ={0}, reason[16] = {0};
+    const char *solt_head = "PzsWmAPT3G";
+    const char *solt_tail = "a7BY5tzfdX";
+
+    mg_get_var(thiz->xml_conn, "passwd", passwd, 46);
+    mg_get_var(thiz->xml_conn, "reason", reason, 16);
+
+    if ( strcmp(reason, "user_setting") == 0 ) {
+        sprintf(passwd_const, "%s%s%s",
+                solt_head, config_read("manual_passwd") ,solt_tail);
+    } else if ( strcmp(reason, "system_setting") == 0 ) {
+        sprintf(passwd_const, "%s%s%s",
+                solt_head, config_read("system_passwd") ,solt_tail);
+    } else if ( strcmp(reason, "manufacturer_config") == 0 ) {
+        sprintf(passwd_const, "%s%s%s",
+                solt_head, config_read("manufacturer_passwd") ,solt_tail);
+    } else {
+        // 非法验证
+        auth_ok = 0;
+        param_check_ok = 0;
+    }
+
+    if ( strcmp(passwd, passwd_const) != 0 ) {
+        auth_ok = 0;
+    }
+
+    thiz->xml_len = sprintf(thiz->iobuff,
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+        "<start>"
+        "  <ok>%s</ok>"
+        "</start>\r\n"
+        "\r\n",
+        auth_ok && param_check_ok ? "yes" : "no"
+    );
+
     return ERR_OK;
 }
 

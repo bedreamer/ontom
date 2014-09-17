@@ -60,8 +60,9 @@ CONFIG_DOMAIN_BEGIN
 {"version_browser",             C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"version_tomd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"version_godd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
-{"manual_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
+{"manual_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"00000"}},
 {"system_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
+{"manufacturer_passwd",         C_STRING,   no,     C_INVALID,  .cub.n=0,       {"8989889"}},
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
 // 系统参数不应该出现在配置文件中, 仅供程序内部使用, 不公开
 {"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
