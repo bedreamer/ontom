@@ -543,13 +543,13 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
 
     if ( strcmp(reason, "user") == 0 ) {
         sprintf(passwd_const, "%s%s%s",
-                solt_head, config_read("manual_passwd") ,solt_tail);
+                solt_head, config_read("manual_passwd"), solt_tail);
     } else if ( strcmp(reason, "system") == 0 ) {
         sprintf(passwd_const, "%s%s%s",
-                solt_head, config_read("system_passwd") ,solt_tail);
+                solt_head, config_read("system_passwd"), solt_tail);
     } else if ( strcmp(reason, "manufacturer") == 0 ) {
         sprintf(passwd_const, "%s%s%s",
-                solt_head, config_read("manufacturer_passwd") ,solt_tail);
+                solt_head, config_read("manufacturer_passwd"), solt_tail);
     } else {
         // 非法验证
         auth_ok = 0;
@@ -566,9 +566,10 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
         "<start>\r\n"
         "  <ok>%s</ok>\r\n"
         "</start>\r\n"
-        "\r\n\r\n\r\n\r\n",
+        "\r\n",
         auth_ok && param_check_ok ? "permit" : "reject"
     );
+    thiz->xml_len --;
 
     log_printf(INF, "for %s autheticate result: %s",
                reason, auth_ok && param_check_ok ? "permit" : "reject");
