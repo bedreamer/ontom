@@ -71,13 +71,13 @@ CONFIG_DOMAIN_BEGIN
 {"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
    // 开始充电任务的刷卡卡号
-{"triger_card_sn",              C_STRING,   no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"triger_card_sn",              C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
    // 确认充电的刷卡卡号
-{"confirm_card_sn",             C_STRING,   no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"confirm_card_sn",             C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
    // 终止充电的刷卡卡号
-{"settle_card_sn",              C_STRING,   no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
+{"settle_card_sn",              C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
    // 卡内余额
-{"card_remaind_money",          C_FLOAT,    no,     C_INVALID,  .cuv.f=0.0f,    {"0.0"}},
+{"card_remaind_money",          C_FLOAT,    no,     C_VALID,    .cuv.f=0.0f,    {"0.0"}},
 // 用户配置数据
    // 超级卡序列号
 {"super_card_sn",               C_STRING,  yes,     C_INVALID,  .cuv.i=0,       {"N/A"}},
