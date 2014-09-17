@@ -346,7 +346,7 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
             // 只做了普通的查询，说明没有收到过刷卡事件
             log_printf(INF, "emputy query, do nothing.");
         }
-        output_len += sprintf(&output[output_len], "</asmoney>\r\n");
+        output_len += sprintf(&output[output_len], "</astime>\r\n");
     } else if ( 0 == strcmp("ascap", mode) ) {
         output_len += sprintf(&output[output_len], "<ascap>\r\n");
         output_len += xml_gen_triger_card(&output[output_len]);
