@@ -570,7 +570,7 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
     );
 
     log_printf(INF, "for %s autheticate result: %s",
-               reason, auth_ok && param_check_ok ? "permit" : "reject")
+               reason, auth_ok && param_check_ok ? "permit" : "reject");
 
     return ERR_OK;
 }
