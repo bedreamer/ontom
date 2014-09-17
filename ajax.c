@@ -68,7 +68,7 @@ static inline int xml_gen_triger_card(char *buff)
                    "<triger>\r\n"
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
-                   "  <remaind>%f</remaind>\r\n"
+                   "  <remaind>%.2f</remaind>\r\n"
                    "</triger>\r\n",
                    "11111222",
                    "yes",
@@ -83,7 +83,7 @@ static inline int xml_gen_confirm_card(char *buff)
                    "<confirm>\r\n"
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
-                   "  <remaind>%f</remaind>\r\n"
+                   "  <remaind>%.2f</remaind>\r\n"
                    "</confirm>\r\n",
                    "11111322",
                    "yes",
@@ -99,7 +99,7 @@ static inline int xml_gen_settle_card(char *buff)
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
                    "  <super>%s</super>\r\n"
-                   "  <remaind>%f</remaind>\r\n"
+                   "  <remaind>%.2f</remaind>\r\n"
                    "</settle>\r\n",
                    "11111222",
                    "yes",
