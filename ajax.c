@@ -541,6 +541,10 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
     mg_get_var(thiz->xml_conn, "passwd", passwd, 46);
     mg_get_var(thiz->xml_conn, "reason", reason, 16);
 
+    config_read("manual_passwd");
+    config_read("system_passwd");
+    config_read("manufacturer_passwd");
+
     if ( strcmp(reason, "user") == 0 ) {
         sprintf(passwd_const, "%s%s%s",
                 solt_head, config_read("manual_passwd"), solt_tail);
