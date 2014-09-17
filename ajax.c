@@ -566,7 +566,7 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
         "<start>\r\n"
         "  <ok>%s</ok>\r\n"
         "</start>\r\n"
-        "\r\n",
+        "\r\n\r\n\r\n\r\n",
         auth_ok && param_check_ok ? "permit" : "reject"
     );
 
