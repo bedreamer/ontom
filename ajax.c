@@ -68,7 +68,7 @@ static inline int xml_gen_triger_card(char *buff)
                    "<triger>\r\n"
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
-                   "  <remaind>%.2f</remaind>\r\n"
+                   "  <remaind>%s</remaind>\r\n"
                    "</triger>\r\n",
                    config_read("triger_card_sn"),
                    "yes",
@@ -83,7 +83,7 @@ static inline int xml_gen_confirm_card(char *buff)
                    "<confirm>\r\n"
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
-                   "  <remaind>%.2f</remaind>\r\n"
+                   "  <remaind>%s</remaind>\r\n"
                    "</confirm>\r\n",
                    config_read("confirm_card_sn"),
                    "yes",
@@ -99,7 +99,7 @@ static inline int xml_gen_settle_card(char *buff)
                    "  <cardid>%s</cardid>\r\n"
                    "  <valid>%s</valid>\r\n"
                    "  <super>%s</super>\r\n"
-                   "  <remaind>%.2f</remaind>\r\n"
+                   "  <remaind>%s</remaind>\r\n"
                    "</settle>\r\n",
                    config_read("settle_card_sn"),
                    "yes",
