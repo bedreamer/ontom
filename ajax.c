@@ -587,11 +587,11 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
     struct ajax_xml_struct thiz = {0};
     thiz.xml_conn = conn;
     if (ev == MG_REQUEST) {
-        log_printf(DBG, "%s %s", conn->uri, conn->query_string);
+        log_printf(DBG, "%s&%s", conn->uri, conn->query_string);
         strncpy(thiz.xml_name, conn->uri, 31);
         err = ajax_gen_xml( & thiz );
         if ( err == ERR_OK ) {
-            log_printf(DBG, "prepare...");
+            //log_printf(DBG, "prepare...");
             mg_printf(conn,
                       "HTTP/1.1 200 HTTP\r\n"
                       "Server: thttpd/2.21b PHP/20030920\r\n"
@@ -604,7 +604,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
                       "Connection: keep-alive\r\n"
                       "\r\n", thiz.xml_len);
             mg_write(conn, thiz.iobuff, thiz.xml_len);
-            log_printf(DBG, "done %d", thiz.xml_len);
+            //log_printf(DBG, "done %d", thiz.xml_len);
         } else {
             mg_printf(conn,
                       "HTTP/1.1 404 Not Found\r\n"
