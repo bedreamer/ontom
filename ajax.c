@@ -377,6 +377,14 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
     } else {
         // 如果出现不需要刷卡就能充电的需求，可以在这里作相应处理
     }
+
+    // 状态机切换确认, 为了保证UI和ontom的状态机一致，必须使用该字段来进行状态同步
+    if ( cardvalid & 0x80 ) {
+        output_len += sprintf(&output[output_len], "<echo>copy</echo>\r\n");
+    } else {
+        output_len += sprintf(&output[output_len], "<echo>N/A</echo>\r\n");
+    }
+
      output_len += sprintf(&output[output_len], "</start>\r\n");
      thiz->xml_len = output_len;
 
@@ -397,6 +405,9 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
          } else if ( task->charge_task_stat == CHARGE_STAT_CONFIRM_PEDDING ) {
              // 重入问题，可以忽略
              // ...
+             log_printf(DBG,
+                        "status machine sync, from CHARGE_STAT_TRIGER_PEDDING"
+                        " to CHARGE_STAT_CONFIRM_PEDDING");
          } else {
              log_printf(ERR, "charge task status machine crashed, errcode=100!!!!");
          }
@@ -414,6 +425,9 @@ int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
          } else if ( task->charge_task_stat == CHARGE_STAT_WAIT_BMS ) {
              // 重入问题，可以忽略
              // ...
+             log_printf(DBG,
+                        "status machine sync, from CHARGE_STAT_CONFIRM_PEDDING"
+                        " to CHARGE_STAT_WAIT_BMS");
          } else {
              log_printf(ERR, "charge task status machine crashed, errcode=101!!!!");
          }
