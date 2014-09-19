@@ -440,6 +440,17 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
          } else if ( task->charge_task_stat == CHARGE_STAT_BILLING_PEDDING ) {
              // 重入问题，可以忽略
              // ...
+         } else if (task->charge_task_stat == CHARGE_STAT_WAIT_BMS ) {
+            // BMS 还未就绪，此时刷卡表示终止充电任务
+             task->charge_task_stat = CHARGE_STAT_ABORT;
+             log_printf(INF, "charge task abort! triger: <%s>"
+                        "confirm: <%s> abort: <%s>",
+                        config_read("triger_card_sn"),
+                        config_read("confirm_card_sn"),
+                        config_read("settle_card_sn"));
+         } else if (task->charge_task_stat == CHARGE_STAT_ABORT) {
+             // 重入问题，可以忽略
+             // ...
          } else {
              log_printf(ERR, "charge task status machine crashed, errcode=102!!!!");
          }

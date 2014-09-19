@@ -78,17 +78,48 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     //task = charge_task_create();
     task->charge_task_stat = CHARGE_STAT_TRIGER_PEDDING;
-    if ( task == NULL ) {
-        log_printf(ERR, "default task struct create faile, panic!");
-        while ( ! *done ) {
-            sleep(1);
-        }
-        return NULL;
-    }
-
     while ( ! *done ) {
-        // 等待刷卡触发充电任务
-        wait_for_triger_charge_task(task);
+        switch ( task->charge_task_stat) {
+        // 无效任务状态
+        case CHARGE_STAT_INVALID:
+            log_printf(INF, "charge task status RESET.");
+            config_write("triger_card_sn", "N/A");
+            config_write("confirm_card_sn", "N/A");
+            config_write("settle_card_sn", "N/A");
+            task->charge_task_stat = CHARGE_STAT_TRIGER_PEDDING;
+            break;
+        // 空闲等待,界面停止于充电模式选择界面
+        case CHARGE_STAT_TRIGER_PEDDING:
+            break;
+        // 充电确认, 刷卡完成，进行充电确认等待
+        case CHARGE_STAT_CONFIRM_PEDDING:
+            break;
+        // BMS 连接等待, 已经确认充电
+        case CHARGE_STAT_WAIT_BMS:
+            break;
+        // BMS 已经连接，进行充电参数配置
+        case CHARGE_STAT_READY:
+            break;
+        // 充电阶段
+        case CHARGE_STAT_CHARGING:
+            break;
+        // 充电结束阶段, 断开接触器
+        case CHARGE_STAT_DONE:
+            break;
+        // 计费阶段, 等待刷卡付费阶段
+        case CHARGE_STAT_BILLING_PEDDING:
+            break;
+        // 充电任务退出阶段，日志记录，清理
+        case CHARGE_STAT_EXIT:
+            break;
+        // 充电任务被终止
+        case CHARGE_STAT_ABORT:
+            task->charge_task_stat = CHARGE_STAT_INVALID;
+            break;
+        // 充电异常退出
+        case CHARGE_STAT_EXCEPTION:
+            break;
+        }
         usleep(5000);
     }
 

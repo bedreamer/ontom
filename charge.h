@@ -104,6 +104,8 @@ typedef enum {
     CHARGE_STAT_BILLING_PEDDING     =0x08,
     // 充电任务退出阶段，日志记录，清理
     CHARGE_STAT_EXIT                =0x09,
+    // 充电任务被终止
+    CHARGE_STAT_ABORT        =0x0A,
     // 充电异常退出
     CHARGE_STAT_EXCEPTION    =0xFF
 }CHARGE_TASK_STAT;
