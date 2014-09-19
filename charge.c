@@ -77,7 +77,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                sizeof(struct charge_task));
 
     //task = charge_task_create();
-    task->charge_task_stat = CHARGE_STAT_TRIGER_PEDDING;
+    task->charge_task_stat = CHARGE_STAT_INVALID;
+
     while ( ! *done ) {
         switch ( task->charge_task_stat) {
         // 无效任务状态
