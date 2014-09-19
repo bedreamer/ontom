@@ -16,7 +16,7 @@ int ajax_battery_status_xml_proc(struct ajax_xml_struct *);
 int ajax_alarm_xml_proc(struct ajax_xml_struct *);
 int ajax_version_xml_proc(struct ajax_xml_struct *);
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
-int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz);
+int ajax_query_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz);
 
 struct xml_generator {
@@ -25,13 +25,13 @@ struct xml_generator {
 	// xml 生成过程地址
     int (*xml_gen_proc)(struct ajax_xml_struct *);
 }xmls[]={
+{"/query.xml",                  ajax_query_xml_proc},
     {"/deal.xml",               ajax_deal_xml_proc},
     {"/chargestatus.xml",       ajax_charge_status_xml_proc},
     {"/battrystatus.xml",       ajax_battery_status_xml_proc},
     {"/alarm.xml",              ajax_alarm_xml_proc},
     {"/version.xml",            ajax_version_xml_proc},
     {"/autheticate.xml",        ajax_autheticate_xml_proc},
-    {"/querycard.xml",          ajax_query_card_xml_proc},
     {"/confirm.xml",            ajax_confirm_charge_xml_proc},
     {"", NULL}
 };
@@ -139,7 +139,7 @@ static inline int xml_gen_system_error(char *buff)
     } else return 0;
 }
 
-/* 充电刷卡事件查询
+/* 充电任务事件查询
  * 不同的使用阶段需要检查不同的字段
  * <start>..</start>:
  *    刷卡触发充电服务响应。 可以是自动或是选择充电方式后获得
@@ -148,17 +148,17 @@ static inline int xml_gen_system_error(char *buff)
  * <settle_accounts>..</settle_accounts>:
  *    结账刷卡。达到结束充电条件后触发。
  *               首页/按金钱/按时间/按容量充电页面
- *  UI ------- GET /querycard.xml?mode=auto ------->>> ontom   没有刷卡
- *  or UI ---- GET /querycard.xml?mode=asmoney ---->>> ontom   没有刷卡
- *  or UI ---- GET /querycard.xml?mode=astime ----->>> ontom   没有刷卡
- *  or UI ---- GET /querycard.xml?mode=ascap ------>>> ontom   没有刷卡
- *  UI <<<--------RETURN /querycard.xml -------------- ontom   没有刷卡
- *  UI ------- GET /querycard.xml?mode=auto ------->>> ontom   刷   卡
- *  or UI ---- GET /querycard.xml?mode=asmoney ---->>> ontom   刷   卡
- *  or UI ---- GET /querycard.xml?mode=astime ----->>> ontom   刷   卡
- *  or UI ---- GET /querycard.xml?mode=ascap ------>>> ontom   刷   卡
- *  UI <<<---------RETURN /querycard.xml ------------- ontom   有 刷卡
- *  UI ----GET /querycard.xml?start=yes&bm=auto --->>> ontom   有 刷卡
+ *  UI ------- GET /query.xml?mode=auto ------->>> ontom   没有刷卡
+ *  or UI ---- GET /query.xml?mode=asmoney ---->>> ontom   没有刷卡
+ *  or UI ---- GET /query.xml?mode=astime ----->>> ontom   没有刷卡
+ *  or UI ---- GET /query.xml?mode=ascap ------>>> ontom   没有刷卡
+ *  UI <<<--------RETURN /query.xml -------------- ontom   没有刷卡
+ *  UI ------- GET /query.xml?mode=auto ------->>> ontom   刷   卡
+ *  or UI ---- GET /query.xml?mode=asmoney ---->>> ontom   刷   卡
+ *  or UI ---- GET /query.xml?mode=astime ----->>> ontom   刷   卡
+ *  or UI ---- GET /query.xml?mode=ascap ------>>> ontom   刷   卡
+ *  UI <<<---------RETURN /query.xml ------------- ontom   有 刷卡
+ *  UI ----GET /query.xml?start=yes&bm=auto --->>> ontom   有 刷卡
  *                    页面跳转至充电确认页面
  * 完整的定量充电刷卡流程如下：
  * UI定时向ontom发送 GET /qerycard.xml请求，并附带当前的请求模式（自动，按金额，时间，容量）
@@ -166,20 +166,20 @@ static inline int xml_gen_system_error(char *buff)
  *
  * UI 根据ontom返回的xml判定刷卡卡号是否有效，例如：
  *  自动模式下收到有效刷卡卡号后下一次请求URL为：
- *  GET /querycard.xml?mode=auto&triger=valid
+ *  GET /query.xml?mode=auto&triger=valid
  * 如果是按条件充电则现需要设定有效参数，并被ontom接受，因此，可以按如方式发送请求：
- *  GET /querycard.xml?mode=asmoney&money=100.0 或者
- *  GET /querycard.xml?mode=astime&time=503 或者
- *  GET /querycard.xml?mode=ascap&cap=89
- * 按上述方式发送请求收到querycard.xml后需要解析<param_accept>字段， 若该字段为yes,
+ *  GET /query.xml?mode=asmoney&money=100.0 或者
+ *  GET /query.xml?mode=astime&time=503 或者
+ *  GET /query.xml?mode=ascap&cap=89
+ * 按上述方式发送请求收到query.xml后需要解析<param_accept>字段， 若该字段为yes,
  * 则表示ontom接受该设置请求，否则需要修改设置值，此时也可以刷卡，但不能触发triger字段设为valid
- * 当收到querycard.xml 解析的param_accept字段为yes后方可，根据刷卡的ID设定triger 是否为
+ * 当收到query.xml 解析的param_accept字段为yes后方可，根据刷卡的ID设定triger 是否为
  * valid, 当解析出param_accept字段为yes后，发送的请求可以如下：
- *  GET /querycard.xml?mode=asmoney&money=100.9&triger=valid 或者
- *  GET /querycard.xml?mode=astime&time=102&triger=valid 或者
- *  GET /querycard.xml?mode=ascap&cap=98&triger=valid
+ *  GET /query.xml?mode=asmoney&money=100.9&triger=valid 或者
+ *  GET /query.xml?mode=astime&time=102&triger=valid 或者
+ *  GET /query.xml?mode=ascap&cap=98&triger=valid
  */
-int ajax_query_card_xml_proc(struct ajax_xml_struct *thiz)
+int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
 {
 #if 0
     char mode[8 + 1] = {0}, start[8 + 1] = {0};
