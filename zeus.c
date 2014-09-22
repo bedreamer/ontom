@@ -9,4 +9,6 @@
  * 2014/09/22 12:24
  */
 #include <malloc.h>
+#include <pthread.h>
+#include "config.h"
 #include "zeus.h"

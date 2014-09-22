@@ -9,8 +9,10 @@
 // 控制配置模块的调试
 #if _DEBUG >= 1
 	#define CONFIG_DEBUG_CONFIG  1
+    #define CONFIG_DEBUG_ZEUS    1
 #else
 	#define CONFIG_DEBUG_CONFIG  0
+    #define CONFIG_DEBUG_ZEUS    0
 #endif
 
 //}}}}}}}}}}}}}
