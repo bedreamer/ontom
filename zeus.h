@@ -48,7 +48,9 @@ typedef enum {
         // 节点被分配锁定标记，即将被分配出去
         NODE_ALLOC_MARK      = 2,
         // 节点已经被分配标记，不能再被合并、拆分或是分配
-        NODE_ALLOCED         = 3
+        NODE_ALLOCED         = 3,
+        // 碎片节点， 最后一个节点，不能出现在链表中间
+        NODE_FRAGMENT        = 4
 }NODE_STATUS;
 
 // 分配的缓冲区头结构

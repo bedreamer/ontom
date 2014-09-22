@@ -206,6 +206,9 @@ compiler_clean:
 ut: config.c log.c unit_test.c
 	gcc -g -o $@ $^
 
+zeus_unit_test: zeus_unit_test.c log.c config.c
+	/usr/bin/gcc -g -o $@ -o $^
+
 onconfig-arm: onconfig.c
 	$(CC) $(CFLAGS) $(INCPATH) -o $@ $^
 
