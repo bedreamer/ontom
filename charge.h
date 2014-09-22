@@ -124,6 +124,18 @@ typedef enum {
     CHARGE_STAGE_DONE         =0x04
 }CHARGE_STAGE;
 
+// BMS CAN通信状态定义
+typedef enum {
+    // 无效模式
+    CAN_INVALID               =0x00,
+    // 普通模式
+    CAN_NORMAL                =0x01,
+    // 连接管理读模式, 多数据包读
+    CAN_TP_RD                 =0x02,
+    // 连接管理写模式，多数据包写，当前的协议标准没有用到
+    CAN_TP_WRITE              =0x03
+}CAN_BMS_STATUS;
+
 /*
  * 充电任务描述
  */
@@ -171,6 +183,9 @@ struct charge_task {
     struct charge_ex_measure *ex_measure;
     // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
     time_t pre_stamp_ex_measure;
+
+    // CAN BMS 通信所处状态
+    CAN_BMS_STATUS can_bms_status;
 
     // 车辆基本信息
     struct pgn512_BRM  vehicle_info;
