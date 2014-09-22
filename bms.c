@@ -98,7 +98,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     bind(s, (struct sockaddr *)&addr, sizeof(addr));
 
-    log_printf(INF, "%s running...s=%d", __FUINCTON__, s);
+    log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
     while ( ! *done ) {
         usleep(90000);
 
