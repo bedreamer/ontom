@@ -12,6 +12,24 @@
 #include "bms.h"
 // 无效时戳，初始化时默认赋值， 用于time_t默认值
 #define INVALID_TIMESTAMP  0x00000000
+// BMS 通信时的缓冲区
+#define CAN_BUFF_SIZE         1024
+/* 支持的BMS个数
+ * 安徽合肥电动公交车项目的配置需求是一个监控器管理两把充电枪
+ * 但是由于充电限流问题的限制，同一时刻只能有一把枪在进行充电
+ * 现在也不排除以后可能需要一个监控同时给一个或多个电池组充电
+ * 进行管理，因此在这里将支持的BMS配置成可变参数的形式。
+ */
+#define CONFIG_SUPPORT_BMS_NR 2
+#define BUFF_NR               CONFIG_SUPPORT_BMS_NR
+typedef enum {
+    // 0# 充电枪
+    GUN_SN0 = 0,
+    // 1# 充电枪
+    GUN_SN1 = 1,
+    // 默认充电强编号
+    GUN_DEFAULT = 0
+}CHARGE_GUN_SN;
 
 /* 卡信息
  * 三个阶段分别用三个缓冲区来存储卡号的目的是
@@ -184,8 +202,19 @@ struct charge_task {
     // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
     time_t pre_stamp_ex_measure;
 
+    /* 当前正在使用的充电枪编号
+     * 由于目前系统配置为只能一把枪独占式充电，因此必须指明枪的编号
+     */
+    CHARGE_GUN_SN can_charge_gun_sn;
     // CAN BMS 通信所处状态
-    CAN_BMS_STATUS can_bms_status;
+    CAN_BMS_STATUS can_bms_status[BUFF_NR];
+    // CAN 通信输入缓冲区
+    unsigned char can_buff_in[BUFF_NR][CAN_BUFF_SIZE];
+    volatile unsigned int can_buff_in_nr[BUFF_NR];
+    unsigned int can_packet_pgn[BUFF_NR];
+    // CAN 通信输出缓冲区
+    unsigned char can_buff_out[BUFF_NR][CAN_BUFF_SIZE];
+    volatile unsigned int can_buff_out_nr[BUFF_NR];
 
     // 车辆基本信息
     struct pgn512_BRM  vehicle_info;

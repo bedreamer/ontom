@@ -22,6 +22,39 @@
 #define u32 unsigned int
 #endif
 
+#pragma pack(1)
+
+// SAE J1939-21 连接管理协议结构
+union SAE_J1939_21_TP {
+    struct {
+        // always equal 16/10h/0x10
+        u8 control_byte;
+        // 参数组共计多少字节
+        u16 total_size;
+        // 参数组共计多少个数据包
+        u8 total_packets;
+        // 数据包中最大的包编号
+        u8 max_sn_packet;
+        // 请求的参数组编号
+        u8 pgn_hi, pgn_mid, pgn_lo;
+    }TP_CM_RTS;
+    struct {
+        u8 control_byte;
+    }TP_CM_CTS;
+    struct {
+        u8 control_byte;
+
+    }TP_CM_EndOfMsgACK;
+    struct {
+        u8 control_byte;
+
+    }TP_Conn_Abort;
+    struct {
+        u8 control_byte;
+        u8 noused[7];
+    }TP_CM_BAM;
+};
+
 // 握手阶段
 // 充电机辨识报文
 struct pgn256_CRM {
@@ -215,5 +248,7 @@ struct pgn7680 {
 struct pgn7936 {
 
 };
+
+#pragma pack()
 
 #endif /*_BMS_PACKAGE_INCLUDED_H_*/

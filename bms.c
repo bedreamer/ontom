@@ -73,6 +73,26 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     }
 }
 
+/*
+ * Adele - <<rolling in the deep>>
+ *
+ * 独立处理连接管理时的连接控制，数据重新组装问题，直到数据接收完成，或者出错
+ */
+typedef enum {
+    // 连接管理正常，在数据接收完成前将返回该值
+    TP_OK = 0,
+    // 数据接收完成后将返回该值
+    TP_DONE = 1,
+    // 数据连接被终止
+    TP_ABORTED = 2,
+    // 数据连接中断，主机通信超时将返回该值
+    TP_LOSSCONN = 3
+}TP_RESULT;
+static inline TP_RESULT rolling_in_the_buffer(struct charge_task *thiz)
+{
+
+}
+
 // bms 通信 读 服务线程
 // 提供bms通信服务
 void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
@@ -84,7 +104,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     int s, ti = 0;
     struct sockaddr_can addr;
     struct ifreq ifr;
-    struct can_frame frame;
+    struct can_frame frame, *buff_in;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     int nbytes;
 
@@ -115,6 +135,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         }
 
         /*
+         * CAN通信处于普通模式
+         *
          * SAE J1939-21 Revised December 2006 版协议中规定
          * TP.DT.PGN 为 0x00EB00  连接管理
          * TP.CM.PGN 为 0x00EC00  数据传输
@@ -128,9 +150,23 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             // Data transfer
         } else if ( frame.can_id & 0x00FF0000 == 0xEC ) {
             // Connection managment
+            if ( 0x10 == frame.data[0] ) {
+                // request a connection.
+            } else if ( 0xFF == frame.data[0] ) {
+                // connection abort.
+            } else {
+                //omited.
+            }
         } else {
 
         }
+
+        if ( task->can_bms_status == CAN_NORMAL ) {
+        } else if ( task->can_bms_status == CAN_TP_RD ) {
+            // CAN通信处于连接管理模式
+        }
+
+
 #if 0
         log_printf(DBG, "TX%d---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
                     ti++,
