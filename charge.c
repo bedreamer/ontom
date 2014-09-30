@@ -66,7 +66,13 @@ static inline void wait_for_triger_charge_task(struct charge_task *thiz)
     }
 }
 
-// 充电任务服务线程
+/* 充电任务服务线程
+ * 充电状态的转换触发条件都由UI转发过来，这样做的目的是为了保证触发唯一和触发条件的同步。
+ *
+ * 1. 触发信号的采集过程由服务器完成；
+ * 2. 将该信号传递（同步）给浏览器，浏览器确认后向服务器；
+ * 3. 发送状态转换触发条件，完成状态转换。
+ */
 void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;

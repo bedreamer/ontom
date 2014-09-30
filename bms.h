@@ -24,6 +24,80 @@
 
 #pragma pack(1)
 
+/*
+ * 读到一个完整数据包后调用该函数
+ */
+typedef enum {
+    // 无效事件，初始化完成前收到该消息
+    EVENT_INVALID    = 0,
+    /* 数据包接受完成。系统中存在两个和CAN接口相关的线程，一个
+     * 是CAN数据读取线程，还有一个是CAN数据发送线程，这两个线程
+     * 对CAN的操作都是同步的，因此，在读取数据包时读线程会被阻塞
+     * 因此需要通过该事件来通知系统，已经完成了数据包的读取。
+     */
+    EVENT_RX_DONE    = 1,
+    /* 数据包接收错误。在阻塞读取CAN数据包时，发生数据包读取错误，
+     * 会收到该事件，表征数据包有问题，应该作相应处理。
+     */
+    EVENT_RX_ERROR   = 2,
+    /* 数据包发送请求。系统中CAN数据的发送线程是同步的，可以通过
+     * 该事件来提醒系统，目前可以进行数据包的发送，若系统有数据包发送
+     * 则设定发送数据，交由发送县城进行发送，若没有数据要发送，则返回一个
+     * 不需要发送的结果即可。
+     */
+    EVENT_TX_REQUEST = 3,
+    /* 连接管理模式下的请求发送数据包，进行连接数据控制。
+     */
+    EVENT_TX_TP_REQUEST = 4,
+    /* 数据包准备发送。当EVENT_TX_REQUEST返回结果是需要发送时，经发送线程
+     * 经发送线程确认后，将会受到该消息，表示发送线程已经准备发送该消息了，此时
+     * 可以返回取消发送指令，实现数据包的取消发送。
+     */
+    EVENT_TX_PRE     = 5,
+    /* 数据包发送完成。当确认后的数据包发送完成后，将会受到该消息，表征数据包
+     * 已经正确的发送完成。
+     */
+    EVENT_TX_DONE    = 6,
+    /* 数据包发送失败。当确认后的数据包发送失败后，将会受到改小。
+     */
+    EVENT_TX_FAILS   = 7,
+    // CAN 消息函数初始化。当第一次运行函数时将会收到该消息，可重复发送。
+    EVENT_CAN_INIT   = 8,
+    // CAN 消息复位。再次执行初始化操作。
+    EVENT_CAN_RESET  = 9
+}EVENT_CAN;
+
+// 事件通知返回/传入参数
+typedef enum {
+    // 无效
+    EVT_RET_INVALID  = 0,
+    // 一切OK
+    EVT_RET_OK       = 1,
+    // 失败了
+    EVT_RET_ERR      = 2,
+    // 超时
+    EVT_RET_TIMEOUT  = 3,
+    // 终止发送，EVENT_CAN.EVENT_TX_PRE的可用参数
+    EVT_RET_TX_ABORT = 4
+}EVT_PARAM;
+
+// 事件通知结构
+struct event_struct {
+    // 事件参数
+    EVT_PARAM evt_param;
+
+    union {
+        // 发送缓冲区地址， 针对EVENT_TX_REQUEST设置
+        unsigned char *tx_buff;
+        // 接收缓冲区地址，针对EVENT_RX_DONE设置
+        const unsigned char* rx_buff;
+    }buff;
+    // 缓冲区大小
+    unsigned int buff_size;
+    // 缓冲区载荷大小
+    unsigned int buff_payload;
+};
+
 // SAE J1939-21 连接管理协议结构
 union SAE_J1939_21_TP {
     struct {

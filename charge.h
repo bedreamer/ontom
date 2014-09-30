@@ -154,6 +154,38 @@ typedef enum {
     CAN_TP_WRITE              =0x03
 }CAN_BMS_STATUS;
 
+/* 遥信定义
+ * 系统共计支持512个遥信量
+ * remote_single[0:511]
+ */
+// 遥信位,遥测偏移定义
+#include "rsrvdefine.h"
+// 遥信位设置
+static inline void rs_set(struct charge_task *tsk, unsigned int bits)
+{
+    volatile unsigned char *byte = tsk->remote_single;
+
+    byte += bits / 8;
+    * byte |= (1 << (bits % 8 ));
+}
+// 遥信位清除
+static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
+{
+    volatile unsigned char *byte = tsk->remote_single;
+
+    byte += bits / 8;
+    * byte &= (~(1 << (bits % 8 )));
+}
+// 遥信位读取
+static inline int rs_val(struct charge_task *tsk, unsigned int bits)
+{
+    volatile unsigned char *byte = tsk->remote_single;
+
+    byte += bits / 8;
+
+    return (* byte & (1 << (bits % 8 ))) ? 1 : 0;
+}
+
 /*
  * 充电任务描述
  */
@@ -173,6 +205,9 @@ struct charge_task {
     CHARGE_TASK_STAT charge_task_stat;
     // 充电任务所处阶段
     CHARGE_STAGE charge_stage;
+
+    // 系统遥信, 最多支持64 * 8 种遥信
+    volatile unsigned char remote_single[64];
 
     // 充电计费
     struct {
@@ -215,6 +250,8 @@ struct charge_task {
     // CAN 通信输出缓冲区
     unsigned char can_buff_out[BUFF_NR][CAN_BUFF_SIZE];
     volatile unsigned int can_buff_out_nr[BUFF_NR];
+    // 标识CAN写缓冲是否满，若缓冲区满，则CAN线程向外写出数据, 写完后置0
+    volatile unsigned int can_buff_out_magic[BUFF_NR];
 
     // 车辆基本信息
     struct pgn512_BRM  vehicle_info;
