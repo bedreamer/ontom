@@ -57,7 +57,7 @@ static int can_packet_callback(
          */
         break;
     case EVENT_TX_TP_REQUEST:
-        /*串口处于连接管理状态时，将会收到该传输数据报请求。*/
+        //串口处于连接管理状态时，将会收到该传输数据报请求。
         break;
     default:
         break;

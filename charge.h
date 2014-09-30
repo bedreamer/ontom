@@ -224,6 +224,11 @@ struct charge_task {
     // 标识CAN写缓冲是否满，若缓冲区满，则CAN线程向外写出数据, 写完后置0
     volatile unsigned int can_buff_out_magic[BUFF_NR];
 
+    /* CAN 通信心跳
+     * CAN 通信需要定时发送数据包，因此需要采用心跳计数，每10ms增加1
+     */
+    unsigned int can_heart_beat;
+
     // 车辆基本信息
     struct pgn512_BRM  vehicle_info;
     // BMS充电配置信息
