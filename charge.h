@@ -166,7 +166,7 @@ typedef enum {
 // 遥信位设置
 static inline void rs_set(struct charge_task *tsk, unsigned int bits)
 {
-    volatile unsigned char *byte = &tsk->remote_single;
+    volatile unsigned char *byte = tsk->remote_single;
 
     byte += bits / 8;
     * byte |= (1 << (bits % 8 ));
@@ -174,7 +174,7 @@ static inline void rs_set(struct charge_task *tsk, unsigned int bits)
 // 遥信位清除
 static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
 {
-    volatile unsigned char *byte = &tsk->remote_single;
+    volatile unsigned char *byte = tsk->remote_single;
 
     byte += bits / 8;
     * byte &= (~(1 << (bits % 8 )));
@@ -182,7 +182,7 @@ static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
 // 遥信位读取
 static inline int rs_val(struct charge_task *tsk, unsigned int bits)
 {
-    volatile unsigned char *byte = &tsk->remote_single;
+    volatile unsigned char *byte = tsk->remote_single;
 
     byte += bits / 8;
 
