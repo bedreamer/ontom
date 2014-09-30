@@ -10,6 +10,9 @@
 #define _CHARGE_INCLUDED_H_
 
 #include "bms.h"
+
+struct charge_task;
+
 // 无效时戳，初始化时默认赋值， 用于time_t默认值
 #define INVALID_TIMESTAMP  0x00000000
 // BMS 通信时的缓冲区
@@ -163,7 +166,7 @@ typedef enum {
 // 遥信位设置
 static inline void rs_set(struct charge_task *tsk, unsigned int bits)
 {
-    unsigned char *byte = tsk->remote_single;
+    volatile unsigned char *byte = &tsk->remote_single;
 
     byte += bits / 8;
     * byte |= (1 << (bits % 8 ));
@@ -171,7 +174,7 @@ static inline void rs_set(struct charge_task *tsk, unsigned int bits)
 // 遥信位清除
 static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
 {
-    unsigned char *byte = tsk->remote_single;
+    volatile unsigned char *byte = &tsk->remote_single;
 
     byte += bits / 8;
     * byte &= (~(1 << (bits % 8 )));
@@ -179,7 +182,7 @@ static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
 // 遥信位读取
 static inline int rs_val(struct charge_task *tsk, unsigned int bits)
 {
-    unsigned char *byte = tsk->remote_single;
+    volatile unsigned char *byte = &tsk->remote_single;
 
     byte += bits / 8;
 
