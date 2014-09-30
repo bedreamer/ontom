@@ -209,7 +209,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
         usleep(90000);
 
-        if ( task->can_bms_status == CAN_INVALID ) {
+        if ( task->can_bms_status[task->can_charge_gun_sn] == CAN_INVALID ) {
             continue;
         }
 
@@ -275,7 +275,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                  * byte[4:5]: 0xFF
                  * byte[6:8]: PGN
                  */
-                task->can_bms_status = CAN_TP_RD;
+                task->can_bms_status[task->can_charge_gun_sn] = CAN_TP_RD;
             } else if ( 0xFF == frame.data[0] ) {
                 /* connection abort.
                  * byte[1]: 0xFF
@@ -291,8 +291,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             can_packet_callback(task, EVENT_RX_DONE, &param);
         }
 
-        if ( task->can_bms_status == CAN_NORMAL ) {
-        } else if ( task->can_bms_status == CAN_TP_RD ) {
+        if ( task->can_bms_status[task->can_charge_gun_sn] == CAN_NORMAL ) {
+        } else if ( task->can_bms_status[task->can_charge_gun_sn] == CAN_TP_RD ) {
             // CAN通信处于连接管理模式
         }
 

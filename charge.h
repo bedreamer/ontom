@@ -157,38 +157,6 @@ typedef enum {
     CAN_TP_WRITE              =0x03
 }CAN_BMS_STATUS;
 
-/* 遥信定义
- * 系统共计支持512个遥信量
- * remote_single[0:511]
- */
-// 遥信位,遥测偏移定义
-#include "rsrvdefine.h"
-// 遥信位设置
-static inline void rs_set(struct charge_task *tsk, unsigned int bits)
-{
-    volatile unsigned char *byte = tsk->remote_single;
-
-    byte += bits / 8;
-    * byte |= (1 << (bits % 8 ));
-}
-// 遥信位清除
-static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
-{
-    volatile unsigned char *byte = tsk->remote_single;
-
-    byte += bits / 8;
-    * byte &= (~(1 << (bits % 8 )));
-}
-// 遥信位读取
-static inline int rs_val(struct charge_task *tsk, unsigned int bits)
-{
-    volatile unsigned char *byte = tsk->remote_single;
-
-    byte += bits / 8;
-
-    return (* byte & (1 << (bits % 8 ))) ? 1 : 0;
-}
-
 /*
  * 充电任务描述
  */
@@ -277,5 +245,37 @@ void charge_task_destroy(struct charge_task *thiz);
 // 重置充电任务
 void charge_task_reset(struct charge_task *thiz);
 extern struct charge_task *task;
+
+/* 遥信定义
+ * 系统共计支持512个遥信量
+ * remote_single[0:511]
+ */
+// 遥信位,遥测偏移定义
+#include "rsrvdefine.h"
+// 遥信位设置
+static inline void rs_set(struct charge_task *tsk, unsigned int bits)
+{
+    volatile unsigned char *byte = tsk->remote_single;
+
+    byte += bits / 8;
+    * byte |= (1 << (bits % 8 ));
+}
+// 遥信位清除
+static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
+{
+    volatile unsigned char *byte = tsk->remote_single;
+
+    byte += bits / 8;
+    * byte &= (~(1 << (bits % 8 )));
+}
+// 遥信位读取
+static inline int rs_val(struct charge_task *tsk, unsigned int bits)
+{
+    volatile unsigned char *byte = tsk->remote_single;
+
+    byte += bits / 8;
+
+    return (* byte & (1 << (bits % 8 ))) ? 1 : 0;
+}
 
 #endif /*_CHARGE_INCLUDED_H_*/
