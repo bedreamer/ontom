@@ -208,7 +208,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
         usleep(90000);
 
-        if ( task->can_bms_status[task->can_charge_gun_sn] == CAN_INVALID ) {
+        if ( task->can_bms_status == CAN_INVALID ) {
             continue;
         }
 
@@ -253,6 +253,13 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         } else if ( frame.can_id & 0x00FF0000 == 0xEC ) {
             // Connection managment
             if ( 0x10 == frame.data[0] ) {
+                if ( task->can_tp_buff_nr ) {
+                    /*
+                     * 数据传输太快，还没将缓冲区的数据发送出去
+                     */
+                    log_printf(WRN, "CAN data transfer too fast.");
+                    continue;
+                }
                 /* request a connection. TP.CM_RTS
                  * byte[1]: 0x10
                  * byte[2:3]: 消息大小，字节数目
@@ -274,7 +281,29 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                  * byte[4:5]: 0xFF
                  * byte[6:8]: PGN
                  */
-                task->can_bms_status[task->can_charge_gun_sn] = CAN_TP_RD;
+                if ( tp_packets_size <= 8 ) {
+                    log_printf(WRN,
+                         "detect a BMS transfer error, pack size < 8 bytes");
+                    continue;
+                }
+                if ( tp_packets_nr <= 1 ) {
+                    log_printf(WRN,
+                               "detect a BMS transfer error, pack count < 2");
+                    continue;
+                }
+
+                // connection request check ok, then do a answer.
+                task->can_tp_buff_tx[0] = 0x11;
+                task->can_tp_buff_tx[1] = tp_packets_nr;
+                task->can_tp_buff_tx[2] = 1;
+                task->can_tp_buff_tx[3] = 0xFF;
+                task->can_tp_buff_tx[4] = 0xFF;
+                task->can_tp_buff_tx[5] = frame.data[5];
+                task->can_tp_buff_tx[6] = frame.data[6];
+                task->can_tp_buff_tx[7] = frame.data[7];
+                task->can_tp_buff_nr = 8;
+                log_printf(DBG, "CAN status change to CAN_TP_RD");
+                task->can_bms_status = CAN_TP_RD;
             } else if ( 0xFF == frame.data[0] ) {
                 /* connection abort.
                  * byte[1]: 0xFF
@@ -290,8 +319,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             can_packet_callback(task, EVENT_RX_DONE, &param);
         }
 
-        if ( task->can_bms_status[task->can_charge_gun_sn] == CAN_NORMAL ) {
-        } else if ( task->can_bms_status[task->can_charge_gun_sn] == CAN_TP_RD ) {
+        if ( task->can_bms_status == CAN_NORMAL ) {
+        } else if ( task->can_bms_status == CAN_TP_RD ) {
             // CAN通信处于连接管理模式
         }
 

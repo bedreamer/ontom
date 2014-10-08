@@ -213,16 +213,21 @@ struct charge_task {
      */
     CHARGE_GUN_SN can_charge_gun_sn;
     // CAN BMS 通信所处状态
-    CAN_BMS_STATUS can_bms_status[BUFF_NR];
+    CAN_BMS_STATUS can_bms_status;
     // CAN 通信输入缓冲区
-    unsigned char can_buff_in[BUFF_NR][CAN_BUFF_SIZE];
-    volatile unsigned int can_buff_in_nr[BUFF_NR];
-    unsigned int can_packet_pgn[BUFF_NR];
+    unsigned char can_buff_in[CAN_BUFF_SIZE];
+    volatile unsigned int can_buff_in_nr;
+    unsigned int can_packet_pgn;
     // CAN 通信输出缓冲区
-    unsigned char can_buff_out[BUFF_NR][CAN_BUFF_SIZE];
-    volatile unsigned int can_buff_out_nr[BUFF_NR];
+    unsigned char can_buff_out[CAN_BUFF_SIZE];
+    volatile unsigned int can_buff_out_nr;
     // 标识CAN写缓冲是否满，若缓冲区满，则CAN线程向外写出数据, 写完后置0
-    volatile unsigned int can_buff_out_magic[BUFF_NR];
+    volatile unsigned int can_buff_out_magic;
+
+    // 连接管理时的输出数据包
+    unsigned char can_tp_buff_tx[8];
+    // 连接管理时的输出数据包大小
+    unsigned int can_tp_buff_nr;
 
     /* CAN 通信心跳
      * CAN 通信需要定时发送数据包，因此需要采用心跳计数，每10ms增加1
