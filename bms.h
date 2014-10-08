@@ -1,7 +1,7 @@
 /*
  * BMS 通信数据包定义
  * 版本 V 1.0
- * 遵循标准： GB/T 27930-2011
+ * 遵循标准： GB/T 27930-2011, SAE J1939-21
  */
 #ifndef _BMS_PACKAGE_INCLUDED_H_
 #define _BMS_PACKAGE_INCLUDED_H_
@@ -96,6 +96,7 @@ struct event_struct {
     EVT_PARAM evt_param;
 
     union {
+        // 如果不主动分类使用这两个指针，后果自负!!!!
         // 发送缓冲区地址， 针对EVENT_TX_REQUEST设置
         unsigned char *tx_buff;
         // 接收缓冲区地址，针对EVENT_RX_DONE设置

@@ -93,7 +93,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
     log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
 
-
     param.buff_payload = 0;
     param.evt_param = EVT_RET_INVALID;
 
