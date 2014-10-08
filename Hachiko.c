@@ -12,6 +12,11 @@
 #include "Hachiko.h"
 #include "log.h"
 #include "config.h"
+#define CLOCKID CLOCK_REALTIME
+#define SIG SIGRTMIN
+
+#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
+                       } while (0)
 
 static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 {
