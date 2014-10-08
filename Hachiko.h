@@ -24,7 +24,7 @@ typedef enum {
 struct Hachiko_food {
     // 定时器事件回调
     void (*Hachiko_notify_proc)(Hachiko_EVT evt, void *private,
-                                const Hachiko_food *self);
+                                const struct Hachiko_food *self);
     // 定时器类型
     Hachiko_Type type;
     // 定时器时长, 最小1ms的精度，根据设置而定，默认为10ms
