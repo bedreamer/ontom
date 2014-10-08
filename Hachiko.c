@@ -37,7 +37,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 }
 
 // 设定内部功能性定时器
-int Hachiko_feed(struct Hachiko_food *, Hachiko_Type type,
+int Hachiko_feed(struct Hachiko_food *thiz, Hachiko_Type type,
                  unsigned int ttl, void *private)
 {
     int err = ERR_OK;
