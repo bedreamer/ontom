@@ -2,6 +2,9 @@
  * 定时器为系统中大量的状态机自动退出提供了重要参考依据。
  * 推荐电影《忠犬八公》，谨以这份源码赞颂狗的忠诚。
  *
+ * REF:
+ *  http://man7.org/linux/man-pages/man2/timer_create.2.html
+ *  http://linux.die.net/man/2/timer_settime
  *
  */
 #include <stdlib.h>
@@ -12,17 +15,36 @@
 #include "Hachiko.h"
 #include "log.h"
 #include "config.h"
+#include "error.h"
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN
+#define NR_POOL 32
 
 #define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
                        } while (0)
+struct Hachiko_food *pool[NR_POOL] = {NULL};
+
+// 定时器指针整理，将有用的向前整理，失效的删除
+static int Hachiko_makeup(void)
+{
+
+}
 
 static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 {
     static int cc = 0;
     log_printf(DBG, "%d", cc++);
 }
+
+// 设定内部功能性定时器
+int Hachiko_feed(struct Hachiko_food *, Hachiko_Type type,
+                 unsigned int ttl, void *private)
+{
+    int err = ERR_OK;
+
+    return err;
+}
+
 
 // 定时器初始化
 void Hachiko_init()
@@ -36,7 +58,7 @@ void Hachiko_init()
 
     /* Establish handler for timer signal */
 
-    log_printf(INF, "Hachiko: Establishing handler for signal %d\n", SIG);
+    log_printf(INF, "Hachiko: Establishing handler for signal %d", SIG);
     sa.sa_flags = SA_SIGINFO;
     sa.sa_sigaction = Hachiko_wangwang;
     sigemptyset(&sa.sa_mask);
@@ -47,7 +69,7 @@ void Hachiko_init()
 
     /* Block timer signal temporarily */
 
-    log_printf(INF, "Hachiko: Blocking signal %d\n", SIG);
+    log_printf(INF, "Hachiko: Blocking signal %d", SIG);
     sigemptyset(&mask);
     sigaddset(&mask, SIG);
     if (sigprocmask(SIG_SETMASK, &mask, NULL) == -1) {
@@ -65,7 +87,7 @@ void Hachiko_init()
         errExit("Hachiko: timer_create");
     }
 
-    log_printf(INF, "Hachiko: timer ID is 0x%lx\n", (long) timerid);
+    log_printf(INF, "Hachiko: timer ID is 0x%lx", (long) timerid);
 
     /* Start the timer , 默认10ms*/
     freq_nanosecs = atoll(config_read("HachikoTTL"));
@@ -86,7 +108,7 @@ void Hachiko_init()
     /* Unlock the timer signal, so that timer notification
        can be delivered */
 
-    log_printf(INF, "Hachiko: Unblocking signal %d\n", SIG);
+    log_printf(INF, "Hachiko: Unblocking signal %d", SIG);
     if (sigprocmask(SIG_UNBLOCK, &mask, NULL) == -1) {
         log_printf(ERR, "Hachiko: sigprocmask faile.");
         errExit("Hachiko: sigprocmask");
