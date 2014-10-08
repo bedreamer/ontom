@@ -214,7 +214,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
         memset(&frame, 0, sizeof(frame));
         nbytes = write(s, &frame, sizeof(struct can_frame));
-        if ( frame.can_id & 0xFFFF != CAN_RCV_ID_MASK ) {
+        if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
             continue;
         }
         if ( nbytes != sizeof(struct can_frame) ) {
@@ -235,7 +235,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
          * 消息的总长度，需要发送的数据包个数（必须大于1），最大的数据包编号，
          * 这个消息的PGN等
          */
-        if ( frame.can_id & 0x00FF0000 == 0xEB ) {
+        if ( (frame.can_id & 0x00FF0000) == 0xEB ) {
             /* Data transfer
              * byte[1]: 数据包编号
              * byte[2:8]: 数据
@@ -250,7 +250,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[5]: 0xFF
              * byte[6:8]: PGN
              */
-        } else if ( frame.can_id & 0x00FF0000 == 0xEC ) {
+        } else if ( (frame.can_id & 0x00FF0000) == 0xEC ) {
             // Connection managment
             if ( 0x10 == frame.data[0] ) {
                 if ( task->can_tp_buff_nr ) {
@@ -271,7 +271,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 tp_packets_size = frame.data[2] * 256 + frame.data[1];
                 tp_packets_nr = frame.data[3];
                 tp_packet_PGN = frame.data[5] +
-                        frame.data[6] << 8 + frame.data[7] << 16;
+                        (frame.data[6] << 8) + (frame.data[7] << 16);
                 /*
                  * 接收到这个数据包后向BMS发送准备发送数据包
                  *
