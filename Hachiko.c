@@ -5,7 +5,10 @@
  *
  */
 #include <stdlib.h>
-#include <pthread.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <signal.h>
+#include <time.h>
 #include "Hachiko.h"
 #include "log.h"
 #include "config.h"
