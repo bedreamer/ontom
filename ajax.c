@@ -611,7 +611,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
     struct ajax_xml_struct thiz = {0};
     thiz.xml_conn = conn;
     if (ev == MG_REQUEST) {
-        log_printf(DBG, "%s&%s", conn->uri, conn->query_string);
+        log_printf(DBG_LV0, "%s&%s", conn->uri, conn->query_string);
         strncpy(thiz.xml_name, conn->uri, 31);
         err = ajax_gen_xml( & thiz );
         if ( err == ERR_OK ) {
