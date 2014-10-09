@@ -62,6 +62,17 @@ static int can_packet_callback(
         break;
     case EVENT_TX_TP_CTS:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
+        thiz->can_tp_buff_tx[0] = 0x11;
+        // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
+        thiz->can_tp_buff_tx[1] = thiz->tp_param.tp_pack_nr;
+        thiz->can_tp_buff_tx[2] = 1;
+        thiz->can_tp_buff_tx[3] = 0xFF;
+        thiz->can_tp_buff_tx[4] = 0xFF;
+        thiz->can_tp_buff_tx[5] = (thiz->tp_param.tp_pgn >> 16) & 0xFF;
+        thiz->can_tp_buff_tx[6] = (thiz->tp_param.tp_pgn >> 8 ) & 0xFF;
+        thiz->can_tp_buff_tx[7] = thiz->tp_param.tp_pgn & 0xFF;
+        thiz->can_tp_buff_nr = 8;
+        param->evt_param = EVT_RET_OK;
         break;
     case EVENT_TX_TP_ACK:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
@@ -369,17 +380,20 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 task->tp_param.tp_rcv_bytes = 0;
                 task->tp_param.tp_rcv_pack_nr = 0;
                 task->can_bms_status = CAN_TP_RD | CAN_TP_CTS;
-                log_printf(DBG_LV2, "BMS: data connection accepted, rolling...");
+                log_printf(DBG_LV2,
+                           "BMS: data connection accepted, rolling...");
             } else if ( 0xFF == frame.data[0] ) {
                 /* connection abort.
                  * byte[1]: 0xFF
                  * byte[2:5]: 0xFF
                  * byte[6:8]: PGN
                  */
-                log_printf(DBG_LV2, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
+                log_printf(DBG_LV2, "BMS: %08X",
+                           *(unsigned int*)(&frame.data[0]));
             } else {
                 //omited.
-                log_printf(DBG_LV3, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
+                log_printf(DBG_LV3, "BMS: %08X",
+                           *(unsigned int*)(&frame.data[0]));
             }
         } else {
             param.buff_payload = frame.can_dlc;
