@@ -181,12 +181,12 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         }
 
         // 应答结束
-        if ( task->can_bms_status == CAN_TP_RD | CAN_TP_ACK ) {
+        if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ACK) ) {
             task->can_bms_status = CAN_NORMAL;
             log_printf(DBG, "BMS: connection closed normally.");
         }
         // 传输终止
-        if ( task->can_bms_status == CAN_TP_RD | CAN_TP_ABRT ) {
+        if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ABRT) ) {
             task->can_bms_status = CAN_NORMAL;
             log_printf(DBG, "BMS: connection aborted.");
         }
@@ -364,6 +364,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 task->tp_param.tp_rcv_bytes = 0;
                 task->tp_param.tp_rcv_pack_nr = 0;
                 task->can_bms_status = CAN_TP_RD | CAN_TP_CTS;
+                log_printf(DBG, "BMS: data connection accepted, rolling...");
             } else if ( 0xFF == frame.data[0] ) {
                 /* connection abort.
                  * byte[1]: 0xFF
