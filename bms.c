@@ -262,12 +262,12 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         memset(&frame, 0, sizeof(frame));
         nbytes = read(s, &frame, sizeof(struct can_frame));
         if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
-            log_printf(DBG, "BMS: id not accept %x", frame.can_id);
+            log_printf(DBG_LV1, "BMS: id not accept %x", frame.can_id);
             continue;
         }
         if ( nbytes != sizeof(struct can_frame) ) {
             param.evt_param = EVT_RET_ERR;
-            log_printf(DBG, "BMS: read frame error %x", frame.can_id);
+            log_printf(DBG_LV3, "BMS: read frame error %x", frame.can_id);
             can_packet_callback(task, EVENT_RX_ERROR, &param);
             continue;
         }
@@ -369,23 +369,23 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 task->tp_param.tp_rcv_bytes = 0;
                 task->tp_param.tp_rcv_pack_nr = 0;
                 task->can_bms_status = CAN_TP_RD | CAN_TP_CTS;
-                log_printf(DBG, "BMS: data connection accepted, rolling...");
+                log_printf(DBG_LV2, "BMS: data connection accepted, rolling...");
             } else if ( 0xFF == frame.data[0] ) {
                 /* connection abort.
                  * byte[1]: 0xFF
                  * byte[2:5]: 0xFF
                  * byte[6:8]: PGN
                  */
-                log_printf(DBG, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
+                log_printf(DBG_LV2, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
             } else {
                 //omited.
-                log_printf(DBG, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
+                log_printf(DBG_LV3, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
             }
         } else {
             param.buff_payload = frame.can_dlc;
             param.evt_param = EVT_RET_INVALID;
             can_packet_callback(task, EVENT_RX_DONE, &param);
-            log_printf(DBG, "BMS: read a frame done. %08X", frame.can_id);
+            log_printf(DBG_LV0, "BMS: read a frame done. %08X", frame.can_id);
         }
 
         if ( task->can_bms_status == CAN_NORMAL ) {
