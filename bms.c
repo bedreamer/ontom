@@ -50,6 +50,7 @@ static int can_packet_callback(
         break;
     case EVENT_TX_PRE:
         // 决定是否要发送刚刚准备发送的数据包
+        param->evt_param = EVT_RET_OK;
         break;
     case EVENT_TX_REQUEST:
         /*
