@@ -70,9 +70,15 @@ CONFIG_DOMAIN_BEGIN
 {"thread_bms_read_service",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
-   // 定时器分辨率
+// 定时器分辨率
 {"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"10000000"}},
-   // 开始充电任务的刷卡卡号
+{"debug_lv1",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lv2",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lv3",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lv4",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+
+
+// 开始充电任务的刷卡卡号
 {"triger_card_sn",              C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
    // 确认充电的刷卡卡号
 {"confirm_card_sn",             C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},

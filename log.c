@@ -8,6 +8,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
 	char buff[256]={0};
 	va_list ap;
 	char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
+    const char *cfg;
 
 	va_start(ap, fmt);
 	vsnprintf(buff, sizeof(buff), fmt, ap);
@@ -26,8 +27,40 @@ int log_printf(unsigned int level, const char *fmt, ...)
     case DBG:
         printf("\033[34m[DBG]\033[0m %s\n", buff);
         break;
+    case DBG_LV0:
+        cfg = config_read("debug_lv0");
+        if ( strcmp(cfg, "false") == 0 ||
+             strcmp(cfg, "FALSE") == 0 ) {
+            return;
+        }
+        printf("\033[34m[DBG_LV0]\033[0m %s\n", buff);
+        break;
+    case DBG_LV1:
+        cfg = config_read("debug_lv1");
+        if ( strcmp(cfg, "false") == 0 ||
+             strcmp(cfg, "FALSE") == 0 ) {
+            return;
+        }
+        printf("\033[34m[DBG_LV1]\033[0m %s\n", buff);
+        break;
+    case DBG_LV2:
+        cfg = config_read("debug_lv2");
+        if ( strcmp(cfg, "false") == 0 ||
+             strcmp(cfg, "FALSE") == 0 ) {
+            return;
+        }
+        printf("\033[34m[DBG_LV2]\033[0m %s\n", buff);
+        break;
+    case DBG_LV3:
+        cfg = config_read("debug_lv3");
+        if ( strcmp(cfg, "false") == 0 ||
+             strcmp(cfg, "FALSE") == 0 ) {
+            return;
+        }
+        printf("\033[34m[DBG_LV3]\033[0m %s\n", buff);
+        break;
     default:
-        return printf("%s\n", buff);
+        //return printf("%s\n", buff);
         break;
     }
 }
