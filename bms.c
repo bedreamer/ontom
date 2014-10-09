@@ -28,6 +28,7 @@ static int can_packet_callback(
     switch ( ev ) {
     case EVENT_CAN_INIT:
         // 事件循环函数初始化
+        thiz->can_bms_status = CAN_NORMAL;
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
@@ -104,6 +105,8 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
     param.buff_payload = 0;
     param.evt_param = EVT_RET_INVALID;
+
+    can_packet_callback(task, EVENT_CAN_INIT, &param);
 
     while ( ! *done ) {
         usleep(90000);
