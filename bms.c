@@ -274,7 +274,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         memset(&frame, 0, sizeof(frame));
         nbytes = read(s, &frame, sizeof(struct can_frame));
         if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
-            log_printf(DBG_LV1, "BMS: id not accept %x", frame.can_id);
+            log_printf(DBG_LV0, "BMS: id not accept %x", frame.can_id);
             continue;
         }
         if ( nbytes != sizeof(struct can_frame) ) {
