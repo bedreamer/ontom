@@ -62,16 +62,15 @@ static int can_packet_callback(
         break;
     case EVENT_TX_TP_CTS:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
-        thiz->can_buff_out[0] = 0x11;
+        param->buff.tx_buff[0] = 0x11;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
-        thiz->can_buff_out[1] = thiz->can_tp_param.tp_pack_nr;
-        thiz->can_buff_out[2] = 1;
-        thiz->can_buff_out[3] = 0xFF;
-        thiz->can_buff_out[4] = 0xFF;
-        thiz->can_buff_out[5] = (thiz->can_tp_param.tp_pgn >> 16) & 0xFF;
-        thiz->can_buff_out[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
-        thiz->can_buff_out[7] = thiz->can_tp_param.tp_pgn & 0xFF;
-        thiz->can_buff_out_nr = 8;
+        param->buff.tx_buff[1] = thiz->can_tp_param.tp_pack_nr;
+        param->buff.tx_buff[2] = 1;
+        param->buff.tx_buff[3] = 0xFF;
+        param->buff.tx_buff[4] = 0xFF;
+        param->buff.tx_buff[5] = (thiz->can_tp_param.tp_pgn >> 16) & 0xFF;
+        param->buff.tx_buff[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
+        param->buff.tx_buff[7] = thiz->can_tp_param.tp_pgn & 0xFF;
         param->buff_payload = 8;
         param->evt_param = EVT_RET_OK;
         break;
@@ -183,7 +182,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         if ( param.buff_payload <= 8 && param.buff_payload > 0 ) {
             frame.can_id = 0x1811f456;
             frame.can_dlc= 8;
-            memcpy(frame.data, task->can_buff_out, 8);
+            memcpy(frame.data, param->buff.tx_buff, 8);
             nbytes = write(s, &frame, sizeof(struct can_frame));
             if ( nbytes < param.buff_payload ) {
                 param.evt_param = EVT_RET_ERR;
