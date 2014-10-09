@@ -180,9 +180,9 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
          * 8字节限制，因此这里不用进行连接管理通信。
          */
         if ( param.buff_payload <= 8 && param.buff_payload > 0 ) {
+            memcpy(frame.data, param.buff.tx_buff, 8);
             frame.can_id = 0x1811f456;
             frame.can_dlc= 8;
-            memcpy(frame.data, param.buff.tx_buff, 8);
             nbytes = write(s, &frame, sizeof(struct can_frame));
             if ( nbytes < param.buff_payload ) {
                 param.evt_param = EVT_RET_ERR;
