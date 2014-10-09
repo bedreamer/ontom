@@ -385,7 +385,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             param.buff_payload = frame.can_dlc;
             param.evt_param = EVT_RET_INVALID;
             can_packet_callback(task, EVENT_RX_DONE, &param);
-            log_printf(DBG, "BMS: read a frame done.");
+            log_printf(DBG, "BMS: read a frame done. %08X", frame.can_id);
         }
 
         if ( task->can_bms_status == CAN_NORMAL ) {
