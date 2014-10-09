@@ -56,7 +56,16 @@ static int can_packet_callback(
          * 进行数据包发送的条件是：充电枪物理连接正常，进入车辆识别过程，或充电过程。
          */
         break;
-    case EVENT_TX_TP_REQUEST:
+    case EVENT_TX_TP_RTS: // 本系统中BMS通信暂时不会使用
+        //串口处于连接管理状态时，将会收到该传输数据报请求。
+        break;
+    case EVENT_TX_TP_CTS:
+        //串口处于连接管理状态时，将会收到该传输数据报请求。
+        break;
+    case EVENT_TX_TP_ACK:
+        //串口处于连接管理状态时，将会收到该传输数据报请求。
+        break;
+    case EVENT_TX_TP_ABRT:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
         break;
     default:
@@ -100,16 +109,39 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         usleep(90000);
 
         /*
-         * 写线程同时负责写数据和进行连接管理时的控制数据写出，这里需要对当前CAN的状态
-         * 进行判定，当CAN处于CAN_NORMAL时进行普通的写操作，当CAN处于CAN_TP_RD时，
-         * 采用EVENT_TX_REQUEST 当CAN处于CAN_TP_RD时采用EVENT_TX_TP_REQUEST
+         * 写线程同时负责写数据和进行连接管理时的控制数据写出，这里需要对当前CAN的
+         * 状态进行判定，当CAN处于CAN_NORMAL时进行普通的写操作，当CAN处于CAN_TP_RD
+         * 时，采用EVENT_TX_REQUEST 当CAN处于CAN_TP_RD时采用EVENT_TX_TP_REQUEST
          */
         param.buff.tx_buff = txbuff;
         param.buff_size = sizeof(txbuff);
-        if ( task->can_bms_status == CAN_NORMAL ) {
+        if ( task->can_bms_status & CAN_NORMAL ) {
             can_packet_callback(task, EVENT_TX_REQUEST, &param);
+        } else if ( task->can_bms_status & CAN_TP_RD ) {
+            switch ( task->can_bms_status & 0xF0 ) {
+            case CAN_TP_CTS:
+                can_packet_callback(task, EVENT_TX_TP_CTS, &param);
+                break;
+            case CAN_TP_ACK:
+                can_packet_callback(task, EVENT_TX_TP_ACK, &param);
+                break;
+            case CAN_TP_ABRT:
+                can_packet_callback(task, EVENT_TX_TP_ABRT, &param);
+                break;
+            default:
+                log_printf(WRN, "BMS: can_bms_status crashed(%d).",
+                           task->can_bms_status);
+                continue;
+                break;
+            }
+        } else if ( task->can_bms_status & CAN_TP_WRITE ) {
+            // 当前协议没有用到
+            log_printf(WRN, "BMS: CAN_TP_WRITE not implement.");
+            continue;
         } else {
-            can_packet_callback(task, EVENT_TX_TP_REQUEST, &param);
+            log_printf(WRN, "BMS: invalid can_bms_status: %d.",
+                       task->can_bms_status);
+            continue;
         }
         if ( EVT_RET_OK != param.evt_param ) {
             continue;
@@ -146,6 +178,17 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                            "Connection manage for send has not implemented.");
             }
             notimplement ++;
+        }
+
+        // 应答结束
+        if ( task->can_bms_status == CAN_TP_RD | CAN_TP_ACK ) {
+            task->can_bms_status = CAN_NORMAL;
+            log_printf(DBG, "BMS: connection closed normally.");
+        }
+        // 传输终止
+        if ( task->can_bms_status == CAN_TP_RD | CAN_TP_ABRT ) {
+            task->can_bms_status = CAN_NORMAL;
+            log_printf(DBG, "BMS: connection aborted.");
         }
     }
 }
@@ -184,6 +227,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     struct event_struct param;
     // 用于链接管理的数据缓冲
     unsigned char tp_buff[2048];
+
     // 缓冲区数据字节数
     unsigned int tp_cnt = 0;
     // 数据包个数
@@ -213,7 +257,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         }
 
         memset(&frame, 0, sizeof(frame));
-        nbytes = write(s, &frame, sizeof(struct can_frame));
+        nbytes = read(s, &frame, sizeof(struct can_frame));
         if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
             continue;
         }
@@ -250,6 +294,15 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[5]: 0xFF
              * byte[6:8]: PGN
              */
+            memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
+            task->tp_param.tp_rcv_pack_nr ++;
+            if ( task->tp_param.tp_rcv_pack_nr >= task->tp_param.tp_pack_nr ) {
+                param.buff_payload = frame.can_dlc;
+                param.evt_param = EVT_RET_INVALID;
+                can_packet_callback(task, EVENT_RX_DONE, &param);
+                // 数据链接接受完成
+                task->can_bms_status = CAN_TP_RD | CAN_TP_ACK;
+            }
         } else if ( (frame.can_id & 0x00FF0000) == 0xEC ) {
             // Connection managment
             if ( 0x10 == frame.data[0] ) {
@@ -291,9 +344,10 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                                "detect a BMS transfer error, pack count < 2");
                     continue;
                 }
-
+/*
                 // connection request check ok, then do a answer.
                 task->can_tp_buff_tx[0] = 0x11;
+                // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
                 task->can_tp_buff_tx[1] = tp_packets_nr;
                 task->can_tp_buff_tx[2] = 1;
                 task->can_tp_buff_tx[3] = 0xFF;
@@ -303,7 +357,13 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 task->can_tp_buff_tx[7] = frame.data[7];
                 task->can_tp_buff_nr = 8;
                 log_printf(DBG, "CAN status change to CAN_TP_RD");
-                task->can_bms_status = CAN_TP_RD;
+*/
+                task->tp_param.tp_pack_nr = tp_packets_nr;
+                task->tp_param.tp_size = tp_packets_size;
+                task->tp_param.tp_pgn = tp_packet_PGN;
+                task->tp_param.tp_rcv_bytes = 0;
+                task->tp_param.tp_rcv_pack_nr = 0;
+                task->can_bms_status = CAN_TP_RD | CAN_TP_CTS;
             } else if ( 0xFF == frame.data[0] ) {
                 /* connection abort.
                  * byte[1]: 0xFF
@@ -323,7 +383,6 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         } else if ( task->can_bms_status == CAN_TP_RD ) {
             // CAN通信处于连接管理模式
         }
-
 
 #if 0
         log_printf(DBG, "TX%d---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",

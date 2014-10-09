@@ -52,28 +52,37 @@ typedef enum {
 
     /* 连接管理模式下的请求发送数据包，进行连接数据控制。
      */
-    EVENT_TX_TP_REQUEST = 4,
+    EVENT_TX_TP_RTS = 4,
+    /* 连接管理模式下的准备发送数据包，进行连接数据控制。
+     */
+    EVENT_TX_TP_CTS = 5,
+    /* 连接管理模式下的接收数据包完成应答，进行连接数据控制。
+     */
+    EVENT_TX_TP_ACK = 6,
+    /* 连接管理模式下的传输中止，进行连接数据控制。
+     */
+    EVENT_TX_TP_ABRT= 7,
 
     /* 数据包准备发送。当EVENT_TX_REQUEST返回结果是需要发送时，经发送线程
      * 经发送线程确认后，将会受到该消息，表示发送线程已经准备发送该消息了，此时
      * 可以返回取消发送指令，实现数据包的取消发送。
      */
-    EVENT_TX_PRE     = 5,
+    EVENT_TX_PRE     = 8,
 
     /* 数据包发送完成。当确认后的数据包发送完成后，将会受到该消息，表征数据包
      * 已经正确的发送完成。
      */
-    EVENT_TX_DONE    = 6,
+    EVENT_TX_DONE    = 9,
 
     /* 数据包发送失败。当确认后的数据包发送失败后，将会受到改小。
      */
-    EVENT_TX_FAILS   = 7,
+    EVENT_TX_FAILS   = 10,
 
     // CAN 消息函数初始化。当第一次运行函数时将会收到该消息，可重复发送。
-    EVENT_CAN_INIT   = 8,
+    EVENT_CAN_INIT   = 11,
 
     // CAN 消息复位。再次执行初始化操作。
-    EVENT_CAN_RESET  = 9
+    EVENT_CAN_RESET  = 12
 }EVENT_CAN;
 
 // 事件通知返回/传入参数
@@ -89,6 +98,21 @@ typedef enum {
     // 终止发送，EVENT_CAN.EVENT_TX_PRE的可用参数
     EVT_RET_TX_ABORT = 4
 }EVT_PARAM;
+
+// CAN 链接临时参数
+struct can_tp_param {
+    // 传输的数据包PGN
+    unsigned int tp_pgn;
+    // 即将传输的数据包大小
+    unsigned int tp_size;
+    // 即将传输的数据包个数
+    unsigned int tp_pack_nr;
+
+    // 已经接收的数据字节数
+    unsigned int tp_rcv_bytes;
+    // 已经接收的数据包个数
+    unsigned int tp_rcv_pack_nr;
+};
 
 // 事件通知结构
 struct event_struct {

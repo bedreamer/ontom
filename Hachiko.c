@@ -30,6 +30,11 @@ static int Hachiko_makeup(void)
 
 }
 
+/*
+ * 定时器处理过程
+ *
+ * 按照设定的分辨率，定时进入该过程完成，相应条件的判定和处理
+ */
 static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 {
     static int cc = 0;

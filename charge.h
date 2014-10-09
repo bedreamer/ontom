@@ -157,6 +157,18 @@ typedef enum {
     CAN_TP_WRITE              =0x03
 }CAN_BMS_STATUS;
 
+// CAN 传输链接状态
+typedef enum {
+    // 链接请求发送
+    CAN_TP_RTS = 0x10,
+    // 链接准备发送
+    CAN_TP_CTS = 0x20,
+    // 链接发送完成
+    CAN_TP_ACK = 0x40,
+    // 链接发送中止
+    CAN_TP_ABRT= 0x80
+}CAN_TP_STATUS;
+
 /*
  * 充电任务描述
  */
@@ -228,6 +240,9 @@ struct charge_task {
     unsigned char can_tp_buff_tx[8];
     // 连接管理时的输出数据包大小
     unsigned int can_tp_buff_nr;
+    // 连接管理的传输控制参数
+    struct can_tp_param tp_param;
+
 
     /* CAN 通信心跳
      * CAN 通信需要定时发送数据包，因此需要采用心跳计数，每10ms增加1
