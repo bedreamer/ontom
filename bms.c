@@ -129,6 +129,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
          */
         param.buff.tx_buff = txbuff;
         param.buff_size = sizeof(txbuff);
+        param.evt_param = EVT_RET_INVALID;
         if ( task->can_bms_status & CAN_NORMAL ) {
             can_packet_callback(task, EVENT_TX_REQUEST, &param);
         } else if ( task->can_bms_status & CAN_TP_RD ) {
