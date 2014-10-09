@@ -62,16 +62,17 @@ static int can_packet_callback(
         break;
     case EVENT_TX_TP_CTS:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
-        thiz->can_tp_buff_tx[0] = 0x11;
+        thiz->can_buff_out[0] = 0x11;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
-        thiz->can_tp_buff_tx[1] = thiz->can_tp_param.tp_pack_nr;
-        thiz->can_tp_buff_tx[2] = 1;
-        thiz->can_tp_buff_tx[3] = 0xFF;
-        thiz->can_tp_buff_tx[4] = 0xFF;
-        thiz->can_tp_buff_tx[5] = (thiz->can_tp_param.tp_pgn >> 16) & 0xFF;
-        thiz->can_tp_buff_tx[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
-        thiz->can_tp_buff_tx[7] = thiz->can_tp_param.tp_pgn & 0xFF;
-        thiz->can_tp_buff_nr = 8;
+        thiz->can_buff_out[1] = thiz->can_tp_param.tp_pack_nr;
+        thiz->can_buff_out[2] = 1;
+        thiz->can_buff_out[3] = 0xFF;
+        thiz->can_buff_out[4] = 0xFF;
+        thiz->can_buff_out[5] = (thiz->can_tp_param.tp_pgn >> 16) & 0xFF;
+        thiz->can_buff_out[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
+        thiz->can_buff_out[7] = thiz->can_tp_param.tp_pgn & 0xFF;
+        thiz->can_buff_out_nr = 8;
+        param->buff_payload = 8;
         param->evt_param = EVT_RET_OK;
         break;
     case EVENT_TX_TP_ACK:
@@ -180,7 +181,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
          * 8字节限制，因此这里不用进行连接管理通信。
          */
         if ( param.buff_payload <= 8 && param.buff_payload > 0 ) {
-            frame.can_id = 0x1812f456;
+            frame.can_id = 0x1811f456;
             frame.can_dlc= 8;
             memcpy(frame.data, task->can_buff_out, 8);
             nbytes = write(s, &frame, sizeof(struct can_frame));

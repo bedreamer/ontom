@@ -236,10 +236,6 @@ struct charge_task {
     // 标识CAN写缓冲是否满，若缓冲区满，则CAN线程向外写出数据, 写完后置0
     volatile unsigned int can_buff_out_magic;
 
-    // 连接管理时的输出数据包
-    unsigned char can_tp_buff_tx[8];
-    // 连接管理时的输出数据包大小
-    unsigned int can_tp_buff_nr;
     // 连接管理的传输控制参数
     struct can_tp_param can_tp_param;
 
