@@ -29,6 +29,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV0:
         cfg = config_read("debug_lv0");
+        if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return;
@@ -37,6 +38,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV1:
         cfg = config_read("debug_lv1");
+        if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return;
@@ -45,6 +47,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV2:
         cfg = config_read("debug_lv2");
+        if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return;
@@ -53,6 +56,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV3:
         cfg = config_read("debug_lv3");
+        if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return;

@@ -38,7 +38,7 @@ static int Hachiko_makeup(void)
 static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 {
     static int cc = 0;
-    log_printf(DBG, "%d", cc++);
+    log_printf(DBG_LV0, "%d", cc++);
 }
 
 // 设定内部功能性定时器
