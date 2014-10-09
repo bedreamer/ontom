@@ -284,7 +284,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
          * 消息的总长度，需要发送的数据包个数（必须大于1），最大的数据包编号，
          * 这个消息的PGN等
          */
-        if ( (frame.can_id & 0x00FF0000) == 0xEB ) {
+        if ( ((frame.can_id & 0x00FF0000) >> 16) == 0xEB ) {
             /* Data transfer
              * byte[1]: 数据包编号
              * byte[2:8]: 数据
@@ -308,7 +308,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 // 数据链接接受完成
                 task->can_bms_status = CAN_TP_RD | CAN_TP_ACK;
             }
-        } else if ( (frame.can_id & 0x00FF0000) == 0xEC ) {
+        } else if ( ((frame.can_id & 0x00FF0000) >> 16 ) == 0xEC ) {
             // Connection managment
             if ( 0x10 == frame.data[0] ) {
                 if ( task->can_tp_buff_nr ) {
