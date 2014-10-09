@@ -262,10 +262,12 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         memset(&frame, 0, sizeof(frame));
         nbytes = read(s, &frame, sizeof(struct can_frame));
         if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
+            log_printf(DBG, "BMS: id not accept %x", frame.can_id);
             continue;
         }
         if ( nbytes != sizeof(struct can_frame) ) {
             param.evt_param = EVT_RET_ERR;
+            log_printf(DBG, "BMS: read frame error %x", frame.can_id);
             can_packet_callback(task, EVENT_RX_ERROR, &param);
             continue;
         }
