@@ -72,10 +72,10 @@ CONFIG_DOMAIN_BEGIN
 {"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 定时器分辨率
 {"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"10000000"}},
-{"debug_lv0",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
-{"debug_lv1",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
-{"debug_lv2",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
-{"debug_lv3",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lvA",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lvB",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lvC",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lvD",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
 
 
 // 开始充电任务的刷卡卡号
