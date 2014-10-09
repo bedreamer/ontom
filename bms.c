@@ -376,13 +376,16 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                  * byte[2:5]: 0xFF
                  * byte[6:8]: PGN
                  */
+                log_printf(DBG, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
             } else {
                 //omited.
+                log_printf(DBG, "BMS: %08X", *(unsigned int*)(&frame.data[0]));
             }
         } else {
             param.buff_payload = frame.can_dlc;
             param.evt_param = EVT_RET_INVALID;
             can_packet_callback(task, EVENT_RX_DONE, &param);
+            log_printf(DBG, "BMS: read a frame done.");
         }
 
         if ( task->can_bms_status == CAN_NORMAL ) {
