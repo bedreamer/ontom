@@ -50,7 +50,6 @@ static int can_packet_callback(
         break;
     case EVENT_TX_PRE:
         // 决定是否要发送刚刚准备发送的数据包
-        param->evt_param = EVT_RET_OK;
         break;
     case EVENT_TX_REQUEST:
         /*
@@ -65,13 +64,13 @@ static int can_packet_callback(
         //串口处于连接管理状态时，将会收到该传输数据报请求。
         thiz->can_tp_buff_tx[0] = 0x11;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
-        thiz->can_tp_buff_tx[1] = thiz->tp_param.tp_pack_nr;
+        thiz->can_tp_buff_tx[1] = thiz->can_tp_param.tp_pack_nr;
         thiz->can_tp_buff_tx[2] = 1;
         thiz->can_tp_buff_tx[3] = 0xFF;
         thiz->can_tp_buff_tx[4] = 0xFF;
-        thiz->can_tp_buff_tx[5] = (thiz->tp_param.tp_pgn >> 16) & 0xFF;
-        thiz->can_tp_buff_tx[6] = (thiz->tp_param.tp_pgn >> 8 ) & 0xFF;
-        thiz->can_tp_buff_tx[7] = thiz->tp_param.tp_pgn & 0xFF;
+        thiz->can_tp_buff_tx[5] = (thiz->can_tp_param.tp_pgn >> 16) & 0xFF;
+        thiz->can_tp_buff_tx[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
+        thiz->can_tp_buff_tx[7] = thiz->can_tp_param.tp_pgn & 0xFF;
         thiz->can_tp_buff_nr = 8;
         param->evt_param = EVT_RET_OK;
         break;
@@ -158,34 +157,38 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                        task->can_bms_status);
             continue;
         }
+
         if ( EVT_RET_OK != param.evt_param ) {
             continue;
         }
 
         param.evt_param = EVT_RET_INVALID;
-        can_packet_callback(task, EVENT_TX_PRE, &param);
-        if ( EVT_RET_TX_ABORT == param.evt_param ) {
-            // packet sent abort.
-            continue;
-        } else if ( EVT_RET_OK != param.evt_param ) {
-            continue;
-        } else {
-            // confirm to send.
+        // 链接模式下的数据包发送不需要确认, 并且也不能被中止
+        if ( task->can_bms_status == CAN_NORMAL ) {
+            can_packet_callback(task, EVENT_TX_PRE, &param);
+            if ( EVT_RET_TX_ABORT == param.evt_param ) {
+                // packet sent abort.
+                continue;
+            } else if ( EVT_RET_OK != param.evt_param ) {
+                continue;
+            } else {
+                // confirm to send.
+            }
         }
 
         /* 根据GB/T 27930-2011 中相关规定，充电机向BMS发送数据包都没有超过
          * 8字节限制，因此这里不用进行连接管理通信。
          */
-        if ( param.buff_payload <= 8 ) {
+        if ( param.buff_payload <= 8 && param.buff_payload > 0 ) {
             nbytes = write(s, &frame, sizeof(struct can_frame));
-            if ( nbytes != param.buff_payload ) {
+            if ( nbytes < param.buff_payload ) {
                 param.evt_param = EVT_RET_ERR;
                 can_packet_callback(task, EVENT_TX_FAILS, &param);
             } else {
                 param.evt_param = EVT_RET_OK;
                 can_packet_callback(task, EVENT_TX_DONE, &param);
             }
-        } else {
+        } else if ( param.buff_payload > 8 ) {
             // 大于8字节的数据包在这里处理，程序向后兼容
             static unsigned int notimplement = 0;
             if ( notimplement % 10000 == 0 ) {
@@ -193,6 +196,8 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                            "Connection manage for send has not implemented.");
             }
             notimplement ++;
+        } else {
+            log_printf(WRN, "BMS: wrong pack size.");
         }
 
         // 应答结束
@@ -312,8 +317,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[6:8]: PGN
              */
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
-            task->tp_param.tp_rcv_pack_nr ++;
-            if ( task->tp_param.tp_rcv_pack_nr >= task->tp_param.tp_pack_nr ) {
+            task->can_tp_param.tp_rcv_pack_nr ++;
+            if ( task->can_tp_param.tp_rcv_pack_nr >= task->can_tp_param.tp_pack_nr ) {
                 param.buff_payload = frame.can_dlc;
                 param.evt_param = EVT_RET_INVALID;
                 can_packet_callback(task, EVENT_RX_DONE, &param);
@@ -375,14 +380,16 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 task->can_tp_buff_nr = 8;
                 log_printf(DBG, "CAN status change to CAN_TP_RD");
 */
-                task->tp_param.tp_pack_nr = tp_packets_nr;
-                task->tp_param.tp_size = tp_packets_size;
-                task->tp_param.tp_pgn = tp_packet_PGN;
-                task->tp_param.tp_rcv_bytes = 0;
-                task->tp_param.tp_rcv_pack_nr = 0;
+                task->can_tp_param.tp_pack_nr = tp_packets_nr;
+                task->can_tp_param.tp_size = tp_packets_size;
+                task->can_tp_param.tp_pgn = tp_packet_PGN;
+                task->can_tp_param.tp_rcv_bytes = 0;
+                task->can_tp_param.tp_rcv_pack_nr = 0;
                 task->can_bms_status = CAN_TP_RD | CAN_TP_CTS;
                 log_printf(DBG_LV2,
-                           "BMS: data connection accepted, rolling...");
+                           "BMS: data connection accepted, rolling..."
+                           "PGN: %X, total: %d packets, %d bytes",
+                           tp_packet_PGN, tp_packets_nr, tp_packets_size);
             } else if ( 0xFF == frame.data[0] ) {
                 /* connection abort.
                  * byte[1]: 0xFF

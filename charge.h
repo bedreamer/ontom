@@ -241,7 +241,7 @@ struct charge_task {
     // 连接管理时的输出数据包大小
     unsigned int can_tp_buff_nr;
     // 连接管理的传输控制参数
-    struct can_tp_param tp_param;
+    struct can_tp_param can_tp_param;
 
 
     /* CAN 通信心跳
