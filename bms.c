@@ -286,7 +286,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
         usleep(90000);
 
-        if ( task->can_bms_status == CAN_INVALID ) {
+        if ( task->can_bms_status  == CAN_INVALID ) {
             continue;
         }
 
@@ -320,7 +320,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[1]: 数据包编号
              * byte[2:8]: 数据
              */
-            if ( task->can_bms_status & CAN_TP_RX != CAN_TP_RX ) {
+            if ( task->can_bms_status & CAN_TP_RD != CAN_TP_RD ) {
                 task->can_bms_status = CAN_NORMAL;
                 continue;
             }
