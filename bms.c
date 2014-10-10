@@ -320,6 +320,10 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[1]: 数据包编号
              * byte[2:8]: 数据
              */
+            if ( task->can_bms_status & CAN_TP_RX != CAN_TP_RX ) {
+                task->can_bms_status = CAN_NORMAL;
+                continue;
+            }
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
             log_printf(DBG_LV2, "BMS: data tansfer fetch the %dst packet.",
                        frame.data[0]);
