@@ -333,7 +333,7 @@ struct pgn4864 {
     u8 min_temperature_of_battery;
     // 最低温度采样点编号
     u8 sn_of_min_temperature_point;
-    // 遥信
+    // 遥信 @ enum pgn4846_remote_single
     u16 remote_single;
 };
 enum pgn4846_remote_single {
