@@ -34,7 +34,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return;
         }
-        printf("\033[34m[DBG_LV0]\033[0m %s\n", buff);
+        printf("\033[35m[DBG_LV0]\033[0m %s\n", buff);
         break;
     case DBG_LV1:
         cfg = config_read("debug_lvB");
@@ -43,7 +43,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return;
         }
-        printf("\033[34m[DBG_LV1]\033[0m %s\n", buff);
+        printf("\033[35m[DBG_LV1]\033[0m %s\n", buff);
         break;
     case DBG_LV2:
         cfg = config_read("debug_lvC");
@@ -52,7 +52,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return;
         }
-        printf("\033[34m[DBG_LV2]\033[0m %s\n", buff);
+        printf("\033[36m[DBG_LV2]\033[0m %s\n", buff);
         break;
     case DBG_LV3:
         cfg = config_read("debug_lvD");
@@ -61,7 +61,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return;
         }
-        printf("\033[34m[DBG_LV3]\033[0m %s\n", buff);
+        printf("\033[36m[DBG_LV3]\033[0m %s\n", buff);
         break;
     default:
         //return printf("%s\n", buff);
