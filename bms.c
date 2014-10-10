@@ -171,7 +171,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                 continue;
                 break;
             }
-        } else if ( task->can_bms_status & CAN_TP_WRITE ) {
+        } else if ( task->can_bms_status & CAN_TP_WR ) {
             // 当前协议没有用到
             log_printf(WRN, "BMS: CAN_TP_WRITE not implement.");
             continue;
