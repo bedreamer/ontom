@@ -76,6 +76,17 @@ static int can_packet_callback(
         break;
     case EVENT_TX_TP_ACK:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
+        param->buff.tx_buff[0] = 0x13;
+        // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
+        param->buff.tx_buff[1] = thiz->can_tp_param.tp_size & 0xFF;
+        param->buff.tx_buff[2] = (thiz->can_tp_param.tp_size >> 8) & 0xFF;
+        param->buff.tx_buff[3] = thiz->can_tp_param.tp_pack_nr;
+        param->buff.tx_buff[4] = 0xFF;
+        param->buff.tx_buff[5] = (thiz->can_tp_param.tp_pgn >> 16) & 0xFF;
+        param->buff.tx_buff[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
+        param->buff.tx_buff[7] = thiz->can_tp_param.tp_pgn & 0xFF;
+        param->buff_payload = 8;
+        param->evt_param = EVT_RET_OK;
         break;
     case EVENT_TX_TP_ABRT:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
@@ -331,6 +342,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[6:8]: PGN
              */
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
+            log_printf(DBG_LV2, "BMS: data tansfer fetch the %d packet.",
+                       frame.data[0]);
             task->can_tp_param.tp_rcv_pack_nr ++;
             if ( task->can_tp_param.tp_rcv_pack_nr >= task->can_tp_param.tp_pack_nr ) {
                 param.buff_payload = frame.can_dlc;
