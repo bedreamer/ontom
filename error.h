@@ -12,6 +12,6 @@
 // 文件读写失败
 #define ERR_FILE_IO_FAILE (ERR_ERR|0x00000003)
 // 达到定时器最大个数
-#define ERR_TIMER_BEMAX  (ERR_ER|0x0000000004)
+#define ERR_TIMER_BEMAX  (ERR_ERR|0x0000000004)
 
 #endif /*_ERROR_H_*/
