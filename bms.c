@@ -137,6 +137,10 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             case CAN_TP_CTS:
                 can_packet_callback(task, EVENT_TX_TP_CTS, &param);
                 break;
+            case CAN_TP_TX:
+                break;
+            case CAN_TP_RX:
+                break;
             case CAN_TP_ACK:
                 can_packet_callback(task, EVENT_TX_TP_ACK, &param);
                 break;
@@ -205,6 +209,11 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
         param.buff_payload = 0;
 
+        // 准备接收完成
+        if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_CTS) ) {
+            task->can_bms_status = (CAN_TP_TD | CAN_TP_RX);
+            log_printf(DBG_LV3, "BMS: ready for data transfer.");
+        }
         // 应答结束
         if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ACK) ) {
             task->can_bms_status = CAN_NORMAL;
@@ -329,6 +338,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 can_packet_callback(task, EVENT_RX_DONE, &param);
                 // 数据链接接受完成
                 task->can_bms_status = CAN_TP_RD | CAN_TP_ACK;
+                log_printf(DBG_LV3, "BMS: data transfer complete change to ACK");
             }
         } else if ( ((frame.can_id & 0x00FF0000) >> 16 ) == 0xEC ) {
             // Connection managment

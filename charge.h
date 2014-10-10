@@ -163,10 +163,14 @@ typedef enum {
     CAN_TP_RTS = 0x10,
     // 链接准备发送
     CAN_TP_CTS = 0x20,
+    // 数据发送中
+    CAN_TP_TX  = 0x30,
+    // 数据接收中
+    CAN_TP_RX  = 0x40,
     // 链接发送完成
-    CAN_TP_ACK = 0x40,
+    CAN_TP_ACK = 0x50,
     // 链接发送中止
-    CAN_TP_ABRT= 0x80
+    CAN_TP_ABRT= 0x60
 }CAN_TP_STATUS;
 
 /*
