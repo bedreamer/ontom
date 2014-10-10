@@ -321,7 +321,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[2:8]: 数据
              */
             log_printf(DBG_LV2, "BMS: status %X ",
-                       task->can_bms_status, frame.data[0]);
+                       task->can_bms_status);
             if ( task->can_bms_status & CAN_TP_RD != CAN_TP_RD ) {
                 task->can_bms_status = CAN_NORMAL;
                 continue;
