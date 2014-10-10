@@ -113,17 +113,16 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
-    if ( done == NULL ) done = &mydone;
-
     int s, ti = 0;
     struct sockaddr_can addr;
     struct ifreq ifr;
     struct can_frame frame;
     struct event_struct param;
     unsigned char txbuff[32];
+    int nbytes;
+    if ( done == NULL ) done = &mydone;
 
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    int nbytes;
 
     strcpy(ifr.ifr_name, "can0" );
     ioctl(s, SIOCGIFINDEX, &ifr);
@@ -175,6 +174,8 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         } else if ( task->can_bms_status & CAN_TP_WRITE ) {
             // 当前协议没有用到
             log_printf(WRN, "BMS: CAN_TP_WRITE not implement.");
+            continue;
+        } else if ( task->can_bms_status == CAN_INVALID ) {
             continue;
         } else {
             log_printf(WRN, "BMS: invalid can_bms_status: %d.",
