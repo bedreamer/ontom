@@ -211,7 +211,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
         // 准备接收完成
         if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_CTS) ) {
-            task->can_bms_status = (CAN_TP_TD | CAN_TP_RX);
+            task->can_bms_status = (CAN_TP_RD | CAN_TP_RX);
             log_printf(DBG_LV3, "BMS: ready for data transfer.");
         }
         // 应答结束
