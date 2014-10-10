@@ -166,15 +166,17 @@ union SAE_J1939_21_TP {
 // 握手阶段
 // 充电机辨识报文
 struct pgn256_CRM {
-    // 充电机辨识结果
+    // 充电机辨识结果 @ enum recognize_result
     u8 spn2560_recognize;
-    #define BMS_RECOGNIZED       0xAA // 充电机能识别BMS
-    #define BMS_NOT_RECOGNIZED   0x00 // 充电机不能识别BMS
 
     // 充电机编号， 范围1-100
     u8 spn2561_charger_sn;
     // 充电机/充电站所在区域编码
     unsigned char spn2562_charger_region_code[6];
+};
+enum recognize_result {
+    BMS_RECOGNIZED     =  0xAA, // 充电机能识别BMS
+    BMS_NOT_RECOGNIZED =  0x00  // 充电机不能识别BMS
 };
 
 // BMS辨识报文
@@ -209,13 +211,16 @@ struct pgn512_BRM {
     u8 spn2571_day;
     // 电池组充电次数
     unsigned char spn2572_charge_count[3];
-    // 电池组产权标识
+    // 电池组产权标识 @ enum battery_property
     u8 spn2573_battery_property;
-    #define BATTERY_LEASE   0x00 // 租赁
-    #define BATTERY_OWNER   0x01 // 私有
+
     u8 spn2574_reserved; // 保留
     // 车辆识别码
     unsigned char spn2575_vin[17];
+};
+enum battery_property {
+    BATTERY_LEASE  = 0x00, // 租赁
+    BATTERY_OWNER  = 0x01  // 私有
 };
 
 // 充电参数配置阶段
@@ -256,20 +261,24 @@ struct pgn2048_CML {
 
 // 电池充电准备就绪状态
 struct pgn2304_BRO {
-    // BMS 充电准备完成
+    // BMS 充电准备完成 @ enum charger_charge_status
     u8 spn2829_bms_ready_for_charge;
-    #define BMS_NOT_READY_FOR_CHARGE  0x00 // 没有准备好
-    #define BMS_READY_FOR_CHARGE      0xAA // 已准备好
-    #define BMS_INVALID               0xFF // 无效
+};
+enum bms_charge_status {
+    BMS_NOT_READY_FOR_CHARGE =  0x00, // 没有准备好
+    BMS_READY_FOR_CHARGE     =  0xAA, // 已准备好
+    BMS_INVALID              =  0xFF // 无效
 };
 
 // 充电机输出准备就绪状态
 struct pgn2560_CRO {
-    // 充电机充电准备完成
+    // 充电机充电准备完成 @ enum charger_charge_status
     u8 spn2830_charger_ready_for_charge;
-    #define CHARGER_NOT_READY_FOR_CHARGE  0x00 // 没有准备好
-    #define CHARGER_READY_FOR_CHARGE      0xAA // 已准备好
-    #define CHARGER_INVALID               0xFF // 无效
+};
+enum charger_charge_status {
+    CHARGER_NOT_READY_FOR_CHARGE = 0x00, // 没有准备好
+    CHARGER_READY_FOR_CHARGE     = 0xAA, // 已准备好
+    CHARGER_INVALID              = 0xFF // 无效
 };
 
 // 充电阶段
@@ -279,10 +288,12 @@ struct pgn4096_BCL {
     u16 spn3072_need_voltage;
     // 充电电流需求，0.1A 每位，-400V偏移，-400A-0A
     u16 spn3073_need_current;
-    // 充电模式
+    // 充电模式 @ enum charge_mode
     u16 spn3074_charge_mode;
-    #define CHARGE_WITH_CONST_VOLTAGE  0x01  // 恒流充电
-    #define CHARGE_WITH_CONST_CURRENT  0x02  // 恒压充电
+};
+enum charge_mode {
+    CHARGE_WITH_CONST_VOLTAGE  = 0x01,  // 恒流充电
+     CHARGE_WITH_CONST_CURRENT = 0x02  // 恒压充电
 };
 
 // 电池充电总状态
@@ -302,12 +313,76 @@ struct pgn4352 {
 
 // 充电机充电状态
 struct pgn4608 {
-
+    // 充电机输出电压，0.1V/位， 0V偏移量，0-750V
+    u16 spn3081_output_voltage;
+    // 充电机输出电流，0.1A/位，-400A偏移，-400A-0A
+    u16 spn3082_outpu_current;
+    // 充电持续时间，1min/位，0偏移，0-600min
+    u16 spn3083_charge_time;
 };
 
 // 动力蓄电池状态信息
 struct pgn4864 {
+    // 最高单体电压的蓄电池编号
+    u8 sn_of_max_voltage_battery;
+    // 最高蓄电池温度
+    u8 max_temperature_of_battery;
+    // 最高温度采样点编号
+    u8 sn_of_max_temperature_point;
+    // 最低蓄电池温度
+    u8 min_temperature_of_battery;
+    // 最低温度采样点编号
+    u8 sn_of_min_temperature_point;
+    // 遥信
+    u16 remote_single;
+};
+enum pgn4846_remote_single {
+    // 单体蓄电池电压正常
+    SINGLE_BATTERY_VOLTAGE_NORMAL = 0x00000000,
+    // 单体蓄电池电压过高
+    SINGLE_BATTERY_VOLTAGE_HIGH   = 0x00000001,
+    // 单体学电池电压过低
+    SINGLE_BATTERY_VOLTAGE_LOW    = 0x00000002,
 
+    // 蓄电池组荷电状态正常
+    BATTERY_SOC_NORMAL            = 0x00000000,
+    // 蓄电池组荷电状态过高
+    BATTERY_SOC_HIGH              = 0x00000004,
+    // 蓄电池组荷电状态过低
+    BATTERY_SOC_LOW               = 0x00000008,
+
+    // 充电电流正常
+    BATTERY_CHARGE_CURRENT_NORMAL = 0x00000000,
+    // 充电电流过高
+    BATTERY_CHARGE_CURRENT_HIGH   = 0x00000010,
+    // 充电电流过低
+    BATTERY_CHARGE_CURRENT_LOW    = 0x00000020,
+
+    // 电池温度正常
+    BATTERY_TEMPRATUEE_NORAML     = 0x00000000,
+    // 电池温度过高
+    BATTERY_TEMPRATURE_HIGH       = 0x00000040,
+    // 电池温度过低
+    BATTERY_TEMPRATURE_LOW        = 0x00000080,
+
+    // 电池绝缘状态正常
+    INSULATION_NORMAL             = 0x00000000,
+    // 电池有绝缘故障
+    INSULATION_FAULT              = 0x00000100,
+    // 绝缘信号不可信
+    INSULATION_UNRELIABLE         = 0x00000200,
+
+    // 冲电连接器状态正常
+    CONNECTOR_STATUS_NORMAL       = 0x00000000,
+    // 充电连接器不正常
+    CONNECTOR_STATUS_FAULT        = 0x00000400,
+    // 冲电连接器状态不可信
+    CONNECTOR_STATUS_UNRELIABLE   = 0x00000800,
+
+    // 允许充电
+    CHARGE_ALLOWED                = 0x00000000,
+    // 禁止充电
+    CHARGE_FORBIDEN               = 0x00001000
 };
 
 // 单体动力蓄电池电压
@@ -358,5 +433,53 @@ struct pgn7936 {
 };
 
 #pragma pack()
+
+// 充电机下发报文索引号
+typedef enum {
+    // 充电握手阶段
+    C2B_PGN256       =  0x00,
+
+    // 重点配置阶段
+    C2B_PGN1792      =  0x01,
+    C2B_PGN2048      =  0x02,
+    C2B_PGN2560      =  0x03,
+
+    // 充电阶段
+    C2B_PGN4608      =  0x04,
+    C2B_PGN6656      =  0x05,
+
+    // 充电结束阶段
+    C2B_PGN7424      =  0x06,
+
+    // 充电错误分类
+    C2B_PGN7936      =  0x07
+}C2B_INDEX;
+
+struct can_pack_generator;
+
+// 通信报文生成依据
+struct can_pack_generator {
+    // 函数地址
+    void (*generator_proc)(struct can_pack_generator *self);
+    // 生成PGN
+    unsigned int pgn;
+    // 数据包优先级
+    unsigned int prioriy;
+    // 数据包长度
+    unsigned int datalen;
+    // 数据包发送周期
+    unsigned int period;
+    // 数据包名称
+    const char *mnemonic;
+};
+
+void gen_packet_PGN256(struct can_pack_generator *self);
+void gen_packet_PGN1792(struct can_pack_generator *self);
+void gen_packet_PGN2048(struct can_pack_generator *self);
+void gen_packet_PGN2560(struct can_pack_generator *self);
+void gen_packet_PGN4608(struct can_pack_generator *self);
+void gen_packet_PGN6656(struct can_pack_generator *self);
+void gen_packet_PGN7424(struct can_pack_generator *self);
+void gen_packet_PGN7936(struct can_pack_generator *self);
 
 #endif /*_BMS_PACKAGE_INCLUDED_H_*/

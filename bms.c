@@ -15,6 +15,19 @@
 #include "log.h"
 #include "error.h"
 
+// 数据包生成
+struct can_pack_generator genor[] = {
+    {gen_packet_PGN256,     256,   6,   8,   250,   "CRM"},
+    {gen_packet_PGN1792,   1792,   6,   7,   500,   "CTS"},
+    {gen_packet_PGN2048,   2048,   6,   6,   250,   "CML"},
+    {gen_packet_PGN2560,   2560,   4,   1,   250,   "CRO"},
+    {gen_packet_PGN4608,   4608,   6,   6,    50,   "CCS"},
+    {gen_packet_PGN6656,   6656,   4,   4,    10,   "CST"},
+    {gen_packet_PGN7424,   7424,   6,   5,   250,   "CSD"},
+    {gen_packet_PGN7936,   7936,   2,   4,   250,   "CEM"},
+    {              NULL,      0,   0,   0,     0,      ""}
+};
+
 /*
  * 本可以将串口通信，SOCKET通信方式也纳入该事件函数，但本着CAN通信优先的原则，暂时将
  * CAN通信时间数据独立出来进行处理。
@@ -320,15 +333,13 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[1]: 数据包编号
              * byte[2:8]: 数据
              */
-            log_printf(DBG_LV2, "BMS: status %X ",
-                       task->can_bms_status);
-            if ( task->can_bms_status & CAN_TP_RD != CAN_TP_RD ) {
+            if ( (task->can_bms_status & CAN_TP_RD) != CAN_TP_RD ) {
                 task->can_bms_status = CAN_NORMAL;
                 continue;
             }
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
-            log_printf(DBG_LV2, "BMS: %X data tansfer fetch the %dst packet.",
-                       task->can_bms_status, frame.data[0]);
+            log_printf(DBG_LV2, "BM data tansfer fetch the %dst packet.",
+                       frame.data[0]);
             task->can_tp_param.tp_rcv_pack_nr ++;
             if ( task->can_tp_param.tp_rcv_pack_nr >=
                  task->can_tp_param.tp_pack_nr ) {
@@ -417,5 +428,46 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             // CAN通信处于连接管理模式
         }
     }
+}
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+void gen_packet_PGN256(struct can_pack_generator *self)
+{
+
+}
+
+void gen_packet_PGN1792(struct can_pack_generator *self)
+{
+
+}
+
+void gen_packet_PGN2048(struct can_pack_generator *self)
+{
+
+}
+
+void gen_packet_PGN2560(struct can_pack_generator *self)
+{
+
+}
+
+void gen_packet_PGN4608(struct can_pack_generator *self)
+{
+
+}
+
+void gen_packet_PGN6656(struct can_pack_generator *self)
+{
+
+}
+
+void gen_packet_PGN7424(struct can_pack_generator *self)
+{
+
+}
+
+void gen_packet_PGN7936(struct can_pack_generator *self)
+{
+
 }
 
