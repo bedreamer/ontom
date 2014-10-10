@@ -3,6 +3,8 @@
 #ifndef _HACHIKO_INCLUDED_H_
 #define _HACHIKO_INCLUDED_H_
 
+struct Hachiko_food;
+
 typedef enum {
     // 超时事件
     HACHIKO_TIMEOUT = 0,
@@ -16,9 +18,9 @@ typedef enum {
 
 typedef enum {
     // 一次性的
-    HACHIKO_ONECE = 0,
+    HACHIKO_ONECE     = 0x40,
     // 自动循环定时器
-    HACHIKO_AUTO_FEED = 1
+    HACHIKO_AUTO_FEED = 0x80
 }Hachiko_Type;
 
 struct Hachiko_food {
@@ -36,7 +38,11 @@ struct Hachiko_food {
 };
 
 void Hachiko_init();
-int Hachiko_feed(struct Hachiko_food *, Hachiko_Type type,
+int Hachiko_new(struct Hachiko_food *, Hachiko_Type type,
                  unsigned int ttl, void *private);
+static inline void Hachiko_feed(struct Hachiko_food *dog)
+{
+    dog->remain = dog->ttl;
+}
 
 #endif // _HACHIKO_INCLUDED_H_

@@ -24,12 +24,6 @@
                        } while (0)
 struct Hachiko_food *pool[NR_POOL] = {NULL};
 
-// 定时器指针整理，将有用的向前整理，失效的删除
-static int Hachiko_makeup(void)
-{
-
-}
-
 /*
  * 定时器处理过程
  *
@@ -37,16 +31,59 @@ static int Hachiko_makeup(void)
  */
 static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 {
-    static int cc = 0;
-    log_printf(DBG_LV0, "%d", cc++);
+    int i, refresh = 0;
+
+    for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
+        if ( pool[i] == NULL ) continue;
+        if ( pool[i]->remain ) pool[i]->remain --;
+
+        if ( pool[i]->remain == 0 ) {
+            pool[i]->Hachiko_notify_proc(HACHIKO_TIMEOUT,
+                                         pool[i]->private, &pool[i]);
+            if ( pool[i]->type == HACHIKO_AUTO_FEED ) {
+                pool[i]->remain = pool[i]->ttl;
+                pool[i]->Hachiko_notify_proc(HACHIKO_FEEDED,
+                                             pool[i]->private, &pool[i]);
+                continue;
+            }
+            if ( pool[i]->type == HACHIKO_ONECE ) {
+                pool[i]->Hachiko_notify_proc(HACHIKO_DIE,
+                                             pool[i]->private, &pool[i]);
+                pool[i] = NULL;
+                refresh ++;
+                continue;
+            }
+        }
+        pool[i]->Hachiko_notify_proc(HACHIKO_ROLLING,
+                                     pool[i]->private, &pool[i]);
+    }
+    if ( 0 == refresh ) return;
 }
 
 // 设定内部功能性定时器
-int Hachiko_feed(struct Hachiko_food *thiz, Hachiko_Type type,
+int Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
                  unsigned int ttl, void *private)
 {
-    int err = ERR_OK;
+    int err = ERR_TIMER_BEMAX;
+    int i = 0;
 
+    if ( thiz->Hachiko_notify_proc == NULL ) {
+        err = ERR_WRONG_PARAM;
+        goto die;
+    }
+
+    for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
+        if ( pool[i] == NULL ) {
+            thiz->type = type;
+            thiz->ttl = ttl;
+            thiz->remain = ttl;
+            thiz->private = private;
+            err = ERR_OK;
+            pool[i] = thiz;
+            break;
+        }
+    }
+die:
     return err;
 }
 
@@ -61,6 +98,7 @@ void Hachiko_init()
     sigset_t mask;
     struct sigaction sa;
 
+    memset(pool, 0, sizeof(pool));
     /* Establish handler for timer signal */
 
     log_printf(INF, "Hachiko: Establishing handler for signal %d", SIG);
