@@ -201,8 +201,9 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             }
             notimplement ++;
         } else {
-            log_printf(WRN, "BMS: wrong pack size.");
         }
+
+        param.buff_payload = 0;
 
         // 应答结束
         if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ACK) ) {
