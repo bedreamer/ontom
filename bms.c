@@ -62,6 +62,15 @@ static int can_packet_callback(
         break;
     case EVENT_TX_TP_CTS:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
+        /*
+         * 当数据包接收完成后向BMS发送消息结束应答数据包
+         *
+         * byte[1]: 0x13
+         * byte[2:3]: 消息大小，字节数目
+         * byte[4]: 全部数据包数目
+         * byte[5]: 0xFF
+         * byte[6:8]: PGN
+         */
         param->buff.tx_buff[0] = 0x11;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
         param->buff.tx_buff[1] = thiz->can_tp_param.tp_pack_nr;
@@ -149,7 +158,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                 can_packet_callback(task, EVENT_TX_TP_CTS, &param);
                 break;
             case CAN_TP_TX:
-                break;
             case CAN_TP_RX:
                 break;
             case CAN_TP_ACK:
@@ -197,7 +205,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
          */
         if ( param.buff_payload <= 8 && param.buff_payload > 0 ) {
             memcpy(frame.data, param.buff.tx_buff, 8);
-            frame.can_id = 0x1C11f456;
+            frame.can_id = 0x8C11f456;
             frame.can_dlc= 8;
             nbytes = write(s, &frame, sizeof(struct can_frame));
             if ( nbytes < param.buff_payload ) {
@@ -236,26 +244,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             log_printf(DBG, "BMS: connection aborted.");
         }
     }
-}
-
-/*
- * Adele - <<rolling in the deep>>
- *
- * 独立处理连接管理时的连接控制，数据重新组装问题，直到数据接收完成，或者出错
- */
-typedef enum {
-    // 连接管理正常，在数据接收完成前将返回该值
-    TP_OK = 0,
-    // 数据接收完成后将返回该值
-    TP_DONE = 1,
-    // 数据连接被终止
-    TP_ABORTED = 2,
-    // 数据连接中断，主机通信超时将返回该值
-    TP_LOSSCONN = 3
-}TP_RESULT;
-static inline TP_RESULT rolling_in_the_buffer(struct charge_task *thiz)
-{
-    return TP_OK;
 }
 
 // bms 通信 读 服务线程
@@ -331,27 +319,19 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[1]: 数据包编号
              * byte[2:8]: 数据
              */
-
-            /*
-             * 当数据包接收完成后向BMS发送消息结束应答数据包
-             *
-             * byte[1]: 0x13
-             * byte[2:3]: 消息大小，字节数目
-             * byte[4]: 全部数据包数目
-             * byte[5]: 0xFF
-             * byte[6:8]: PGN
-             */
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
-            log_printf(DBG_LV2, "BMS: data tansfer fetch the %d packet.",
+            log_printf(DBG_LV2, "BMS: data tansfer fetch the %dst packet.",
                        frame.data[0]);
             task->can_tp_param.tp_rcv_pack_nr ++;
-            if ( task->can_tp_param.tp_rcv_pack_nr >= task->can_tp_param.tp_pack_nr ) {
+            if ( task->can_tp_param.tp_rcv_pack_nr >=
+                 task->can_tp_param.tp_pack_nr ) {
                 param.buff_payload = frame.can_dlc;
                 param.evt_param = EVT_RET_INVALID;
                 can_packet_callback(task, EVENT_RX_DONE, &param);
                 // 数据链接接受完成
                 task->can_bms_status = CAN_TP_RD | CAN_TP_ACK;
-                log_printf(DBG_LV3, "BMS: data transfer complete change to ACK");
+                log_printf(DBG_LV3,
+                           "BMS: data transfer complete change to ACK");
             }
         } else if ( ((frame.can_id & 0x00FF0000) >> 16 ) == 0xEC ) {
             // Connection managment
@@ -394,20 +374,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                                "detect a BMS transfer error, pack count < 2");
                     continue;
                 }
-/*
-                // connection request check ok, then do a answer.
-                task->can_tp_buff_tx[0] = 0x11;
-                // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
-                task->can_tp_buff_tx[1] = tp_packets_nr;
-                task->can_tp_buff_tx[2] = 1;
-                task->can_tp_buff_tx[3] = 0xFF;
-                task->can_tp_buff_tx[4] = 0xFF;
-                task->can_tp_buff_tx[5] = frame.data[5];
-                task->can_tp_buff_tx[6] = frame.data[6];
-                task->can_tp_buff_tx[7] = frame.data[7];
-                task->can_tp_buff_nr = 8;
-                log_printf(DBG, "CAN status change to CAN_TP_RD");
-*/
+
                 task->can_tp_param.tp_pack_nr = tp_packets_nr;
                 task->can_tp_param.tp_size = tp_packets_size;
                 task->can_tp_param.tp_pgn = tp_packet_PGN;
@@ -442,22 +409,6 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         } else if ( task->can_bms_status == CAN_TP_RD ) {
             // CAN通信处于连接管理模式
         }
-
-#if 0
-        log_printf(DBG, "TX%d---%X:%d %02X %02X %02X %02X %02X %02X %02X %02X",
-                    ti++,
-                    frame.can_id,
-                    nbytes,
-                    frame.data[0],
-                    frame.data[1],
-                    frame.data[2],
-                    frame.data[3],
-                    frame.data[4],
-                    frame.data[5],
-                    frame.data[6],
-                    frame.data[7]
-                );
-#endif
     }
 }
 
