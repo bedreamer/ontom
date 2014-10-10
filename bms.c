@@ -325,8 +325,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
-            log_printf(DBG_LV2, "BMS: data tansfer fetch the %dst packet.",
-                       frame.data[0]);
+            log_printf(DBG_LV2, "BMS: %X data tansfer fetch the %dst packet.",
+                       task->can_bms_status, frame.data[0]);
             task->can_tp_param.tp_rcv_pack_nr ++;
             if ( task->can_tp_param.tp_rcv_pack_nr >=
                  task->can_tp_param.tp_pack_nr ) {

@@ -154,7 +154,7 @@ typedef enum {
     // 连接管理读模式, 多数据包读
     CAN_TP_RD                 =0x02,
     // 连接管理写模式，多数据包写，当前的协议标准没有用到
-    CAN_TP_WRITE              =0x03
+    CAN_TP_WR                 =0x03
 }CAN_BMS_STATUS;
 
 // CAN 传输链接状态
