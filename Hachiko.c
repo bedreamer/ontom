@@ -38,6 +38,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
         if ( pool[i]->status == HACHIKO_DIE ) {
             pool[i] = NULL;
             refresh ++;
+            log_printf(DBG_LV2, "HACHIKO: watch dog killed.");
             continue;
         }
         if ( pool[i]->status == HACHIKO_PAUSE ) {
