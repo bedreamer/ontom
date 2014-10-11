@@ -43,7 +43,7 @@ struct Hachiko_food {
     // 定时器剩余时长
     volatile unsigned int remain;
     // 定时器状态
-    hachiko_status status;
+    Hachiko_status status;
     // 私有数据
     void *private;
 };
