@@ -307,7 +307,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     unsigned int tp_packet_PGN = 0;
 
     task->can_tp_private.status = PRIVATE_INVALID;
-    task->can_tp_bomb.private = (void *)&can_tp_private;
+    task->can_tp_bomb.private = (void *)&task->can_tp_private;
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
