@@ -151,6 +151,8 @@ void Hachiko_init()
     its.it_interval.tv_sec = its.it_value.tv_sec;
     its.it_interval.tv_nsec = its.it_value.tv_nsec;
 
+    log_printf(INF, "HACHIKO: timer resolution: %ld", freq_nanosecs);
+
     if (timer_settime(timerid, 0, &its, NULL) == -1) {
         log_printf(ERR, "Hachiko: timer_settime faile.");
          errExit("Hachiko: timer_settime");
