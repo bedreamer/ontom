@@ -35,7 +35,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 
     for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
         if ( pool[i] == NULL ) continue;
-        if ( pool[i]->status == HACHIKO_DIE ) {
+        if ( pool[i]->status == HACHIKO_KILLED ) {
             pool[i] = NULL;
             refresh ++;
             log_printf(DBG_LV2, "HACHIKO: watch dog killed.");
