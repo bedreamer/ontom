@@ -422,7 +422,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     continue;
                 }
 
-                if ( can_tp_private.status == PRIVATE_BUSY ) {
+                if ( task->can_tp_private.status == PRIVATE_BUSY ) {
                     log_printf(WRN, "BMS: previous connection not exit,"
                                " do new connection instead.");
                     Hachiko_feed( &task->can_tp_bomb );
@@ -434,7 +434,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     // 计算得来125
                     int ret = Hachiko_new( & task->can_tp_bomb,
                                            HACHIKO_ONECE, 125,
-                                           &can_tp_private);
+                                           &task->can_tp_private);
                     if ( ret == ERR_WRONG_PARAM ) {
                         log_printf(ERR, "BMS: set new timer error, with code:%d",
                                    ret);
