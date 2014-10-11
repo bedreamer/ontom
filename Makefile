@@ -10,9 +10,10 @@
 
 CC            = arm-arago-linux-gnueabi-gcc -lts
 CXX           = arm-arago-linux-gnueabi-g++ -lts
-DEFINES       = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED
-CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -g $(DEFINES)
-CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -g $(DEFINES)
+#DEFINES       = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED
+DEFINES       =
+CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
+CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
 INCPATH       = -I../qt-4.8.2-arm/mkspecs/qws/linux-arm-g++ -I. -I../qt-4.8.2-arm/include/QtCore -I../qt-4.8.2-arm/include/QtNetwork -I../qt-4.8.2-arm/include/QtGui -I../qt-4.8.2-arm/include -I. -I.
 LINK          = arm-arago-linux-gnueabi-g++ -lts -lrt
 LFLAGS        = -Wl,-O1
