@@ -52,23 +52,23 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 
         if ( pool[i]->remain == 0 ) {
             pool[i]->Hachiko_notify_proc(HACHIKO_TIMEOUT,
-                                         pool[i]->private, &pool[i]);
+                                         pool[i]->private, pool[i]);
             if ( pool[i]->type == HACHIKO_AUTO_FEED ) {
                 pool[i]->remain = pool[i]->ttl;
                 pool[i]->Hachiko_notify_proc(HACHIKO_FEEDED,
-                                             pool[i]->private, &pool[i]);
+                                             pool[i]->private, pool[i]);
                 continue;
             }
             if ( pool[i]->type == HACHIKO_ONECE ) {
                 pool[i]->Hachiko_notify_proc(HACHIKO_DIE,
-                                             pool[i]->private, &pool[i]);
+                                             pool[i]->private, pool[i]);
                 pool[i] = NULL;
                 refresh ++;
                 continue;
             }
         }
         pool[i]->Hachiko_notify_proc(HACHIKO_ROLLING,
-                                     pool[i]->private, &pool[i]);
+                                     pool[i]->private, pool[i]);
     }
     if ( 0 == refresh ) return;
 }
