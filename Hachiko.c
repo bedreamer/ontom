@@ -87,7 +87,6 @@ die:
     return err;
 }
 
-
 // 定时器初始化
 void Hachiko_init()
 {

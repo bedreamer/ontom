@@ -10,6 +10,7 @@
 #define _CHARGE_INCLUDED_H_
 
 #include "bms.h"
+#include "Hachiko.h"
 
 struct charge_task;
 
@@ -247,7 +248,6 @@ struct charge_task {
 
     // 连接管理的传输控制参数
     struct can_tp_param can_tp_param;
-
 
     /* CAN 通信心跳
      * CAN 通信需要定时发送数据包，因此需要采用心跳计数，每10ms增加1

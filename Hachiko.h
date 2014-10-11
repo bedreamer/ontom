@@ -37,6 +37,19 @@ struct Hachiko_food {
     void *private;
 };
 
+typedef enum {
+    // 无效
+    PRIVATE_INVALID = 0x00,
+    // 已经使用
+    PRIVATE_BUSY    = 0x01,
+    // 闲置等待
+    PRIVATE_STANDBY = 0x02
+}PRIVATE_STATUS;
+// CAN 连接传输管理超时参数组
+struct Hachiko_CNA_TP_private {
+    PRIVATE_STATUS status;
+};
+
 void Hachiko_init();
 int Hachiko_new(struct Hachiko_food *, Hachiko_Type type,
                  unsigned int ttl, void *private);

@@ -260,6 +260,28 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     }
 }
 
+// CAN 传输连接管理超时控制信号, 这里可能会控制task->can_bms_status
+void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self)
+{
+    switch ( evt ) {
+    case HACHIKO_TIMEOUT:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_TIMEOUT");
+        break;
+    case HACHIKO_ROLLING:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_ROLLING");
+        break;
+    case HACHIKO_DIE:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_DIE");
+        break;
+    case HACHIKO_FEEDED:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_FEEDED");
+        break;
+    default:
+        break;
+    }
+}
+
 // bms 通信 读 服务线程
 // 提供bms通信服务
 void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
@@ -283,6 +305,12 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     unsigned int tp_packets_size = 0;
     // 数据包对应的PGN
     unsigned int tp_packet_PGN = 0;
+    // 连接管理超时控制器
+    struct Hachiko_food can_tp_bomb;
+    struct Hachiko_CNA_TP_private can_tp_private;
+
+    can_tp_private.status = PRIVATE_INVALID;
+    can_tp_bomb.private = (void *)&can_tp_private;
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
@@ -391,6 +419,31 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     log_printf(WRN,
                                "detect a BMS transfer error, pack count < 2");
                     continue;
+                }
+
+                if ( can_tp_private.status == PRIVATE_BUSY ) {
+                    log_printf(WRN, "BMS: previous connection not exit,"
+                               " do new connection instead.");
+                    Hachiko_feed( & can_tp_bomb );
+                } else {
+                    can_tp_bomb.Hachiko_notify_proc =
+                            Hachiko_CAN_TP_notify_proc;
+                    // 根据SAE J1939-21中关于CAN总线数据传输链接的说明，中间传输
+                    // 过程最大不超过1250ms，而根据系统中定时器的默认分辨率（10ms）
+                    // 计算得来125
+                    int ret = Hachiko_new( & can_tp_bomb,
+                                           HACHIKO_ONECE, 125,
+                                           &can_tp_private);
+                    if ( ret == ERR_WRONG_PARAM ) {
+                        log_printf(ERR, "BMS: set new timer error, with code:%d",
+                                   ret);
+                        continue;
+                    }
+                    if ( ret == ERR_TIMER_BEMAX ) {
+                        log_printf(ERR, "BMS: set new timer error, with code:%d",
+                                   ret);
+                        continue;
+                    }
                 }
 
                 task->can_tp_param.tp_pack_nr = tp_packets_nr;
