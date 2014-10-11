@@ -23,6 +23,15 @@ typedef enum {
     HACHIKO_AUTO_FEED = 0x80
 }Hachiko_Type;
 
+typedef enum {
+    // 正常使用
+    HACHIKO_NORMAL    = 0x01,
+    // 计时器暂停
+    HACHIKO_PAUSE     = 0x02,
+    // 计时器死亡，已经删除
+    HACHIKO_KILLED    = 0x03
+}Hachiko_status;
+
 struct Hachiko_food {
     // 定时器事件回调
     void (*Hachiko_notify_proc)(Hachiko_EVT evt, void *private,
@@ -33,6 +42,8 @@ struct Hachiko_food {
     unsigned int ttl;
     // 定时器剩余时长
     volatile unsigned int remain;
+    // 定时器状态
+    hachiko_status status;
     // 私有数据
     void *private;
 };
@@ -53,6 +64,11 @@ struct Hachiko_CNA_TP_private {
 void Hachiko_init();
 int Hachiko_new(struct Hachiko_food *, Hachiko_Type type,
                  unsigned int ttl, void *private);
+static inline void Hachiko_kill(struct Hachiko_food *dog)
+{
+    dog->status = HACHIKO_KILLED;
+}
+
 static inline void Hachiko_feed(struct Hachiko_food *dog)
 {
     dog->remain = dog->ttl;

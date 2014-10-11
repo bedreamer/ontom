@@ -305,12 +305,9 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     unsigned int tp_packets_size = 0;
     // 数据包对应的PGN
     unsigned int tp_packet_PGN = 0;
-    // 连接管理超时控制器
-    struct Hachiko_food can_tp_bomb;
-    struct Hachiko_CNA_TP_private can_tp_private;
 
-    can_tp_private.status = PRIVATE_INVALID;
-    can_tp_bomb.private = (void *)&can_tp_private;
+    task->can_tp_private.status = PRIVATE_INVALID;
+    task->can_tp_bomb.private = (void *)&can_tp_private;
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
@@ -365,12 +362,16 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 task->can_bms_status = CAN_NORMAL;
                 continue;
             }
+            Hachiko_feed(&task->can_tp_bomb);
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
             log_printf(DBG_LV2, "BM data tansfer fetch the %dst packet.",
                        frame.data[0]);
             task->can_tp_param.tp_rcv_pack_nr ++;
             if ( task->can_tp_param.tp_rcv_pack_nr >=
                  task->can_tp_param.tp_pack_nr ) {
+                // 数据接收完成后即可关闭定时器
+                Hachiko_kill(&task->can_tp_bomb);
+
                 param.buff_payload = frame.can_dlc;
                 param.evt_param = EVT_RET_INVALID;
                 can_packet_callback(task, EVENT_RX_DONE, &param);
@@ -424,14 +425,14 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 if ( can_tp_private.status == PRIVATE_BUSY ) {
                     log_printf(WRN, "BMS: previous connection not exit,"
                                " do new connection instead.");
-                    Hachiko_feed( & can_tp_bomb );
+                    Hachiko_feed( &task->can_tp_bomb );
                 } else {
-                    can_tp_bomb.Hachiko_notify_proc =
+                    task->can_tp_bomb.Hachiko_notify_proc =
                             Hachiko_CAN_TP_notify_proc;
                     // 根据SAE J1939-21中关于CAN总线数据传输链接的说明，中间传输
                     // 过程最大不超过1250ms，而根据系统中定时器的默认分辨率（10ms）
                     // 计算得来125
-                    int ret = Hachiko_new( & can_tp_bomb,
+                    int ret = Hachiko_new( & task->can_tp_bomb,
                                            HACHIKO_ONECE, 125,
                                            &can_tp_private);
                     if ( ret == ERR_WRONG_PARAM ) {

@@ -248,6 +248,9 @@ struct charge_task {
 
     // 连接管理的传输控制参数
     struct can_tp_param can_tp_param;
+    // 连接管理超时控制器
+    struct Hachiko_food can_tp_bomb;
+    struct Hachiko_CNA_TP_private can_tp_private;
 
     /* CAN 通信心跳
      * CAN 通信需要定时发送数据包，因此需要采用心跳计数，每10ms增加1

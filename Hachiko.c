@@ -35,6 +35,14 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 
     for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
         if ( pool[i] == NULL ) continue;
+        if ( pool[i]->status == HACHIKO_DIE ) {
+            pool[i] = NULL;
+            refresh ++;
+            continue;
+        }
+        if ( pool[i]->status == HACHIKO_PAUSE ) {
+            continue;
+        }
         if ( pool[i]->remain ) pool[i]->remain --;
 
         if ( pool[i]->remain == 0 ) {
