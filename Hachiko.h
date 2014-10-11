@@ -28,8 +28,10 @@ typedef enum {
     HACHIKO_NORMAL    = 0x01,
     // 计时器暂停
     HACHIKO_PAUSE     = 0x02,
+    // 计时器恢复
+    HACHIKO_RESUME    = 0x03,
     // 计时器死亡，已经删除
-    HACHIKO_KILLED    = 0x03
+    HACHIKO_KILLED    = 0x04
 }Hachiko_status;
 
 struct Hachiko_food {

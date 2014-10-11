@@ -69,6 +69,21 @@ static int can_packet_callback(
          * 在这里进行CAN数据包的发送处理
          * 进行数据包发送的条件是：充电枪物理连接正常，进入车辆识别过程，或充电过程。
          */
+        switch ( thiz->charge_stage ) {
+        case CHARGE_STAGE_INVALID:
+            param->evt_param = EVT_RET_ERR;
+            break;
+        case CHARGE_STAGE_HANDSHACKING:
+            break;
+        case CHARGE_STAGE_CONFIGURE:
+            break;
+        case CHARGE_STAGE_CHARGING:
+            break;
+        case CHARGE_STAGE_DONE:
+            break;
+        default:
+            break;
+        }
         break;
     case EVENT_TX_TP_RTS: // 本系统中BMS通信暂时不会使用
         //串口处于连接管理状态时，将会收到该传输数据报请求。
@@ -118,6 +133,28 @@ static int can_packet_callback(
     }
 
     return 0;
+}
+
+// CAN 数据发送报文
+void Hachiko_CAN_WRITE_notify_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self)
+{
+    switch ( evt ) {
+    case HACHIKO_TIMEOUT:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_TIMEOUT");
+        break;
+    case HACHIKO_ROLLING:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_ROLLING");
+        break;
+    case HACHIKO_DIE:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_DIE");
+        break;
+    case HACHIKO_FEEDED:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_FEEDED");
+        break;
+    default:
+        break;
+    }
 }
 
 // bms 通信 写 服务线程
