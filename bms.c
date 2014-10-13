@@ -572,12 +572,31 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     }
 }
 
-// 充电阶段改变事件处理过程
+/* 充电阶段改变事件处理过程
+ *
+ * 充电阶段发生改变后，会影响系统中数据包的发送逻辑等其他数据通信逻辑
+ * 因此需要用单独的事件捕捉函数来进行处理，作相应的状态机修改
+ **/
 void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
                             CHARGE_STAGE pre,
                             struct charge_task *thiz)
 {
-
+    switch (evt) {
+    case STAGE_CHANGE_2_INVALID:
+        break;
+    case STAGE_CHANGE_2_HANDSHAKING:
+        break;
+    case STAGE_CHANGE_2_CHARGING:
+        break;
+    case STAGE_CHANGE_2_DONE:
+        break;
+    case STAGE_CHANGE_2_EXIT:
+        break;
+    case STAGE_CHANGE_2_ABORT:
+        break;
+    default:
+        break;
+    }
 }
 
 
