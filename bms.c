@@ -10,11 +10,11 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include "bms.h"
+#include "Hachiko.h"
 #include "charge.h"
 #include "config.h"
 #include "log.h"
 #include "error.h"
-#include "Hachiko.h"
 
 // 数据包生成
 struct can_pack_generator genor[] = {
