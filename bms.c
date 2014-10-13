@@ -42,7 +42,7 @@ static void can_packets_generator_init()
         thiz->friend.type = HACHIKO_AUTO_FEED;
         // 定时器的默认分辨率是10ms， 所以需要除10
         thiz->friend.ttl = thiz->period / 10;
-        thiz->friend.remian = 0;
+        thiz->friend.remain = 0;
         thiz->friend.status = HACHIKO_INVALID;
     }
 }
