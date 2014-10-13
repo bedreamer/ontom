@@ -78,6 +78,8 @@ int main()
 {
     const char *user_cfg = NULL;
     pthread_t tid = 0;
+    pthread_attr_t attr;
+    int s;
     int thread_done[ 7 ] = {0};
     char buff[32];
     int errcode = 0, ret;
@@ -99,6 +101,32 @@ int main()
         user_cfg = "user.cfg";
     }
     config_initlize(user_cfg);
+
+    s = pthread_attr_init(&attr);
+    if ( 0 != s ) {
+        log_printf(WRN, "could not set thread stack size, use default.");
+    }
+
+    if ( 0 == s ) {
+        int stack_KB;
+        const char *stack_size = config_read("thread_stack_size");
+        if ( stack_size == NULL ) {
+            log_printf(INF, "thread_stack_size not set, use 1024K");
+            stack_size = "1024";
+        }
+        stack_KB = atoi(stack_size);
+        if ( stack_KB <= 10 || stack_KB >= 20480 ) {
+            log_printf(WRN, "stack size not statisfied(%d KB)."
+                       "use default 1024 K instead.", stack_KB);
+            stack_KB = 1024;
+        }
+        if ( pthread_attr_setstacksize(&attr, stack_KB * 1024) ) {
+            log_printf(INF, "set all thread stack size to: %d KB", stack_KB);
+        } else {
+            log_printf(ERR, "set all thread stack_size to %d KB faile, "
+                       "use system default size.", stack_KB);
+        }
+    }
 
     // 检查是否需要开启SOCKET端的配置服务器以接受网络端的配置
     user_cfg = config_read("socket_config");
@@ -187,6 +215,9 @@ int main()
     }
     log_printf(INF, "charge service start up.                           DONE.");
 
+    if ( s == 0 ) {
+        pthread_attr_destroy(&attr);
+    }
 
 #if CONFIG_DEBUG_CONFIG >= 1
     config_print();

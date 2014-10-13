@@ -72,6 +72,8 @@ CONFIG_DOMAIN_BEGIN
 {"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 定时器分辨率
 {"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"10000000"}},
+// 线程栈大小，单位KB
+{"thread_stack_size",           C_INT,      no,     C_VALID,    .cuv.i=0,       {"1024"}},
 {"debug_lvA",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
 {"debug_lvB",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
 {"debug_lvC",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
