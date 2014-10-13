@@ -120,7 +120,7 @@ int main()
                        "use default 1024 K instead.", stack_KB);
             stack_KB = 1024;
         }
-        if ( pthread_attr_setstacksize(&attr, stack_KB * 1024) ) {
+        if ( 0 == pthread_attr_setstacksize(&attr, stack_KB * 1024) ) {
             log_printf(INF, "set all thread stack size to: %d KB", stack_KB);
         } else {
             log_printf(ERR, "set all thread stack_size to %d KB faile, "
@@ -132,7 +132,7 @@ int main()
     user_cfg = config_read("socket_config");
     if ( strcmp(user_cfg, "TURE") ||
          strcmp(user_cfg, "true") ) {
-        pthread_create( & tid, NULL, config_drive_service, NULL);
+        pthread_create( & tid, &attr, config_drive_service, NULL);
         sprintf(buff, "%d", tid);
         config_write("thread_config_server_id", buff);
     }
@@ -141,7 +141,7 @@ int main()
     Hachiko_init();
 
     // mongoose 线程，用来处理AJAX请求，解析由客户提交的请求，返回应答的xml文件或其他数据
-    ret = pthread_create( & tid, NULL, thread_xml_service, &thread_done[0]);
+    ret = pthread_create( & tid, &attr, thread_xml_service, &thread_done[0]);
     if ( 0 != ret ) {
         errcode  = 0x1000;
         log_printf(ERR,
@@ -151,7 +151,7 @@ int main()
     log_printf(INF, "mongoose service start up.                         DONE.");
 
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
-    ret = pthread_create( & tid, NULL, thread_bms_write_service,
+    ret = pthread_create( & tid, &attr, thread_bms_write_service,
                           &thread_done[1]);
     if ( 0 != ret ) {
         errcode  = 0x1001;
@@ -162,7 +162,7 @@ int main()
     log_printf(INF, "CAN-BUS reader start up.                           DONE.");
 
     // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
-    ret = pthread_create( & tid, NULL, thread_bms_read_service,
+    ret = pthread_create( & tid, &attr, thread_bms_read_service,
                           &thread_done[2]);
     if ( 0 != ret ) {
         errcode  = 0x1002;
@@ -173,7 +173,7 @@ int main()
     log_printf(INF, "CAN-BUS writer start up.                           DONE.");
 
     // 串口服务线程，和读卡器，采样盒，电能表进行数据交换，测量
-    ret = pthread_create( & tid, NULL, thread_measure_service, &thread_done[3]);
+    ret = pthread_create( & tid, &attr, thread_measure_service, &thread_done[3]);
     if ( 0 != ret ) {
         errcode  = 0x1003;
         log_printf(ERR,
@@ -183,7 +183,7 @@ int main()
     log_printf(INF, "EX-measure service start up.                       DONE.");
 
     // 串口服务线程，和充电机进行通信
-    ret = pthread_create( & tid, NULL, thread_charger_service,
+    ret = pthread_create( & tid, &attr, thread_charger_service,
                           &thread_done[4]);
     if ( 0 != ret ) {
         errcode  = 0x1004;
@@ -194,7 +194,7 @@ int main()
     log_printf(INF, "charger service start up.                          DONE.");
 
     // 后台通信线程
-    ret = pthread_create( & tid, NULL, thread_backgroud_service,
+    ret = pthread_create( & tid, &attr, thread_backgroud_service,
                           &thread_done[5]);
     if ( 0 != ret ) {
         errcode  = 0x1004;
@@ -205,7 +205,7 @@ int main()
     log_printf(INF, "backgroud service start up.                        DONE.");
 
     // 充电线程，负责充电逻辑
-    ret = pthread_create( & tid, NULL, thread_charge_task_service,
+    ret = pthread_create( & tid, &attr, thread_charge_task_service,
                           &thread_done[6]);
     if ( 0 != ret ) {
         errcode  = 0x1005;
