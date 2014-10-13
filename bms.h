@@ -494,11 +494,6 @@ struct can_pack_generator {
     struct Hachiko_food friend;
 };
 
-// 充电阶段改变事件处理过程
-void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
-                            CHARGE_STAGE pre,
-                            struct charge_task *thiz);
-
 void gen_packet_PGN256(struct can_pack_generator *self,
                        struct charge_task * thiz,
                        struct event_struct* param);

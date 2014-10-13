@@ -163,6 +163,10 @@ typedef enum {
     // 充电阶段变为中止充电推出阶段
     STAGE_CHANGE_2_ABORT       = 0x06
 }CHARGE_STAGE_CHANGE_EVENT;
+// 充电阶段改变事件处理过程
+void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
+                            CHARGE_STAGE pre,
+                            struct charge_task *thiz);
 
 // BMS CAN通信状态定义
 typedef enum {
