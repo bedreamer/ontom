@@ -9,9 +9,9 @@
 #include <sys/ioctl.h>
 #include <linux/can.h>
 #include <linux/can/raw.h>
-#include "bms.h"
-#include "Hachiko.h"
 #include "charge.h"
+#include "Hachiko.h"
+#include "bms.h"
 #include "config.h"
 #include "log.h"
 #include "error.h"
