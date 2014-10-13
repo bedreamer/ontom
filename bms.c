@@ -18,15 +18,15 @@
 
 // 数据包生成
 struct can_pack_generator genor[] = {
-    {gen_packet_PGN256,     256,   6,   8,   250,  GENERATOR_INVALID,   "CRM"},
-    {gen_packet_PGN1792,   1792,   6,   7,   500,  GENERATOR_INVALID,   "CTS"},
-    {gen_packet_PGN2048,   2048,   6,   6,   250,  GENERATOR_INVALID,   "CML"},
-    {gen_packet_PGN2560,   2560,   4,   1,   250,  GENERATOR_INVALID,   "CRO"},
-    {gen_packet_PGN4608,   4608,   6,   6,    50,  GENERATOR_INVALID,   "CCS"},
-    {gen_packet_PGN6656,   6656,   4,   4,    10,  GENERATOR_INVALID,   "CST"},
-    {gen_packet_PGN7424,   7424,   6,   5,   250,  GENERATOR_INVALID,   "CSD"},
-    {gen_packet_PGN7936,   7936,   2,   4,   250,  GENERATOR_INVALID,   "CEM"},
-    {              NULL,      0,   0,   0,     0,  GENERATOR_INVALID,      ""}
+    {gen_packet_PGN256,   256, 6, 8, 250,  GENERATOR_INVALID,   "CRM", {0}},
+    {gen_packet_PGN1792, 1792, 6, 7, 500,  GENERATOR_INVALID,   "CTS", {0}},
+    {gen_packet_PGN2048, 2048, 6, 6, 250,  GENERATOR_INVALID,   "CML", {0}},
+    {gen_packet_PGN2560, 2560, 4, 1, 250,  GENERATOR_INVALID,   "CRO", {0}},
+    {gen_packet_PGN4608, 4608, 6, 6,  50,  GENERATOR_INVALID,   "CCS", {0}},
+    {gen_packet_PGN6656, 6656, 4, 4,  10,  GENERATOR_INVALID,   "CST", {0}},
+    {gen_packet_PGN7424, 7424, 6, 5, 250,  GENERATOR_INVALID,   "CSD", {0}},
+    {gen_packet_PGN7936, 7936, 2, 4, 250,  GENERATOR_INVALID,   "CEM", {0}},
+    {              NULL,    0, 0, 0,   0,  GENERATOR_INVALID,      "", {0}}
 };
 void Hachiko_CAN_PACKETS_need_send_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self);
