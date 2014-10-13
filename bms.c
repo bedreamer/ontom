@@ -14,19 +14,60 @@
 #include "config.h"
 #include "log.h"
 #include "error.h"
+#include "Hachiko.h"
 
 // 数据包生成
 struct can_pack_generator genor[] = {
-    {gen_packet_PGN256,     256,   6,   8,   250,   "CRM"},
-    {gen_packet_PGN1792,   1792,   6,   7,   500,   "CTS"},
-    {gen_packet_PGN2048,   2048,   6,   6,   250,   "CML"},
-    {gen_packet_PGN2560,   2560,   4,   1,   250,   "CRO"},
-    {gen_packet_PGN4608,   4608,   6,   6,    50,   "CCS"},
-    {gen_packet_PGN6656,   6656,   4,   4,    10,   "CST"},
-    {gen_packet_PGN7424,   7424,   6,   5,   250,   "CSD"},
-    {gen_packet_PGN7936,   7936,   2,   4,   250,   "CEM"},
-    {              NULL,      0,   0,   0,     0,      ""}
+    {gen_packet_PGN256,     256,   6,   8,   250,  GENERATOR_INVALID,   "CRM"},
+    {gen_packet_PGN1792,   1792,   6,   7,   500,  GENERATOR_INVALID,   "CTS"},
+    {gen_packet_PGN2048,   2048,   6,   6,   250,  GENERATOR_INVALID,   "CML"},
+    {gen_packet_PGN2560,   2560,   4,   1,   250,  GENERATOR_INVALID,   "CRO"},
+    {gen_packet_PGN4608,   4608,   6,   6,    50,  GENERATOR_INVALID,   "CCS"},
+    {gen_packet_PGN6656,   6656,   4,   4,    10,  GENERATOR_INVALID,   "CST"},
+    {gen_packet_PGN7424,   7424,   6,   5,   250,  GENERATOR_INVALID,   "CSD"},
+    {gen_packet_PGN7936,   7936,   2,   4,   250,  GENERATOR_INVALID,   "CEM"},
+    {              NULL,      0,   0,   0,     0,  GENERATOR_INVALID,      ""}
 };
+void Hachiko_CAN_PACKETS_need_send_notify_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self);
+// CAN数据包发送过程初始化
+static void can_packets_generator_init()
+{
+    struct can_pack_generator *thiz;
+
+    for ( thiz = genor; thiz && thiz->generator_proc; thiz ++ )
+    {
+        thiz->friend.Hachiko_notify_proc =
+                Hachiko_CAN_PACKETS_need_send_notify_proc;
+        thiz->friend.type = HACHIKO_AUTO_FEED;
+        // 定时器的默认分辨率是10ms， 所以需要除10
+        thiz->friend.ttl = thiz->period / 10;
+        thiz->friend.remian = 0;
+        thiz->friend.status = HACHIKO_INVALID;
+    }
+}
+
+// CAN 需要发送数据发送报文
+void Hachiko_CAN_PACKETS_need_send_notify_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self)
+{
+    switch ( evt ) {
+    case HACHIKO_TIMEOUT:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_TIMEOUT");
+        break;
+    case HACHIKO_ROLLING:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_ROLLING");
+        break;
+    case HACHIKO_DIE:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_DIE");
+        break;
+    case HACHIKO_FEEDED:
+        log_printf(DBG_LV1, "this is a test: HACHIKO_FEEDED");
+        break;
+    default:
+        break;
+    }
+}
 
 /*
  * 本可以将串口通信，SOCKET通信方式也纳入该事件函数，但本着CAN通信优先的原则，暂时将
@@ -42,6 +83,7 @@ static int can_packet_callback(
     case EVENT_CAN_INIT:
         // 事件循环函数初始化
         thiz->can_bms_status = CAN_NORMAL;
+        can_packets_generator_init();
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
@@ -99,6 +141,7 @@ static int can_packet_callback(
          * byte[5]: 0xFF
          * byte[6:8]: PGN
          */
+    {
         param->buff.tx_buff[0] = 0x11;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
         param->buff.tx_buff[1] = thiz->can_tp_param.tp_pack_nr;
@@ -109,10 +152,13 @@ static int can_packet_callback(
         param->buff.tx_buff[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
         param->buff.tx_buff[7] = thiz->can_tp_param.tp_pgn & 0xFF;
         param->buff_payload = 8;
+        param->can_id = 0x1cecf456;
         param->evt_param = EVT_RET_OK;
+    }
         break;
     case EVENT_TX_TP_ACK:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
+    {
         param->buff.tx_buff[0] = 0x13;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
         param->buff.tx_buff[1] = thiz->can_tp_param.tp_size & 0xFF;
@@ -123,7 +169,9 @@ static int can_packet_callback(
         param->buff.tx_buff[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
         param->buff.tx_buff[7] = thiz->can_tp_param.tp_pgn & 0xFF;
         param->buff_payload = 8;
+        param->can_id = 0x1cecf456;
         param->evt_param = EVT_RET_OK;
+    }
         break;
     case EVENT_TX_TP_ABRT:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
@@ -186,6 +234,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     param.buff_payload = 0;
     param.evt_param = EVT_RET_INVALID;
 
+    // 进行数据结构的初始化操作
     can_packet_callback(task, EVENT_CAN_INIT, &param);
 
     while ( ! *done ) {
@@ -255,9 +304,9 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
          * 8字节限制，因此这里不用进行连接管理通信。
          */
         if ( param.buff_payload <= 8 && param.buff_payload > 0 ) {
+            frame.can_id = param.can_id;
+            frame.can_dlc= param.buff_payload;
             memcpy(frame.data, param.buff.tx_buff, 8);
-            frame.can_id = 0x8C11f456;
-            frame.can_dlc= 8;
             nbytes = write(s, &frame, sizeof(struct can_frame));
             if ( nbytes < param.buff_payload ) {
                 param.evt_param = EVT_RET_ERR;
@@ -508,6 +557,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                            *(unsigned int*)(&frame.data[0]));
             }
         } else {
+            param.can_id = frame.can_id;
             param.buff_payload = frame.can_dlc;
             param.evt_param = EVT_RET_INVALID;
             can_packet_callback(task, EVENT_RX_DONE, &param);
@@ -522,42 +572,58 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 }
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void gen_packet_PGN256(struct can_pack_generator *self)
+void gen_packet_PGN256(struct can_pack_generator *self,
+                       struct charge_task * thiz,
+                       struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN1792(struct can_pack_generator *self)
+void gen_packet_PGN1792(struct can_pack_generator *self,
+                        struct charge_task * thiz,
+                        struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN2048(struct can_pack_generator *self)
+void gen_packet_PGN2048(struct can_pack_generator *self,
+                        struct charge_task * thiz,
+                        struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN2560(struct can_pack_generator *self)
+void gen_packet_PGN2560(struct can_pack_generator *self,
+                        struct charge_task * thiz,
+                        struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN4608(struct can_pack_generator *self)
+void gen_packet_PGN4608(struct can_pack_generator *self,
+                        struct charge_task * thiz,
+                        struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN6656(struct can_pack_generator *self)
+void gen_packet_PGN6656(struct can_pack_generator *self,
+                        struct charge_task * thiz,
+                        struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN7424(struct can_pack_generator *self)
+void gen_packet_PGN7424(struct can_pack_generator *self,
+                        struct charge_task * thiz,
+                        struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN7936(struct can_pack_generator *self)
+void gen_packet_PGN7936(struct can_pack_generator *self,
+                        struct charge_task * thiz,
+                        struct event_struct* param)
 {
 
 }

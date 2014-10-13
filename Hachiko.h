@@ -24,6 +24,8 @@ typedef enum {
 }Hachiko_Type;
 
 typedef enum {
+    // 无效定时器, 初始状态
+    HACHIKO_INVALID   = 0x00,
     // 正常使用
     HACHIKO_NORMAL    = 0x01,
     // 计时器暂停
