@@ -9,10 +9,10 @@
 #ifndef _CHARGE_INCLUDED_H_
 #define _CHARGE_INCLUDED_H_
 
-#include "bms.h"
-#include "Hachiko.h"
-
 struct charge_task;
+
+#include "Hachiko.h"
+#include "bms.h"
 
 // 无效时戳，初始化时默认赋值， 用于time_t默认值
 #define INVALID_TIMESTAMP  0x00000000
