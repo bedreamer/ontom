@@ -146,6 +146,24 @@ typedef enum {
     CHARGE_STAGE_DONE         =0x04
 }CHARGE_STAGE;
 
+// 充电阶段变更事件
+typedef enum {
+    // 充电状态变为无效状态
+    STAGE_CHANGE_2_INVALID     = 0x00,
+    // 充电状态变为握手阶段
+    STAGE_CHANGE_2_HANDSHAKING = 0x01,
+    // 充电状态变为配置阶段
+    STAGE_CHANGE_2_CONFIGURE   = 0x02,
+    // 充电阶段变为充电阶段
+    STAGE_CHANGE_2_CHARGING    = 0x03,
+    // 充电阶段变为充电完成阶段
+    STAGE_CHANGE_2_DONE        = 0x04,
+    // 充电阶段变为充电正常退出阶段
+    STAGE_CHANGE_2_EXIT        = 0x05,
+    // 充电阶段变为中止充电推出阶段
+    STAGE_CHANGE_2_ABORT       = 0x06
+}CHARGE_STAGE_CHANGE_EVENT;
+
 // BMS CAN通信状态定义
 typedef enum {
     // 无效模式

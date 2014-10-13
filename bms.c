@@ -48,6 +48,7 @@ static void can_packets_generator_init()
 }
 
 // CAN 需要发送数据发送报文
+// 通过这个定时事件来确定什么时候该发送什么数据帧
 void Hachiko_CAN_PACKETS_need_send_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
@@ -184,7 +185,7 @@ static int can_packet_callback(
 }
 
 // CAN 数据发送报文
-void Hachiko_CAN_WRITE_notify_proc(Hachiko_EVT evt, void *private,
+void ioii(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
     switch ( evt ) {
@@ -570,6 +571,16 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         }
     }
 }
+
+// 充电阶段改变事件处理过程
+void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
+                            CHARGE_STAGE pre,
+                            struct charge_task *thiz)
+{
+
+}
+
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void gen_packet_PGN256(struct can_pack_generator *self,

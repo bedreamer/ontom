@@ -296,6 +296,8 @@ struct pgn7936 {
 
 
 #include "Hachiko.h"
+#include "charge.h"
+
 /*
  * 读到一个完整数据包后调用该函数
  */
@@ -491,6 +493,11 @@ struct can_pack_generator {
     // 数据包发送定时器
     struct Hachiko_food friend;
 };
+
+// 充电阶段改变事件处理过程
+void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
+                            CHARGE_STAGE pre,
+                            struct charge_task *thiz);
 
 void gen_packet_PGN256(struct can_pack_generator *self,
                        struct charge_task * thiz,
