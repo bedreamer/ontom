@@ -156,6 +156,7 @@ static int can_packet_callback(
         break;
     case EVENT_TX_PRE:
         // 决定是否要发送刚刚准备发送的数据包
+        param->evt_param = EVT_RET_OK;
         break;
     case EVENT_TX_REQUEST:
         /*
@@ -340,7 +341,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         param.buff_size = sizeof(txbuff);
         param.evt_param = EVT_RET_INVALID;
         if ( task->can_bms_status & CAN_NORMAL ) {
-            log_printf(DBG_LV0, "fasdfasdfasdfasdfasdf");
             can_packet_callback(task, EVENT_TX_REQUEST, &param);
         } else if ( task->can_bms_status & CAN_TP_RD ) {
             switch ( task->can_bms_status & 0xF0 ) {
