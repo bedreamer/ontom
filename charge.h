@@ -143,7 +143,9 @@ typedef enum {
     // 充电
     CHARGE_STAGE_CHARGING     =0x03,
     // 充电结束
-    CHARGE_STAGE_DONE         =0x04
+    CHARGE_STAGE_DONE         =0x04,
+    // 任意阶段
+    CHARGE_STAGE_ANY          =0x05
 }CHARGE_STAGE;
 
 // 充电阶段变更事件
@@ -216,8 +218,10 @@ struct charge_task {
     // 充电任务所处阶段
     CHARGE_STAGE charge_stage;
 
-    // 系统遥信, 最多支持64 * 8 种遥信
-    volatile unsigned char remote_single[64];
+    // 系统信号, 最多支持64 * 8 种信号标记
+    // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
+    // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
+    volatile unsigned char single[64];
 
     // 充电计费
     struct {
@@ -274,11 +278,8 @@ struct charge_task {
     // 连接管理超时控制器
     struct Hachiko_food can_tp_bomb;
     struct Hachiko_CNA_TP_private can_tp_private;
-
-    /* CAN 通信心跳
-     * CAN 通信需要定时发送数据包，因此需要采用心跳计数，每10ms增加1
-     */
-    unsigned int can_heart_beat;
+    // CAN数据包心跳
+    struct Hachiko_food can_heart_beat;
 
     // 车辆基本信息
     struct pgn512_BRM  vehicle_info;
@@ -291,6 +292,28 @@ struct charge_task {
     // BMS 动力蓄电池状态信息
     //struct pgn4864_BSM bms_battery_status;
 };
+
+/* 系统信号定义
+ * 前 128个信号为系统标记
+ */
+typedef enum {
+    // CAN 数据包发送标记, 当需要发送对应的PGN数据包时，该位被置1，发送完成后清零
+    ONTOM_F_TX_PGN256         = 0x0000,
+    ONTOM_F_TX_PGN1792,
+    ONTOM_F_TX_PGN2048,
+    ONTOM_F_TX_PGN2560,
+    ONTOM_F_TX_PGM4608,
+    ONTOM_F_TX_PGN6656,
+    ONTOM_F_TX_PGN7424,
+    ONTOM_F_TX_PGN7936,
+
+    // 系统遥信量
+    ONTOM_S_ERROR             = 0x0080,
+    ONTOM_S_V_OUT_HIGH,
+    ONTOM_S_V_OUT_LOW,
+    ONTOM_S_I_OUT_HIGH,
+    ONTOM_S_I_OUT_LOW
+}ONTOM_FLAG_SINGLE;
 
 // 创建充电任务
 struct charge_task * charge_task_create(void);
@@ -308,30 +331,30 @@ extern struct charge_task *task;
  */
 // 遥信位,遥测偏移定义
 #include "rsrvdefine.h"
-// 遥信位设置
-static inline void rs_set(struct charge_task *tsk, unsigned int bits)
+// 位设置
+static inline void bit_set(struct charge_task *tsk, ONTOM_FLAG_SINGLE single)
 {
-    volatile unsigned char *byte = tsk->remote_single;
+    volatile unsigned char *byte = tsk->single;
 
-    byte += bits / 8;
-    * byte |= (1 << (bits % 8 ));
+    byte += single / 8;
+    * byte |= (1 << (single % 8 ));
 }
-// 遥信位清除
-static inline void rs_clr(struct charge_task *tsk, unsigned int bits)
+// 位清除
+static inline void bit_clr(struct charge_task *tsk, ONTOM_FLAG_SINGLE single)
 {
-    volatile unsigned char *byte = tsk->remote_single;
+    volatile unsigned char *byte = tsk->single;
 
-    byte += bits / 8;
-    * byte &= (~(1 << (bits % 8 )));
+    byte += single / 8;
+    * byte &= (~(1 << (single % 8 )));
 }
-// 遥信位读取
-static inline int rs_val(struct charge_task *tsk, unsigned int bits)
+// 位读取
+static inline int bit_read(struct charge_task *tsk, ONTOM_FLAG_SINGLE single)
 {
-    volatile unsigned char *byte = tsk->remote_single;
+    volatile unsigned char *byte = tsk->single;
 
-    byte += bits / 8;
+    byte += single / 8;
 
-    return (* byte & (1 << (bits % 8 ))) ? 1 : 0;
+    return (* byte & (1 << (single % 8 ))) ? 1 : 0;
 }
 
 #endif /*_CHARGE_INCLUDED_H_*/

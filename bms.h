@@ -408,75 +408,12 @@ struct event_struct {
     unsigned int buff_payload;
 };
 
-// SAE J1939-21 连接管理协议结构
-union SAE_J1939_21_TP {
-    struct {
-        // always equal 16/10h/0x10
-        u8 control_byte;
-        // 参数组共计多少字节
-        u16 total_size;
-        // 参数组共计多少个数据包
-        u8 total_packets;
-        // 数据包中最大的包编号
-        u8 max_sn_packet;
-        // 请求的参数组编号
-        u8 pgn_hi, pgn_mid, pgn_lo;
-    }TP_CM_RTS;
-    struct {
-        u8 control_byte;
-    }TP_CM_CTS;
-    struct {
-        u8 control_byte;
-
-    }TP_CM_EndOfMsgACK;
-    struct {
-        u8 control_byte;
-
-    }TP_Conn_Abort;
-    struct {
-        u8 control_byte;
-        u8 noused[7];
-    }TP_CM_BAM;
-};
-
-// 充电机下发报文索引号
-typedef enum {
-    // 充电握手阶段
-    C2B_PGN256       =  0x00,
-
-    // 重点配置阶段
-    C2B_PGN1792      =  0x01,
-    C2B_PGN2048      =  0x02,
-    C2B_PGN2560      =  0x03,
-
-    // 充电阶段
-    C2B_PGN4608      =  0x04,
-    C2B_PGN6656      =  0x05,
-
-    // 充电结束阶段
-    C2B_PGN7424      =  0x06,
-
-    // 充电错误分类
-    C2B_PGN7936      =  0x07
-}C2B_INDEX;
 
 struct can_pack_generator;
-// 报文生成器状态
-typedef enum {
-    // 无效状态
-    GENERATOR_INVALID = 0x00,
-    // 启用状态
-    GENERATOR_ENABLED = 0x01,
-    // 禁用状态
-    GENERATOR_DISABLED= 0x02
-}GENERATOR_STATUS;
-
 // 通信报文生成依据
 struct can_pack_generator {
-    // 函数地址
-    void (*generator_proc)(struct can_pack_generator *self,
-                           struct charge_task * thiz,
-                           struct event_struct* param);
+    // 所属阶段
+    CHARGE_STAGE stage;
     // 生成PGN
     unsigned int pgn;
     // 数据包优先级
@@ -485,38 +422,27 @@ struct can_pack_generator {
     unsigned int datalen;
     // 数据包发送周期
     unsigned int period;
-    // 状态
-    GENERATOR_STATUS status;
+    // 心跳计数
+    unsigned int heartbeat;
     // 数据包名称
     const char *mnemonic;
-
-    // 数据包发送定时器
-    struct Hachiko_food friend;
 };
 
-void gen_packet_PGN256(struct can_pack_generator *self,
-                       struct charge_task * thiz,
+int gen_packet_PGN256(struct charge_task * thiz,
                        struct event_struct* param);
-void gen_packet_PGN1792(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+int gen_packet_PGN1792(struct charge_task * thiz,
                         struct event_struct* param);
-void gen_packet_PGN2048(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+int gen_packet_PGN2048(struct charge_task * thiz,
                         struct event_struct* param);
-void gen_packet_PGN2560(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+int gen_packet_PGN2560(struct charge_task * thiz,
                         struct event_struct* param);
-void gen_packet_PGN4608(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+int gen_packet_PGN4608(struct charge_task * thiz,
                         struct event_struct* param);
-void gen_packet_PGN6656(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+int gen_packet_PGN6656(struct charge_task * thiz,
                         struct event_struct* param);
-void gen_packet_PGN7424(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+int gen_packet_PGN7424(struct charge_task * thiz,
                         struct event_struct* param);
-void gen_packet_PGN7936(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+int gen_packet_PGN7936(struct charge_task * thiz,
                         struct event_struct* param);
 
 #endif /*_BMS_PACKAGE_INCLUDED_H_*/

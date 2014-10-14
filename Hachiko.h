@@ -70,7 +70,8 @@ int Hachiko_new(struct Hachiko_food *, Hachiko_Type type,
                  unsigned int ttl, void *private);
 static inline void Hachiko_kill(struct Hachiko_food *dog)
 {
-    dog->status = HACHIKO_KILLED;
+    if ( dog->status != HACHIKO_INVALID )
+        dog->status = HACHIKO_KILLED;
 }
 
 static inline void Hachiko_feed(struct Hachiko_food *dog)

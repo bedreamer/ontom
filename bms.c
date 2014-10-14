@@ -16,59 +16,105 @@
 #include "log.h"
 #include "error.h"
 
-// 数据包生成
-struct can_pack_generator genor[] = {
-    {gen_packet_PGN256,   256, 6, 8, 250,  GENERATOR_INVALID,   "CRM", {0}},
-    {gen_packet_PGN1792, 1792, 6, 7, 500,  GENERATOR_INVALID,   "CTS", {0}},
-    {gen_packet_PGN2048, 2048, 6, 6, 250,  GENERATOR_INVALID,   "CML", {0}},
-    {gen_packet_PGN2560, 2560, 4, 1, 250,  GENERATOR_INVALID,   "CRO", {0}},
-    {gen_packet_PGN4608, 4608, 6, 6,  50,  GENERATOR_INVALID,   "CCS", {0}},
-    {gen_packet_PGN6656, 6656, 4, 4,  10,  GENERATOR_INVALID,   "CST", {0}},
-    {gen_packet_PGN7424, 7424, 6, 5, 250,  GENERATOR_INVALID,   "CSD", {0}},
-    {gen_packet_PGN7936, 7936, 2, 4, 250,  GENERATOR_INVALID,   "CEM", {0}},
-    {              NULL,    0, 0, 0,   0,  GENERATOR_INVALID,      "", {0}}
-};
-void Hachiko_CAN_PACKETS_need_send_notify_proc(Hachiko_EVT evt, void *private,
-                            const struct Hachiko_food *self);
-// CAN数据包发送过程初始化
-static void can_packets_generator_init()
-{
-    struct can_pack_generator *thiz;
-
-    for ( thiz = genor; thiz && thiz->generator_proc; thiz ++ )
+// 数据包生成器信息
+struct can_pack_generator generator[] = {
     {
-        thiz->friend.Hachiko_notify_proc =
-                Hachiko_CAN_PACKETS_need_send_notify_proc;
-        thiz->friend.type = HACHIKO_AUTO_FEED;
-        // 定时器的默认分辨率是10ms， 所以需要除10
-        thiz->friend.ttl = thiz->period / 10;
-        thiz->friend.remain = 0;
-        thiz->friend.status = HACHIKO_INVALID;
+    .stage      =  CHARGE_STAGE_HANDSHACKING,
+    .pgn        =  256,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CRM"
+    },
+    {
+    .stage      =  CHARGE_STAGE_CONFIGURE,
+    .pgn        =  1792,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CTS"
+    },
+    {
+    .stage      =  CHARGE_STAGE_CONFIGURE,
+    .pgn        =  2048,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CML"
+    },
+    {
+    .stage      =  CHARGE_STAGE_CONFIGURE,
+    .pgn        =  2560,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CRO"
+    },
+    {
+    .stage      =  CHARGE_STAGE_CHARGING,
+    .pgn        =  4608,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CCS"
+    },
+    {
+    .stage      =  CHARGE_STAGE_CHARGING,
+    .pgn        =  6656,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CST"
+    },
+    {
+    .stage      =  CHARGE_STAGE_DONE,
+    .pgn        =  7424,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CSD"
+    },
+    {
+    .stage      =  CHARGE_STAGE_ANY,
+    .pgn        =  7936,
+    .prioriy    =  0,
+    .datalen    =  7,
+    .period     =  250,
+    .hearbeat   =  0,
+    .mnemonic   =  "CEM"
     }
-}
+};
 
-// CAN 需要发送数据发送报文
-// 通过这个定时事件来确定什么时候该发送什么数据帧
-void Hachiko_CAN_PACKETS_need_send_notify_proc(Hachiko_EVT evt, void *private,
+// 数据包超时心跳包, 定时器自动复位, 10ms(一个单位时间)一次
+void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
-    switch ( evt ) {
-    case HACHIKO_TIMEOUT:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_TIMEOUT");
-        break;
-    case HACHIKO_ROLLING:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_ROLLING");
-        break;
-    case HACHIKO_DIE:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_DIE");
-        break;
-    case HACHIKO_FEEDED:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_FEEDED");
-        break;
-    default:
-        break;
+    if (evt == HACHIKO_TIMEOUT ) {
+        int i = 0;
+        struct can_pack_generator *thiz;
+        for ( i = 0;
+              i < sizeof(generator) / sizeof(struct can_pack_generator); i++ ) {
+            thiz = &generator[i];
+            if ( thiz->stage == task->charge_stage ) {
+                if ( thiz->heartbeat < thiz->period ) {
+                    thiz->heartbeat += 10;
+                } else {
+                    thiz->heartbeat = thiz->period;
+                }
+            } else {
+                thiz->heartbeat = 0;
+            }
+        }
     }
 }
+
 
 /*
  * 本可以将串口通信，SOCKET通信方式也纳入该事件函数，但本着CAN通信优先的原则，暂时将
@@ -84,7 +130,9 @@ static int can_packet_callback(
     case EVENT_CAN_INIT:
         // 事件循环函数初始化
         thiz->can_bms_status = CAN_NORMAL;
-        can_packets_generator_init();
+        thiz->can_heart_beat.Hachiko_notify_proc=
+                Hachiko_packet_heart_beart_notify_proc;
+        Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 1, NULL);
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
@@ -117,12 +165,56 @@ static int can_packet_callback(
             param->evt_param = EVT_RET_ERR;
             break;
         case CHARGE_STAGE_HANDSHACKING:
+            if ( generator[0].heartbeat >= generator[0].period ) {
+                gen_packet_PGN256(thiz, param);
+                generator[0].heartbeat = 0;
+            }
+            if ( generator[7].heartbeat >= generator[7].period ) {
+                gen_packet_PGN7936(thiz, param);
+                generator[7].heartbeat = 0;
+            }
             break;
         case CHARGE_STAGE_CONFIGURE:
+            if ( generator[1].heartbeat >= generator[1].period ) {
+                gen_packet_PGN1792(thiz, param);
+                generator[1].heartbeat = 0;
+            }
+            else if ( generator[2].heartbeat >= generator[2].period ) {
+                gen_packet_PGN2048(thiz, param);
+                generator[2].heartbeat = 0;
+            }
+            else if ( generator[3].heartbeat >= generator[3].period ) {
+                gen_packet_PGN2560(thiz, param);
+                generator[3].heartbeat = 0;
+            }
+            if ( generator[7].heartbeat >= generator[7].period ) {
+                gen_packet_PGN7936(thiz, param);
+                generator[7].heartbeat = 0;
+            }
             break;
         case CHARGE_STAGE_CHARGING:
+            if ( generator[4].heartbeat >= generator[4].period ) {
+                gen_packet_PGN4608(thiz, param);
+                generator[4].heartbeat = 0;
+            }
+            else if ( generator[5].heartbeat >= generator[5].period ) {
+                gen_packet_PGN6656(thiz, param);
+                generator[5].heartbeat = 0;
+            }
+            if ( generator[7].heartbeat >= generator[7].period ) {
+                gen_packet_PGN7936(thiz, param);
+                generator[7].heartbeat = 0;
+            }
             break;
         case CHARGE_STAGE_DONE:
+            if ( generator[6].heartbeat >= generator[6].period ) {
+                gen_packet_PGN7424(thiz, param);
+                generator[6].heartbeat = 0;
+            }
+            if ( generator[7].heartbeat >= generator[7].period ) {
+                gen_packet_PGN7936(thiz, param);
+                generator[7].heartbeat = 0;
+            }
             break;
         default:
             break;
@@ -185,21 +277,17 @@ static int can_packet_callback(
 }
 
 // CAN 数据发送报文
-void ioii(Hachiko_EVT evt, void *private,
+void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
     switch ( evt ) {
     case HACHIKO_TIMEOUT:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_TIMEOUT");
         break;
     case HACHIKO_ROLLING:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_ROLLING");
         break;
     case HACHIKO_DIE:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_DIE");
         break;
     case HACHIKO_FEEDED:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_FEEDED");
         break;
     default:
         break;
@@ -344,28 +432,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             task->can_bms_status = CAN_NORMAL;
             log_printf(DBG, "BMS: connection aborted.");
         }
-    }
-}
-
-// CAN 传输连接管理超时控制信号, 这里可能会控制task->can_bms_status
-void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
-                            const struct Hachiko_food *self)
-{
-    switch ( evt ) {
-    case HACHIKO_TIMEOUT:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_TIMEOUT");
-        break;
-    case HACHIKO_ROLLING:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_ROLLING");
-        break;
-    case HACHIKO_DIE:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_DIE");
-        break;
-    case HACHIKO_FEEDED:
-        log_printf(DBG_LV1, "this is a test: HACHIKO_FEEDED");
-        break;
-    default:
-        break;
     }
 }
 
@@ -593,7 +659,6 @@ void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
     case STAGE_CHANGE_2_EXIT:
         break;
     case STAGE_CHANGE_2_ABORT:
-        break;
     default:
         break;
     }
@@ -602,57 +667,57 @@ void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-void gen_packet_PGN256(struct can_pack_generator *self,
-                       struct charge_task * thiz,
+// 握手-CRM-充电机辨识报文
+int gen_packet_PGN256(struct charge_task * thiz,
                        struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN1792(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+// 配置-CTS-充电机发送时间同步信息
+int gen_packet_PGN1792(struct charge_task * thiz,
                         struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN2048(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+// 配置-CML-充电机最大输出能力
+int gen_packet_PGN2048(struct charge_task * thiz,
                         struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN2560(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+// 配置-CRO-充电机输出准备就绪状态
+int gen_packet_PGN2560(struct charge_task * thiz,
                         struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN4608(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+// 充电-CCS-充电机充电状态
+int gen_packet_PGN4608(struct charge_task * thiz,
                         struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN6656(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+// 充电-CST-充电机中止充电
+int gen_packet_PGN6656(struct charge_task * thiz,
                         struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN7424(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+// 结束-CSD-充电机统计数据
+int gen_packet_PGN7424(struct charge_task * thiz,
                         struct event_struct* param)
 {
 
 }
 
-void gen_packet_PGN7936(struct can_pack_generator *self,
-                        struct charge_task * thiz,
+// 错误-CEM-充电机错误报文
+int gen_packet_PGN7936(struct charge_task * thiz,
                         struct event_struct* param)
 {
 
