@@ -20,72 +20,72 @@
 struct can_pack_generator generator[] = {
     {
     .stage      =  CHARGE_STAGE_HANDSHACKING,
-    .pgn        =  256,
-    .prioriy    =  0,
-    .datalen    =  7,
+    .pgn        =  0x000100,
+    .prioriy    =  6,
+    .datalen    =  8,
     .period     =  250,
     .heartbeat   =  0,
     .mnemonic   =  "CRM"
     },
     {
     .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  1792,
-    .prioriy    =  0,
+    .pgn        =  0x000700,
+    .prioriy    =  6,
     .datalen    =  7,
-    .period     =  250,
+    .period     =  500,
     .heartbeat   =  0,
     .mnemonic   =  "CTS"
     },
     {
     .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  2048,
-    .prioriy    =  0,
-    .datalen    =  7,
+    .pgn        =  0x000800,
+    .prioriy    =  6,
+    .datalen    =  6,
     .period     =  250,
     .heartbeat   =  0,
     .mnemonic   =  "CML"
     },
     {
     .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  2560,
-    .prioriy    =  0,
-    .datalen    =  7,
+    .pgn        =  0x00A000,
+    .prioriy    =  4,
+    .datalen    =  1,
     .period     =  250,
     .heartbeat   =  0,
     .mnemonic   =  "CRO"
     },
     {
     .stage      =  CHARGE_STAGE_CHARGING,
-    .pgn        =  4608,
-    .prioriy    =  0,
-    .datalen    =  7,
-    .period     =  250,
+    .pgn        =  0x001200,
+    .prioriy    =  6,
+    .datalen    =  6,
+    .period     =  50,
     .heartbeat   =  0,
     .mnemonic   =  "CCS"
     },
     {
     .stage      =  CHARGE_STAGE_CHARGING,
-    .pgn        =  6656,
-    .prioriy    =  0,
-    .datalen    =  7,
-    .period     =  250,
+    .pgn        =  0x001A00,
+    .prioriy    =  4,
+    .datalen    =  4,
+    .period     =  10,
     .heartbeat   =  0,
     .mnemonic   =  "CST"
     },
     {
     .stage      =  CHARGE_STAGE_DONE,
-    .pgn        =  7424,
-    .prioriy    =  0,
-    .datalen    =  7,
+    .pgn        =  0x001D00,
+    .prioriy    =  6,
+    .datalen    =  5,
     .period     =  250,
     .heartbeat   =  0,
     .mnemonic   =  "CSD"
     },
     {
     .stage      =  CHARGE_STAGE_ANY,
-    .pgn        =  7936,
-    .prioriy    =  0,
-    .datalen    =  7,
+    .pgn        =  0x001F00,
+    .prioriy    =  2,
+    .datalen    =  4,
     .period     =  250,
     .heartbeat   =  0,
     .mnemonic   =  "CEM"
@@ -132,6 +132,7 @@ static int can_packet_callback(
         thiz->can_heart_beat.Hachiko_notify_proc=
                 Hachiko_packet_heart_beart_notify_proc;
         Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 1, NULL);
+        thiz->charge_stage = CHARGE_STAGE_HANDSHACKING;
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
@@ -667,58 +668,65 @@ void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 // 握手-CRM-充电机辨识报文
-int gen_packet_PGN256(struct charge_task * thiz,
-                       struct event_struct* param)
+int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[0];
+    param->buff.tx_buff[0] = 0x00;
+    param->buff.tx_buff[1] = 0x01;
+    strcpy(&param->buff.tx_buff[2], "ZH-CN");
+    param->buff.tx_buff[7] = 0xFF;
+    param->buff_payload = gen->datalen;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
 
+    param->evt_param = EVT_RET_OK;
 }
 
 // 配置-CTS-充电机发送时间同步信息
-int gen_packet_PGN1792(struct charge_task * thiz,
-                        struct event_struct* param)
+int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[1];
 
 }
 
 // 配置-CML-充电机最大输出能力
-int gen_packet_PGN2048(struct charge_task * thiz,
-                        struct event_struct* param)
+int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[2];
 
 }
 
 // 配置-CRO-充电机输出准备就绪状态
-int gen_packet_PGN2560(struct charge_task * thiz,
-                        struct event_struct* param)
+int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[3];
 
 }
 
 // 充电-CCS-充电机充电状态
-int gen_packet_PGN4608(struct charge_task * thiz,
-                        struct event_struct* param)
+int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[4];
 
 }
 
 // 充电-CST-充电机中止充电
-int gen_packet_PGN6656(struct charge_task * thiz,
-                        struct event_struct* param)
+int gen_packet_PGN6656(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[5];
 
 }
 
 // 结束-CSD-充电机统计数据
-int gen_packet_PGN7424(struct charge_task * thiz,
-                        struct event_struct* param)
+int gen_packet_PGN7424(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[6];
 
 }
 
 // 错误-CEM-充电机错误报文
-int gen_packet_PGN7936(struct charge_task * thiz,
-                        struct event_struct* param)
+int gen_packet_PGN7936(struct charge_task * thiz, struct event_struct* param)
 {
+    struct can_pack_generator *gen = &generator[7];
 
 }
 
