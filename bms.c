@@ -151,6 +151,7 @@ static int can_packet_callback(
         break;
     case EVENT_TX_DONE:
         // 数据包发送完成了
+        log_printf(DBG_LV0, "packet sent.");
         break;
     case EVENT_TX_PRE:
         // 决定是否要发送刚刚准备发送的数据包
