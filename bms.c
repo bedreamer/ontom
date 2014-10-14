@@ -115,7 +115,6 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
     }
 }
 
-
 /*
  * 本可以将串口通信，SOCKET通信方式也纳入该事件函数，但本着CAN通信优先的原则，暂时将
  * CAN通信时间数据独立出来进行处理。
