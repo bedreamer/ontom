@@ -198,6 +198,25 @@ typedef enum {
     CAN_TP_ABRT= 0x60
 }CAN_TP_STATUS;
 
+struct can_pack_generator;
+// 通信报文生成依据
+struct can_pack_generator {
+    // 所属阶段
+    CHARGE_STAGE stage;
+    // 生成PGN
+    unsigned int pgn;
+    // 数据包优先级
+    unsigned int prioriy;
+    // 数据包长度
+    unsigned int datalen;
+    // 数据包发送周期
+    unsigned int period;
+    // 心跳计数
+    unsigned int heartbeat;
+    // 数据包名称
+    const char *mnemonic;
+};
+
 /*
  * 充电任务描述
  */
