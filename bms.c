@@ -24,7 +24,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CRM"
     },
     {
@@ -33,7 +33,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CTS"
     },
     {
@@ -42,7 +42,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CML"
     },
     {
@@ -51,7 +51,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CRO"
     },
     {
@@ -60,7 +60,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CCS"
     },
     {
@@ -69,7 +69,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CST"
     },
     {
@@ -78,7 +78,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CSD"
     },
     {
@@ -87,7 +87,7 @@ struct can_pack_generator generator[] = {
     .prioriy    =  0,
     .datalen    =  7,
     .period     =  250,
-    .hearbeat   =  0,
+    .heartbeat   =  0,
     .mnemonic   =  "CEM"
     }
 };
