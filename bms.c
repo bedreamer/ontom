@@ -679,7 +679,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
     strcpy(&param->buff.tx_buff[2], "ZH-CN");
     param->buff.tx_buff[7] = 0xFF;
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
 }
