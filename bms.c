@@ -422,7 +422,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     default:
         log_printf(WRN, "un-recognized PGN %08X",
-                   param->can_id & 0x00FF0000;
+                   param->can_id & 0x00FF0000);
         break;
     }
     return ERR_OK;
