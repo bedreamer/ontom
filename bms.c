@@ -290,7 +290,7 @@ static int can_packet_callback(
 int about_packet_reciev_done(struct charge_task *thiz,
                              struct event_struct *param)
 {
-    switch ( (param->can_id & 0x00FF0000) >> 8 ) {
+    switch ( param->can_id ) {
     case PGN_CRM :// 0x000100,
         break;
     case PGN_CTS :// 0x000700,
@@ -422,7 +422,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     default:
         log_printf(WRN, "un-recognized PGN %08X",
-                   param->can_id & 0x00FF0000);
+                   param->can_id);
         break;
     }
     return ERR_OK;
