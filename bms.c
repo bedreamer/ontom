@@ -672,7 +672,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 // 数据接收完成后即可关闭定时器
                 Hachiko_kill(&task->can_tp_bomb);
 
-                param.buff_payload = task->can_tp_param.tp_pack_nr;
+                param.buff_payload = task->can_tp_param.tp_size;
                 param.evt_param = EVT_RET_INVALID;
                 param.can_id = task->can_tp_param.tp_pgn;
                 log_printf(DBG_LV3,
