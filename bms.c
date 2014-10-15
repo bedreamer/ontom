@@ -675,11 +675,12 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 param.buff_payload = task->can_tp_param.tp_pack_nr;
                 param.evt_param = EVT_RET_INVALID;
                 param.can_id = task->can_tp_param.tp_pgn;
+                log_printf(DBG_LV3,
+                           "BMS: data transfer complete PGN=%08X change to ACK",
+                           task->can_tp_param.tp_pgn);
                 can_packet_callback(task, EVENT_RX_DONE, &param);
                 // 数据链接接受完成
                 task->can_bms_status = CAN_TP_RD | CAN_TP_ACK;
-                log_printf(DBG_LV3,
-                           "BMS: data transfer complete change to ACK");
             }
         } else if ( ((frame.can_id & 0x00FF0000) >> 16 ) == 0xEC ) {
             // Connection managment
