@@ -91,6 +91,7 @@ int Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
             thiz->ttl = ttl;
             thiz->remain = ttl;
             thiz->private = private;
+            thiz->status = HACHIKO_NORMAL;
             err = ERR_OK;
             pool[i] = thiz;
             log_printf(DBG_LV2, "set timer ok, type: %X, ttl: %d",
