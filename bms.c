@@ -102,7 +102,6 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
         for ( i = 0;
               i < sizeof(generator) / sizeof(struct can_pack_generator); i++ ) {
             thiz = &generator[i];
-            log_printf(DBG_LV0, "P: %X-%X", thiz->stage, task->charge_stage);
             if ( thiz->stage == task->charge_stage ) {
                 if ( thiz->heartbeat < thiz->period ) {
                     thiz->heartbeat += 10;
@@ -143,6 +142,7 @@ static int can_packet_callback(
         break;
     case EVENT_RX_DONE:
         // 数据包接受成功了
+        about_packet_reciev_done(thiz, param);
         break;
     case EVENT_RX_ERROR:
         // 数据包接受失败了
@@ -228,6 +228,7 @@ static int can_packet_callback(
         break;
     case EVENT_TX_TP_CTS:
         //串口处于连接管理状态时，将会收到该传输数据报请求。
+    {
         /*
          * 当数据包接收完成后向BMS发送消息结束应答数据包
          *
@@ -237,7 +238,7 @@ static int can_packet_callback(
          * byte[5]: 0xFF
          * byte[6:8]: PGN
          */
-    {
+
         param->buff.tx_buff[0] = 0x11;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
         param->buff.tx_buff[1] = thiz->can_tp_param.tp_pack_nr;
@@ -279,23 +280,54 @@ static int can_packet_callback(
     return 0;
 }
 
-// CAN 数据发送报文
-void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
-                            const struct Hachiko_food *self)
+// CAN数据包接受完成
+int about_packet_reciev_done(struct charge_task *thiz, struct event_struct *param)
 {
-    switch ( evt ) {
-    case HACHIKO_TIMEOUT:
+    switch ( (param->can_id & 0x00FF0000) >> 8 ) {
+    case PGN_CRM :// 0x000100,
         break;
-    case HACHIKO_ROLLING:
+    case PGN_CTS :// 0x000700,
         break;
-    case HACHIKO_DIE:
+    case PGN_CML :// 0x000800,
         break;
-    case HACHIKO_FEEDED:
+    case PGN_CCS :// 0x001200,
         break;
-    default:
+    case PGN_CST :// 0x001A00,
+        break;
+    case PGN_CSD :// 0x001D00,
+        break;
+    case PGN_CRO :// 0x000A00,
+        break;
+    case PGN_CEM :// 0x001F00
+        break;
+    case PGN_BRM :// 0x000200, BMS 车辆辨识报文
+        break;
+    case PGN_BCP :// 0x000600, BMS 配置报文
+        break;
+    case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
+        break;
+    case PGN_BCL :// 0x001000, BMS 电池充电需求报文
+        break;
+    case PGN_BCS :// 0x001100, BMS 电池充电总状态报文
+        break;
+    case PGN_BSM :// 0x001300, 动力蓄电池状态信息报文
+        break;
+    case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
+        break;
+    case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
+        break;
+    case PGN_BSP :// 0x001700, 动力蓄电池预留报文
+        break;
+    case PGN_BST :// 0x001900, BMS 中止充电报文
+        break;
+    case PGN_BSD :// 0x001C00, BMS 统计数据报文
+        break;
+    case PGN_BEM :// 0x001E00, BMS 错误报文
         break;
     }
+    return ERR_OK;
 }
+
 
 // bms 通信 写 服务线程
 // 提供bms通信服务
@@ -428,13 +460,25 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         // 应答结束
         if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ACK) ) {
             task->can_bms_status = CAN_NORMAL;
-            log_printf(DBG, "BMS: connection closed normally.");
+            log_printf(DBG_LV0, "BMS: connection closed normally.");
         }
         // 传输终止
         if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ABRT) ) {
             task->can_bms_status = CAN_NORMAL;
-            log_printf(DBG, "BMS: connection aborted.");
+            log_printf(DBG_LV2, "BMS: connection aborted.");
         }
+    }
+}
+
+// CAN 数据发送报文
+void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self)
+{
+    if ( evt == HACHIKO_TIMEOUT ) {
+        log_printf(DBG_LV1, "CAN data transfer terminal due to time out.");
+        task->can_bms_status = CAN_NORMAL;
+    } else if ( evt == HACHIKO_DIE ) {
+
     }
 }
 

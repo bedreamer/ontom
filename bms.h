@@ -248,23 +248,48 @@ enum pgn4846_remote_single {
 
 // 单体动力蓄电池电压
 struct pgn5376 {
-
+    // bit[0:11]: 电压， 0.01V 每位, 0V偏移，范围 0- 24V
+    // bit[12:15]: 蓄电池编号，1 / 每位， 范围 1-16
+    u16 bat_v[256];
 };
 
 // 动力蓄电池温度
 struct pgn5632 {
-
+    // 1 度每位， -50度偏移， 范围 -50 - 200
+    u16 bat_tmp[128];
 };
 
 // 动力蓄电池预留报文
 struct pgn5888 {
-
+    u16 reseved[16];
 };
 
 // BMS终止充电
 struct pgn6400 {
-
+    // BMS 中止充电原因 @ enum REASON_PGN6400
+    u8 reason;
+    // BMS 中止充电故障原因 enum ERROR_PGN6400
+    u16 error;
+    // BMS 中止充电错误原因 enum FAULT_PGN6400
+    u16 fault;
 };
+enum REASON_PGN6400 {
+    // 达到所需SOC值 bit[0:1]
+    REASON_UN_REACH_SOC_VAL  = 0x00,
+    REASON_REACH_SOC_VAL     = 0x01,
+    REASON_SOC_UNRELIABLE        = 0x02,
+
+    // 达到总电压设定值 bit[2:3]
+    REASON_UN_REACH_VOL_VAL  = 0x00,
+    REASON_REACH_VOL_VAL     = 0x04,
+    REASON_VOL_UNRELIABLE        = 0x08
+    //                bit[4:5]
+    REASON_UN_REACH_SINGLE_BAT_VOL = 0x00,
+    REASON_REACH_SINGLE_BAT_VOL    = 0x10,
+    REASON_SINGLE_VOL_UNRELIABLE   = 0x20
+};
+enum ERROR_PGN6400 {};
+enum FAULT_PGN6400 {};
 
 // 充电机终止充电
 struct pgn6656 {
@@ -295,6 +320,28 @@ struct pgn7936 {
 
 #pragma pack()
 
+typedef enum {
+    PGN_CRM = 0x000100,
+    PGN_BRM = 0x000200,
+    PGN_BCP = 0x000600,
+    PGN_CTS = 0x000700,
+    PGN_CML = 0x000800,
+    PGN_BRO = 0x000900,
+    PGN_CRO = 0x000A00,
+    PGN_BCL = 0x001000,
+    PGN_BCS = 0x001100,
+    PGN_CCS = 0x001200,
+    PGN_BSM = 0x001300,
+    PGN_BMV = 0x001500,
+    PGN_BMT = 0x001600,
+    PGN_BSP = 0x001700,
+    PGN_BST = 0x001900,
+    PGN_CST = 0x001A00,
+    PGN_BSD = 0x001C00,
+    PGN_CSD = 0x001D00,
+    PGN_BEM = 0x001E00,
+    PGN_CEM = 0x001F00
+}CAN_PGN;
 
 #include "Hachiko.h"
 #include "charge.h"
@@ -409,6 +456,8 @@ struct event_struct {
     unsigned int buff_payload;
 };
 
+int about_packet_reciev_done(struct charge_task *thiz,
+                             struct event_struct *param);
 int gen_packet_PGN256(struct charge_task * thiz,
                        struct event_struct* param);
 int gen_packet_PGN1792(struct charge_task * thiz,
