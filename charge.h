@@ -326,6 +326,9 @@ typedef enum {
     ONTOM_F_TX_PGN7424,
     ONTOM_F_TX_PGN7936,
 
+    // BMS 已经识别
+    ONTOM_F_BMS_RECONIZED,
+
     // 系统遥信量
     ONTOM_S_ERROR             = 0x0080,
     ONTOM_S_V_OUT_HIGH,

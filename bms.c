@@ -1,3 +1,9 @@
+/*
+ * BMS - CAN 通信过程
+ * 后台 - 串口通信过程
+ * 充电机 - 串口通信过程
+ * 读卡器 - 串口通信过程
+ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -281,7 +287,8 @@ static int can_packet_callback(
 }
 
 // CAN数据包接受完成
-int about_packet_reciev_done(struct charge_task *thiz, struct event_struct *param)
+int about_packet_reciev_done(struct charge_task *thiz,
+                             struct event_struct *param)
 {
     switch ( (param->can_id & 0x00FF0000) >> 8 ) {
     case PGN_CRM :// 0x000100,
@@ -301,8 +308,97 @@ int about_packet_reciev_done(struct charge_task *thiz, struct event_struct *para
     case PGN_CEM :// 0x001F00
         break;
     case PGN_BRM :// 0x000200, BMS 车辆辨识报文
+        if ( param->buff_payload == 8 ) {
+            memcpy(&thiz->vehicle_info, param->buff.rx_buff, 8);
+        } else if ( param->buff_payload == sizeof(struct pgn512_BRM) ) {
+            memcpy(thiz->vehicle_info,
+                   param->buff.rx_buff, sizeof(struct pgn512_BRM));
+        }
+
+        if ( thiz->vehicle_info.spn2565_bms_version[0] == 0x00 &&
+             thiz->vehicle_info.spn2565_bms_version[1] == 0x00 &&
+             thiz->vehicle_info.spn2565_bms_version[2] == 0x01 ) {
+
+        } else {
+            log_printf(WRN,
+                  "BMS not recognized due to invalid BMS VERSION(SPN2565).");
+            bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
+            break;
+        }
+
+        if ( thiz->vehicle_info.spn2566_battery_type == 0 ||
+             (thiz->vehicle_info.spn2566_battery_type > 0x08 &&
+              thiz->vehicle_info.spn2566_battery_type < 0xFF) ) {
+            log_printf(WRN,
+                   "BMS not recognized due to invalid BATTERY TYPE(SPN2566)");
+            bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
+            break;
+        }
+
+        if ( thiz->vehicle_info.spn2567_capacity / 10 > 1000 ) {
+            log_printf(WRN,
+                   "BMS not recognized due to invalid CAP INFO(SPN2567)");
+            bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
+            break;
+        }
+
+        if ( thiz->vehicle_info.spn2568_volatage / 10 > 750 ) {
+            log_printf(WRN,
+                  "BMS not recognized due to invalid VOLTAGE INFO(SPN2568)");
+            bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
+            break;
+        }
+        log_printf(INF, "BMS recognized....CAP: %.1f A.H, VOL: %.1f V",
+                   thiz->vehicle_info.spn2567_capacity / 10.0f,
+                   thiz->vehicle_info.spn2568_volatage / 10.0f);
+        if ( ! bit_read(thiz, ONTOM_F_BMS_RECONIZED ) ) {
+            // send recognized event from here.
+        }
+        bit_set(thiz, ONTOM_F_BMS_RECONIZED);
         break;
     case PGN_BCP :// 0x000600, BMS 配置报文
+        if ( param->buff_payload != 13 ) {
+            log_printf(WRN, "BCP packet size crash, need 13 gave %d",
+                       param->buff_payload);
+            break;
+        }
+        memcpy(&thiz->bms_config_info, param->buff.rx_buff,
+               sizeof(struct pgn1536_BCP));
+
+        if ( thiz->bms_config_info.spn2816_max_charge_volatage_single_battery /
+                100.0f > 24.0f ) {
+            log_printf(WRN,
+                       "max_charge_volatage_single_battery out of rang(0-24)"
+                       "gave %.2f V (SPN2816)",
+             thiz->bms_config_info.spn2816_max_charge_volatage_single_battery /
+                       100.0f);
+            break;
+        }
+
+        if ( thiz->bms_config_info.spn2817_max_charge_current / 10.0f >
+             400.0f ) {
+            log_printf(WRN, "max_charge_current out of rang(-400-0)"
+                       "gave %.1f V (SPN2816)",
+                     thiz->bms_config_info.spn2817_max_charge_current / 10.0f);
+            break;
+        }
+
+        if ( thiz->bms_config_info.spn2818_total_energy / 10.0f > 1000.0f ) {
+            log_printf(WRN, "total_energy out of rang(0-1000 KW.H)"
+                       "gave %.1f KW.H (SPN2818)",
+                     thiz->bms_config_info.spn2818_total_energy / 10.0f);
+            break;
+        }
+
+        if ( thiz->bms_config_info.spn2819_max_charge_voltage / 10.0f >
+                750.0f ) {
+            log_printf(WRN, "max_charge_voltage out of rang(0-750 V)"
+                       "gave %.1f V (SPN2819)",
+                     thiz->bms_config_info.spn2819_max_charge_voltage / 10.0f);
+            break;
+        }
+
+        if ( thiz->bms_config_info.spn2820_max_temprature )
         break;
     case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
         break;
@@ -572,7 +668,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 // 数据接收完成后即可关闭定时器
                 Hachiko_kill(&task->can_tp_bomb);
 
-                param.buff_payload = frame.can_dlc;
+                param.buff_payload = task->can_tp_param.tp_pack_nr;
                 param.evt_param = EVT_RET_INVALID;
                 can_packet_callback(task, EVENT_RX_DONE, &param);
                 // 数据链接接受完成
@@ -636,12 +732,14 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                                            HACHIKO_ONECE, 125,
                                            &task->can_tp_private);
                     if ( ret == ERR_WRONG_PARAM ) {
-                        log_printf(ERR, "BMS: set new timer error, with code:%d",
+                        log_printf(ERR,
+                                   "BMS: set new timer error, with code:%d",
                                    ret);
                         continue;
                     }
                     if ( ret == ERR_TIMER_BEMAX ) {
-                        log_printf(ERR, "BMS: set new timer error, with code:%d",
+                        log_printf(ERR,
+                                   "BMS: set new timer error, with code:%d",
                                    ret);
                         continue;
                     }
@@ -718,7 +816,11 @@ void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
 int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[0];
-    param->buff.tx_buff[0] = 0x00;
+
+    if ( bit_read(thiz, ONTOM_F_BMS_RECONIZED) )
+        param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
+    else param->buff.tx_buff[0] = BMS_RECOGNIZED;
+
     param->buff.tx_buff[1] = 0x01;
     strcpy(&param->buff.tx_buff[2], "ZH-CN");
     param->buff.tx_buff[7] = 0xFF;

@@ -94,7 +94,7 @@ struct pgn1536_BCP {
     // 蓄电池标称总能量, 0.1kW。h每位， 0-1000 kW。h
     u16 spn2818_total_energy;
     // 最高允许充电电压, 0.1V 每位， 0-750V
-    u16 spn2819_max_chage_voltage;
+    u16 spn2819_max_charge_voltage;
     // 最高允许温度，1 度每位，-50度偏移，-50 度 - 200度
     u8 spn2820_max_temprature;
     // 整车蓄电池荷电状态，0.1% 每位，0-100%
