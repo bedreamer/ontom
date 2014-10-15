@@ -311,7 +311,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         if ( param->buff_payload == 8 ) {
             memcpy(&thiz->vehicle_info, param->buff.rx_buff, 8);
         } else if ( param->buff_payload == sizeof(struct pgn512_BRM) ) {
-            memcpy(thiz->vehicle_info,
+            memcpy(&thiz->vehicle_info,
                    param->buff.rx_buff, sizeof(struct pgn512_BRM));
         }
 
