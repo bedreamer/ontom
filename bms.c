@@ -255,7 +255,7 @@ static int can_packet_callback(
         param->buff.tx_buff[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
         param->buff.tx_buff[7] = thiz->can_tp_param.tp_pgn & 0xFF;
         param->buff_payload = 8;
-        param->can_id = 0x1cecf456;
+        param->can_id = 0x1cecf456 | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
     }
         break;
@@ -272,7 +272,7 @@ static int can_packet_callback(
         param->buff.tx_buff[6] = (thiz->can_tp_param.tp_pgn >> 8 ) & 0xFF;
         param->buff.tx_buff[7] = thiz->can_tp_param.tp_pgn & 0xFF;
         param->buff_payload = 8;
-        param->can_id = 0x1cecf456;
+        param->can_id = 0x1cecf456 | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
     }
         break;
