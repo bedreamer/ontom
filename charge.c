@@ -84,6 +84,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     //task = charge_task_create();
     task->charge_task_stat = CHARGE_STAT_INVALID;
+    memset(task->single, 0, sizeof(task->single));
 
     while ( ! *done ) {
         switch ( task->charge_task_stat) {
