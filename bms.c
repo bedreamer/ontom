@@ -316,8 +316,8 @@ int about_packet_reciev_done(struct charge_task *thiz,
         }
 
         if ( thiz->vehicle_info.spn2565_bms_version[0] == 0x00 &&
-             thiz->vehicle_info.spn2565_bms_version[1] == 0x00 &&
-             thiz->vehicle_info.spn2565_bms_version[2] == 0x01 ) {
+             thiz->vehicle_info.spn2565_bms_version[1] == 0x01 &&
+             thiz->vehicle_info.spn2565_bms_version[2] == 0x00 ) {
 
         } else {
             log_printf(WRN,
