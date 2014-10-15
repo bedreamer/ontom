@@ -335,14 +335,14 @@ int about_packet_reciev_done(struct charge_task *thiz,
             break;
         }
 
-        if ( thiz->vehicle_info.spn2567_capacity / 10 > 1000 ) {
+        if ( thiz->vehicle_info.spn2567_capacity / 10.0f > 1000.0f ) {
             log_printf(WRN,
                    "BMS not recognized due to invalid CAP INFO(SPN2567)");
             bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
             break;
         }
 
-        if ( thiz->vehicle_info.spn2568_volatage / 10 > 750 ) {
+        if ( thiz->vehicle_info.spn2568_volatage / 10.0f > 750.0f ) {
             log_printf(WRN,
                   "BMS not recognized due to invalid VOLTAGE INFO(SPN2568)");
             bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
