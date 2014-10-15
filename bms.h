@@ -288,8 +288,8 @@ enum REASON_PGN6400 {
     REASON_REACH_SINGLE_BAT_VOL    = 0x10,
     REASON_SINGLE_VOL_UNRELIABLE   = 0x20
 };
-enum ERROR_PGN6400 {};
-enum FAULT_PGN6400 {};
+//enum ERROR_PGN6400 {};
+//enum FAULT_PGN6400 {};
 
 // 充电机终止充电
 struct pgn6656 {
