@@ -282,7 +282,7 @@ enum REASON_PGN6400 {
     // 达到总电压设定值 bit[2:3]
     REASON_UN_REACH_VOL_VAL  = 0x00,
     REASON_REACH_VOL_VAL     = 0x04,
-    REASON_VOL_UNRELIABLE        = 0x08
+    REASON_VOL_UNRELIABLE        = 0x08,
     //                bit[4:5]
     REASON_UN_REACH_SINGLE_BAT_VOL = 0x00,
     REASON_REACH_SINGLE_BAT_VOL    = 0x10,
