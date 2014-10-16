@@ -939,7 +939,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.tx_buff, &cts, sizeof(struct pgn1792_CTS));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
 }
@@ -957,7 +957,7 @@ int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
 }
@@ -974,7 +974,7 @@ int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.tx_buff, &cro, sizeof(struct pgn2560_CRO));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
 }
@@ -993,7 +993,7 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn | CAN_TX_ID_MASK;
+    param->can_id = gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
 }
