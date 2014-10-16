@@ -398,10 +398,6 @@ int about_packet_reciev_done(struct charge_task *thiz,
             break;
         }
 
-        if ( thiz->bms_config_info.spn2820_max_temprature ) {
-            break;
-        }
-
         log_printf(INF, "BCP done, BSVH: %.2f V, MAXi: %.1 A, "
                    "CAP: %d KW.H, M-V-C: %.1f V, M-T: %d C, CAP-statu: %.1f%%",
                    "V: %.1f V",
