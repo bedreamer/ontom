@@ -665,7 +665,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
-        log_printf(DBG_LV0, "get %dst packet %08X", dbg_packets,
+        log_printf(DBG_LV1, "get %dst packet %08X", dbg_packets,
                    *(unsigned int *)frame.data);
 
         /*
