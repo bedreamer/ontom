@@ -158,7 +158,7 @@ enum charge_mode {
 };
 
 // 电池充电总状态
-struct pgn4352 {
+struct pgn4352_BCS {
     // BMS 的充电电压测量值，0.1V 每位，0V偏移， 0-750V
     u16 spn3075_charge_voltage;
     // BMS的充电电流测量值，0.1A 每位， -400A偏移， -400A-0A
