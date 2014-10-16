@@ -428,7 +428,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
                        thiz->bms_charge_need_now.spn3073_need_current);
         }
 
-        log_printf(INF, "PGN_BCL fetched, V-need: %d V, I-need: %s mode:",
+        log_printf(INF, "PGN_BCL fetched, V-need: %d V, I-need: %d mode: %s",
                    thiz->bms_charge_need_now.spn3072_need_voltage,
                    thiz->bms_charge_need_now.spn3073_need_current,
                    thiz->bms_charge_need_now.spn3074_charge_mode == 0x01 ?
