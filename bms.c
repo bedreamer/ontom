@@ -839,6 +839,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             param.can_id = (frame.can_id & 0x00FF0000) >> 8;
             param.buff_payload = frame.can_dlc;
             param.evt_param = EVT_RET_INVALID;
+            memcpy(param.buff.rx_buff, frame.data, 8);
             can_packet_callback(task, EVENT_RX_DONE, &param);
             log_printf(DBG_LV0, "BMS: read a frame done. %08X", frame.can_id);
         }
