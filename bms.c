@@ -915,7 +915,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     struct tm *p;
 
     time(&timep);
-    p =localltime(&timep);
+    p =localtime(&timep);
     if ( p == NULL ) {
         param->evt_param = EVT_RET_ERR;
         return;
