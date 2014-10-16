@@ -481,7 +481,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     can_packet_callback(task, EVENT_CAN_INIT, &param);
 
     while ( ! *done ) {
-        usleep(90000);
+        usleep(5000);
 
         /*
          * 写线程同时负责写数据和进行连接管理时的控制数据写出，这里需要对当前CAN的
@@ -643,7 +643,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     param.buff_size = sizeof(tp_buff);
     param.buff_payload = 0;
     while ( ! *done ) {
-        usleep(90000);
+        usleep(5000);
 
         if ( task->can_bms_status  == CAN_INVALID ) {
             continue;
