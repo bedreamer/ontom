@@ -355,6 +355,10 @@ int about_packet_reciev_done(struct charge_task *thiz,
             // send recognized event from here.
         }
         bit_set(thiz, ONTOM_F_BMS_RECONIZED);
+        if ( thiz->charge_stage != CHARGE_STAGE_CONFIGURE ) {
+            thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
+            log_printf(INF, "CHARGER change stage to CHARGE_STAGE_CONFIGURE");
+        }
         break;
     case PGN_BCP :// 0x000600, BMS 配置报文
         if ( param->buff_payload != 13 ) {
@@ -415,6 +419,10 @@ int about_packet_reciev_done(struct charge_task *thiz,
                     "not ready" :
                     param->buff.rx_buff[0] == 0xAA ?
                     "ready" : "<unkown status>");
+        if ( thiz->charge_stage != CHARGE_STAGE_CHARGING ) {
+            thiz->charge_stage = CHARGE_STAGE_CHARGING;
+            log_printf(INF, "CHARGER change stage to CHARGE_STAGE_CHARGING");
+        }
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
         memcpy(&thiz->bms_charge_need_now,
@@ -617,7 +625,7 @@ void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
     if ( evt == HACHIKO_TIMEOUT ) {
-        log_printf(DBG_LV1, "CAN data transfer terminal due to time out.");
+        log_printf(WRN, "CAN data transfer terminal due to time out.");
         task->can_bms_status = CAN_NORMAL;
     } else if ( evt == HACHIKO_DIE ) {
 
@@ -903,6 +911,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     struct can_pack_generator *gen = &generator[1];
     time_t timep;
     struct tm *p;
+
     time(&timep);
     p =localltime(&timep);
     if ( p == NULL ) {
