@@ -775,7 +775,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                            *(unsigned int*)(&frame.data[0]));
             }
         } else {
-            param.can_id = frame.can_id;
+            param.can_id = (frame.can_id & 0x00FF0000) >> 8;
             param.buff_payload = frame.can_dlc;
             param.evt_param = EVT_RET_INVALID;
             can_packet_callback(task, EVENT_RX_DONE, &param);
