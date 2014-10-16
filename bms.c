@@ -625,6 +625,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     // 数据包对应的PGN
     unsigned int tp_packet_PGN = 0;
 
+    unsigned int dbg_packets = 0;
+
     task->can_tp_private.status = PRIVATE_INVALID;
     task->can_tp_bomb.private = (void *)&task->can_tp_private;
 
@@ -653,12 +655,17 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             log_printf(DBG_LV0, "BMS: id not accept %x", frame.can_id);
             continue;
         }
+
+        dbg_packets ++;
+
         if ( nbytes != sizeof(struct can_frame) ) {
             param.evt_param = EVT_RET_ERR;
             log_printf(DBG_LV3, "BMS: read frame error %x", frame.can_id);
             can_packet_callback(task, EVENT_RX_ERROR, &param);
             continue;
         }
+
+        log_printf(DBG_LV1, "get %dst packet", dbg_packets);
 
         /*
          * CAN通信处于普通模式
@@ -683,7 +690,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             }
             Hachiko_feed(&task->can_tp_bomb);
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
-            log_printf(DBG_LV2, "BM data tansfer fetch the %dst packet.",
+            log_printf(DBG_LV1, "BM data tansfer fetch the %dst packet.",
                        frame.data[0]);
             task->can_tp_param.tp_rcv_pack_nr ++;
             if ( task->can_tp_param.tp_rcv_pack_nr >=
