@@ -410,24 +410,34 @@ int about_packet_reciev_done(struct charge_task *thiz,
                    thiz->bms_config_info.spn2822_total_voltage);
         break;
     case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
+        log_printf(INF, "BMS is ready for charge.");
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
+        log_printf(INF, "PGN_BCL fetched.");
         break;
     case PGN_BCS :// 0x001100, BMS 电池充电总状态报文
+        log_printf(INF, "PGN_BCS fetched.");
         break;
     case PGN_BSM :// 0x001300, 动力蓄电池状态信息报文
+        log_printf(INF, "PGN_BSM fetched.");
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
+        log_printf(INF, "PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
+        log_printf(INF, "PGN_BMT fetched.");
         break;
     case PGN_BSP :// 0x001700, 动力蓄电池预留报文
+        log_printf(INF, "PGN_BSP fetched.");
         break;
     case PGN_BST :// 0x001900, BMS 中止充电报文
+        log_printf(INF, "PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
+        log_printf(INF, "PGN_BSD fetched.");
         break;
     case PGN_BEM :// 0x001E00, BMS 错误报文
+        log_printf(INF, "PGN_BEM fetched.");
         break;
     default:
         log_printf(WRN, "un-recognized PGN %08X",
