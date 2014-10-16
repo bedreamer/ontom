@@ -688,9 +688,18 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
-        log_printf(DBG_LV1, "get %dst packet %08X:%08X", dbg_packets,
+        log_printf(DBG_LV1,
+                   "get %dst packet %08X:%02X%02X%02X%02X%02X%02X%02X%02X",
+                   dbg_packets,
                    frame.can_id,
-                   *(unsigned int *)frame.data);
+                   frame.data[0],
+                   frame.data[1],
+                   frame.data[2],
+                   frame.data[3],
+                   frame.data[4],
+                   frame.data[5],
+                   frame.data[6],
+                   frame.data[7]);
 
         /*
          * CAN通信处于普通模式
