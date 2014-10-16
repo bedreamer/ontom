@@ -348,9 +348,9 @@ int about_packet_reciev_done(struct charge_task *thiz,
             bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
             break;
         }
-        log_printf(INF, "BMS recognized....CAP: %.1f A.H, VOL: %.1f V",
-                   thiz->vehicle_info.spn2567_capacity / 10.0f,
-                   thiz->vehicle_info.spn2568_volatage / 10.0f);
+        log_printf(INF, "BMS recognized....CAP: %d A.H, VOL: %d V",
+                   thiz->vehicle_info.spn2567_capacity,
+                   thiz->vehicle_info.spn2568_volatage);
         if ( ! bit_read(thiz, ONTOM_F_BMS_RECONIZED ) ) {
             // send recognized event from here.
         }
@@ -398,16 +398,16 @@ int about_packet_reciev_done(struct charge_task *thiz,
             break;
         }
 
-        log_printf(INF, "BCP done, BSVH: %.2f V, MAXi: %.1 A, "
-                   "CAP: %d KW.H, M-V-C: %.1f V, M-T: %d C, CAP-statu: %.1f%%",
-                   "V: %.1f V",
-                   (float)thiz->bms_config_info.spn2816_max_charge_volatage_single_battery,
-                   (float)thiz->bms_config_info.spn2817_max_charge_current,
-                   (float)thiz->bms_config_info.spn2818_total_energy,
-                   (float)thiz->bms_config_info.spn2819_max_charge_voltage,
+        log_printf(INF, "BCP done, BSVH: %d V, MAXi: %d A, "
+                   "CAP: %d KW.H, M-V-C: %d V, M-T: %d C, CAP-statu: %d %%",
+                   "V: %d V",
+                   thiz->bms_config_info.spn2816_max_charge_volatage_single_battery,
+                   thiz->bms_config_info.spn2817_max_charge_current,
+                   thiz->bms_config_info.spn2818_total_energy,
+                   thiz->bms_config_info.spn2819_max_charge_voltage,
                    thiz->bms_config_info.spn2820_max_temprature,
-                   (float)thiz->bms_config_info.spn2821_soc,
-                   (float)thiz->bms_config_info.spn2822_total_voltage);
+                   thiz->bms_config_info.spn2821_soc,
+                   thiz->bms_config_info.spn2822_total_voltage);
         break;
     case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
         break;
