@@ -107,7 +107,13 @@ struct pgn1536_BCP {
 struct pgn1792_CTS {
     // 压缩的BCD码
     // 第6-7字节为年
-    unsigned char spn2823_date[7];
+    u8 spn2823_bcd_sec;
+    u8 spn2823_bcd_min;
+    u8 spn2823_bcd_hour;
+    u8 spn2823_bcd_day;
+    u8 spn2823_bcd_mon;
+    u8 spn2823_bcd_year_h;
+    u8 spn2823_bcd_year_l;
 };
 
 // 充电机最大输出能力

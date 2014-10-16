@@ -909,6 +909,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
 int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[1];
+    struct pgn1792_CTS cts;
     time_t timep;
     struct tm *p;
 
@@ -918,22 +919,23 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
         param->evt_param = EVT_RET_ERR;
         return;
     }
-
-    param->buff.tx_buff[0] = (((p->tm_sec / 10 ) & 0x0F ) << 4) |
+    cts.spn2823_bcd_sec = (((p->tm_sec / 10 ) & 0x0F ) << 4) |
             ((p->tm_sec % 10) & 0x0F);
-    param->buff.tx_buff[1] = (((p->tm_min / 10 ) & 0x0F ) << 4) |
+    cts.spn2823_bcd_min = (((p->tm_min / 10 ) & 0x0F ) << 4) |
             ((p->tm_min % 10) & 0x0F);
-    param->buff.tx_buff[2] = (((p->tm_hour / 10 ) & 0x0F ) << 4) |
+    cts.spn2823_bcd_hour = (((p->tm_hour / 10 ) & 0x0F ) << 4) |
             ((p->tm_hour % 10) & 0x0F);
-    param->buff.tx_buff[3] = (((p->tm_day / 10 ) & 0x0F ) << 4) |
+    cts.spn2823_bcd_day = (((p->tm_day / 10 ) & 0x0F ) << 4) |
             ((p->tm_day % 10) & 0x0F);
-    param->buff.tx_buff[4] = (((p->tm_mon / 10 ) & 0x0F ) << 4) |
+    cts.spn2823_bcd_mon = (((p->tm_mon / 10 ) & 0x0F ) << 4) |
             ((p->tm_mon % 10) & 0x0F);
-    param->buff.tx_buff[5] = (((p->tm_year / 100 ) & 0x0F ) << 4) |
+    cts.spn2823_bcd_year_h = (((p->tm_year / 100 ) & 0x0F ) << 4) |
             ((p->tm_year % 100) & 0x0F);
-    param->buff.tx_buff[6] = (((p->tm_year / 10 ) & 0x0F ) << 4) |
+    cts.spn2823_bcd_year_l = (((p->tm_year / 10 ) & 0x0F ) << 4) |
             ((p->tm_year % 10) & 0x0F);;
-    param->buff.tx_buff[7] = 0xFF;
+
+    memset(param->buff.tx_buff, 0xFF, 8);
+    memcpy(param->buff.tx_buff, &cts, sizeof(struct pgn1792_CTS));
 
     param->buff_payload = gen->datalen;
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
@@ -950,9 +952,8 @@ int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
     cml.spn2824_max_output_voltage = 7500;
     cml.spn2825_min_output_voltage = 2400;
     cml.spn2826_max_output_current = 3000;
+    memset(param->buff.tx_buff, 0xFF, 8);
     memcpy(param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
-    param->buff.rx_buff[6] = 0xFF;
-    param->buff.rx_buff[7] = 0xFF;
 
     param->buff_payload = gen->datalen;
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
