@@ -926,8 +926,8 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
             ((p->tm_min % 10) & 0x0F);
     cts.spn2823_bcd_hour = (((p->tm_hour / 10 ) & 0x0F ) << 4) |
             ((p->tm_hour % 10) & 0x0F);
-    cts.spn2823_bcd_day = (((p->tm_day / 10 ) & 0x0F ) << 4) |
-            ((p->tm_day % 10) & 0x0F);
+    cts.spn2823_bcd_day = (((p->tm_mday / 10 ) & 0x0F ) << 4) |
+            ((p->tm_mday % 10) & 0x0F);
     cts.spn2823_bcd_mon = (((p->tm_mon / 10 ) & 0x0F ) << 4) |
             ((p->tm_mon % 10) & 0x0F);
     cts.spn2823_bcd_year_h = (((p->tm_year / 100 ) & 0x0F ) << 4) |
