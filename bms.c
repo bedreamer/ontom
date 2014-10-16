@@ -686,6 +686,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              */
             if ( (task->can_bms_status & CAN_TP_RD) != CAN_TP_RD ) {
                 task->can_bms_status = CAN_NORMAL;
+                log_printf(WRN, "timing crashed.");
                 continue;
             }
             Hachiko_feed(&task->can_tp_bomb);
