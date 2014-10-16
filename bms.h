@@ -173,7 +173,7 @@ struct pgn4352_BCS {
 };
 
 // 充电机充电状态
-struct pgn4608 {
+struct pgn4608_CCS {
     // 充电机输出电压，0.1V/位， 0V偏移量，0-750V
     u16 spn3081_output_voltage;
     // 充电机输出电流，0.1A/位，-400A偏移，-400A-0A
@@ -183,7 +183,7 @@ struct pgn4608 {
 };
 
 // 动力蓄电池状态信息
-struct pgn4864 {
+struct pgn4864_BSM {
     // 最高单体电压的蓄电池编号
     u8 sn_of_max_voltage_battery;
     // 最高蓄电池温度
@@ -247,25 +247,25 @@ enum pgn4846_remote_single {
 };
 
 // 单体动力蓄电池电压
-struct pgn5376 {
+struct pgn5376_BMV {
     // bit[0:11]: 电压， 0.01V 每位, 0V偏移，范围 0- 24V
     // bit[12:15]: 蓄电池编号，1 / 每位， 范围 1-16
     u16 bat_v[256];
 };
 
 // 动力蓄电池温度
-struct pgn5632 {
+struct pgn5632_BMT {
     // 1 度每位， -50度偏移， 范围 -50 - 200
     u16 bat_tmp[128];
 };
 
 // 动力蓄电池预留报文
-struct pgn5888 {
+struct pgn5888_BSP {
     u16 reseved[16];
 };
 
 // BMS终止充电
-struct pgn6400 {
+struct pgn6400_BST {
     // BMS 中止充电原因 @ enum REASON_PGN6400
     u8 reason;
     // BMS 中止充电故障原因 enum ERROR_PGN6400

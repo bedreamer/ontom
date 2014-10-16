@@ -688,7 +688,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
-        log_printf(DBG_LV1,
+        debug_log(DBG_LV1,
                    "get %dst packet %08X:%02X%02X%02X%02X%02X%02X%02X%02X",
                    dbg_packets,
                    frame.can_id,
@@ -877,7 +877,6 @@ void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
     }
 }
 
-
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 // 握手-CRM-充电机辨识报文
@@ -902,28 +901,90 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
 int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[1];
+    time_t timep;
+    struct tm *p;
+    time(&timep);
+    p =localltime(&timep);
+    if ( p == NULL ) {
+        param->evt_param = EVT_RET_ERR;
+        return;
+    }
 
+    param->buff.tx_buff[0] = (((p->tm_sec / 10 ) & 0x0F ) << 4) |
+            ((p->tm_sec % 10) & 0x0F);
+    param->buff.tx_buff[1] = (((p->tm_min / 10 ) & 0x0F ) << 4) |
+            ((p->tm_min % 10) & 0x0F);
+    param->buff.tx_buff[2] = (((p->tm_hour / 10 ) & 0x0F ) << 4) |
+            ((p->tm_hour % 10) & 0x0F);
+    param->buff.tx_buff[3] = (((p->tm_day / 10 ) & 0x0F ) << 4) |
+            ((p->tm_day % 10) & 0x0F);
+    param->buff.tx_buff[4] = (((p->tm_mon / 10 ) & 0x0F ) << 4) |
+            ((p->tm_mon % 10) & 0x0F);
+    param->buff.tx_buff[5] = (((p->tm_year / 100 ) & 0x0F ) << 4) |
+            ((p->tm_year % 100) & 0x0F);
+    param->buff.tx_buff[6] = (((p->tm_year / 10 ) & 0x0F ) << 4) |
+            ((p->tm_year % 10) & 0x0F);;
+    param->buff.tx_buff[7] = 0xFF;
+
+    param->buff_payload = gen->datalen;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
+
+    param->evt_param = EVT_RET_OK;
 }
 
 // 配置-CML-充电机最大输出能力
 int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[2];
+    struct pgn2048_CML cml;
 
+    cml.spn2824_max_output_voltage = 7500;
+    cml.spn2825_min_output_voltage = 2400;
+    cml.spn2826_max_output_current = 3000;
+    memcpy(param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
+    param->buff.rx_buff[6] = 0xFF;
+    param->buff.rx_buff[7] = 0xFF;
+
+    param->buff_payload = gen->datalen;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
+
+    param->evt_param = EVT_RET_OK;
 }
 
 // 配置-CRO-充电机输出准备就绪状态
 int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[3];
+    struct pgn2560_CRO cro;
 
+    cro.spn2830_charger_ready_for_charge = CHARGER_READY_FOR_CHARGE;
+
+    memset(param->buff.tx_buff, 0xFF, 8);
+    memcpy(param->buff.tx_buff, &cro, sizeof(struct pgn2560_CRO));
+
+    param->buff_payload = gen->datalen;
+    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK;
+
+    param->evt_param = EVT_RET_OK;
 }
 
 // 充电-CCS-充电机充电状态
 int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[4];
+    struct pgn4608_CCS ccs;
 
+    ccs.spn3081_output_voltage = 7500;
+    ccs.spn3082_outpu_current  = 1200;
+    ccs.spn3083_charge_time = 122;
+
+    memset(param->buff.tx_buff, 0xFF, 8);
+    memcpy(param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
+
+    param->buff_payload = gen->datalen;
+    param->can_id = gen->pgn | CAN_TX_ID_MASK;
+
+    param->evt_param = EVT_RET_OK;
 }
 
 // 充电-CST-充电机中止充电

@@ -14,5 +14,6 @@
 #define DBG_LV3 0x03
 
 int log_printf(unsigned int level, const char *fmt, ...);
+#define debug_log log_printf
 
 #endif
