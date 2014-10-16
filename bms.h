@@ -150,7 +150,7 @@ struct pgn4096_BCL {
     // 充电电流需求，0.1A 每位，-400V偏移，-400A-0A
     u16 spn3073_need_current;
     // 充电模式 @ enum charge_mode
-    u16 spn3074_charge_mode;
+    u8  spn3074_charge_mode;
 };
 enum charge_mode {
     CHARGE_WITH_CONST_VOLTAGE  = 0x01,  // 恒流充电

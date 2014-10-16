@@ -431,10 +431,10 @@ int about_packet_reciev_done(struct charge_task *thiz,
         log_printf(INF, "PGN_BCL fetched, V-need: %.1f V, I-need: %.1f mode: %s",
                    thiz->bms_charge_need_now.spn3072_need_voltage/10.0,
                    thiz->bms_charge_need_now.spn3073_need_current/10.0f,
-                   thiz->bms_charge_need_now.spn3074_charge_mode == 0x01 ?
-                       "恒压充电" :
-                   thiz->bms_charge_need_now.spn3074_charge_mode == 0x02 ?
-                       "恒流充电" : "无效模式");
+                   thiz->bms_charge_need_now.spn3074_charge_mode ==
+                    CHARGE_WITH_CONST_VOLTAGE ? "恒压充电" :
+                   thiz->bms_charge_need_now.spn3074_charge_mode ==
+                        CHARGE_WITH_CONST_CURRENT ? "恒流充电" : "无效模式");
         break;
     case PGN_BCS :// 0x001100, BMS 电池充电总状态报文
         log_printf(INF, "PGN_BCS fetched.");
