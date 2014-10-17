@@ -27,6 +27,7 @@ extern void * thread_measure_service(void *) ___THREAD_ENTRY___;
 extern void * thread_charger_service(void *) ___THREAD_ENTRY___;
 extern void * thread_backgroud_service(void *) ___THREAD_ENTRY___;
 extern void * thread_charge_task_service(void *) ___THREAD_ENTRY___;
+extern void * thread_uart_service(void *arg) ___THREAD_ENTRY___;
 
 // 串口通信 服务线程
 // 提供串口通信服务
@@ -80,7 +81,7 @@ int main()
     pthread_t tid = 0;
     pthread_attr_t attr;
     int s;
-    int thread_done[ 7 ] = {0};
+    int thread_done[ 8 ] = {0};
     char buff[32];
     int errcode = 0, ret;
 
@@ -214,6 +215,17 @@ int main()
         goto die;
     }
     log_printf(INF, "charge service start up.                           DONE.");
+
+    // 串口通信线程
+    ret = pthread_create( & tid, &attr, thread_uart_service,
+                          &thread_done[7]);
+    if ( 0 != ret ) {
+        errcode  = 0x1006;
+        log_printf(ERR,
+                   "UART framework start up.                       FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "UART framework start up.                           DONE.");
 
     if ( s == 0 ) {
         pthread_attr_destroy(&attr);
