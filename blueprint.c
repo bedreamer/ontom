@@ -160,8 +160,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 max_handle = thiz->dev_handle;
             }
 
-            FD_ZET(thiz->dev_handle, &rd_set);
-            FD_ZET(thiz->dev_handle, &wr_set);
+            FD_SET(thiz->dev_handle, &rd_set);
+            FD_SET(thiz->dev_handle, &wr_set);
 
             log_printf(INF, "open UART correct.");
             continue;
