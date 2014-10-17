@@ -25,7 +25,7 @@ main()
 
     /* open the device to be non-blocking (read will return immediatly) */
     fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    if (fd <0) {perror(MODEMDEVICE); exit(-1); }
+    if (fd <0) {perror("open"); exit(-1); }
 
     fprintf(stderr, "open %s OK\n", MODEMDEVICE);
 
