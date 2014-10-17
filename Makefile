@@ -46,9 +46,10 @@ OBJECTS_DIR   = ./
 
 SOURCES       = mongoose.c \
 		tom.c ajax.c bms.c config.c log.c charge.c zeus.c \
-		Hachiko.c
+		Hachiko.c blueprint.c
 OBJECTS       = mongoose.o \
-		tom.o ajax.o bms.o config.o log.o charge.o Hachiko.o
+		tom.o ajax.o bms.o config.o log.o charge.o Hachiko.o \
+		blueprint.o
 DIST          = ../qt-4.8.2-arm/mkspecs/common/unix.conf \
 		../qt-4.8.2-arm/mkspecs/common/linux.conf \
 		../qt-4.8.2-arm/mkspecs/common/gcc-base.conf \

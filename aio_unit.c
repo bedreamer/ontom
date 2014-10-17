@@ -16,6 +16,8 @@ volatile int STOP=FALSE;
 void signal_handler_IO (int status);   /* definition of signal handler */
 int wait_flag=TRUE;                    /* TRUE while no signal received */
 
+
+
 main()
 {
     int fd,c, res;

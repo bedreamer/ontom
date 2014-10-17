@@ -479,7 +479,6 @@ int about_packet_reciev_done(struct charge_task *thiz,
     return ERR_OK;
 }
 
-
 // bms 通信 写 服务线程
 // 提供bms通信服务
 void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
