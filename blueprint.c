@@ -97,6 +97,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
     while ( ! *done ) {
         usleep(5000);
+        if ( thiz == NULL ) continue;
         if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
 
         if ( thiz->status == BP_UART_STAT_INVALID ) {
