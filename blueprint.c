@@ -362,6 +362,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_RD ) {
             char buff[512] = {0};
             retval = FD_ISSET(thiz->dev_handle, &rd_set);
+#if 0
             if ( retval ) {
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
@@ -371,7 +372,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 if ( i ++ % 100 == 0 )
                     log_printf(DBG_LV1, "not fetch rd_set <%d:%d>", retval, errno);
             }
-
+#endif
             int rd = 0;
             while ( read(thiz->dev_handle, &buff[rd], 1) == 1 && rd < 32 ) {
                 rd ++;
