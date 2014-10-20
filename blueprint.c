@@ -367,7 +367,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         }
 
         retval =
-            select(1, &rd_set, &wr_set, NULL, &tv);
+            select(max_handle, &rd_set, &wr_set, NULL, &tv);
         if ( retval == -1 ) {
             log_printf(DBG_LV0, "toto..");
             continue;
@@ -381,7 +381,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     log_printf(DBG_LV1, "<%s>", buff);
                 }
             } else {
-                log_printf(DBG_LV0, "not fetch rd_set <%d>", retval);
+                static int i = 0;
+                if ( i ++ % 100 == 0 )
+                    log_printf(DBG_LV1, "not fetch rd_set <%d>", retval);
             }
             continue;
         }
@@ -393,7 +395,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITVH_2_RX, NULL);
                 thiz->status = BP_UART_STAT_WR;
             } else {
-                log_printf(DBG_LV0, "not fetch wr_set <%d>", retval);
+                static int i = 0;
+                if ( i ++ % 100 == 0 )
+                    log_printf(DBG_LV1, "not fetch wr_set <%d>", retval);
             }
             continue;
         }
