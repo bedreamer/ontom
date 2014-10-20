@@ -398,7 +398,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-            usleep(100);
+            sleep(1);
             if ( retval ) {
                 retval = write(thiz->dev_handle, "0123456789", 11);
                 log_printf(DBG_LV1, "write out %d. ", retval);
