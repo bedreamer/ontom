@@ -371,6 +371,10 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( retval == -1 ) {
             log_printf(DBG_LV0, "toto..");
             continue;
+        } else {
+            static int i = 0;
+            if ( i ++ % 100 == 0 )
+                log_printf(DBG_LV1, "select fetched <%d>", retval);
         }
 
         if ( thiz->status == BP_UART_STAT_RD ) {
