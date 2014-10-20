@@ -383,8 +383,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 char buff[32] = {0};
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-                    thiz->status = BP_UART_STAT_WR;
+                    //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+                    //thiz->status = BP_UART_STAT_WR;
                 }
             } else {
                 static int i = 0;
