@@ -397,8 +397,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             int rd = 0;
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
             usleep(100);
-            while ( read(thiz->dev_handle, &buff[rd ++ ], 1) != -1 && rd < 32 ) {
-
+            while ( read(thiz->dev_handle, &buff[rd], 1) == 1 && rd < 32 ) {
+                rd ++;
             }
 
             if ( rd ) {
