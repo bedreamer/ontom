@@ -397,7 +397,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_WR ) {
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
             if ( retval ) {
-                write(thiz->dev_handle, "0123456789", 11);
+                retval = write(thiz->dev_handle, "0123456789", 11);
+                log_printf(DBG_LV1, "write out %d. ", retval);
             } else {
                 static int i = 0;
                 if ( i ++ % 100 == 0 )
