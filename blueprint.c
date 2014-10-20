@@ -91,10 +91,10 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
 
     switch (stopbits) {
         case 1:
-            options.c_cflag &= ~CSTOPB;
+            options.c_cflag |= CSTOPB;
             break;
         case 2:
-            options.c_cflag |= CSTOPB;
+            options.c_cflag &= ~CSTOPB;
             break;
         default:
             options.c_cflag &= ~CSTOPB;
