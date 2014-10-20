@@ -1,11 +1,10 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
-/* According to POSIX.1-2001 */
-#include <sys/select.h>
-/* According to earlier standards */
-#include <sys/time.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 #include <termios.h>
 #include <errno.h>
 #include <sys/ioctl.h>
