@@ -106,7 +106,7 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
     options.c_cc[VTIME] = 150;							// 设置超时 15 seconds
     options.c_cc[VMIN] = 0;								// Update the options and do it NOW
     options.c_lflag&= ~(ICANON | ECHO | ECHOE | ISIG);//设置为非标准模式，输入在终端不显示,不启用组合按键
-    status = tcsetattr(fd, TCSANOW, &options);
+    status = tcsetattr(fd, TCSAFLUSH, &options);
     if  (status != 0) {
         log_printf(ERR, "tcsetattr fd");
         return ERR_UART_CONFIG_FAILE;
