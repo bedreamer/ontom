@@ -275,7 +275,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0, ret;
-    struct bp_uart *thiz = NULL;
+    struct bp_uart *thiz = &uarts[0];
     fd_set rd_set, wr_set;
     struct timeval tv;
     int retval, max_handle = 0;
@@ -369,6 +369,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         retval =
             select(max_handle + 1, &rd_set, &wr_set, NULL, &tv);
         if ( retval == -1 ) {
+            log_printf(DBG_LV0, "toto..");
             continue;
         }
 
