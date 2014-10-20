@@ -360,7 +360,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         }
 
         if ( thiz->status == BP_UART_STAT_RD ) {
-            char buff[33] = {0};
+            char buff[512] = {0};
             retval = FD_ISSET(thiz->dev_handle, &rd_set);
             if ( retval ) {
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
