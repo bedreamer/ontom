@@ -33,98 +33,79 @@ static unsigned long arg_send_pin = 0, arg_rec_pin = 0;
 static int fd_rec = -1, fd_send = -1;
 FILE *fp = NULL;
 
-int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
+int configure_uart(int fd,int baud_rate, int data_bits, char parity, int stop_bits)
 {
-    int   status;
-    struct termios options;
+    struct termios new_cfg,old_cfg;
+    int speed;
 
-    tcflush(fd, TCIOFLUSH);
-
-    tcgetattr(fd, &options);
-    cfsetispeed(&options, speed);
-    cfsetospeed(&options, speed);
-#if 0
-    options.c_cflag &= ~CSIZE;
-    /* 设置数据位数*/
-    switch (databits)
-    {
-        case 7:
-            options.c_cflag |= CS7;
-            break;
-        case 8:
-            options.c_cflag |= CS8;
-            break;
-        default:
-            options.c_cflag |= CS8;
-            break;
-    }
-
-    switch (parity)
-    {
-        case 'n':
-        case 'N':
-            options.c_cflag &= ~PARENB; 				/* Clear parity enable */
-            options.c_iflag &= ~INPCK;					/* Enable parity checking */
-            break;
-        case 'o':
-        case 'O':
-            options.c_cflag |= (PARODD | PARENB);
-            options.c_iflag |= INPCK;					/* Disnable parity checking */
-            break;
-        case 'e':
-        case 'E':
-            options.c_cflag |= PARENB;					/* Enable parity */
-            options.c_cflag &= ~PARODD;
-            options.c_iflag |= INPCK; 					/* Disnable parity checking */
-            break;
-        case 'S':
-        case 's': 										/*as no parity*/
-            options.c_cflag &= ~PARENB;
-            options.c_cflag &= ~CSTOPB;
-            break;
-        default:
-            options.c_cflag &= ~PARENB;
-            options.c_cflag &= ~CSTOPB;
-            break;
-    }
-
-    /*  设置停止位*/
-    switch (stopbits)
-    {
-        case 1:
-            options.c_cflag &= ~CSTOPB;
-            break;
-        case 2:
-            options.c_cflag |= CSTOPB;
-            break;
-        default:
-            options.c_cflag &= ~CSTOPB;
-            break;
-    }
-
-
-    options.c_cc[VTIME] = 150;							// 设置超时 15 seconds
-    options.c_cc[VMIN] = 0;								// Update the options and do it NOW
-    options.c_lflag&= ~(ICANON | ECHO | ECHOE | ISIG);//设置为非标准模式，输入在终端不显示,不启用组合按键
-
-    options.c_cflag |= CS8;      //8位数据位，1位停止位
-    options.c_cflag &= ~CSTOPB;
-    options.c_cflag &= ~PARENB;  //无奇偶校验
-    options.c_oflag &= ~(OPOST); //关闭输出
-
-    options.c_lflag &= ~(ISIG|ECHO|IEXTEN); //关闭组合按键,关闭回显
-    options.c_iflag &= ~(INPCK|BRKINT|ICRNL|ISTRIP|IXON |INLCR);
-    options.c_iflag |=IGNCR;     //忽略接受到回车符
-#endif
-
-    status = tcsetattr(fd, TCSAFLUSH, &options);
-    if  (status != 0) {
-        log_printf(ERR, "tcsetattr fd");
+    /* 保存并测试现有串口参数设置，在这里如果串口号等出错，会有相关的出错信息 */
+    if (tcgetattr(fd, &old_cfg) != 0) {
+        perror("tcgetattr");
         return ERR_UART_CONFIG_FAILE;
     }
+    new_cfg = old_cfg;
+    cfmakeraw(&new_cfg); /* 配置为原始模式 */
+    new_cfg.c_cflag &= ~CSIZE;
+    /* 设置波特率 */
+    cfsetispeed(&new_cfg, baud_rate);
+    cfsetospeed(&new_cfg, baud_rate);
 
-    tcflush(fd, TCIOFLUSH);
-    //fflush(fd);
+    /* 设置数据位 */
+    if (data_bits == 7) {
+        new_cfg.c_cflag |= CS7;
+    } else { //8:
+        new_cfg.c_cflag |= CS8;
+    }
+
+    switch (parity) /* 设置奇偶校验位 */
+    {
+        default:
+        case 'n':
+        case 'N':
+        {
+            new_cfg.c_cflag &= ~PARENB;
+            new_cfg.c_iflag &= ~INPCK;
+        }
+        break;
+        case 'o':
+        case 'O':
+        {
+            new_cfg.c_cflag |= (PARODD | PARENB);
+            new_cfg.c_iflag |= INPCK;
+        }
+        break;
+        case 'e':
+        case 'E':
+        {
+            new_cfg.c_cflag |= PARENB;
+            new_cfg.c_cflag &= ~PARODD;
+            new_cfg.c_iflag |= INPCK;
+        }
+        break;
+        case 's': /* as no parity */
+        case 'S':
+        {
+            new_cfg.c_cflag &= ~PARENB;
+            new_cfg.c_cflag &= ~CSTOPB;
+        }
+        break;
+    }
+
+    /* 设置停止位 */
+    if ( stop_bits == 2 ) {
+        new_cfg.c_cflag |= CSTOPB;
+    } else { // 默认一位
+        new_cfg.c_cflag &= ~CSTOPB;
+    }
+
+    /* 设置等待时间和最小接收字符 */
+    new_cfg.c_cc[VTIME] = 0;
+    new_cfg.c_cc[VMIN] = 1;
+    tcflush(fd, TCIFLUSH); /* 处理未接收字符 */
+    if ((tcsetattr(fd, TCSANOW, &new_cfg)) != 0) { /* 激活新配置 */
+        perror("tcsetattr");
+        return ERR_UART_CONFIG_FAILE;
+    }
     return ERR_OK;
 }
 
@@ -212,7 +193,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         }
-        ret = configure_uart(self->dev_handle, B9600, 8, 2, 'S');
+        ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
         if ( ret == ERR_UART_CONFIG_FAILE ) {
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
