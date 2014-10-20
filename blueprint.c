@@ -396,9 +396,18 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     log_printf(DBG_LV1, "not fetch rd_set <%d:%d>", retval, errno);
             }
 
+            int rd = 0;
+            while ( read(thiz->dev_handle, &buff[rd ++ ], 1) != -1 && rd < 32 ) {
+
+            }
+
+            if ( rd ) {
+                log_printf(DBG_LV1, "%s", buff);
+            }
+
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-            sleep(1);
+            usleep(100);
             if ( retval ) {
                 retval = write(thiz->dev_handle, "0123456789", 11);
                 log_printf(DBG_LV1, "write out %d. ", retval);
