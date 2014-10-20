@@ -190,7 +190,7 @@ int set_gpio_output(int pin, int value)
     fprintf(fp, "%d\n", value);
     fclose(fp);
 
-    return 0;
+    return ERR_OK;
 }
 
 /*
@@ -228,13 +228,17 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
-        set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
-        self->status = BP_UART_STAT_WR;
+        ret = set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
+        if ( ret != ERR_OK ) {
+            log_printf(DBG_LV1, "set uart to TX mode faile");
+        }
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
-        set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
-        self->status = BP_UART_STAT_RD;
+        ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
+        if ( ret != ERR_OK ) {
+            log_printf(DBG_LV1, "set uart to RX mode faile");
+        }
         break;
 
     // 串口接收到新数据
