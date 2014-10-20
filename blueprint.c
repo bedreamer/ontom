@@ -368,6 +368,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
+        continue;
         tv.tv_sec  = 1;
         tv.tv_usec = 0; // 100 ms.
         retval =
