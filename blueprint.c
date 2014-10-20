@@ -44,7 +44,7 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
     cfsetispeed(&options, speed);
     cfsetospeed(&options, speed);
     options.c_cflag &= ~CSIZE;
-
+#if 0
     /* 设置数据位数*/
     switch (databits)
     {
@@ -106,6 +106,17 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
     options.c_cc[VTIME] = 150;							// 设置超时 15 seconds
     options.c_cc[VMIN] = 0;								// Update the options and do it NOW
     options.c_lflag&= ~(ICANON | ECHO | ECHOE | ISIG);//设置为非标准模式，输入在终端不显示,不启用组合按键
+#endif
+
+    options.c_cflag |= CS8;      //8位数据位，1位停止位
+    options.c_cflag &= ~CSTOPB;
+    options.c_cflag &= ~PARENB;  //无奇偶校验
+    options.c_oflag &= ~(OPOST); //关闭输出
+
+    options.c_lflag &= ~(ISIG|ECHO|IEXTEN); //关闭组合按键,关闭回显
+    options.c_iflag &= ~(INPCK|BRKINT|ICRNL|ISTRIP|IXON |INLCR);
+    options.c_iflag |=IGNCR;     //忽略接受到回车符
+
     status = tcsetattr(fd, TCSAFLUSH, &options);
     if  (status != 0) {
         log_printf(ERR, "tcsetattr fd");
