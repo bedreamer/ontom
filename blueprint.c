@@ -65,48 +65,48 @@ int set_speed(int fd, int speed)
     return -1;
 }
 
-int set_other_attribute(int fd, int databits, int stopbits, int parity)
+int set_other_attribute(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options;
 
-    if (tcgetattr(fd, &options) != 0)
-    {
+    if (tcgetattr(fd, &options) != 0) {
         perror("SetupSerial 1");
-        return -1;
+        return ERR_UART_CONFIG_FAILE;
     }
 
+    tcflush(fd, TCIOFLUSH);
+    cfsetispeed(&options, baud_rate);
+    cfsetospeed(&options, baud_rate);
+    status = tcsetattr(fd, TCSANOW, &options);
+
+    if (tcgetattr(fd, &options) != 0) {
+        perror("SetupSerial 1");
+        return ERR_UART_CONFIG_FAILE;
+    }
     options.c_cflag &= ~CSIZE;
 
-    switch (databits)
-    {
+    switch (databits) {
+        default:
         case 7:
             options.c_cflag |= CS7;
             break;
-
         case 8:
             options.c_cflag |= CS8;
             break;
-
-        default:
-            fprintf(stderr,"Unsupported data size\n");
-            return -1;
     }
 
-    switch (parity)
-    {
+    switch (parity) {
         case 'n':
         case 'N':
             options.c_cflag &= ~PARENB;   /* Clear parity enable */
             options.c_iflag &= ~INPCK;     /* Enable parity checking */
             break;
-
         case 'o':
         case 'O':
         case 1:
             options.c_cflag |= (PARODD | PARENB);
             options.c_iflag |= INPCK;             /* Disnable parity checking */
             break;
-
         case 'e':
         case 'E':
         case 2:
@@ -114,32 +114,23 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
             options.c_cflag &= ~PARODD;
             options.c_iflag |= INPCK;      /* Disnable parity checking */
             break;
-
+        default:
         case 'S':
         case 's':  /*as no parity*/
         case 0:
             options.c_cflag &= ~PARENB;
             options.c_cflag &= ~CSTOPB;
             break;
-
-        default:
-            fprintf(stderr,"Unsupported parity\n");
-            return -1;
     }
 
-    switch (stopbits)
-    {
+    switch (stopbits) {
+        default:
         case 1:
             options.c_cflag &= ~CSTOPB;
             break;
-
         case 2:
             options.c_cflag |= CSTOPB;
             break;
-
-        default:
-            fprintf(stderr,"Unsupported stop bits\n");
-            return -1;
     }
 
     /* Set input parity option */
@@ -161,10 +152,10 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
 if (tcsetattr(fd,TCSANOW,&options) != 0)
     {
         perror("SetupSerial 3");
-        return -1;
+        return ERR_UART_CONFIG_FAILE;
     }
 
-    return 0;
+    return ERR_OK;
 }
 
 
@@ -331,8 +322,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             return ERR_UART_CONFIG_FAILE;
         }
 #endif
-        set_speed(self->dev_handle, 9600);
-        set_other_attribute(self->dev_handle, 8, 1, 0);
+        set_other_attribute(self->dev_handle, B9600, 8, 1, 0);
         self->status = BP_UART_STAT_RD;
         break;
     // 关闭串口
