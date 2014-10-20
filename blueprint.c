@@ -68,6 +68,7 @@ int set_speed(int fd, int speed)
 int set_other_attribute(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options;
+    int   status;
 
     if (tcgetattr(fd, &options) != 0) {
         perror("SetupSerial 1");
