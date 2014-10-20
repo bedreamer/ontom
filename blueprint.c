@@ -38,11 +38,11 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
     int   status;
     struct termios options;
 
-    tcgetattr(fd, &options);
     tcflush(fd, TCIOFLUSH);
+
+    tcgetattr(fd, &options);
     cfsetispeed(&options, speed);
     cfsetospeed(&options, speed);
-
     options.c_cflag &= ~CSIZE;
 
     /* 设置数据位数*/
@@ -200,7 +200,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         }
-        ret = configure_uart(self->dev_handle, B9600, 8, 2, 'N');
+        ret = configure_uart(self->dev_handle, B9600, 8, 2, 'S');
         if ( ret == ERR_UART_CONFIG_FAILE ) {
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
