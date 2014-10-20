@@ -45,77 +45,77 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
 
     options.c_cflag &= ~CSIZE;
 
-    switch (databits) {
+    /* 设置数据位数*/
+    switch (databits)
+    {
         case 7:
             options.c_cflag |= CS7;
             break;
         case 8:
             options.c_cflag |= CS8;
             break;
+
         default:
-            options.c_cflag |= CS8;
-            break;
+            fprintf(stderr,"Unsupported data sizen");
+            return (FALSE);
     }
 
-    switch (parity) {
+    switch (parity)
+    {
         case 'n':
         case 'N':
-            options.c_cflag &= ~PARENB;   /* Clear parity enable */
-            options.c_iflag &= ~INPCK;     /* Enable parity checking */
+            options.c_cflag &= ~PARENB; 				/* Clear parity enable */
+            options.c_iflag &= ~INPCK;					/* Enable parity checking */
             break;
+
         case 'o':
         case 'O':
-        case 1:
             options.c_cflag |= (PARODD | PARENB);
-            options.c_iflag |= INPCK;             /* Disnable parity checking */
+            options.c_iflag |= INPCK;					/* Disnable parity checking */
             break;
+
         case 'e':
         case 'E':
-        case 2:
-            options.c_cflag |= PARENB;     /* Enable parity */
+            options.c_cflag |= PARENB;					/* Enable parity */
             options.c_cflag &= ~PARODD;
-            options.c_iflag |= INPCK;      /* Disnable parity checking */
+            options.c_iflag |= INPCK; 					/* Disnable parity checking */
             break;
+
         case 'S':
-        case 's':  /*as no parity*/
-        case 0:
+        case 's': 										/*as no parity*/
             options.c_cflag &= ~PARENB;
             options.c_cflag &= ~CSTOPB;
             break;
-        default:
-            options.c_cflag &= ~PARENB;   /* Clear parity enable */
-            options.c_iflag &= ~INPCK;     /* Enable parity checking */
-            break;
 
+        default:
+            fprintf(stderr,"Unsupported parityn");
+            return (FALSE);
     }
 
-    switch (stopbits) {
+    /*  设置停止位*/
+    switch (stopbits)
+    {
         case 1:
-            options.c_cflag |= CSTOPB;
+            options.c_cflag &= ~CSTOPB;
             break;
         case 2:
-            options.c_cflag &= ~CSTOPB;
+            options.c_cflag |= CSTOPB;
             break;
         default:
-            options.c_cflag &= ~CSTOPB;
-            break;
+            fprintf(stderr,"Unsupported stop bitsn");
+            return (FALSE);
     }
 
     /* Set input parity option */
     if (parity != 'n')
         options.c_iflag |= INPCK;
 
-    //options.c_cflag   |= CRTSCTS;
-    //options.c_iflag &=~(IXON | IXOFF | IXANY);
-    //options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    //options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    //options.c_lflag |= ISIG;
-
     tcflush(fd,TCIFLUSH);
+    options.c_iflag = 0;
     options.c_oflag = 0;
-    //options.c_lflag = 0;
-    options.c_cc[VTIME] = 0; 						// delay 15 seconds
-    options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
+    options.c_lflag = 0;
+    options.c_cc[VTIME] = 150;							// 设置超时 15 seconds
+    options.c_cc[VMIN] = 0;								// Update the options and do it NOW
 
     status = tcsetattr(fd, TCSANOW, &options);
     if  (status != 0) {
