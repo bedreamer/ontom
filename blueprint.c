@@ -216,7 +216,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             return ERR_UART_CONFIG_FAILE;
         }
         gpio_export(SERIAL4_CTRL_PIN);
-        self->status = BP_UART_STAT_WR;
+        self->status = BP_UART_STAT_RD;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
