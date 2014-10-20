@@ -29,34 +29,6 @@ struct bp_uart uarts[] = {
 #define	RX_LOW_LEVEL			0
 #define	TX_HIGH_LEVEL			1
 
-int set_speed(int fd, int speed)
-{
-    int   i;
-    int   status;
-    struct termios   Opt;
-
-    tcgetattr(fd, &Opt);
-
-    for ( i= 0;  i < sizeof(speed_arr) / sizeof(int);  i++)
-    {
-        if (speed == name_arr[i])
-        {
-            tcflush(fd, TCIOFLUSH);
-            cfsetispeed(&Opt, speed_arr[i]);
-            cfsetospeed(&Opt, speed_arr[i]);
-            status = tcsetattr(fd, TCSANOW, &Opt);
-            if  (status != 0)
-            {
-                perror("tcsetattr fd");
-                return -1;
-            }
-            tcflush(fd,TCIOFLUSH);
-            return 0;
-        }
-    }
-    return -1;
-}
-
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options;
