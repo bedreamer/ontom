@@ -77,7 +77,7 @@ typedef enum {
     // 发送的数据帧需要接收响应帧
     BP_FRAME_NEED_RX_ACK,
     // 接收的数据帧需要发送响应帧
-    BP_FRAME_NEED_TX_ACK,
+    BP_FRAME_NEED_TX_ACK
 }BP_FRAME_ATTRIB;
 
 // 串口事件参数
@@ -107,6 +107,8 @@ struct bp_uart {
     BP_UART_STAT status;
     // 初始化标识
     unsigned int init_magic;
+    int (*bp_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
+                         struct bp_evt_param *param);
 
     // 接收缓冲区
     char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
