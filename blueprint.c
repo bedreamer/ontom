@@ -359,7 +359,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             FD_SET(thiz->dev_handle, &rd_set);
             FD_SET(thiz->dev_handle, &wr_set);
 
-            log_printf(INF, "open UART %s correct.", thiz->dev_name);
+            log_printf(INF, "open UART %d:%s correct.",
+                       thiz->dev_handle, thiz->dev_name);
             continue;
         }
 
