@@ -274,12 +274,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     int *done = (int *)arg;
     int mydone = 0, ret;
     struct bp_uart *thiz = &uarts[0];
-    fd_set rd_set, wr_set;
     struct timeval tv;
     int retval, max_handle = 0;
 
-    FD_ZERO(&rd_set);
-    FD_ZERO(&wr_set);
     if ( done == NULL ) done = &mydone;
 
     if ( thiz ) {
@@ -354,9 +351,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 max_handle = thiz->dev_handle;
             }
 
-            FD_SET(thiz->dev_handle, &wr_set);
-            FD_SET(thiz->dev_handle, &rd_set);
-
             log_printf(INF, "open UART %d:%s correct.",
                        thiz->dev_handle, thiz->dev_name);
             continue;
@@ -377,23 +371,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
         if ( thiz->status == BP_UART_STAT_RD ) {
             char buff[512] = {0};
-#if 1
-            retval = FD_ISSET(thiz->dev_handle, &rd_set);
 
-            int r = 0;
-            if ( retval ) {
-                r = read(thiz->dev_handle, buff, 512);
-                if ( r > 0 ) {
-                    log_printf(DBG_LV1, "<%s>", buff);
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-                    thiz->status = BP_UART_STAT_WR;
-                }
-            } else {
-                static int i = 0;
-                if ( i ++ % 100 == 0 )
-                    log_printf(DBG_LV1, "not fetch rd_set <%d:%d>", retval, errno);
-            }
-#endif
             int rd = 0;
             while ( read(thiz->dev_handle, &buff[rd], 1) == 1 && rd < 32 ) {
                 rd ++;
@@ -401,24 +379,19 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             if ( rd ) {
                 log_printf(DBG_LV1, "%d:<%s>", rd, buff);
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+                thiz->status = BP_UART_STAT_WR;
             }
             continue;
         }
 
         if ( thiz->status == BP_UART_STAT_WR ) {
-            retval = FD_ISSET(thiz->dev_handle, &wr_set);
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+            retval = write(thiz->dev_handle, "0123456789", 10);
             if ( retval ) {
-                retval = write(thiz->dev_handle, "0123456789", 10);
-                log_printf(DBG_LV1, "write out %d. ", retval);
-            } else {
-                static int i = 0;
-                if ( i ++ % 100 == 0 )
-                    log_printf(DBG_LV1, "not fetch wr_set <%d>", retval);
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                thiz->status = BP_UART_STAT_RD;
             }
-            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-            thiz->status = BP_UART_STAT_RD;
-            sleep(1);
             continue;
         }
     }
