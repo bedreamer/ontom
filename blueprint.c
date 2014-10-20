@@ -364,8 +364,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
-        tv.tv_sec  = 1;
-        tv.tv_usec = 0; // 100 ms.
+        tv.tv_sec  = 0;
+        tv.tv_usec = 10 * 1000; // 100 ms.
         retval =
             select(max_handle + 1, &rd_set, &wr_set, NULL, &tv);
         if ( retval == -1 ) {
