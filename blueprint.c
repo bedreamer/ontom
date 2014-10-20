@@ -274,7 +274,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     int *done = (int *)arg;
     int mydone = 0, ret;
     struct bp_uart *thiz = &uarts[0];
-    struct timeval tv;
     int retval, max_handle = 0;
 
     if ( done == NULL ) done = &mydone;
@@ -354,19 +353,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             log_printf(INF, "open UART %d:%s correct.",
                        thiz->dev_handle, thiz->dev_name);
             continue;
-        }
-
-        tv.tv_sec  = 1 ;
-        tv.tv_usec = 0; // 100 ms.
-        retval =
-            select(max_handle + 1, &rd_set, &wr_set, NULL, &tv);
-        if ( retval == -1 ) {
-            log_printf(DBG_LV0, "toto..");
-            continue;
-        } else if ( retval <= 0 ) {
-            static int i = 0;
-            if ( i ++ % 100 == 0 )
-                log_printf(DBG_LV1, "select fetched <%d:%d>", retval, errno);
         }
 
         if ( thiz->status == BP_UART_STAT_RD ) {
