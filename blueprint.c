@@ -398,13 +398,13 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
             if ( retval ) {
                 write(thiz->dev_handle, "0123456789", 11);
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                thiz->status = BP_UART_STAT_RD;
             } else {
                 static int i = 0;
                 if ( i ++ % 100 == 0 )
                     log_printf(DBG_LV1, "not fetch wr_set <%d>", retval);
             }
+            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+            thiz->status = BP_UART_STAT_RD;
             continue;
         }
     }
