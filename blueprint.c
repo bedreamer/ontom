@@ -383,7 +383,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 char buff[32] = {0};
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITVH_2_TX, NULL);
+                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                     thiz->status = BP_UART_STAT_WR;
                 }
             } else {
@@ -398,7 +398,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
             if ( retval ) {
                 write(thiz->dev_handle, "0123456789", 11);
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITVH_2_RX, NULL);
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->status = BP_UART_STAT_RD;
             } else {
                 static int i = 0;

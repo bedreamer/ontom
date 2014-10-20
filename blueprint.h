@@ -33,7 +33,7 @@ typedef enum {
     // 切换到发送模式
     BP_EVT_SWITCH_2_TX,
     // 切换到接收模式
-    BP_EVT_SWITVH_2_RX,
+    BP_EVT_SWITCH_2_RX,
 
     // 串口接收到新数据
     BP_EVT_RX_DATA               = 0x10,
