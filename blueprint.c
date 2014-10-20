@@ -155,7 +155,7 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
     tcflush(fd,TCIFLUSH);
     options.c_oflag = 0;
     //options.c_lflag = 0;
-    options.c_cc[VTIME] = 15; 						// delay 15 seconds
+    options.c_cc[VTIME] = 0; 						// delay 15 seconds
     options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
 
 if (tcsetattr(fd,TCSANOW,&options) != 0)
