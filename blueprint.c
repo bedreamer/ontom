@@ -167,7 +167,7 @@ int set_gpio_output(int pin, int value)
     char file[40], direction[5];
 
     sprintf(file, "/sys/class/gpio/gpio%d/direction", pin);
-    fp = fopen(file, "w");
+    FILE *fp = fopen(file, "w");
 
     sprintf(direction,"out");
 
