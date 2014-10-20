@@ -364,7 +364,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
 
             if ( rd ) {
-                log_printf(DBG_LV1, "%d:<%s>", rd, buff);
+                log_printf(DBG_LV1, "RD:%d <%s>", rd, buff);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->status = BP_UART_STAT_WR;
             }
@@ -375,6 +375,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
             retval = write(thiz->dev_handle, "0123456789", 10);
             if ( retval ) {
+                log_printf(DBG_LV0, "WR:%d <%s>", retval, "0123456789");
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->status = BP_UART_STAT_RD;
             }
