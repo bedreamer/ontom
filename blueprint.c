@@ -385,8 +385,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             char buff[32] = {0};
             retval = FD_ISSET(thiz->dev_handle, &rd_set);
             if ( retval ) {
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                usleep(100);
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
                 }
@@ -397,12 +395,14 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
 
             int rd = 0;
+            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+            usleep(100);
             while ( read(thiz->dev_handle, &buff[rd ++ ], 1) != -1 && rd < 32 ) {
 
             }
 
             if ( rd ) {
-                log_printf(DBG_LV1, "%s", buff);
+                log_printf(DBG_LV1, "%d:%s", rd, buff);
             }
 
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
