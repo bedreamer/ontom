@@ -28,10 +28,145 @@ struct bp_uart uarts[] = {
 
 #define	RX_LOW_LEVEL			0
 #define	TX_HIGH_LEVEL			1
+static int speed_arr[] = {B230400, B115200, B57600, B38400, B19200, \
+                        B9600, B4800, B2400, B1800, B1200, B600, B300};
+static int name_arr[]  = {230400,  115200,  57600,  38400,  19200,  \
+                        9600,  4800,  2400,  1800,  1200,  600,  300};
 
 static unsigned long arg_send_pin = 0, arg_rec_pin = 0;
 static int fd_rec = -1, fd_send = -1;
 FILE *fp = NULL;
+
+int set_speed(int fd, int speed)
+{
+    int   i;
+    int   status;
+    struct termios   Opt;
+
+    tcgetattr(fd, &Opt);
+
+    for ( i= 0;  i < sizeof(speed_arr) / sizeof(int);  i++)
+    {
+        if (speed == name_arr[i])
+        {
+            tcflush(fd, TCIOFLUSH);
+            cfsetispeed(&Opt, speed_arr[i]);
+            cfsetospeed(&Opt, speed_arr[i]);
+            status = tcsetattr(fd, TCSANOW, &Opt);
+            if  (status != 0)
+            {
+                perror("tcsetattr fd");
+                return -1;
+            }
+            tcflush(fd,TCIOFLUSH);
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int set_other_attribute(int fd, int databits, int stopbits, int parity)
+{
+    struct termios options;
+
+    if (tcgetattr(fd, &options) != 0)
+    {
+        perror("SetupSerial 1");
+        return -1;
+    }
+
+    options.c_cflag &= ~CSIZE;
+
+    switch (databits)
+    {
+        case 7:
+            options.c_cflag |= CS7;
+            break;
+
+        case 8:
+            options.c_cflag |= CS8;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported data size\n");
+            return -1;
+    }
+
+    switch (parity)
+    {
+        case 'n':
+        case 'N':
+            options.c_cflag &= ~PARENB;   /* Clear parity enable */
+            options.c_iflag &= ~INPCK;     /* Enable parity checking */
+            break;
+
+        case 'o':
+        case 'O':
+        case 1:
+            options.c_cflag |= (PARODD | PARENB);
+            options.c_iflag |= INPCK;             /* Disnable parity checking */
+            break;
+
+        case 'e':
+        case 'E':
+        case 2:
+            options.c_cflag |= PARENB;     /* Enable parity */
+            options.c_cflag &= ~PARODD;
+            options.c_iflag |= INPCK;      /* Disnable parity checking */
+            break;
+
+        case 'S':
+        case 's':  /*as no parity*/
+        case 0:
+            options.c_cflag &= ~PARENB;
+            options.c_cflag &= ~CSTOPB;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported parity\n");
+            return -1;
+    }
+
+    switch (stopbits)
+    {
+        case 1:
+            options.c_cflag &= ~CSTOPB;
+            break;
+
+        case 2:
+            options.c_cflag |= CSTOPB;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported stop bits\n");
+            return -1;
+    }
+
+    /* Set input parity option */
+    if (parity != 'n')
+        options.c_iflag |= INPCK;
+
+    //options.c_cflag   |= CRTSCTS;
+    options.c_iflag &=~(IXON | IXOFF | IXANY);
+    options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    //options.c_lflag |= ISIG;
+
+    tcflush(fd,TCIFLUSH);
+    options.c_oflag = 0;
+    //options.c_lflag = 0;
+    options.c_cc[VTIME] = 15; 						// delay 15 seconds
+    options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
+
+if (tcsetattr(fd,TCSANOW,&options) != 0)
+    {
+        perror("SetupSerial 3");
+        return -1;
+    }
+
+    return 0;
+}
+
 
 int configure_uart(int fd,int baud_rate, int data_bits, char parity, int stop_bits)
 {
@@ -189,11 +324,15 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         }
+#if 0
         ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
         if ( ret == ERR_UART_CONFIG_FAILE ) {
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
         }
+#endif
+        set_speed(self->dev_handle, 9600);
+        set_other_attribute(fd5, 8, 1, 0);
         self->status = BP_UART_STAT_RD;
         break;
     // 关闭串口
