@@ -216,7 +216,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             return ERR_UART_CONFIG_FAILE;
         }
         gpio_export(SERIAL4_CTRL_PIN);
-        self->status = BP_UART_STAT_RD;
+        self->status = BP_UART_STAT_WR;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
@@ -367,7 +367,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         tv.tv_sec  = 0;
         tv.tv_usec = 1000; // 100 ms.
         retval =
-            select(max_handle + 1, &rd_set, NULL, NULL, &tv);
+            select(max_handle + 1, &rd_set, &wr_set, NULL, &tv);
         if ( retval == -1 ) {
             log_printf(DBG_LV0, "toto..");
             continue;
@@ -383,8 +383,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 char buff[32] = {0};
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
-                    //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-                    //thiz->status = BP_UART_STAT_WR;
+                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+                    thiz->status = BP_UART_STAT_WR;
                 }
             } else {
                 static int i = 0;
