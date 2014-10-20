@@ -96,7 +96,7 @@ int configure_uart(int fd,int baud_rate, int data_bits, char parity, int stop_bi
 
     /* 设置等待时间和最小接收字符 */
     new_cfg.c_cc[VTIME] = 0;
-    new_cfg.c_cc[VMIN] = 1;
+    new_cfg.c_cc[VMIN] = 6;
     tcflush(fd, TCIFLUSH); /* 处理未接收字符 */
     if ((tcsetattr(fd, TCSANOW, &new_cfg)) != 0) { /* 激活新配置 */
         perror("tcsetattr");
