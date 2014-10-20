@@ -333,7 +333,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 #endif
         set_speed(self->dev_handle, 9600);
         set_other_attribute(self->dev_handle, 8, 1, 0);
-        self->status = BP_UART_STAT_RD;
+        self->status = BP_UART_STAT_WR;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
@@ -527,7 +527,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
             if ( retval ) {
-                retval = write(thiz->dev_handle, "0123456789\n", 12);
+                retval = write(thiz->dev_handle, "0123456789\r\n", 13);
                 log_printf(DBG_LV1, "write out %d. ", retval);
             } else {
                 static int i = 0;
