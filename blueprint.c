@@ -362,7 +362,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             FD_SET(thiz->dev_handle, &rd_set);
             FD_SET(thiz->dev_handle, &wr_set);
 
-            log_printf(INF, "open UART correct.");
+            log_printf(INF, "open UART %s correct.", thiz->dev_name);
             continue;
         }
 
@@ -379,18 +379,19 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
                 }
+            } else {
+                log_printf(DBG_LV0, "not fetch rd_set");
             }
             continue;
         }
 
         if ( thiz->status == BP_UART_STAT_WR ) {
             if ( FD_ISSET(thiz->dev_handle, &wr_set) ) {
-                static int i = 0;
-                if ( i ++ % 500 == 0 ) {
-                    write(thiz->dev_handle, "0123456789", 11);
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITVH_2_RX, NULL);
-                    thiz->status = BP_UART_STAT_WR;
-                }
+                write(thiz->dev_handle, "0123456789", 11);
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITVH_2_RX, NULL);
+                thiz->status = BP_UART_STAT_WR;
+            } else {
+                log_printf(DBG_LV0, "not fetch wr_set");
             }
             continue;
         }
