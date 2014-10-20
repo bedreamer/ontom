@@ -114,7 +114,7 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
     tcflush(fd,TCIFLUSH);
     options.c_oflag = 0;
     //options.c_lflag = 0;
-    options.c_cc[VTIME] = 15; 						// delay 15 seconds
+    options.c_cc[VTIME] = 0; 						// delay 15 seconds
     options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
 
     status = tcsetattr(fd, TCSANOW, &options);
@@ -211,7 +211,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         }
-        ret = configure_uart(self->dev_handle, B9600, 8, 1, 0);
+        ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
         if ( ret == ERR_UART_CONFIG_FAILE ) {
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
