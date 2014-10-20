@@ -374,24 +374,26 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         }
 
         if ( thiz->status == BP_UART_STAT_RD ) {
-            if ( FD_ISSET(thiz->dev_handle, &rd_set) ) {
+            retval = FD_ISSET(thiz->dev_handle, &rd_set);
+            if ( retval ) {
                 char buff[32] = {0};
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
                 }
             } else {
-                log_printf(DBG_LV0, "not fetch rd_set");
+                log_printf(DBG_LV0, "not fetch rd_set <%d>", retval);
             }
             continue;
         }
 
         if ( thiz->status == BP_UART_STAT_WR ) {
-            if ( FD_ISSET(thiz->dev_handle, &wr_set) ) {
+            retval = FD_ISSET(thiz->dev_handle, &wr_set);
+            if ( retval ) {
                 write(thiz->dev_handle, "0123456789", 11);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITVH_2_RX, NULL);
                 thiz->status = BP_UART_STAT_WR;
             } else {
-                log_printf(DBG_LV0, "not fetch wr_set");
+                log_printf(DBG_LV0, "not fetch wr_set <%d>", retval);
             }
             continue;
         }
