@@ -374,7 +374,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         } else {
             static int i = 0;
             if ( i ++ % 100 == 0 )
-                log_printf(DBG_LV1, "select fetched <%d>", retval);
+                log_printf(DBG_LV1, "select fetched <%d:%d>", retval, errno);
         }
 
         if ( thiz->status == BP_UART_STAT_RD ) {
@@ -387,7 +387,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             } else {
                 static int i = 0;
                 if ( i ++ % 100 == 0 )
-                    log_printf(DBG_LV1, "not fetch rd_set <%d>", retval);
+                    log_printf(DBG_LV1, "not fetch rd_set <%d:%d>", retval, errno);
             }
             continue;
         }
