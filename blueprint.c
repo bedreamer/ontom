@@ -371,7 +371,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         tv.tv_sec  = 1;
         tv.tv_usec = 0; // 100 ms.
         retval =
-            select(max_handle + 1, &rd_set, NULL, NULL, &tv);
+            select(max_handle + 1, &rd_set, &wr_set, NULL, &tv);
         if ( retval == -1 ) {
             log_printf(DBG_LV0, "toto..");
             continue;
@@ -385,6 +385,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             retval = FD_ISSET(thiz->dev_handle, &rd_set);
             if ( retval ) {
                 char buff[32] = {0};
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                usleep(100);
                 if ( read(thiz->dev_handle, buff, 32) > 0 ) {
                     log_printf(DBG_LV1, "<%s>", buff);
                 }
@@ -393,6 +395,19 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 if ( i ++ % 100 == 0 )
                     log_printf(DBG_LV1, "not fetch rd_set <%d:%d>", retval, errno);
             }
+
+            retval = FD_ISSET(thiz->dev_handle, &wr_set);
+            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+            usleep(100);
+            if ( retval ) {
+                retval = write(thiz->dev_handle, "0123456789", 11);
+                log_printf(DBG_LV1, "write out %d. ", retval);
+            } else {
+                static int i = 0;
+                if ( i ++ % 100 == 0 )
+                    log_printf(DBG_LV1, "not fetch wr_set <%d>", retval);
+            }
+
             //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
             //thiz->status = BP_UART_STAT_WR;
             continue;
