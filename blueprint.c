@@ -227,7 +227,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(DBG_LV1, "set uart to TX mode faile");
             break;
         }
-        usleep(10000);
+        usleep(20000);
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
@@ -236,7 +236,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(DBG_LV1, "set uart to RX mode faile");
             break;
         }
-        usleep(10000);
+        usleep(20000);
         break;
 
     // 串口接收到新数据
@@ -380,8 +380,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             retval = write(thiz->dev_handle, "01234560012345601234567712345677", 32);
             if ( retval ) {
                 log_printf(DBG_LV1, "WR:%d <%s>", retval, "0123456789");
-                //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                //thiz->status = BP_UART_STAT_RD;
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                thiz->status = BP_UART_STAT_RD;
             } else {
                 log_printf(DBG_LV1, "WR faile, %d-%d", retval, errno);
             }
