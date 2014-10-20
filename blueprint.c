@@ -333,7 +333,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 #endif
         set_speed(self->dev_handle, 9600);
         set_other_attribute(self->dev_handle, 8, 1, 0);
-        self->status = BP_UART_STAT_WR;
+        self->status = BP_UART_STAT_RD;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
