@@ -54,10 +54,9 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
         case 8:
             options.c_cflag |= CS8;
             break;
-
         default:
-            fprintf(stderr,"Unsupported data sizen");
-            return (FALSE);
+            options.c_cflag |= CS8;
+            break;
     }
 
     switch (parity)
@@ -67,29 +66,26 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
             options.c_cflag &= ~PARENB; 				/* Clear parity enable */
             options.c_iflag &= ~INPCK;					/* Enable parity checking */
             break;
-
         case 'o':
         case 'O':
             options.c_cflag |= (PARODD | PARENB);
             options.c_iflag |= INPCK;					/* Disnable parity checking */
             break;
-
         case 'e':
         case 'E':
             options.c_cflag |= PARENB;					/* Enable parity */
             options.c_cflag &= ~PARODD;
             options.c_iflag |= INPCK; 					/* Disnable parity checking */
             break;
-
         case 'S':
         case 's': 										/*as no parity*/
             options.c_cflag &= ~PARENB;
             options.c_cflag &= ~CSTOPB;
             break;
-
         default:
-            fprintf(stderr,"Unsupported parityn");
-            return (FALSE);
+            options.c_cflag &= ~PARENB;
+            options.c_cflag &= ~CSTOPB;
+            break;
     }
 
     /*  设置停止位*/
@@ -102,8 +98,8 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
             options.c_cflag |= CSTOPB;
             break;
         default:
-            fprintf(stderr,"Unsupported stop bitsn");
-            return (FALSE);
+            options.c_cflag &= ~CSTOPB;
+            break;
     }
 
     /* Set input parity option */
