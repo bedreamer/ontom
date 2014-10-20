@@ -280,9 +280,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     struct timeval tv;
     int retval, max_handle = 0;
 
-    tv.tv_sec  = 0;
-    tv.tv_usec = 100 * 1000; // 100 ms.
-
     FD_ZERO(&rd_set);
     FD_ZERO(&wr_set);
     if ( done == NULL ) done = &mydone;
@@ -366,6 +363,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
+        tv.tv_sec  = 1;
+        tv.tv_usec = 100 * 1000; // 100 ms.
         retval =
             select(max_handle, &rd_set, NULL, NULL, &tv);
         if ( retval == -1 ) {
