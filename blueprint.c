@@ -206,6 +206,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口配置
     case BP_EVT_CONFIGURE:
+        gpio_export(SERIAL4_CTRL_PIN);
         self->dev_handle = open(self->dev_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
@@ -215,13 +216,12 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
         }
-        gpio_export(SERIAL4_CTRL_PIN);
         self->status = BP_UART_STAT_WR;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
-        close(self->dev_handle);
         gpio_unexport(SERIAL4_CTRL_PIN);
+        close(self->dev_handle);
         break;
     // 串口数据帧校验
     case BP_EVT_FRAME_CHECK:
