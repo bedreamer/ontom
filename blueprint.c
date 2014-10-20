@@ -28,44 +28,8 @@ struct bp_uart uarts[] = {
 
 #define	RX_LOW_LEVEL			0
 #define	TX_HIGH_LEVEL			1
-static int speed_arr[] = {B230400, B115200, B57600, B38400, B19200, \
-                        B9600, B4800, B2400, B1800, B1200, B600, B300};
-static int name_arr[]  = {230400,  115200,  57600,  38400,  19200,  \
-                        9600,  4800,  2400,  1800,  1200,  600,  300};
 
-static unsigned long arg_send_pin = 0, arg_rec_pin = 0;
-static int fd_rec = -1, fd_send = -1;
-FILE *fp = NULL;
-
-int set_speed(int fd, int speed)
-{
-    int   i;
-    int   status;
-    struct termios   Opt;
-
-    tcgetattr(fd, &Opt);
-
-    for ( i= 0;  i < sizeof(speed_arr) / sizeof(int);  i++)
-    {
-        if (speed == name_arr[i])
-        {
-            tcflush(fd, TCIOFLUSH);
-            cfsetispeed(&Opt, speed_arr[i]);
-            cfsetospeed(&Opt, speed_arr[i]);
-            status = tcsetattr(fd, TCSANOW, &Opt);
-            if  (status != 0)
-            {
-                perror("tcsetattr fd");
-                return -1;
-            }
-            tcflush(fd,TCIOFLUSH);
-            return 0;
-        }
-    }
-    return -1;
-}
-
-int set_other_attribute(int fd, int baud_rate, int databits, int stopbits, int parity)
+int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options;
     int   status;
@@ -150,85 +114,11 @@ int set_other_attribute(int fd, int baud_rate, int databits, int stopbits, int p
     options.c_cc[VTIME] = 0; 						// delay 15 seconds
     options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
 
-if (tcsetattr(fd,TCSANOW,&options) != 0)
-    {
+    if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
         return ERR_UART_CONFIG_FAILE;
     }
 
-    return ERR_OK;
-}
-
-
-int configure_uart(int fd,int baud_rate, int data_bits, char parity, int stop_bits)
-{
-    struct termios new_cfg,old_cfg;
-    int speed;
-
-    /* 保存并测试现有串口参数设置，在这里如果串口号等出错，会有相关的出错信息 */
-    if (tcgetattr(fd, &old_cfg) != 0) {
-        perror("tcgetattr");
-        return ERR_UART_CONFIG_FAILE;
-    }
-    new_cfg = old_cfg;
-    cfmakeraw(&new_cfg); /* 配置为原始模式 */
-    new_cfg.c_cflag &= ~CSIZE;
-    /* 设置波特率 */
-    cfsetispeed(&new_cfg, baud_rate);
-    cfsetospeed(&new_cfg, baud_rate);
-
-    /* 设置数据位 */
-    if (data_bits == 7) {
-        new_cfg.c_cflag |= CS7;
-    } else { //8:
-        new_cfg.c_cflag |= CS8;
-    }
-
-    /* 设置奇偶校验位 */
-    switch (parity) {
-        default:
-        case 'n':
-        case 'N': {
-            new_cfg.c_cflag &= ~PARENB;
-            new_cfg.c_iflag &= ~INPCK;
-        }
-        break;
-        case 'o':
-        case 'O': {
-            new_cfg.c_cflag |= (PARODD | PARENB);
-            new_cfg.c_iflag |= INPCK;
-        }
-        break;
-        case 'e':
-        case 'E': {
-            new_cfg.c_cflag |= PARENB;
-            new_cfg.c_cflag &= ~PARODD;
-            new_cfg.c_iflag |= INPCK;
-        }
-        break;
-        case 's': /* as no parity */
-        case 'S': {
-            new_cfg.c_cflag &= ~PARENB;
-            new_cfg.c_cflag &= ~CSTOPB;
-        }
-        break;
-    }
-
-    /* 设置停止位 */
-    if ( stop_bits == 2 ) {
-        new_cfg.c_cflag |= CSTOPB;
-    } else { // 默认一位
-        new_cfg.c_cflag &= ~CSTOPB;
-    }
-
-    /* 设置等待时间和最小接收字符 */
-    new_cfg.c_cc[VTIME] = 100;
-    new_cfg.c_cc[VMIN] = 0;
-    tcflush(fd, TCIFLUSH); /* 处理未接收字符 */
-    if ((tcsetattr(fd, TCSANOW, &new_cfg)) != 0) { /* 激活新配置 */
-        perror("tcsetattr");
-        return ERR_UART_CONFIG_FAILE;
-    }
     return ERR_OK;
 }
 
@@ -316,14 +206,12 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         }
-#if 0
+
         ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
         if ( ret == ERR_UART_CONFIG_FAILE ) {
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
         }
-#endif
-        set_other_attribute(self->dev_handle, B9600, 8, 1, 0);
         self->status = BP_UART_STAT_RD;
         break;
     // 关闭串口
