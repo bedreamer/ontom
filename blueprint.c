@@ -402,7 +402,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
 
             if ( rd ) {
-                log_printf(DBG_LV1, "%d:%s", rd, buff);
+                log_printf(DBG_LV1, "%d:<%s>", rd, buff);
             }
 
             retval = FD_ISSET(thiz->dev_handle, &wr_set);
