@@ -335,7 +335,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 int trynr = 0;
                 do {
                     usleep(50000);
-                    ret = thiz->bp_evt_handle(thiz, BP_EVT_SWITVH_2_RX, NULL);
+                    ret = thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 } while ( ret != ERR_OK && trynr ++ < 100 );
             }
             if ( thiz->status == BP_UART_STAT_WR ) {
