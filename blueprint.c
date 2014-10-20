@@ -232,7 +232,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->status = BP_UART_STAT_WR;
         break;
     // 切换到接收模式
-    case BP_EVT_SWITVH_2_RX:
+    case BP_EVT_SWITCH_2_RX:
         set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
         self->status = BP_UART_STAT_RD;
         break;
