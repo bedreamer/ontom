@@ -106,9 +106,9 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
         options.c_iflag |= INPCK;
 
     //options.c_cflag   |= CRTSCTS;
-    options.c_iflag &=~(IXON | IXOFF | IXANY);
-    options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    //options.c_iflag &=~(IXON | IXOFF | IXANY);
+    //options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+    //options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
     //options.c_lflag |= ISIG;
 
     tcflush(fd,TCIFLUSH);
