@@ -57,34 +57,30 @@ int configure_uart(int fd,int baud_rate, int data_bits, char parity, int stop_bi
         new_cfg.c_cflag |= CS8;
     }
 
-    switch (parity) /* 设置奇偶校验位 */
-    {
+    /* 设置奇偶校验位 */
+    switch (parity) {
         default:
         case 'n':
-        case 'N':
-        {
+        case 'N': {
             new_cfg.c_cflag &= ~PARENB;
             new_cfg.c_iflag &= ~INPCK;
         }
         break;
         case 'o':
-        case 'O':
-        {
+        case 'O': {
             new_cfg.c_cflag |= (PARODD | PARENB);
             new_cfg.c_iflag |= INPCK;
         }
         break;
         case 'e':
-        case 'E':
-        {
+        case 'E': {
             new_cfg.c_cflag |= PARENB;
             new_cfg.c_cflag &= ~PARODD;
             new_cfg.c_iflag |= INPCK;
         }
         break;
         case 's': /* as no parity */
-        case 'S':
-        {
+        case 'S': {
             new_cfg.c_cflag &= ~PARENB;
             new_cfg.c_cflag &= ~CSTOPB;
         }
