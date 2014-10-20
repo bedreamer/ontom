@@ -124,7 +124,7 @@ int configure_uart(int fd, int speed, int databits, int stopbits, int parity)
     }
 
     tcflush(fd, TCIOFLUSH);
-    fflush(fd);
+    //fflush(fd);
     return ERR_OK;
 }
 
