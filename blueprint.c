@@ -392,7 +392,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
             if ( retval ) {
                 retval = write(thiz->dev_handle, "0123456789\n", 12);
-                fflush(thiz->dev_handle);
+                syncfs(thiz->dev_handle);
                 log_printf(DBG_LV1, "write out %d. ", retval);
             } else {
                 static int i = 0;
