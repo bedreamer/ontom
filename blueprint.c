@@ -2,11 +2,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/ioctl.h>
 /* According to POSIX.1-2001 */
 #include <sys/select.h>
 /* According to earlier standards */
 #include <sys/time.h>
+#include <termios.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <sys/wait.h>
 #include "config.h"
 #include "log.h"
 #include "error.h"
