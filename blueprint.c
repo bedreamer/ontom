@@ -210,7 +210,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
         }
-        self->status = BP_UART_STAT_RD;
+        self->status = BP_UART_STAT_WR;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
