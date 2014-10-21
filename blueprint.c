@@ -222,21 +222,21 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
+        sleep(1);
         ret = set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
         if ( ret != ERR_OK ) {
             log_printf(DBG_LV1, "set uart to TX mode faile");
             break;
         }
-        sleep(1);
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
+        sleep(1);
         ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
         if ( ret != ERR_OK ) {
             log_printf(DBG_LV1, "set uart to RX mode faile");
             break;
         }
-        sleep(1);
         break;
 
     // 串口接收到新数据
