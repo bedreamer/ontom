@@ -23,7 +23,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
     switch (level) {
     case INF:
         printf("\033[32m[INF@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               gettid(),
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
@@ -34,7 +34,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case WRN:
         printf("\033[33m[WRN@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               gettid(),
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
@@ -45,6 +45,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case ERR:
         printf("\033[31m[ERR@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
@@ -55,7 +56,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG:
         printf("\033[34m[DBG@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               gettid(),
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
@@ -72,7 +73,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[35m[DBG_LV0@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               gettid(),
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
@@ -89,7 +90,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[35m[DBG_LV1@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               gettid(),
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
@@ -106,7 +107,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[36m[DBG_LV2@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               gettid(),
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
@@ -123,7 +124,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[36m[DBG_LV3@%d %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               gettid(),
+               pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
