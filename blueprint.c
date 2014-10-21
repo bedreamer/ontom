@@ -361,13 +361,14 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_RD ) {
             char buff[512] = {0};
 
-            int rd = 0;
-            while ( read(thiz->dev_handle, &buff[rd], 1) == 1 && rd < 32 ) {
-                rd ++;
-            }
+            int rd = 0, i = 0;
+            do {
+                rd = read(thiz->dev_handle, &buff[i], 32);
+                i += rd;
+            } while ( rd >= 256 );
 
-            if ( rd ) {
-                log_printf(DBG_LV1, "RD:%d <%s>", rd, buff);
+            if ( i ) {
+                log_printf(DBG_LV1, "RD:%d <%s>", i, buff);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->status = BP_UART_STAT_WR;
             }
