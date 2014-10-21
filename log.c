@@ -22,7 +22,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
     switch (level) {
     case INF:
         printf("\033[32m[INF %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
@@ -32,7 +32,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case WRN:
         printf("\033[33m[WRN %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
@@ -42,7 +42,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case ERR:
         printf("\033[31m[ERR %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
@@ -52,7 +52,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG:
         printf("\033[34m[DBG %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
@@ -68,7 +68,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[35m[DBG_LV0 %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
@@ -84,7 +84,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[35m[DBG_LV1 %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
@@ -100,7 +100,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[36m[DBG_LV2 %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
@@ -116,7 +116,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
             return;
         }
         printf("\033[36m[DBG_LV3 %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               p->tm_year,
+               p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
                p->tm_hour,
