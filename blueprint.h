@@ -17,6 +17,8 @@
 #ifndef _BLUE_PRINT_INCLUED_H_
 #define _BLUE_PRINT_INCLUED_H_
 
+#include "Hachiko.h"
+
 struct bp_uart;
 #define CONFIG_BP_IO_BUFF_SIZE   512
 
@@ -109,6 +111,10 @@ struct bp_uart {
     unsigned int init_magic;
     int (*bp_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
                          struct bp_evt_param *param);
+    // 接收定时器
+    struct Hachiko_food rx_seed;
+    // 发送定时器
+    struct Hachiko_food tx_seed;
 
     // 接收缓冲区
     char rx_buff[CONFIG_BP_IO_BUFF_SIZE];

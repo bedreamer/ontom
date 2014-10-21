@@ -74,8 +74,8 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 }
 
 // 设定内部功能性定时器
-int Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
-                 unsigned int ttl, void *private)
+int _Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
+                 unsigned int ttl, Hachiko_status status, void *private)
 {
     int err = ERR_TIMER_BEMAX;
     int i = 0;
@@ -91,7 +91,7 @@ int Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
             thiz->ttl = ttl;
             thiz->remain = ttl;
             thiz->private = private;
-            thiz->status = HACHIKO_NORMAL;
+            thiz->status = status;
             err = ERR_OK;
             pool[i] = thiz;
             log_printf(DBG_LV2, "set timer ok, type: %X, ttl: %d",

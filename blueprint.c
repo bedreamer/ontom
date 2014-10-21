@@ -12,6 +12,7 @@
 #include "config.h"
 #include "log.h"
 #include "error.h"
+#include "Hachiko.h"
 #include "blueprint.h"
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
