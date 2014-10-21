@@ -187,6 +187,24 @@ int set_gpio_output(int pin, int value)
     return ERR_OK;
 }
 
+// 串口4的超时响应
+void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self)
+{
+    struct uart_bp * thiz = (struct uart_bp *)private;
+
+    if ( evt == HACHIKO_TIMEOUT ) {
+        if ( self == & (thiz->rx_seed) ) {
+            return;
+        }
+
+        if ( self == & (thiz->tx_seed) ) {
+            return;
+        }
+
+    }
+}
+
 /*
  * 串口事件响应函数
  */
@@ -197,6 +215,20 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     switch ( evt ) {
     // 串口数据结构初始化
     case BP_EVT_INIT:
+        self->rx_seed.private = (void*)self;
+        self->rx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
+        ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
+                     2, HACHIKO_PAUSE, (void*)self);
+        if ( ret != ERR_OK ) {
+            log_printf(ERR, "create uart reciever's timer faile.");
+        }
+        self->tx_seed.private = (void*)self;
+        self->tx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
+        ret = _Hachiko_new(&self->tx_seed, HACHIKO_AUTO_FEED,
+                     2, HACHIKO_PAUSE, (void*)self);
+        if ( ret != ERR_OK ) {
+            log_printf(ERR, "create uart transfer's timer faile.");
+        }
         break;
     // 串口配置
     case BP_EVT_CONFIGURE:
