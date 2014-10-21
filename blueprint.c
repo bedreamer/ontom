@@ -194,11 +194,11 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     struct uart_bp * thiz = (struct uart_bp *)private;
 
     if ( evt == HACHIKO_TIMEOUT ) {
-        if ( self == & (thiz->rx_seed) ) {
+        if ( (unsigned long)self == ((unsigned long))(& (thiz->rx_seed)) ) {
             return;
         }
 
-        if ( self == & (thiz->tx_seed) ) {
+        if ( (unsigned long)self == (unsigned long)(& (thiz->tx_seed)) ) {
             return;
         }
 
