@@ -377,7 +377,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
         if ( thiz->status == BP_UART_STAT_WR ) {
             thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-            retval = write(thiz->dev_handle, "012345600123456012345677123456\r\n", 32);
+            retval = write(thiz->dev_handle, "01234560012345601234567712345689", 32);
             if ( retval > 0 ) {
                 log_printf(DBG_LV1, "WR:%d <%s>", retval, "0123456789");
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
