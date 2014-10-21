@@ -195,7 +195,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     const struct Hachiko_food *p;
 
     if ( evt == HACHIKO_TIMEOUT ) {
-        p = &thiz->rx_seed;
+        p = &((*thiz).rx_seed);
         if ( self == p ) {
             return;
         }
