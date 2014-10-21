@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <sys/types.h>
 #include "log.h"
 #include "config.h"
 
