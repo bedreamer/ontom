@@ -362,7 +362,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             char buff[512] = {0};
 
             int rd = 0;
-            tcflush(thiz->dev_handle, TCIFLUSH);
             while ( read(thiz->dev_handle, &buff[rd], 1) == 1 && rd < 32 ) {
                 rd ++;
             }
