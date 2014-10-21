@@ -230,6 +230,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
+        usleep(100 * 1000);
         ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
         if ( ret != ERR_OK ) {
             log_printf(DBG_LV1, "set uart to RX mode faile");
