@@ -443,7 +443,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             i += rd;
 
-            if ( i >= 7 ) {
+            if ( rd ) {
                 tcflush(thiz->dev_handle, TCIFLUSH);
                 log_printf(DBG_LV1, "RD:%d <%02X %02X %02X %02X %02X %02X %02X >",
                            i, buff[0], buff[1], buff[2], buff[3], buff[4],
