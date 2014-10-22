@@ -441,9 +441,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             i += rd;
 
             if ( i >= 7 ) {
-                i = 0;
                 tcflush(thiz->dev_handle, TCIFLUSH);
                 Hachiko_pause(&thiz->rx_seed);
+                i = 0;
                 log_printf(DBG_LV1, "RD:%d <%s>", i, buff);
                 thiz->status = BP_UART_STAT_WR;
             }
