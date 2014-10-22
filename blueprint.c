@@ -461,7 +461,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 goto continue_to_send;
             }
             if ( thiz->tx_param.payload_size ) {
-                usleep(500 * 1000);
                 continue;
             }
 
