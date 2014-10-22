@@ -432,12 +432,18 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
+                thiz->rx_param.cursor = 0;
+                thiz->rx_param.payload_size = 0;
                 nr = 0;
             }
 
-            rd = read(thiz->dev_handle, buff, 512);
+            cursor = thiz->rx_param.cursor;
+            rd = read(thiz->dev_handle,
+                      &thiz->rx_param.buff.rx_buff[cursor], 256);
             if ( rd ) {
                 Hachiko_feed(&thiz->rx_seed);
+                thiz->rx_param.payload_size += rd;
+                thiz->rx_param.cursor = thiz->rx_param.payload_size;
             }
 
             nr += rd;
