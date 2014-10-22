@@ -72,6 +72,14 @@ typedef enum {
     BP_UART_STAT_WR
 }BP_UART_STAT;
 
+// 串口角色
+typedef enum {
+    // 主动设备
+    BP_UART_MASTER,
+    // 被动设备
+    BP_UART_SLAVE
+}BP_UART_ROLE;
+
 // 帧属性
 typedef enum {
     // 数据帧特性不确定
@@ -111,6 +119,7 @@ struct bp_uart {
     unsigned int init_magic;
     int (*bp_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
                          struct bp_evt_param *param);
+    BP_UART_ROLE role;
     // 接收定时器
     struct Hachiko_food rx_seed;
     // 发送定时器

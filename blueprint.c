@@ -217,6 +217,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     switch ( evt ) {
     // 串口数据结构初始化
     case BP_EVT_INIT:
+        self->role = BP_UART_MASTER;
         self->rx_seed.private = (void*)self;
         self->rx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
@@ -265,7 +266,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
-        usleep(100 * 1000);
+        usleep(1 * 1000);
         ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
         if ( ret != ERR_OK ) {
             log_printf(DBG_LV1, "set uart to RX mode faile");
@@ -393,6 +394,16 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
+        /*
+         * 串口在这里扮演的角色必定是主动设备或者从动设备
+         * 因此读取数据是否需要进行计时操作完全取决于扮演的角色类型。
+         *
+         * 如果是主动设备，那么必须要设定超时计时器，以确定接收数据是否超时
+         * 如果是从动设备，设定超时计时器并非是必须的，而是根据是否需要接收
+         * 连续的串口数据流来判定，若不需要连续的数据流，那么就不必要设定
+         * 超时计时器，反之需要设定超时计时器来确定能否在指定时间内收到完整
+         * 的数据帧。
+         */
         if ( thiz->status == BP_UART_STAT_RD ) {
             char buff[512] = {0};
 

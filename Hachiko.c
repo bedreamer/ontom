@@ -35,17 +35,21 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 
     for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
         if ( pool[i] == NULL ) continue;
+        if ( pool[i]->status == HACHIKO_INVALID ) continue;
         if ( pool[i]->status == HACHIKO_KILLED ) {
             pool[i] = NULL;
             refresh ++;
             log_printf(DBG_LV3, "HACHIKO: watch dog killed.");
             continue;
         }
-        if ( pool[i]->status == HACHIKO_PAUSE ) {
+        if ( pool[i]->status == HACHIKO_RESUME ) {
+            Hachiko_feed(&pool[i]);
+            pool[i]->status = HACHIKO_NORMAL;
             continue;
         }
-        if ( pool[i]->status == HACHIKO_RESUME ) {
-
+        if ( pool[i]->status == HACHIKO_PAUSE ) {
+            Hachiko_feed(&pool[i]);
+            continue;
         }
 
         if ( pool[i]->remain ) pool[i]->remain --;
@@ -64,6 +68,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
                                              pool[i]->private, pool[i]);
                 pool[i] = NULL;
                 refresh ++;
+                log_printf(DBG_LV3, "HACHIKO: watch dog die.");
                 continue;
             }
         }
@@ -86,18 +91,16 @@ int _Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
     }
 
     for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
-        if ( pool[i] == NULL ) {
-            thiz->type = type;
-            thiz->ttl = ttl;
-            thiz->remain = ttl;
-            thiz->private = private;
-            thiz->status = status;
-            err = ERR_OK;
-            pool[i] = thiz;
-            log_printf(DBG_LV2, "set timer ok, type: %X, ttl: %d",
-                       type, ttl);
-            break;
-        }
+        if ( pool[i] != NULL ) continue;
+        thiz->type = type;
+        thiz->ttl = ttl;
+        thiz->remain = ttl;
+        thiz->private = private;
+        thiz->status = status;
+        err = ERR_OK;
+        pool[i] = thiz;
+        log_printf(DBG_LV2, "set timer ok, type: %X, ttl: %d", type, ttl);
+        break;
     }
 die:
     return err;
