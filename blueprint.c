@@ -441,7 +441,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( rd ) {
                 Hachiko_pause(&thiz->rx_seed);
                 log_printf(DBG_LV1, "RD:%d <%s>", rd, buff);
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->status = BP_UART_STAT_WR;
             }
             continue;
