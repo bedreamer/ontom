@@ -437,7 +437,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             do {
                 rd = read(thiz->dev_handle, &buff[i], 32);
                 i += rd;
-            } while ( rd >= 256 );
+            } while ( rd >= 0 );
 
             if ( i ) {
                 Hachiko_pause(&thiz->rx_seed);
