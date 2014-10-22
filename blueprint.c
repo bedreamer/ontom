@@ -428,7 +428,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
          */
         if ( thiz->status == BP_UART_STAT_RD ) {
             char buff[513] = {0};
-            int rd = 0, i = 0;
+            int rd = 0;
+            static int i = 0;
 
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
@@ -437,10 +438,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             rd = read(thiz->dev_handle, buff, 512);
 
+            i += rd;
 
-            if ( rd ) {
+            if ( i >= 7 ) {
+                tcflush(thiz->dev_handle, TCIFLUSH);
                 Hachiko_pause(&thiz->rx_seed);
-                log_printf(DBG_LV1, "RD:%d <%s>", rd, buff);
+                log_printf(DBG_LV1, "RD:%d <%s>", i, buff);
                 thiz->status = BP_UART_STAT_WR;
             }
             continue;
@@ -464,7 +467,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
-            //tcflush(thiz->dev_handle, TCOFLUSH);
+            tcflush(thiz->dev_handle, TCOFLUSH);
 
             thiz->tx_param.buff.tx_buff = thiz->tx_buff;
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
