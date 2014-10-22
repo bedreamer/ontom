@@ -320,6 +320,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     int mydone = 0, ret;
     struct bp_uart *thiz = &uarts[0];
     int retval, max_handle = 0;
+    size_t cursor;
 
     if ( done == NULL ) done = &mydone;
 
@@ -473,7 +474,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
 
 continue_to_send:
-            size_t cursor = thiz->tx_param.cursor;
+            cursor = thiz->tx_param.cursor;
             retval = write(thiz->dev_handle,
                            & thiz->tx_param.buff.tx_buff[cursor],
                            thiz->tx_param.payload_size - cursor);
