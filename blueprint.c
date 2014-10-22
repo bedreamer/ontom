@@ -196,7 +196,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 
     if ( evt != HACHIKO_TIMEOUT ) return;
 
-    p = &((*me).rx_seed);
+    p = & me->rx_seed;
     if ( self == p ) {
         return;
     }
