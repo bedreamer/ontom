@@ -230,6 +230,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口数据结构初始化
     case BP_EVT_INIT:
         self->role = BP_UART_MASTER;
+        self->tx_param.payload_size = 0;
+        self->tx_param.cursor = 0;
         self->rx_seed.private = (void*)self;
         self->rx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
