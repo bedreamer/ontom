@@ -105,7 +105,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
 
     //options.c_cflag   |= CRTSCTS;
     options.c_iflag &=~(IXON | IXOFF | IXANY);
-    options.c_iflag &=~(ICRNL | INPCK | ISTRIP | IXON);
+    options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
     //options.c_lflag |= ISIG;
 
@@ -250,7 +250,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口配置
     case BP_EVT_CONFIGURE:
         gpio_export(SERIAL4_CTRL_PIN);
-        self->dev_handle = open(self->dev_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
+        self->dev_handle = open(self->dev_name,
+                                O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         }
