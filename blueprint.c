@@ -467,7 +467,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
-            tcflush(thiz->dev_handle, TCOFLUSH);
+            //tcflush(thiz->dev_handle, TCOFLUSH);
 
             thiz->tx_param.buff.tx_buff = thiz->tx_buff;
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
