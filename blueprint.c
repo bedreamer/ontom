@@ -433,10 +433,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         // 抛去程序运行时的延迟，发送延迟，可估计每发送一个字节耗时1.1 ms
         if ( thiz->status == BP_UART_STAT_WR ) {
 
-            if ( thiz->tx_param.payload_size > 0 ) {
+            if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
+                 thiz->tx_param.payload_size > 0 ) {
                 // 前一次没有发送完成， 继续发送
                 goto continue_to_send;
             }
+            if ( thiz->tx_param.payload_size ) continue;
 
             tcflush(thiz->dev_handle, TCOFLUSH);
 
