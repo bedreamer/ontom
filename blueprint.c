@@ -300,7 +300,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( param->payload_size ) return ERR_ERR;
         param->attrib = BP_FRAME_UNSTABLE;
         param->payload_size = 0;
-        for ( ; param->payload_size < 16 ; param->payload_size ++ )
+        for ( ; param->payload_size < 100 ; param->payload_size ++ )
             param->buff.tx_buff[ param->payload_size ] =
                     'A' + param->payload_size;
         break;
