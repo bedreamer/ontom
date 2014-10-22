@@ -443,6 +443,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 log_printf(DBG_LV1, "RD:%d <%s>", i, buff);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->status = BP_UART_STAT_WR;
+            } else {
+                log_printf(ERR, "read with error code: %d", errno);
             }
             continue;
         }
