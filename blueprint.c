@@ -198,7 +198,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     p = & thiz->rx_seed;
 
     if ( self == p ) {
-        log_printf(DBG_LV1, "rx packet time out.");
+        log_printf(DBG_LV1, "rx packet TIME-OUT.");
         Hachiko_pause(&thiz->rx_seed);
         thiz->status = BP_UART_STAT_WR;
         return;
@@ -442,7 +442,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             i += rd;
 
-            if ( i >= 32 ) {
+            if ( i >= 7 ) {
                 Hachiko_pause(&thiz->rx_seed);
 
                 tcflush(thiz->dev_handle, TCIFLUSH);
