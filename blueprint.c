@@ -19,8 +19,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 
 struct bp_uart uarts[] = {
-    {"/dev/ttyO4", -1, BP_FRAME_UNSTABLE, 0, uart4_bp_evt_handle},
-    {"/dev/ttyO5", -1, BP_FRAME_UNSTABLE, 0, NULL}
+    {"/dev/ttyO4", -1, BP_FRAME_UNSTABLE, BP_FRAME_UNSTABLE, 0, uart4_bp_evt_handle},
+    {"/dev/ttyO5", -1, BP_FRAME_UNSTABLE, BP_FRAME_UNSTABLE, 0, NULL}
 };
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
