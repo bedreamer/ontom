@@ -284,6 +284,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        if ( param->payload_size ) return ERR_ERR;
         param->attrib = BP_FRAME_UNSTABLE;
         param->payload_size = 0;
         for ( ; param->payload_size < 16 ; param->payload_size ++ )
