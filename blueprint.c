@@ -428,9 +428,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             int rd = 0, i = 0;
 
-            if ( hw_status != BP_UART_STAT_RD ) {
+            if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                hw_status = BP_UART_STAT_RD;
+                thiz->hw_status = BP_UART_STAT_RD;
             }
 
             do {
@@ -450,9 +450,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         // 抛去程序运行时的延迟，发送延迟，可估计每发送一个字节耗时1.1 ms
         if ( thiz->status == BP_UART_STAT_WR ) {
 
-            if ( hw_status != BP_UART_STAT_WR ) {
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_WR, NULL);
-                hw_status = BP_UART_STAT_WR;
+            if ( thiz->hw_status != BP_UART_STAT_WR ) {
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                thiz->hw_status = BP_UART_STAT_WR;
             }
 
             if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
