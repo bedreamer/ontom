@@ -435,21 +435,17 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
                 nr = 0;
+                continue;
             }
 
             cursor = thiz->rx_param.cursor;
             rd = read(thiz->dev_handle,
                       &thiz->rx_param.buff.rx_buff[cursor], 256);
-            if ( rd ) {
+            if ( rd > 0 ) {
                 Hachiko_feed(&thiz->rx_seed);
                 thiz->rx_param.payload_size += rd;
                 thiz->rx_param.cursor = thiz->rx_param.payload_size;
-            }
-
-            nr += rd;
-
-            if ( rd ) {
-                tcflush(thiz->dev_handle, TCIFLUSH);
+                nr += rd;
                 log_printf(DBG_LV1, "RD:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
                            rd, nr, buff[0], buff[1], buff[2], buff[3], buff[4],
                         buff[5], buff[6], buff[7]);
@@ -464,6 +460,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->hw_status = BP_UART_STAT_WR;
+                continue;
             }
 
             if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
