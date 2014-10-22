@@ -198,6 +198,9 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     p = & thiz->rx_seed;
 
     if ( self == p ) {
+        log_printf(DBG_LV1, "rx packet time out.");
+        Hachiko_pause(&thiz->rx_seed);
+        thiz->status = BP_UART_STAT_WR;
         return;
     }
 
@@ -206,6 +209,12 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         log_printf(DBG_LV1, "packet send done.");
         thiz->tx_param.payload_size = 0;
         Hachiko_pause(p);
+        thiz->status = BP_UART_STAT_RD;
+        if ( thiz->role == BP_UART_MASTER ) {
+            // 主动设备，需要进行接收超时判定
+            thiz->rx_seed.ttl = 2;
+            Hachiko_resume(&thiz->rx_seed);
+        }
         return;
     }
 }
@@ -418,6 +427,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             char buff[512] = {0};
 
             int rd = 0, i = 0;
+
+            if ( hw_status != BP_UART_STAT_RD ) {
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                hw_status = BP_UART_STAT_RD;
+            }
+
             do {
                 rd = read(thiz->dev_handle, &buff[i], 32);
                 i += rd;
@@ -434,6 +449,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         // 程序默认采用9600 的波特率， 大致估算出来，每发送一个字节耗时1.04ms
         // 抛去程序运行时的延迟，发送延迟，可估计每发送一个字节耗时1.1 ms
         if ( thiz->status == BP_UART_STAT_WR ) {
+
+            if ( hw_status != BP_UART_STAT_WR ) {
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_WR, NULL);
+                hw_status = BP_UART_STAT_WR;
+            }
 
             if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
                  thiz->tx_param.payload_size > 0 ) {

@@ -117,6 +117,9 @@ struct bp_uart {
     int dev_handle;
     // 串口状态
     BP_UART_STAT status;
+    // 硬件状态,仅针对RS485有效
+    BP_UART_STAT hw_status;
+
     // 初始化标识
     unsigned int init_magic;
     int (*bp_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
