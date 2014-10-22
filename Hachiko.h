@@ -74,7 +74,7 @@ int _Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
 static inline void Hachiko_kill(struct Hachiko_food *dog)
 {
     if ( dog->status != HACHIKO_INVALID )
-        dog->status = HACHIKO_RESUME;
+        dog->status = HACHIKO_KILLED;
 }
 
 static inline void Hachiko_pause(struct Hachiko_food *dog)
@@ -85,7 +85,7 @@ static inline void Hachiko_pause(struct Hachiko_food *dog)
 
 static inline void Hachiko_resume(struct Hachiko_food *dog)
 {
-    dog->status = HACHIKO_KILLED;
+    dog->status = HACHIKO_RESUME;
 }
 
 static inline void Hachiko_feed(struct Hachiko_food *dog)
