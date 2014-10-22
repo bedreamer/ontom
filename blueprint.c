@@ -286,7 +286,6 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(DBG_LV1, "set uart to RX mode faile");
             break;
         }
-        usleep(1 * 1000);
         break;
 
     // 串口接收到新数据
