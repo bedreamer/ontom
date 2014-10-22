@@ -204,6 +204,8 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     p = & thiz->tx_seed;
     if ( self == p ) {
         log_printf(DBG_LV1, "packet send done.");
+        thiz->tx_param.payload_size = 0;
+        Hachiko_pause(p);
         return;
     }
 }
