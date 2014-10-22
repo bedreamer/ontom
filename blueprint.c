@@ -427,7 +427,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
          * 的数据帧。
          */
         if ( thiz->status == BP_UART_STAT_RD ) {
-            char buff[512] = {0};
+            char buff[513] = {0};
             int rd = 0, i = 0;
 
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
@@ -435,7 +435,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->hw_status = BP_UART_STAT_RD;
             }
 
-            rd = read(thiz->dev_handle, buff, 32);
+            rd = read(thiz->dev_handle, buff, 512);
 
 
             if ( rd ) {
