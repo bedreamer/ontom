@@ -440,7 +440,10 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 // 前一次没有发送完成， 继续发送
                 goto continue_to_send;
             }
-            if ( thiz->tx_param.payload_size ) continue;
+            if ( thiz->tx_param.payload_size ) {
+                continue;
+                usleep(500 * 1000);
+            }
 
             tcflush(thiz->dev_handle, TCOFLUSH);
 
