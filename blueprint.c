@@ -212,7 +212,6 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         thiz->status = BP_UART_STAT_RD;
         if ( thiz->role == BP_UART_MASTER ) {
             // 主动设备，需要进行接收超时判定
-            thiz->rx_seed.ttl = 2;
             Hachiko_resume(&thiz->rx_seed);
         }
         return;
