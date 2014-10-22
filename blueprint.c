@@ -428,12 +428,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_RD ) {
             char buff[513] = {0};
             int rd = 0;
-            static int i = 0;
+            static int nr = 0;
 
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
-                i = 0;
+                nr = 0;
             }
 
             rd = read(thiz->dev_handle, buff, 512);
@@ -441,12 +441,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 Hachiko_feed(&thiz->rx_seed);
             }
 
-            i += rd;
+            nr += rd;
 
             if ( rd ) {
                 tcflush(thiz->dev_handle, TCIFLUSH);
-                log_printf(DBG_LV1, "RD:%d <%02X %02X %02X %02X %02X %02X %02X >",
-                           i, buff[0], buff[1], buff[2], buff[3], buff[4],
+                log_printf(DBG_LV1, "RD:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
+                           rd, nr, buff[0], buff[1], buff[2], buff[3], buff[4],
                         buff[5], buff[6], buff[7]);
             }
             continue;
