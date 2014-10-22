@@ -434,14 +434,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->hw_status = BP_UART_STAT_RD;
             }
 
-            do {
-                rd = read(thiz->dev_handle, &buff[i], 32);
-                i += rd;
-            } while ( rd >= 0 && i < 256 );
+            rd = read(thiz->dev_handle, buff, 32);
 
-            if ( i ) {
+
+            if ( rd ) {
                 Hachiko_pause(&thiz->rx_seed);
-                log_printf(DBG_LV1, "RD:%d <%s>", i, buff);
+                log_printf(DBG_LV1, "RD:%d <%s>", rd, buff);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->status = BP_UART_STAT_WR;
             }
