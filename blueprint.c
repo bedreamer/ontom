@@ -434,6 +434,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->hw_status = BP_UART_STAT_RD;
             }
 
+            errno = 0;
             do {
                 rd = read(thiz->dev_handle, &buff[i], 32);
                 i += rd;
