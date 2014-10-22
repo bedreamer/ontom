@@ -436,12 +436,16 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
 
             rd = read(thiz->dev_handle, buff, 512);
+            if ( rd ) {
+                Hachiko_feed(&thiz->rx_seed);
+            }
 
             i += rd;
 
-            if ( i >= 7 ) {
-                tcflush(thiz->dev_handle, TCIFLUSH);
+            if ( i >= 32 ) {
                 Hachiko_pause(&thiz->rx_seed);
+
+                tcflush(thiz->dev_handle, TCIFLUSH);
                 log_printf(DBG_LV1, "RD:%d <%02X %02X %02X %02X %02X %02X %02X >",
                            i, buff[0], buff[1], buff[2], buff[3], buff[4],
                         buff[5], buff[6], buff[7]);
