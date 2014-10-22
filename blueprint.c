@@ -433,6 +433,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
+                i = 0;
             }
 
             rd = read(thiz->dev_handle, buff, 512);
@@ -447,7 +448,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 log_printf(DBG_LV1, "RD:%d <%02X %02X %02X %02X %02X %02X %02X >",
                            i, buff[0], buff[1], buff[2], buff[3], buff[4],
                         buff[5], buff[6], buff[7]);
-                i = 0;
             }
             continue;
         }
