@@ -203,6 +203,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 
     p = & thiz->tx_seed;
     if ( self == p ) {
+        log_printf(DBG_LV1, "packet send done.");
         return;
     }
 }
@@ -283,6 +284,11 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        param->payload_size = 0;
+        for ( ; param->payload_size < 16 ; param->payload_size ++ )
+            param->buff.tx_buff[ param->payload_size ] =
+                    'A' + param->payload_size;
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -421,20 +427,86 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
+        // 程序默认采用9600 的波特率， 大致估算出来，每发送一个字节耗时1.04ms
+        // 抛去程序运行时的延迟，发送延迟，可估计每发送一个字节耗时1.1 ms
         if ( thiz->status == BP_UART_STAT_WR ) {
-            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-            tcflush(thiz->dev_handle, TCOFLUSH);
-            retval = write(thiz->dev_handle, "01234560012345601234567712345689", 32);
-            if ( retval > 0 ) {
-                log_printf(DBG_LV1, "WR:%d <%s>", retval, "0123456789");
-                fsync(thiz->dev_handle);
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                thiz->status = BP_UART_STAT_RD;
-                tcflush(thiz->dev_handle, TCIFLUSH);
-            } else {
-                log_printf(DBG_LV1, "WR faile, %d-%d", retval, errno);
+
+            if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
+                 thiz->tx_param.payload_size > 0 ) {
+                // 前一次没有发送完成， 继续发送
+                goto continue_to_send;
             }
-            sleep(1);
+
+            tcflush(thiz->dev_handle, TCOFLUSH);
+
+            thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+            thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+            thiz->tx_param.payload_size = 0;
+            thiz->tx_param.cursor = 0;
+            ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
+                                      &thiz->tx_param);
+            if ( ret != ERR_OK || thiz->tx_param.payload_size <= 0 ||
+                 thiz->tx_param.payload_size > 255 ) {
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+            ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_CONFIRM,
+                                      &thiz->tx_param);
+            if ( ret != ERR_OK ) {
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+            if ( thiz->tx_param.cursor > thiz->tx_param.payload_size ) {
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+continue_to_send:
+            size_t cursor = thiz->tx_param.cursor;
+            retval = write(thiz->dev_handle,
+                           & thiz->tx_param.buff.tx_buff[cursor],
+                           thiz->tx_param.payload_size - cursor);
+            if ( retval <= 0 ) {
+                log_printf(ERR, "send error, TX REQUEST AUTO ABORTED.");
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+            if ( retval == thiz->tx_param.payload_size - cursor ) {
+                // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
+                // 此时启动发送计时器，用来确定数据发送完成事件
+                thiz->tx_param.cursor = thiz->tx_param.payload_size;
+                thiz->tx_seed.ttl = thiz->tx_param.payload_size / 10 +
+                        (thiz->tx_param.payload_size % 10 ? 1 : 0);
+                log_printf(DBG_LV1, "send data len: %d, TX ttl: %d unit",
+                           thiz->tx_seed.ttl);
+                Hachiko_resume( & thiz->tx_seed );
+            } else if ( retval < thiz->tx_param.payload_size - cursor ) {
+                // 发送了一部分
+                thiz->tx_param.cursor = retval;
+            } else {
+                // Unexpected. Exception
+                log_printf(ERR, "send error, TX AUTO ABORTED.");
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
             continue;
         }
     }

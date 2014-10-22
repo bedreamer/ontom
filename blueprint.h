@@ -103,6 +103,8 @@ struct bp_evt_param {
     size_t buff_size;
     // 缓冲区载荷大小
     size_t payload_size;
+    // 读写游标
+    size_t cursor;
 };
 
 /*
@@ -125,8 +127,12 @@ struct bp_uart {
     // 发送定时器
     struct Hachiko_food tx_seed;
 
+    // 接收参数
+    struct bp_evt_param rx_param;
     // 接收缓冲区
     char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
+    // 发送参数
+    struct bp_evt_param tx_param;
     // 发送缓冲区
     char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
 };
