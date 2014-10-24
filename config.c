@@ -646,8 +646,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
     log_printf(DBG_LV1, "get configure list from WEB.");
     thiz->ct = "text/html";
     output_len = sprintf(&thiz->iobuff[output_len],
-                            "<html>"
-                            "  <title>直流充电桩内部调试接口</title>"
+                            "<html><title>直流充电桩内部调试接口</title>"
                             "  <body><table>");
 
     for ( ; head && head->config_name; head ++, nr ++ ) {
@@ -661,6 +660,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
 
     output_len += sprintf(&thiz->iobuff[output_len], "</table></body></html>");
     thiz->xml_len = output_len;
+    log_printf(DBG_LV0, "general done..");
     return ERR_OK;
 }
 
