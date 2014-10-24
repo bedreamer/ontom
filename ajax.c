@@ -18,6 +18,8 @@ int ajax_version_xml_proc(struct ajax_xml_struct *);
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
 int ajax_query_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz);
+int ajax_debug_list(struct ajax_xml_struct *thiz);
+int ajax_debug_commit(struct ajax_xml_struct *thiz);
 
 struct xml_generator {
 	// xml 文件名
@@ -33,6 +35,10 @@ struct xml_generator {
     {"/version.xml",            ajax_version_xml_proc},
     {"/autheticate.xml",        ajax_autheticate_xml_proc},
     {"/confirm.xml",            ajax_confirm_charge_xml_proc},
+
+    // 调试接口
+    {"/debug/list.html",        ajax_debug_list},
+    {"/debug/commit.html",      ajax_debug_commit},
     {"", NULL}
 };
 
@@ -613,6 +619,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
     if (ev == MG_REQUEST) {
         log_printf(DBG_LV0, "%s&%s", conn->uri, conn->query_string);
         strncpy(thiz.xml_name, conn->uri, 31);
+        thiz.ct = "text/xml";
         err = ajax_gen_xml( & thiz );
         if ( err == ERR_OK ) {
             //log_printf(DBG, "prepare...");
@@ -620,13 +627,13 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
                       "HTTP/1.1 200 HTTP\r\n"
                       "Server: thttpd/2.21b PHP/20030920\r\n"
                       "Access-Control-Allow-Origin: *\r\n"
-                      "Content-Type: text/xml\r\n"
+                      "Content-Type: %s\r\n"
                       "Date: Wed, 20 Aug 2014 03:29:12 GMT\r\n"
                       "Last-Modified: Tue, 19 Aug 2014 09:23:50 GMT\r\n"
                       "Accept-Ranges: bytes\r\n"
                       "Content-Length: %d\r\n"
                       "Connection: keep-alive\r\n"
-                      "\r\n", thiz.xml_len);
+                      "\r\n", thiz.ct, thiz.xml_len);
             mg_write(conn, thiz.iobuff, thiz.xml_len);
             //log_printf(DBG, "done %d", thiz.xml_len);
         } else {
