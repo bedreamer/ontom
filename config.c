@@ -648,7 +648,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
                             "<html><title>直流充电桩内部调试接口</title>"
                             "  <body><table>");
     for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
-        log_printf(DBG_LV1, "get configure list from WEB. %d:%p", nr, head);
+        log_printf(DBG_LV1, "get configure list from WEB. %d:%p:%d", nr, head, output_len);
         output_len += sprintf(&thiz->iobuff[output_len], "<tr><td>%s</td>", head->config_name);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%08X</td>", head->config_type);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%s</td>", head->config_value);
