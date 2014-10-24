@@ -444,6 +444,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
                 nr = 0;
+                tcflush(thiz->dev_handle, TCIFLUSH);
                 log_printf(DBG_LV2, "switch to RX mode %d.", errno);
             }
 
