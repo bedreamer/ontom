@@ -651,9 +651,10 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
         log_printf(DBG_LV1, "get configure list from WEB. %d:%p:%d", nr, head, output_len);
         output_len += sprintf(&thiz->iobuff[output_len], "<tr><td>%s</td>", head->config_name);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%08X</td>", head->config_type);
-        output_len += sprintf(&thiz->iobuff[output_len], "<td>%s</td>", head->config_value);
+        output_len += sprintf(&thiz->iobuff[output_len], "<td>%s</td></tr>", head->config_value);
+        continue;
         output_len += sprintf(&thiz->iobuff[output_len],
-        "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td></tr>",
+        "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td>",
                                  head->config_name, head->config_value);
     }
     log_printf(DBG_LV0, "general done..");
