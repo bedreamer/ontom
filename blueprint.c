@@ -198,7 +198,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     p = & thiz->rx_seed;
 
     if ( self == p ) {
-        log_printf(DBG_LV1, "rx packet TIME-OUT.");
+        log_printf(WRN, "rx packet TIME-OUT.");
         Hachiko_pause(&thiz->rx_seed);
         thiz->status = BP_UART_STAT_WR;
         return;
@@ -431,7 +431,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
          * 的数据帧。
          */
         if ( thiz->status == BP_UART_STAT_RD ) {
-            char buff[513] = {0};
+            char *buff = thiz->rx_param.buff.rx_buff;
             int rd = 0;
             static int nr = 0;
 
