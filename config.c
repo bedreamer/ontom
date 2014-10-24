@@ -641,24 +641,25 @@ void config_print()
 int ajax_debug_list(struct ajax_xml_struct *thiz)
 {
     struct config_struct *head = configs;
-    int nr = 0;
+    int nr = 0, output_len = 0;
 
     thiz->ct = "text/html";
-    thiz->xml_len = sprintf(thiz->iobuff,
+    output_len = sprintf(&thiz->iobuff[output_len],
                             "<html>"
                             "  <title>直流充电桩内部调试接口</title>"
                             "  <body><table>");
 
     for ( ; head && head->config_name; head ++, nr ++ ) {
-        thiz->xml_len += sprintf(thiz->iobuff, "<tr><td>%s</td>", head->config_name);
-        thiz->xml_len += sprintf(thiz->iobuff, "<td>%08X</td>", head->config_type);
-        thiz->xml_len += sprintf(thiz->iobuff, "<td>%s</td>", head->config_value);
-        thiz->xml_len += sprintf(thiz->iobuff,
+        output_len += sprintf(&thiz->iobuff[output_len], "<tr><td>%s</td>", head->config_name);
+        output_len += sprintf(&thiz->iobuff[output_len], "<td>%08X</td>", head->config_type);
+        output_len += sprintf(&thiz->iobuff[output_len], "<td>%s</td>", head->config_value);
+        output_len += sprintf(thiz->iobuff,
         "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td></tr>",
                                  head->config_name, head->config_value);
     }
 
-    thiz->xml_len += sprintf(thiz->iobuff, "</table></body></html>");
+    output_len += sprintf(thiz->iobuff, "</table></body></html>");
+    thiz->xml_len = output_len;
     return ERR_OK;
 }
 
