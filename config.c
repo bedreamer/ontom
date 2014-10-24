@@ -656,10 +656,10 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
         "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td></tr>",
                                  head->config_name, head->config_value);
     }
+    log_printf(DBG_LV0, "general done..");
 
     output_len += sprintf(&thiz->iobuff[output_len], "</table></body></html>");
     thiz->xml_len = output_len;
-    log_printf(DBG_LV0, "general done..");
     return ERR_OK;
 }
 
