@@ -454,8 +454,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->rx_param.payload_size += rd;
                 thiz->rx_param.cursor = thiz->rx_param.payload_size;
                 nr += rd;
-                log_printf(DBG_LV1, "RD:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
-                           rd, nr, buff[0], buff[1], buff[2], buff[3], buff[4],
+                log_printf(DBG_LV1, "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
+                           rd, nr, cursor, buff[0], buff[1], buff[2], buff[3], buff[4],
                         buff[5], buff[6], buff[7]);
             } else {
                 /*
