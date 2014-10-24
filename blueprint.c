@@ -236,7 +236,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.payload_size = 0;
         self->rx_param.buff_size = sizeof(self->rx_buff);
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
-                     1000, HACHIKO_PAUSE, (void*)self);
+                     120, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
             log_printf(ERR, "create uart reciever's timer faile.");
         }
@@ -543,8 +543,8 @@ continue_to_send:
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
-                thiz->tx_seed.ttl = 2/*thiz->tx_param.payload_size / 10 +
-                        (thiz->tx_param.payload_size % 10 ? 1 : 0)*/;
+                thiz->tx_seed.ttl = thiz->tx_param.payload_size / 10 +
+                        (thiz->tx_param.payload_size % 10 ? 1 : 0);
                 log_printf(DBG_LV1, "send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
