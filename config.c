@@ -649,7 +649,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
                             "  <body><table>");
     for ( ; head && head->config_name; head ++, nr ++ ) {
         output_len += sprintf(&thiz->iobuff[output_len], "<tr><td>%s</td>", head->config_name);
-        log_printf(DBG_LV1, "get configure list from WEB.");
+        log_printf(DBG_LV1, "get configure list from WEB. %d", nr);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%08X</td>", head->config_type);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%s</td>", head->config_value);
         output_len += sprintf(&thiz->iobuff[output_len],
