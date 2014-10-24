@@ -352,6 +352,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
     while ( ! *done ) {
         usleep(500);
+donot_rest:
         if ( thiz == NULL ) continue;
         if ( thiz->bp_evt_handle == NULL ) continue;
         if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
@@ -451,29 +452,31 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             errno = 0;
             cursor = thiz->rx_param.cursor;
-            rd = read(thiz->dev_handle,
-                      &thiz->rx_param.buff.rx_buff[cursor], 256);
-            if ( rd > 0 ) {
-                Hachiko_feed(&thiz->rx_seed);
-                thiz->rx_param.payload_size += rd;
-                thiz->rx_param.cursor = thiz->rx_param.payload_size;
-                nr += rd;
-                log_printf(DBG_LV1,
-                           "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
-                           rd, nr, cursor,
-                           buff[0], buff[1], buff[2], buff[3],
-                           buff[4], buff[5], buff[6], buff[7]);
-            }
+            do {
+                rd = read(thiz->dev_handle,
+                          &thiz->rx_param.buff.rx_buff[cursor], 256);
+                if ( rd > 0 ) {
+                    Hachiko_feed(&thiz->rx_seed);
+                    thiz->rx_param.payload_size += rd;
+                    thiz->rx_param.cursor = thiz->rx_param.payload_size;
+                    nr += rd;
+                    log_printf(DBG_LV1,
+                               "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
+                               rd, nr, cursor,
+                               buff[0], buff[1], buff[2], buff[3],
+                               buff[4], buff[5], buff[6], buff[7]);
+                }
 
-            if ( thiz->rx_param.payload_size >=
-                 thiz->rx_param.buff.rx_buff[1] + 4 ) {
-                log_printf(INF, "recv done.need: %d, fetched: %d",
-                           thiz->rx_param.buff.rx_buff[1]+4,
-                        thiz->rx_param.payload_size);
-                Hachiko_pause(&thiz->rx_seed);
-                thiz->status = BP_UART_STAT_WR;
-            }
-            continue;
+                if ( thiz->rx_param.payload_size >=
+                     thiz->rx_param.buff.rx_buff[1] + 4 ) {
+                    log_printf(INF, "recv done.need: %d, fetched: %d",
+                               thiz->rx_param.buff.rx_buff[1]+4,
+                            thiz->rx_param.payload_size);
+                    Hachiko_pause(&thiz->rx_seed);
+                    thiz->status = BP_UART_STAT_WR;
+                }
+            } while (0);
+            goto donot_rest;
         }
 
         // 程序默认采用9600 的波特率， 大致估算出每发送一个字节耗时1.04ms
