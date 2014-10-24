@@ -430,14 +430,16 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             static int nr = 0;
 
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
+                errno = 0;
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
                 nr = 0;
-                log_printf(DBG_LV2, "switch to RX mode.");
+                log_printf(DBG_LV2, "switch to RX mode %d.", errno);
             }
 
+            errno = 0;
             cursor = thiz->rx_param.cursor;
             rd = read(thiz->dev_handle,
                       &thiz->rx_param.buff.rx_buff[cursor], 256);
@@ -450,7 +452,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                            rd, nr, buff[0], buff[1], buff[2], buff[3], buff[4],
                         buff[5], buff[6], buff[7]);
             } else {
-                if ( nr ++ % 1000 ) {
+                if ( nr ++ % 20000 ) {
                     log_printf(WRN, "no data read %d:%d.", rd, errno);
                 }
             }
