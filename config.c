@@ -643,6 +643,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
     struct config_struct *head = configs;
     int nr = 0, output_len = 0;
 
+    log_printf(DBG_LV1, "get configure list from WEB.");
     thiz->ct = "text/html";
     output_len = sprintf(&thiz->iobuff[output_len],
                             "<html>"
