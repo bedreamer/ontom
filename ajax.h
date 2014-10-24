@@ -1,7 +1,7 @@
 #ifndef _AJAX_DEF_INCLUDED_H
 #define _AJAX_DEF_INCLUDED_H
 
-#define XML_IO_SIZE   4*1024  // 4K
+#define XML_IO_SIZE   8*1024  // 4K
 
 #include "mongoose.h"
 
