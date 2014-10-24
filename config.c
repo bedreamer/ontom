@@ -659,7 +659,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
     }
 
     thiz->xml_len += sprintf(thiz->iobuff, "</table></body></html>");
-    return ERR_ERR;
+    return ERR_OK;
 }
 
 // 提交并跳转
