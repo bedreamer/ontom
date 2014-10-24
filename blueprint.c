@@ -452,7 +452,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
-        // 程序默认采用9600 的波特率， 大致估算出来，每发送一个字节耗时1.04ms
+        // 程序默认采用9600 的波特率， 大致估算出每发送一个字节耗时1.04ms
         // 抛去程序运行时的延迟，发送延迟，可估计每发送一个字节耗时1.1 ms
         if ( thiz->status == BP_UART_STAT_WR ) {
 
@@ -524,8 +524,8 @@ continue_to_send:
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
-                thiz->tx_seed.ttl = thiz->tx_param.payload_size / 10 +
-                        (thiz->tx_param.payload_size % 10 ? 1 : 0);
+                thiz->tx_seed.ttl = 1/*thiz->tx_param.payload_size / 10 +
+                        (thiz->tx_param.payload_size % 10 ? 1 : 0)*/;
                 log_printf(DBG_LV1, "send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
