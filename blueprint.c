@@ -352,7 +352,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
     while ( ! *done ) {
         usleep(500);
-donot_rest:
         if ( thiz == NULL ) continue;
         if ( thiz->bp_evt_handle == NULL ) continue;
         if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
@@ -476,7 +475,7 @@ donot_rest:
                     thiz->status = BP_UART_STAT_WR;
                 }
             } while (0);
-            goto donot_rest;
+            continue;
         }
 
         // 程序默认采用9600 的波特率， 大致估算出每发送一个字节耗时1.04ms
