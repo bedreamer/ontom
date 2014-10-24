@@ -654,12 +654,12 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
         output_len += sprintf(&thiz->iobuff[output_len], "<tr><td>%s</td>", head->config_name);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%08X</td>", head->config_type);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%s</td>", head->config_value);
-        output_len += sprintf(thiz->iobuff,
+        output_len += sprintf(&thiz->iobuff[output_len],
         "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td></tr>",
                                  head->config_name, head->config_value);
     }
 
-    output_len += sprintf(thiz->iobuff, "</table></body></html>");
+    output_len += sprintf(&thiz->iobuff[output_len], "</table></body></html>");
     thiz->xml_len = output_len;
     return ERR_OK;
 }
