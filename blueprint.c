@@ -444,6 +444,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
                 nr = 0;
+                memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
                 tcflush(thiz->dev_handle, TCIFLUSH);
                 log_printf(DBG_LV2, "switch to RX mode %d.", errno);
             }
@@ -482,6 +483,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->hw_status = BP_UART_STAT_WR;
+                memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
                 log_printf(DBG_LV2, "switch to TX mode.");
                 continue;
             }
