@@ -229,10 +229,12 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口数据结构初始化
     case BP_EVT_INIT:
         self->role = BP_UART_MASTER;
-        self->tx_param.payload_size = 0;
-        self->tx_param.cursor = 0;
         self->rx_seed.private = (void*)self;
         self->rx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
+        self->rx_param.buff.rx_buff = self->rx_buff;
+        self->rx_param.cursor = 0;
+        self->rx_param.payload_size = 0;
+        self->rx_param.buff_size = sizeof(self->rx_buff);
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      1000, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
@@ -240,6 +242,10 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
         self->tx_seed.private = (void*)self;
         self->tx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
+        self->tx_param.payload_size = 0;
+        self->tx_param.cursor = 0;
+        self->tx_param.buff.tx_buff = self->tx_buff;
+        self->tx_param.buff_size = sizeof(self->tx_buff);
         ret = _Hachiko_new(&self->tx_seed, HACHIKO_AUTO_FEED,
                      2, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
@@ -453,7 +459,10 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                         buff[5], buff[6], buff[7]);
             } else {
                 if ( nr ++ % 100000 ) {
-                    log_printf(WRN, "no data read %d:%d.", rd, errno);
+                    log_printf(WRN, "no data read %p, %d, %d:%d.",
+                               thiz->rx_param.buff.rx_buff,
+                               thiz->rx_param.cursor,
+                               rd, errno);
                 }
             }
             continue;
