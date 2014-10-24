@@ -452,7 +452,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                            rd, nr, buff[0], buff[1], buff[2], buff[3], buff[4],
                         buff[5], buff[6], buff[7]);
             } else {
-                if ( nr ++ % 20000 ) {
+                if ( nr ++ % 100000 ) {
                     log_printf(WRN, "no data read %d:%d.", rd, errno);
                 }
             }
