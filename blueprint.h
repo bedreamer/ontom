@@ -93,7 +93,7 @@ typedef enum {
 // 串口事件参数
 struct bp_evt_param {
     union _unamed {
-        const char *rx_buff;
+        char *rx_buff;
         char *tx_buff;
     }buff;
 
