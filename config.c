@@ -658,7 +658,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
                                  head->config_name, head->config_value);
     }
 
-    thiz->xml_len += sprintf(thiz->iobuff, "</table></body></html>")
+    thiz->xml_len += sprintf(thiz->iobuff, "</table></body></html>");
     return ERR_ERR;
 }
 
