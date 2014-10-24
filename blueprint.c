@@ -456,21 +456,18 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->rx_param.payload_size += rd;
                 thiz->rx_param.cursor = thiz->rx_param.payload_size;
                 nr += rd;
-                log_printf(DBG_LV1, "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
-                           rd, nr, cursor, buff[0], buff[1], buff[2], buff[3], buff[4],
-                        buff[5], buff[6], buff[7]);
-            } else {
-                /*
-                if ( nr ++ % 100000 ) {
-                    log_printf(WRN, "no data read %p, %d, %d:%d.",
-                               thiz->rx_param.buff.rx_buff,
-                               thiz->rx_param.cursor,
-                               rd, errno);
-                }
-                */
+                log_printf(DBG_LV1,
+                           "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X >",
+                           rd, nr, cursor,
+                           buff[0], buff[1], buff[2], buff[3],
+                           buff[4], buff[5], buff[6], buff[7]);
             }
-            if ( thiz->rx_param.payload_size >= thiz->rx_param.buff.rx_buff[1] + 4 ) {
-                log_printf(INF, "recv done.");
+
+            if ( thiz->rx_param.payload_size >=
+                 thiz->rx_param.buff.rx_buff[1] + 4 ) {
+                log_printf(INF, "recv done.need: %d, fetched: %d",
+                           thiz->rx_param.buff.rx_buff[1]+4,
+                        thiz->rx_param.payload_size);
                 Hachiko_pause(&thiz->rx_seed);
                 thiz->status = BP_UART_STAT_WR;
             }

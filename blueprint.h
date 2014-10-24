@@ -93,8 +93,8 @@ typedef enum {
 // 串口事件参数
 struct bp_evt_param {
     union _unamed {
-        char *rx_buff;
-        char *tx_buff;
+        unsigned char *rx_buff;
+        unsigned char *tx_buff;
     }buff;
 
     // 帧属性，仅在发送帧和接收到正确帧时有效
@@ -133,11 +133,11 @@ struct bp_uart {
     // 接收参数
     struct bp_evt_param rx_param;
     // 接收缓冲区
-    char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
+    unsigned char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
     // 发送参数
     struct bp_evt_param tx_param;
     // 发送缓冲区
-    char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
+    unsigned char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
 };
 
 #endif // _BLUE_PRINT_INCLUED_H_
