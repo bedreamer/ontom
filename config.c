@@ -657,8 +657,8 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
         output_len += sprintf(&thiz->iobuff[output_len],
                               "<td><input id=\"e%d\" type=\"text\" value=\"%s\""
                               "/><a href=\"javascript:c(\"e%d\")\"></a></td></tr>",
-                              nr, nr,
-                              head->config_value);
+                              nr,
+                              head->config_value, nr);
         continue;
         output_len += sprintf(&thiz->iobuff[output_len],
         "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td>",
