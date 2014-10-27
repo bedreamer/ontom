@@ -38,6 +38,7 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
     int mydone = 0;
     int icdev, ret;
     unsigned long _Snr;
+    char buff[32] = {0};
 
     if ( done == NULL ) done = &mydone;
     log_printf(INF, "%s running...", __FUNCTION__);
@@ -53,13 +54,31 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
 
         ret = dc_card(icdev, 0, &_Snr);
-        if ( ret == 0 ) {
-            log_printf(INF, "GET CARD: %08X", _Snr);
-            dc_beep(icdev, 50);
-            usleep(500000);
-            dc_beep(icdev, 50);
+        if ( ret != 0 ) {
+            continue;
+       }
+        log_printf(INF, "GET CARD: %08X", _Snr);
+        dc_beep(icdev, 50);
+        usleep(100000);
+        dc_beep(icdev, 50);
+
+        sprintf(buff, "%08X", _Snr);
+        if ( !config_read("triger_card_sn")[0] ) {
+            config_write("triger_card_sn", buff);
+            continue;
+        }
+        if ( 0 != strcmp(config_read("triger_card_sn"), buff) ) {
+            continue;
+        } else if ( !config_read("confirm_card_sn")[0] ) {
+            config_write("confirm_card_sn", buff);
+            continue;
         }
 
+        if ( 0 == strcmp(config_read("triger_card_sn"), buff) &&
+             0 == strcmp(config_read("confirm_card_sn"), buff) ) {
+            config_write("settle_card_sn", buff);
+            continue;
+        }
     }
 }
 
