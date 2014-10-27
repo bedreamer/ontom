@@ -43,7 +43,7 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
 
     if ( icdev > 0 ) {
         log_printf(INF, "open D8 reader OK...");
-        dc_beep(50);
+        dc_beep(icdev, 50);
     } else {
         log_printf(ERR, "open D8 reader ERROR: %d", icdev);
     }
