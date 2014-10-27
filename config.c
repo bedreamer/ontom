@@ -651,7 +651,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
                             "<html><title>直流充电桩内部调试接口</title>"
                             "<script>function c(e,t){"
                             "window.location.href=\"list.html?t=\""
-                            "+document.getElementById(t).value+\"&v=\""
+                            "+document.getElementById(t).innerHTML+\"&v=\""
                             "+document.getElementById(e).value;"
                             "}</script>"
                             "<body><table border=\"1px\" align=\"center\">");
