@@ -622,7 +622,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
         thiz.ct = "text/xml";
         err = ajax_gen_xml( & thiz );
         if ( err == ERR_OK ) {
-            //log_printf(DBG, "prepare...");
+            log_printf(DBG_LV0, "prepare stage1 done...");
             mg_printf(conn,
                       "HTTP/1.1 200 HTTP\r\n"
                       "Server: thttpd/2.21b PHP/20030920\r\n"
@@ -634,7 +634,9 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
                       "Content-Length: %d\r\n"
                       "Connection: keep-alive\r\n"
                       "\r\n", thiz.ct, thiz.xml_len);
+            log_printf(DBG_LV0, "prepare stage2 done...");
             mg_write(conn, thiz.iobuff, thiz.xml_len);
+            log_printf(DBG_LV0, "send file done...");
             //log_printf(DBG, "done %d", thiz.xml_len);
         } else {
             mg_printf(conn,
