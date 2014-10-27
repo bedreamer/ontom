@@ -649,12 +649,16 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
     thiz->ct = "text/html";
     output_len = sprintf(&thiz->iobuff[output_len],
                             "<html><title>直流充电桩内部调试接口</title>"
-                            "  <body><table border=\"1px\" align=\"center\">");
+                            "<body><table border=\"1px\" align=\"center\">");
     for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
         log_printf(DBG_LV1, "get configure list from WEB. %d:%p:%d", nr, head, output_len);
         output_len += sprintf(&thiz->iobuff[output_len], "<tr><td>%s</td>", head->config_name);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%08X</td>", head->config_type);
-        output_len += sprintf(&thiz->iobuff[output_len], "<td><input type=\"text\" value=\"%s\"/></td></tr>", head->config_value);
+        output_len += sprintf(&thiz->iobuff[output_len],
+                              "<td><input id=\"e%d\" type=\"text\" value=\"%s\""
+                              "/><a href=\"javascript:c(\"e%d\")\"></a></td></tr>",
+                              nr, nr,
+                              head->config_value);
         continue;
         output_len += sprintf(&thiz->iobuff[output_len],
         "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td>",
