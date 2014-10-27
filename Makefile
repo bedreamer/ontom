@@ -17,7 +17,7 @@ CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
 INCPATH       = -I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 LINK          = arm-arago-linux-gnueabi-gcc -lts -lrt
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS)  -L/home/tom/workspace/qt-4.8.2-arm/lib  -L/home/tom/workspace/tslib/lib -L/home/tom/workspace/qt-4.8.2-arm/lib -lpthread 
+LIBS          = $(SUBLIBS)  -L/home/tom/workspace/qt-4.8.2-arm/lib  -L/home/tom/workspace/tslib/lib -L/home/tom/workspace/qt-4.8.2-arm/lib -L. -lusb-1.0 -lpthread
 AR            = arm-arago-linux-gnueabi-ar cqs
 RANLIB        = 
 QMAKE         = /home/tom/workspace/qt-4.8.2-arm/bin/qmake
@@ -47,7 +47,7 @@ OBJECTS_DIR   = ./
 SOURCES       = mongoose.c \
 		tom.c ajax.c bms.c config.c log.c charge.c zeus.c \
 		Hachiko.c blueprint.c
-OBJECTS       = D8U.a mongoose.o \
+OBJECTS       = mongoose.o \
 		tom.o ajax.o bms.o config.o log.o charge.o Hachiko.o \
 		blueprint.o
 DIST          = ../qt-4.8.2-arm/mkspecs/common/unix.conf \
@@ -104,7 +104,7 @@ first: all
 all: Makefile $(TARGET)
 
 $(TARGET):  $(OBJECTS)  
-	$(LINK) $(LFLAGS) -Map=ontom.map -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
+	$(LINK) $(LFLAGS) -Map=ontom.map -o $(TARGET) D8U.a $(OBJECTS) $(OBJCOMP) $(LIBS)
 	$(STRIP) $@
 
 Makefile: ontom.pro  ../qt-4.8.2-arm/mkspecs/qws/linux-arm-g++/qmake.conf ../qt-4.8.2-arm/mkspecs/common/unix.conf \
