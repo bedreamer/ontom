@@ -468,7 +468,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
                 if ( thiz->rx_param.payload_size >=
                      thiz->rx_param.buff.rx_buff[1] + 4 ) {
-                    log_printf(INF, "recv done.need: %d, fetched: %d",
+                    log_printf(DBG_LV1, "recv done.need: %d, fetched: %d",
                                thiz->rx_param.buff.rx_buff[1]+4,
                             thiz->rx_param.payload_size);
                     Hachiko_pause(&thiz->rx_seed);
