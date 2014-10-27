@@ -1,4 +1,4 @@
-#ifndef __RDRF_H
+ï»¿#ifndef __RDRF_H
 #define __RDRF_H
 
 #define uc unsigned char
@@ -138,7 +138,7 @@ int dc_pro_commandsource_hex(int idComDev,unsigned char slen,
 										   char * sendbuffer,unsigned char *rlen, 
 										   char * databuffer,unsigned char timeout);
 										   
-//½Ó´¥Ê½¿¨º¯Êı2007/02/27
+//æ¥è§¦å¼å¡å‡½æ•°2007/02/27
 int hex_a(unsigned char *hex,unsigned char *a,int length);
 int a_hex(unsigned char *a,unsigned char *hex,int len);		
 //4428								   									 										 

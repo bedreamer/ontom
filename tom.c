@@ -20,6 +20,7 @@
 #include "config.h"
 #include "error.h"
 #include "log.h"
+#include "librf.h"
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_read_service(void *) ___THREAD_ENTRY___;
@@ -35,8 +36,17 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
+    int icdev;
     if ( done == NULL ) done = &mydone;
     log_printf(INF, "%s running...", __FUNCTION__);
+    icdev = dc_init(100, 9600);//初始化串口1，波特率9600
+
+    if ( icdev > 0 ) {
+        log_printf(INF, "open D8 reader OK...");
+        dc_beep(50);
+    } else {
+        log_printf(ERR, "open D8 reader ERROR: %d", icdev);
+    }
 
     while ( ! *done ) {
         usleep(5000);
