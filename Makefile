@@ -104,7 +104,7 @@ first: all
 all: Makefile $(TARGET)
 
 $(TARGET):  $(OBJECTS)  
-	$(LINK) $(LFLAGS) -Map=ontom.map -o $(TARGET) D8U.a $(OBJECTS) $(OBJCOMP) $(LIBS)
+	$(LINK) $(LFLAGS) -Map=ontom.map -o $(TARGET) -static -L. -lD8U $(OBJECTS) $(OBJCOMP) $(LIBS)
 	$(STRIP) $@
 
 Makefile: ontom.pro  ../qt-4.8.2-arm/mkspecs/qws/linux-arm-g++/qmake.conf ../qt-4.8.2-arm/mkspecs/common/unix.conf \
