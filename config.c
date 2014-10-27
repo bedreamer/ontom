@@ -645,6 +645,18 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
 {
     struct config_struct *head = configs;
     int nr = 0, output_len = 0;
+    char tag[128] = {0}, val[128] ={0}, de_val[128]={0};
+
+    mg_get_var(thiz->xml_conn, "t", tag, 128);
+    mg_get_var(thiz->xml_conn, "v", val, 128);
+
+    if ( tag[0] && val[0] ) {
+        mg_url_decode(val, 128, de_val, 128, 0);
+        log_printf(DBG_LV0, "WEB SET %s: %s", tag, de_val);
+        if ( de_val[0] ) {
+            config_write(tag, val);
+        }
+    }
 
     thiz->ct = "text/html";
     output_len = sprintf(&thiz->iobuff[output_len],
