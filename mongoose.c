@@ -288,7 +288,7 @@ int ns_avprintf(char **buf, size_t size, const char *fmt, va_list ap);
 
 struct ctl_msg {
   ns_callback_t callback;
-  char message[1024 * 8];
+  char message[1024 * 16];
 };
 
 void iobuf_init(struct iobuf *iobuf, size_t size) {
