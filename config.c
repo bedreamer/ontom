@@ -619,13 +619,16 @@ void config_print()
 	for ( ; head && head->config_name && *head->config_name; head ++, nr ++ ) {
 		printf("%-32s", head->config_name);
 
-		i = (head->config_type >=0 && head->config_type <= 3)? head->config_type : 4;
+        i = (head->config_type >=0 && head->config_type <= 3)?
+                    head->config_type : 4;
 		printf("  %-6s", value_type[ i ]);
 
-        i = (head->config_user == 0 || head->config_user == 1) ? head->config_user : 2;
+        i = (head->config_user == 0 || head->config_user == 1) ?
+                    head->config_user : 2;
 		printf("  %-6s", value_system[ i ]);
 
-		i = (head->config_status >=0 && head->config_status <= 2) ? head->config_status : 3;
+        i = (head->config_status >=0 && head->config_status <= 2) ?
+                    head->config_status : 3;
 		printf("  %-8s", value_status[ i ]);
 		
 		printf("  %s\n", head->config_value);
@@ -651,7 +654,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
         log_printf(DBG_LV1, "get configure list from WEB. %d:%p:%d", nr, head, output_len);
         output_len += sprintf(&thiz->iobuff[output_len], "<tr><td>%s</td>", head->config_name);
         output_len += sprintf(&thiz->iobuff[output_len], "<td>%08X</td>", head->config_type);
-        output_len += sprintf(&thiz->iobuff[output_len], "<td>%s</td></tr>", head->config_value);
+        output_len += sprintf(&thiz->iobuff[output_len], "<td><input type=\"text\" value=\"%s\"/></td></tr>", head->config_value);
         continue;
         output_len += sprintf(&thiz->iobuff[output_len],
         "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td>",
