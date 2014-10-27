@@ -16,7 +16,7 @@ CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
 INCPATH       = -I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 LINK          = arm-arago-linux-gnueabi-gcc -lts -lrt
-LFLAGS        = -Wl,-O1 D8U.a
+LFLAGS        = -Wl,-O1
 LIBS          = $(SUBLIBS)  -L/home/tom/workspace/qt-4.8.2-arm/lib  -L/home/tom/workspace/tslib/lib -L/home/tom/workspace/qt-4.8.2-arm/lib -lpthread 
 AR            = arm-arago-linux-gnueabi-ar cqs
 RANLIB        = 
@@ -47,7 +47,7 @@ OBJECTS_DIR   = ./
 SOURCES       = mongoose.c \
 		tom.c ajax.c bms.c config.c log.c charge.c zeus.c \
 		Hachiko.c blueprint.c
-OBJECTS       = mongoose.o \
+OBJECTS       = D8U.a mongoose.o \
 		tom.o ajax.o bms.o config.o log.o charge.o Hachiko.o \
 		blueprint.o
 DIST          = ../qt-4.8.2-arm/mkspecs/common/unix.conf \
