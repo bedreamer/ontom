@@ -2,8 +2,10 @@
 #define __RDRF_H
 
 #define uc unsigned char
+#ifndef false
 #define false 0
 #define true  1
+#endif
 
 int  dc_readdevsnr(int idComDev,unsigned char *snr);
 int dc_readreadersnr(int idComDev,unsigned char *snr);
