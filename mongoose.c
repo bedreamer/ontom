@@ -411,7 +411,7 @@ int ns_avprintf(char **buf, size_t size, const char *fmt, va_list ap) {
 }
 
 int ns_vprintf(struct ns_connection *conn, const char *fmt, va_list ap) {
-  char mem[2000], *buf = mem;
+  char mem[16 * 1024], *buf = mem;
   int len;
 
   if ((len = ns_avprintf(&buf, sizeof(mem), fmt, ap)) > 0) {
