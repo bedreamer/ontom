@@ -65,14 +65,14 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
         dc_beep(icdev, 50);
 
         sprintf(buff, "%08X", _Snr);
-        if ( !config_read("triger_card_sn")[0] ) {
+        if ( config_read("triger_card_sn") == 'N' ) {
             config_write("triger_card_sn", buff);
             log_printf(INF, "card trigerd.");
             continue;
         }
         if ( 0 != strcmp(config_read("triger_card_sn"), buff) ) {
             continue;
-        } else if ( !config_read("confirm_card_sn")[0] ) {
+        } else if ( config_read("confirm_card_sn")[0] == 'N' ) {
             config_write("confirm_card_sn", buff);
             log_printf(INF, "card confirmed.");
             continue;
