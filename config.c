@@ -650,9 +650,9 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
     output_len = sprintf(&thiz->iobuff[output_len],
                             "<html><title>直流充电桩内部调试接口</title>"
                             "<script>function c(e,t){"
-                            "window.location.href=\"debug/list.html?t=\""
-                            "+document.getElementById(t).innerHtml+\"&v=\""
-                            "+document.getElementById(e).innerHtml;"
+                            "window.location.href=\"list.html?t=\""
+                            "+document.getElementById(t).innerHTML+\"&v=\""
+                            "+document.getElementById(e).innerHTML;"
                             "}</script>"
                             "<body><table border=\"1px\" align=\"center\">");
     for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
