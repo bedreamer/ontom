@@ -448,7 +448,6 @@ struct event_struct {
     EVT_PARAM evt_param;
 
     union {
-        // 如果不主动分类使用这两个指针，后果自负!!!!
         // 发送缓冲区地址， 针对EVENT_TX_REQUEST设置
         unsigned char *tx_buff;
         // 接收缓冲区地址，针对EVENT_RX_DONE设置
