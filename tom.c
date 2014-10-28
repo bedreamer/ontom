@@ -64,8 +64,8 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
         usleep(100000);
         dc_beep(icdev, 50);
 
-        sprintf(buff, "%08X", _Snr);
-        if ( config_read("triger_card_sn") == 'N' ) {
+        sprintf(buff, "%08X", (unsigned int)_Snr);
+        if ( config_read("triger_card_sn")[0] == 'N' ) {
             config_write("triger_card_sn", buff);
             log_printf(INF, "card trigerd.");
             continue;
@@ -178,7 +178,7 @@ int main()
     if ( strcmp(user_cfg, "TURE") ||
          strcmp(user_cfg, "true") ) {
         pthread_create( & tid, &attr, config_drive_service, NULL);
-        sprintf(buff, "%d", tid);
+        sprintf(buff, "%d", (int)tid);
         config_write("thread_config_server_id", buff);
     }
 
