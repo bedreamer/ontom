@@ -20,6 +20,7 @@
 #include "config.h"
 #include "error.h"
 #include "log.h"
+#include "Hachiko.h"
 #include "librf.h"
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;
