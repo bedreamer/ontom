@@ -393,6 +393,8 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
 
     // 充电任务，状态机转移
     switch ( cardvalid ) {
+    case CARD_INVALID:
+    break;
     case CARD_TRIGER_VALID:    // 触发刷卡有效, 充电任务触发
      // 前驱充电任务必须是充电任务触发等待状态，
      // 考虑到该事件可能会重复出现，所以
@@ -508,6 +510,7 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
  */
 int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz)
 {
+    thiz->ct = "text/xml";
     return ERR_ERR;
 }
 
@@ -515,6 +518,7 @@ int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz)
 int ajax_deal_xml_proc(struct ajax_xml_struct *thiz)
 {
     log_printf(DBG, "get into %s", __FUNCTION__);
+    thiz->ct = "text/xml";
     return ERR_ERR;
 }
 
@@ -522,6 +526,7 @@ int ajax_deal_xml_proc(struct ajax_xml_struct *thiz)
 int ajax_charge_status_xml_proc(struct ajax_xml_struct  *thiz)
 {
     log_printf(DBG, "get into %s", __FUNCTION__);
+    thiz->ct = "text/xml";
     return ERR_ERR;
 }
 
@@ -529,6 +534,7 @@ int ajax_charge_status_xml_proc(struct ajax_xml_struct  *thiz)
 int ajax_battery_status_xml_proc(struct ajax_xml_struct  *thiz)
 {
     log_printf(DBG, "get into %s", __FUNCTION__);
+    thiz->ct = "text/xml";
     return ERR_ERR;
 }
 
@@ -536,6 +542,7 @@ int ajax_battery_status_xml_proc(struct ajax_xml_struct  *thiz)
 int ajax_alarm_xml_proc(struct ajax_xml_struct  *thiz)
 {
     log_printf(DBG, "get into %s", __FUNCTION__);
+    thiz->ct = "text/xml";
     return ERR_ERR;
 }
 
