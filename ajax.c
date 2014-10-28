@@ -621,7 +621,8 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
 
 static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
     int result = MG_FALSE, err;
-    struct ajax_xml_struct thiz = {0};
+    struct ajax_xml_struct thiz;
+    memset(&thiz, 0, sizeof(thiz));
     thiz.xml_conn = conn;
     if (ev == MG_REQUEST) {
         log_printf(DBG_LV0, "%s&%s", conn->uri, conn->query_string);
