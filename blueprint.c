@@ -14,6 +14,7 @@
 #include "error.h"
 #include "Hachiko.h"
 #include "blueprint.h"
+#include "charge.h"
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
@@ -306,10 +307,17 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_TX_FRAME_REQUEST:
         if ( param->payload_size ) return ERR_ERR;
         param->attrib = BP_FRAME_UNSTABLE;
-        param->payload_size = 0;
-        for ( ; param->payload_size < 35 ; param->payload_size ++ )
-            param->buff.tx_buff[ param->payload_size ] =
-                    'A' + param->payload_size;
+        struct MDATA_QRY qry;
+        qry.magic[0] = 0xF0;
+        qry.magic[0] = 0xE1;
+        qry.magic[0] = 0xD2;
+        qry.magic[0] = 0xC3;
+        qry.magic[0] = 0xB4;
+        qry.addr = 0x05;
+        qry.len = 16;
+        qry.crc = 0xFFFF;
+        memcpy(param->buff.tx_buff, &qry, sizeof(qry));
+        param->payload_size = sizeof(qry);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
