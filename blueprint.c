@@ -309,10 +309,10 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         param->attrib = BP_FRAME_UNSTABLE;
         struct MDATA_QRY qry;
         qry.magic[0] = 0xF0;
-        qry.magic[0] = 0xE1;
-        qry.magic[0] = 0xD2;
-        qry.magic[0] = 0xC3;
-        qry.magic[0] = 0xB4;
+        qry.magic[1] = 0xE1;
+        qry.magic[2] = 0xD2;
+        qry.magic[3] = 0xC3;
+        qry.magic[4] = 0xB4;
         qry.addr = 0x05;
         qry.len = 16;
         qry.crc = 0xFFFF;
