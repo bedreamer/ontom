@@ -119,12 +119,6 @@ void *thread_backgroud_service(void *arg) ___THREAD_ENTRY___
     return NULL;
 }
 
-// 定时器
-static void ontom_timer_sig()
-{
-
-}
-
 int main()
 {
     const char *user_cfg = NULL;
