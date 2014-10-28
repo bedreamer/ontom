@@ -86,6 +86,8 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
     }
+
+    return NULL;
 }
 
 // 充电机通信服务线程
@@ -99,6 +101,7 @@ void *thread_charger_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
         usleep(5000);
     }
+    return NULL;
 }
 
 // 后台通信服务线程
@@ -112,6 +115,8 @@ void *thread_backgroud_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
         usleep(5000);
     }
+
+    return NULL;
 }
 
 // 定时器
