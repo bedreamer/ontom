@@ -837,11 +837,11 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                  * byte[6:8]: PGN
                  */
                 log_printf(DBG_LV2, "BMS: %08X",
-                           *reinterpret_cast(unsigned int* __restrict__)(&frame.data[0]));
+                           *reinterpret_cast(int* __restrict__)(&frame.data[0]));
             } else {
                 //omited.
                 log_printf(DBG_LV3, "BMS: %08X",
-                           *reinterpret_cast(unsigned int* __restrict__)(&frame.data[0]));
+                           *reinterpret_cast(int* __restrict__)(&frame.data[0]));
             }
         } else {
             param.can_id = (frame.can_id & 0x00FF0000) >> 8;
