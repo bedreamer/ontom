@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
+#include <string.h>
 #include <time.h>
 #include "Hachiko.h"
 #include "log.h"
@@ -33,7 +34,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 {
     int i, refresh = 0;
 
-    for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
+    for ( i = 0; (unsigned int)i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
         if ( pool[i] == NULL ) continue;
         if ( pool[i]->status == HACHIKO_INVALID ) continue;
         if ( pool[i]->status == HACHIKO_KILLED ) {
@@ -43,12 +44,12 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
             continue;
         }
         if ( pool[i]->status == HACHIKO_RESUME ) {
-            Hachiko_feed(&pool[i]);
+            Hachiko_feed(pool[i]);
             pool[i]->status = HACHIKO_NORMAL;
             continue;
         }
         if ( pool[i]->status == HACHIKO_PAUSE ) {
-            Hachiko_feed(&pool[i]);
+            Hachiko_feed(pool[i]);
             continue;
         }
 
@@ -90,7 +91,7 @@ int _Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
         goto die;
     }
 
-    for ( i = 0; i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
+    for ( i = 0; (unsigned int)i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
         if ( pool[i] != NULL ) continue;
         thiz->type = type;
         thiz->ttl = ttl;
