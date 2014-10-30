@@ -99,7 +99,7 @@ CONFIG_DOMAIN_BEGIN
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
-static struct config_struct *config_search(const char *name)
+static struct config_struct *config_search(const unsigned char *name)
 {
 	struct config_struct *head = configs;
 	int nr = 0;
