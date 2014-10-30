@@ -133,11 +133,11 @@ struct bp_uart {
     // 接收参数
     struct bp_evt_param rx_param;
     // 接收缓冲区
-    unsigned char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
+    char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
     // 发送参数
     struct bp_evt_param tx_param;
     // 发送缓冲区
-    unsigned char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
+    char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
 };
 
 #endif // _BLUE_PRINT_INCLUED_H_
