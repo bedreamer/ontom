@@ -107,7 +107,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
         int i = 0;
         struct can_pack_generator *thiz;
         for ( i = 0;
-              i < sizeof(generator) / sizeof(struct can_pack_generator); i++ ) {
+              (unsigned int)i < sizeof(generator) / sizeof(struct can_pack_generator); i++ ) {
             thiz = &generator[i];
             if ( thiz->stage == task->charge_stage ) {
                 if ( thiz->heartbeat < thiz->period ) {
@@ -484,7 +484,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
-    int s, ti = 0;
+    int s;
     struct sockaddr_can addr;
     struct ifreq ifr;
     struct can_frame frame;
@@ -581,7 +581,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             frame.can_dlc= param.buff_payload;
             memcpy(frame.data, param.buff.tx_buff, 8);
             nbytes = write(s, &frame, sizeof(struct can_frame));
-            if ( nbytes < param.buff_payload ) {
+            if ( (unsigned int)nbytes < param.buff_payload ) {
                 param.evt_param = EVT_RET_ERR;
                 can_packet_callback(task, EVENT_TX_FAILS, &param);
             } else {
@@ -805,13 +805,13 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     int ret = Hachiko_new( & task->can_tp_bomb,
                                            HACHIKO_ONECE, 125,
                                            &task->can_tp_private);
-                    if ( ret == ERR_WRONG_PARAM ) {
+                    if ( ret == (int)ERR_WRONG_PARAM ) {
                         log_printf(ERR,
                                    "BMS: set new timer error, with code:%d",
                                    ret);
                         continue;
                     }
-                    if ( ret == ERR_TIMER_BEMAX ) {
+                    if ( ret == (int)ERR_TIMER_BEMAX ) {
                         log_printf(ERR,
                                    "BMS: set new timer error, with code:%d",
                                    ret);
