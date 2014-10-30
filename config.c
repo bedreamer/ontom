@@ -47,8 +47,8 @@
 #include "ajax.h"
 
 static char *value_type[] = {"STRING", "INT", "FLOAT", "BOOL", "N/A"};
-static char *value_system[] = {"NO", "YES", "N/A"};
-static char *value_status[] = {"INVALID", "VALID", "MODIFY", "N/A"};
+//static char *value_system[] = {"NO", "YES", "N/A"};
+//static char *value_status[] = {"INVALID", "VALID", "MODIFY", "N/A"};
 //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 CONFIG_DOMAIN_BEGIN
 //数据名称                   |数据类型| 用户配置项？|nnn数据状态|数据默认值|	数据值
@@ -99,7 +99,7 @@ CONFIG_DOMAIN_BEGIN
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
-static struct config_struct *config_search(const unsigned char *name)
+static struct config_struct *config_search(const char *name)
 {
 	struct config_struct *head = configs;
 	int nr = 0;
@@ -107,7 +107,7 @@ static struct config_struct *config_search(const unsigned char *name)
 	if ( name == NULL ) goto die;
 
     for ( ; head && head->config_name && head->config_name[0]; head ++, nr ++ ) {
-        if ( 0 == strcmp(head->config_name, (const char*)name) ) return head;
+        if ( 0 == strcmp(head->config_name, name) ) return head;
 	}
 
 die:
