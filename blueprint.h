@@ -93,8 +93,8 @@ typedef enum {
 // 串口事件参数
 struct bp_evt_param {
     union _unamed {
-        unsigned char *rx_buff;
-        unsigned char *tx_buff;
+        char *rx_buff;
+        char *tx_buff;
     }buff;
 
     // 帧属性，仅在发送帧和接收到正确帧时有效

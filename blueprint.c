@@ -265,7 +265,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
 
         ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
-        if ( ret == ERR_UART_CONFIG_FAILE ) {
+        if ( ret == (int)ERR_UART_CONFIG_FAILE ) {
             log_printf(ERR, "configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
         }
