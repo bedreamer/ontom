@@ -100,7 +100,7 @@ struct socket_config_request {
     // 变量索引号
     unsigned char config_item_type;
     // 配置值
-    unsigned char config_item_value[CONFIG_MAX_VALUE];
+    char config_item_value[CONFIG_MAX_VALUE];
 };
 // 套接字传递的数据包格式
 struct socket_config_ack {

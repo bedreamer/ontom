@@ -38,6 +38,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>  /* system data type definitions */
 #include <sys/socket.h> /* socket specific definitions */
 #include <netinet/in.h> /* INET constants and stuff */
@@ -436,7 +437,7 @@ void *config_drive_service(void *arg)
 {
     int ok = 1;
     int srv_port;
-    char *pport = config_read("socket_config_port");
+    char *pport = config_read((const char *)"socket_config_port");
     int s_config = -1;
     int need_autheticate = 0, good_request = 0;
     struct sockaddr_in si_me, si_other;
