@@ -99,7 +99,7 @@ first: all
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .c.o:
-	@echo "ARM-GCC                  $<"
+	@echo "        ARM-GCC                  $<"
 	@$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
 
 ####### Build rules
