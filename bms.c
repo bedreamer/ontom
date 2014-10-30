@@ -638,10 +638,10 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
-    int s, ti = 0;
+    int s;
     struct sockaddr_can addr;
     struct ifreq ifr;
-    struct can_frame frame, *buff_in;
+    struct can_frame frame;
     int nbytes;
     struct event_struct param;
     // 用于链接管理的数据缓冲
