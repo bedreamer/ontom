@@ -378,13 +378,13 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             // 打开并配置串口
             // 如果初始化失败，则会不断的尝试
             ret = thiz->bp_evt_handle(thiz, BP_EVT_CONFIGURE, NULL);
-            if ( ret == ERR_UART_OPEN_FAILE ) {
+            if ( ret == (int)ERR_UART_OPEN_FAILE ) {
                 thiz->status = BP_UART_STAT_INVALID;
                 log_printf(ERR, "try open %s faile.", thiz->dev_name);
                 thiz->init_magic --;
                 continue;
             }
-            if ( ret == ERR_UART_CONFIG_FAILE ) {
+            if ( ret == (int)ERR_UART_CONFIG_FAILE ) {
                 thiz->status = BP_UART_STAT_INVALID;
                 // 首先关闭串口，然后才能进行下一次尝试
                 thiz->bp_evt_handle(thiz, BP_EVT_KILLED, NULL);
