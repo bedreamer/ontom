@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include <sys/types.h>  /* system data type definitions */
 #include <sys/socket.h> /* socket specific definitions */
 #include <netinet/in.h> /* INET constants and stuff */
@@ -188,7 +189,7 @@ int config_initlize(const char *cfgfile)
 				if ( (fbuf[i] >= 'a' && fbuf[i] <= 'z') ||
 					 (fbuf[i] >= 'A' && fbuf[i] <= 'Z') ||
 					  fbuf[i] == '_' ){
-					if ( A_l >= sizeof(A) ) break;
+                    if ( (unsigned int)A_l >= sizeof(A) ) break;
 					A[ A_l ++ ] = fbuf[i];
 				} else if ( fbuf[i] == '=' && A_l ){
 					// 找到 '='
@@ -210,7 +211,7 @@ int config_initlize(const char *cfgfile)
                     B[ B_l ] = '\0';
 					break;
 				}
-				if ( B_l >= sizeof(B) ) break;
+                if ( (unsigned int)B_l >= sizeof(B) ) break;
 
 				if ( fbuf[i] >= 0x20 && fbuf[i] <= 0x7F )
 					B[ B_l ++ ] = fbuf[i];
@@ -390,7 +391,7 @@ const char *config_write(const char *name, const char *value)
 			int sign = 0;
 			int dot = 0;
 			int zhengshu = 0, xiaoshu = 0;
-			int i, len;
+            int len;
 
 			if ( value[0] == '-') sign = -1;
 			if ( value[0] == '+') sign = 1;

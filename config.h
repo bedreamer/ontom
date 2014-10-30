@@ -94,7 +94,7 @@ struct socket_config_request {
     #define CONFIG_RD       0xAA  // 读变量
     #define CONFIG_WR       0x55  // 写变量
     // 变量名
-    unsigned char config_item_name[32];
+    char config_item_name[32];
     // 变量索引，变量名为空时使用
     unsigned int  config_item_index;
     // 变量索引号
