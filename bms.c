@@ -856,6 +856,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             // CAN通信处于连接管理模式
         }
     }
+
+    return NULL;
 }
 
 /* 充电阶段改变事件处理过程
@@ -902,6 +904,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
+    return 0;
 }
 
 // 配置-CTS-充电机发送时间同步信息
@@ -940,6 +943,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
+    return 0;
 }
 
 // 配置-CML-充电机最大输出能力
@@ -958,6 +962,7 @@ int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
+    return 0;
 }
 
 // 配置-CRO-充电机输出准备就绪状态
@@ -975,6 +980,7 @@ int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
+    return 0;
 }
 
 // 充电-CCS-充电机充电状态
@@ -994,12 +1000,14 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
     param->can_id = gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
+    return 0;
 }
 
 // 充电-CST-充电机中止充电
 int gen_packet_PGN6656(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[5];
+    return 0;
 
 }
 
@@ -1007,6 +1015,7 @@ int gen_packet_PGN6656(struct charge_task * thiz, struct event_struct* param)
 int gen_packet_PGN7424(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[6];
+    return 0;
 
 }
 
@@ -1014,6 +1023,6 @@ int gen_packet_PGN7424(struct charge_task * thiz, struct event_struct* param)
 int gen_packet_PGN7936(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[7];
-
+    return 0;
 }
 
