@@ -617,6 +617,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             log_printf(DBG_LV2, "BMS: connection aborted.");
         }
     }
+    return NULL;
 }
 
 // CAN 数据发送报文
@@ -919,7 +920,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     p =localtime(&timep);
     if ( p == NULL ) {
         param->evt_param = EVT_RET_ERR;
-        return;
+        return 0;
     }
     cts.spn2823_bcd_sec = (((p->tm_sec / 10 ) & 0x0F ) << 4) |
             ((p->tm_sec % 10) & 0x0F);
