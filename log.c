@@ -11,7 +11,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
 {
 	char buff[256]={0};
 	va_list ap;
-	char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
+    //char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
     const char *cfg;
     time_t timep;
     struct tm *p;
@@ -69,7 +69,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV0:
         cfg = config_read("debug_lvA");
-        if ( cfg == NULL ) return;
+        if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
@@ -86,7 +86,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV1:
         cfg = config_read("debug_lvB");
-        if ( cfg == NULL ) return;
+        if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
@@ -103,7 +103,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV2:
         cfg = config_read("debug_lvC");
-        if ( cfg == NULL ) return;
+        if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
@@ -120,7 +120,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case DBG_LV3:
         cfg = config_read("debug_lvD");
-        if ( cfg == NULL ) return;
+        if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
