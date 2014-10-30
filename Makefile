@@ -224,12 +224,6 @@ onconfig-i386: onconfig.c
 
 ####### Compile
 
-mongoose.o: mongoose.c mongoose.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o mongoose.o mongoose.c
-
-tom.o: tom.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o tom.o tom.c
-
 ####### Install
 
 install:   FORCE
