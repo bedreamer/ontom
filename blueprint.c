@@ -193,7 +193,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
     volatile struct bp_uart * thiz = /*(struct uart_bp *)(int *)*/private;
-    const struct Hachiko_food *p;
+    struct Hachiko_food *p;
 
     if ( evt != HACHIKO_TIMEOUT ) return;
     p = & thiz->rx_seed;
@@ -475,7 +475,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 }
 
                 if ( thiz->rx_param.payload_size >=
-                     thiz->rx_param.buff.rx_buff[1] + 4 ) {
+                     (size_t)(thiz->rx_param.buff.rx_buff[1] + 4) ) {
                     log_printf(DBG_LV1, "recv done.need: %d, fetched: %d",
                                thiz->rx_param.buff.rx_buff[1]+4,
                             thiz->rx_param.payload_size);
@@ -556,7 +556,7 @@ continue_to_send:
                 continue;
             }
 
-            if ( retval == thiz->tx_param.payload_size - cursor ) {
+            if ( retval == (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
@@ -566,7 +566,7 @@ continue_to_send:
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
                 Hachiko_resume( & thiz->tx_seed );
-            } else if ( retval < thiz->tx_param.payload_size - cursor ) {
+            } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送了一部分
                 thiz->tx_param.cursor = retval;
             } else {
@@ -581,4 +581,5 @@ continue_to_send:
             continue;
         }
     }
+    return NULL;
 }
