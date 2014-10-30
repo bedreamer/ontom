@@ -137,4 +137,5 @@ int log_printf(unsigned int level, const char *fmt, ...)
         //return printf("%s\n", buff);
         break;
     }
+    return 0;
 }

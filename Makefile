@@ -20,7 +20,7 @@ LFLAGS        = -Wl,-O1
 LIBS          = $(SUBLIBS)  -L/home/tom/workspace/qt-4.8.2-arm/lib  \
 		-L/home/tom/workspace/tslib/lib -L/home/tom/workspace/qt-4.8.2-arm/lib \
 		-L. -lD8U -lD8usb -lpthread
-AR            = arm-arago-linux-gnueabi-ar cqs
+AR            = arm-arago-linux-ar cqs
 RANLIB        = 
 QMAKE         = /home/tom/workspace/qt-4.8.2-arm/bin/qmake
 TAR           = tar -cf

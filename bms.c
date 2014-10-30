@@ -234,9 +234,8 @@ static int can_packet_callback(
         //串口处于连接管理状态时，将会收到该传输数据报请求。
         break;
     case EVENT_TX_TP_CTS:
-        //串口处于连接管理状态时，将会收到该传输数据报请求。
     {
-        /*
+        /*串口处于连接管理状态时，将会收到该传输数据报请求。
          * 当数据包接收完成后向BMS发送消息结束应答数据包
          *
          * byte[1]: 0x13
@@ -261,8 +260,8 @@ static int can_packet_callback(
     }
         break;
     case EVENT_TX_TP_ACK:
-        //串口处于连接管理状态时，将会收到该传输数据报请求。
     {
+        //串口处于连接管理状态时，将会收到该传输数据报请求。
         param->buff.tx_buff[0] = 0x13;
         // 目前的多数据包发送策略是： 无论要发送多少数据包，都一次传输完成
         param->buff.tx_buff[1] = thiz->can_tp_param.tp_size & 0xFF;
