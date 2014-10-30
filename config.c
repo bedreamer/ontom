@@ -135,8 +135,10 @@ int config_initlize(const char *cfgfile)
 			return ERR_OK;
 		} else {
 			if ( thiz->config_type != C_STRING ) {
-				int i = (thiz->config_type >= 0 && thiz->config_type <= 3)? 
-					thiz->config_type : 4;
+                int i = 4;
+                if (thiz->config_type >= 0 && thiz->config_type <= 3) {
+                    i = thiz->config_type;
+                }
 				log_printf(ERR, "config_type need string give %s", 
 					value_type[i]);
 				return ERR_WRONG_PARAM;
@@ -437,7 +439,7 @@ void *config_drive_service(void *arg)
 {
     int ok = 1;
     int srv_port;
-    char *pport = config_read((const char *)"socket_config_port");
+    const char *pport = config_read((const char *)"socket_config_port");
     int s_config = -1;
     int need_autheticate = 0, good_request = 0;
     struct sockaddr_in si_me, si_other;
@@ -479,7 +481,7 @@ void *config_drive_service(void *arg)
         memset(&ack, 0, sizeof(ack));
         recv_len = recvfrom(s_config, &request,
                  sizeof(struct socket_config_request),
-                 0, (struct sockaddr *) &si_other, &slen);
+                 0, (struct sockaddr *) &si_other, (socklen_t * __restrict__)&slen);
         if ( recv_len <= 0 ) continue;
 
         request.config_username[ 7 ] = '\0';
@@ -676,7 +678,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
                               head->config_name);
         output_len += sprintf(&thiz->iobuff[output_len],
                               "<td>%s</td>",
-                              value_type[head->config_type]);
+                              value_type[(unsigned int)(head->config_type)]);
         output_len += sprintf(&thiz->iobuff[output_len],
                               "<td><input id=\"e%d\" type=\"text\" value=\"%s\""
                               "/><a href=\"javascript:c(\'e%d\',\'t%d\')\">SET</a></td></tr>",
