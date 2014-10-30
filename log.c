@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <string.h>
+#include <pthread.h>
 #include <sys/types.h>
 #include "log.h"
 #include "config.h"
@@ -70,7 +72,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
-            return;
+            return 1;
         }
         printf("\033[35m[DBG_LV0@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                pthread_self(),
@@ -87,7 +89,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
-            return;
+            return 1;
         }
         printf("\033[35m[DBG_LV1@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                pthread_self(),
@@ -104,7 +106,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
-            return;
+            return 1;
         }
         printf("\033[36m[DBG_LV2@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                pthread_self(),
@@ -121,7 +123,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         if ( cfg == NULL ) return;
         if ( strcmp(cfg, "false") == 0 ||
              strcmp(cfg, "FALSE") == 0 ) {
-            return;
+            return 1;
         }
         printf("\033[36m[DBG_LV3@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                pthread_self(),
