@@ -136,9 +136,9 @@ int config_initlize(const char *cfgfile)
 		} else {
 			if ( thiz->config_type != C_STRING ) {
                 int i = 4;
-                if (thiz->config_type >= 0 && thiz->config_type <= 3) {
+                //if (thiz->config_type >= 0 && thiz->config_type <= 3) {
                     i = thiz->config_type;
-                }
+                //}
 				log_printf(ERR, "config_type need string give %s", 
 					value_type[i]);
 				return ERR_WRONG_PARAM;
