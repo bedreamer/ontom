@@ -1008,6 +1008,9 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
 int gen_packet_PGN6656(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[5];
+    (void)thiz;
+    (void)param;
+    (void)gen;
     return 0;
 
 }
@@ -1016,6 +1019,9 @@ int gen_packet_PGN6656(struct charge_task * thiz, struct event_struct* param)
 int gen_packet_PGN7424(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[6];
+    (void)thiz;
+    (void)param;
+    (void)gen;
     return 0;
 
 }
@@ -1024,6 +1030,9 @@ int gen_packet_PGN7424(struct charge_task * thiz, struct event_struct* param)
 int gen_packet_PGN7936(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[7];
+    (void)thiz;
+    (void)param;
+    (void)gen;
     return 0;
 }
 
