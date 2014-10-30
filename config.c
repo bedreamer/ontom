@@ -107,7 +107,7 @@ static struct config_struct *config_search(const unsigned char *name)
 	if ( name == NULL ) goto die;
 
     for ( ; head && head->config_name && head->config_name[0]; head ++, nr ++ ) {
-		if ( 0 == strcmp(head->config_name, name) ) return head;
+        if ( 0 == strcmp(head->config_name, (const char*)name) ) return head;
 	}
 
 die:
