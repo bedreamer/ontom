@@ -898,7 +898,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
     else param->buff.tx_buff[0] = BMS_RECOGNIZED;
 
     param->buff.tx_buff[1] = 0x01;
-    strcpy(&param->buff.tx_buff[2], "ZH-CN");
+    strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
     param->buff.tx_buff[7] = 0xFF;
     param->buff_payload = gen->datalen;
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
@@ -956,7 +956,7 @@ int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
     cml.spn2825_min_output_voltage = 2400;
     cml.spn2826_max_output_current = 3000;
     memset(param->buff.tx_buff, 0xFF, 8);
-    memcpy(param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
+    memcpy((void * __restrict__)param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
 
     param->buff_payload = gen->datalen;
     param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
@@ -994,7 +994,7 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
     ccs.spn3083_charge_time = 122;
 
     memset(param->buff.tx_buff, 0xFF, 8);
-    memcpy(param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
+    memcpy((void * __restrict__)param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
 
     param->buff_payload = gen->datalen;
     param->can_id = gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
