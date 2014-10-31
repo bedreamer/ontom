@@ -836,8 +836,9 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                  * byte[2:5]: 0xFF
                  * byte[6:8]: PGN
                  */
+                int *d = &frame.data[0];
                 log_printf(DBG_LV2, "BMS: %08X",
-                           *(int*)(&frame.data[0]));
+                           *d);
             } else {
                 //omited.
                 log_printf(DBG_LV3, "BMS: %08X",
