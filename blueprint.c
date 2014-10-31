@@ -19,10 +19,7 @@
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 
-struct bp_uart uarts[] = {
-    {"/dev/ttyO4", -1, BP_FRAME_UNSTABLE, BP_FRAME_UNSTABLE, 0, uart4_bp_evt_handle},
-    {"/dev/ttyO5", -1, BP_FRAME_UNSTABLE, BP_FRAME_UNSTABLE, 0, NULL}
-};
+struct bp_uart uarts[2];
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
 #define	SERIAL4_CTRL_PIN	GPIO_TO_PIN(0, 19)
@@ -352,6 +349,16 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     size_t cursor;
 
     if ( done == NULL ) done = &mydone;
+
+    memset(uarts, 0, sizeof(uarts));
+
+    uarts[0].bp_evt_handle = uart4_bp_evt_handle;
+    uarts[0].dev_handle = -1;
+    uarts[0].dev_name = "/dev/ttyO4";
+
+    uarts[1].bp_evt_handle = NULL;
+    uarts[1].dev_handle = -1;
+    uarts[1].dev_name = "/dev/ttyO5";
 
     if ( thiz ) {
         // 出错误后尝试的次数
