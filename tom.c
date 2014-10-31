@@ -37,7 +37,7 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
-    int icdev, ret;
+    int icdev, ret, initok = 1;
     unsigned long _Snr;
     char buff[32] = {0};
 
@@ -49,12 +49,15 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
         log_printf(INF, "open D8 reader OK...");
         dc_beep(icdev, 100);
     } else {
+        initok = 0;
         log_printf(ERR, "open D8 reader ERROR: %d", icdev);
     }
 
     while ( ! *done ) {
 
         sleep(2);
+
+        if ( 0 == initok ) continue;
 
         ret = dc_card(icdev, 0, &_Snr);
         if ( ret != 0 ) {
