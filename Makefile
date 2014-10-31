@@ -10,8 +10,9 @@
 
 CC            = arm-arago-linux-gnueabi-gcc -lts
 CXX           = arm-arago-linux-gnueabi-gcc -lts
-#DEFINES       = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED
-DEFINES       = -DVERSION=`svn info | grep 'Revision' | awk '{print $2}'`
+#DEFINES      = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED
+VER           = `svn info | grep 'Revision' | awk '{print $2}'`
+DEFINES       = -DVERSION=$(VER)
 CFLAGS        = -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT $(DEFINES)
 INCPATH       = -I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
