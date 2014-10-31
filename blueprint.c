@@ -196,7 +196,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     struct Hachiko_food *p;
 
     if ( evt != HACHIKO_TIMEOUT ) return;
-    p = & thiz->rx_seed;
+    p = & (thiz->rx_seed);
 
     if ( self == p ) {
         log_printf(WRN, "rx packet TIME-OUT.need: %d, fetched: %d",
