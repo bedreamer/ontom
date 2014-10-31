@@ -101,7 +101,7 @@ first: all
 
 .c.o:
 	@echo "        ARM-GCC                  $<"
-	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
+	@$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
 
 ####### Build rules
 
