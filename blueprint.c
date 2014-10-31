@@ -192,7 +192,7 @@ int set_gpio_output(int pin, int value)
 void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
-    volatile struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
+    struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
     struct Hachiko_food *p;
 
     if ( evt != HACHIKO_TIMEOUT ) return;
