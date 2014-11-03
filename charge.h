@@ -330,11 +330,23 @@ typedef enum {
     ONTOM_F_BMS_RECONIZED,
 
     // 系统遥信量
-    ONTOM_S_ERROR             = 0x0080,
-    ONTOM_S_V_OUT_HIGH,
-    ONTOM_S_V_OUT_LOW,
-    ONTOM_S_I_OUT_HIGH,
-    ONTOM_S_I_OUT_LOW
+    S_ERROR             = 0x0080,
+    // 辅助电源故障
+    S_ASSIT_POWER_DOWN,
+    // 采样单元通信中断
+    S_MEASURE_COMM_DOWN,
+    // 1# 充电枪物理连接故障
+    S_GUN_1_PYH_CONN_DOWN,
+    // 2# 充电枪物理连接故障
+    S_GUN_2_PYH_CONN_DOWN,
+    // 输出电压过高
+    S_V_OUT_HIGH,
+    // 输出电压过低
+    S_V_OUT_LOW,
+    // 输出电流过高
+    S_I_OUT_HIGH,
+    // 输出电流过低
+    S_I_OUT_LOW
 }ONTOM_FLAG_SINGLE;
 
 // 创建充电任务

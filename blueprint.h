@@ -99,6 +99,13 @@ struct bp_evt_param {
 
     // 帧属性，仅在发送帧和接收到正确帧时有效
     BP_FRAME_ATTRIB attrib;
+    // {{帧附加属性
+    // 帧头魔数长度
+    unsigned char magic_len;
+    // 帧数据长度所谓位置索引
+    unsigned char len_index;
+    // }}
+
     // 缓冲区大小
     size_t buff_size;
     // 缓冲区载荷大小

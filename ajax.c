@@ -27,7 +27,7 @@ struct xml_generator {
 	// xml 生成过程地址
     int (*xml_gen_proc)(struct ajax_xml_struct *);
 }xmls[]={
-{"/query.xml",                  ajax_query_xml_proc},
+    {"/query.xml",                  ajax_query_xml_proc},
     {"/deal.xml",               ajax_deal_xml_proc},
     {"/chargestatus.xml",       ajax_charge_status_xml_proc},
     {"/battrystatus.xml",       ajax_battery_status_xml_proc},

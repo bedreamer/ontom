@@ -36,6 +36,8 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 
     for ( i = 0; (unsigned int)i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
         if ( pool[i] == NULL ) continue;
+
+        // 下面的逻辑判定顺序不可更改，详情请参考README文件
         if ( pool[i]->status == HACHIKO_INVALID ) continue;
         if ( pool[i]->status == HACHIKO_KILLED ) {
             pool[i] = NULL;
