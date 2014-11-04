@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
+#include <single.h>
 #include "config.h"
 #include "log.h"
 #include "error.h"
@@ -183,6 +184,11 @@ int set_gpio_output(int pin, int value)
     fclose(fp);
 
     return ERR_OK;
+}
+
+void uarts_async_sigio()
+{
+    log_printf(INF, "SIGIO fetched.");
 }
 
 // 串口4的超时响应
@@ -374,6 +380,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         // 出错误后尝试的次数
         thiz->init_magic = 5;
     }
+
+    single(SIGIO, uarts_async_sigio);
 
     while ( ! *done ) {
         usleep(3000);
