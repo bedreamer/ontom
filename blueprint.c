@@ -380,7 +380,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         thiz->init_magic = 5;
     }
 
-    single(SIGIO, uarts_async_sigio);
+    signal(SIGIO, uarts_async_sigio);
 
     while ( ! *done ) {
         usleep(3000);
