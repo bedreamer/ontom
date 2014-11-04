@@ -479,7 +479,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 rd = read(thiz->dev_handle,
                           &thiz->rx_param.buff.rx_buff[cursor], 256);
                 if ( rd > 0 ) {
-                    Hachiko_feed(&thiz->rx_seed);
                     thiz->rx_param.payload_size += rd;
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
@@ -493,6 +492,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                                buff[4+8], buff[5+8], buff[6+8], buff[7+8]);
                 }
 
+                Hachiko_feed(&thiz->rx_seed);
                 if ( thiz->rx_param.payload_size >=
                      (size_t)(thiz->rx_param.buff.rx_buff[1] + 4) ) {
                     log_printf(DBG_LV1, "recv done.need: %d, fetched: %d",
