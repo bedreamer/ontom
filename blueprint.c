@@ -381,12 +381,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     }
 
     while ( ! *done ) {
-        usleep(3000);
+        //usleep(3000);
         if ( thiz == NULL ) continue;
         if ( thiz->bp_evt_handle == NULL ) continue;
         if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
 
-        signal(SIGIO, uarts_async_sigio);
+        //signal(SIGIO, uarts_async_sigio);
 
         if ( thiz->status == BP_UART_STAT_INVALID ) {
             if ( thiz->init_magic <= 0 ) {
