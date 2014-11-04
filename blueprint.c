@@ -209,6 +209,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         log_printf(DBG_LV1, "packet send done.");
         thiz->tx_param.payload_size = 0;
         Hachiko_pause(p);
+        memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
         thiz->status = BP_UART_STAT_RD;
         if ( thiz->role == BP_UART_MASTER ) {
             // 主动设备，需要进行接收超时判定
