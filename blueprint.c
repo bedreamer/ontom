@@ -9,7 +9,6 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
-#include <single.h>
 #include "config.h"
 #include "log.h"
 #include "error.h"
