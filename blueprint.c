@@ -492,7 +492,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
                     log_printf(DBG_LV1,
-                               "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X "
+                               "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X"
                                " %02X %02X %02X %02X %02X %02X %02X %02X>",
                                rd, nr, cursor,
                                buff[0], buff[1], buff[2], buff[3],
@@ -503,11 +503,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
                 if ( thiz->rx_param.payload_size >=
                      (size_t)(thiz->rx_param.buff.rx_buff[1] + 4) ) {
+                    thiz->status = BP_UART_STAT_WR;
+                    Hachiko_pause(&thiz->rx_seed);
                     log_printf(DBG_LV1, "recv done.need: %d, fetched: %d",
                                thiz->rx_param.buff.rx_buff[1]+4,
                             thiz->rx_param.payload_size);
-                    Hachiko_pause(&thiz->rx_seed);
-                    thiz->status = BP_UART_STAT_WR;
                 }
             } while (0);
             continue;
@@ -575,7 +575,7 @@ continue_to_send:
                            & thiz->tx_param.buff.tx_buff[cursor],
                            thiz->tx_param.payload_size - cursor);
             if ( retval <= 0 ) {
-                log_printf(ERR, "send error, TX REQUEST AUTO ABORTED.");
+                log_printf(ERR, "send error, TX REQUEST AUTOMATIC ABORTED.");
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                 thiz->tx_param.payload_size = 0;

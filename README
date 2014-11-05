@@ -2,6 +2,19 @@
 =========
 ontom 是用来进行充电桩外设监视和控制的核心程序。
 
+索引
+=========
+* 系统设计原则
+* 刷卡三步确认原则
+* 设置认证流程
+* 内建http服务器的多种用途
+* 串口服务线程工作原理
+* 定时器的使用
+* AJAX相关
+* 配置
+* 日志
+* 系统逻辑
+
 FAQ
 =========
 系统设计原则：
@@ -148,4 +161,144 @@ FAQ
     已经被判为死亡，没有继续处理的需要了，然后是恢复定时器，定时器从暂定状态回到普通状态
     和定时器从普通状态转变为暂停状态顺序可以更换。但需要注意的时，当状态发生改变后需要
     重新进行喂狗操作。
+AJAX相关：
+    1. 在此鸣谢： mongoose 开发组。
+    2. 提供监控程序内部变量监视，修改，查询接口。
+    3. 修改了mongoose部分代码逻辑，主要更改了缓冲区大小从原来的2K修改为8K，用来适应较大
+       的输出文件，例如调试文件/debug.html
+    4. HTTP返回头中添加了返回文件类型，这个属性是后来加上的，主要目的是为了适配xml文件
+       和html文件，也就是真正在用的AJAX请求文件和调试文件。通过ct属性进行设置，例如：
+       // 返回告警信息 alarm.xml
+       int ajax_alarm_xml_proc(struct ajax_xml_struct  *thiz)
+       {
+	   log_printf(DBG, "get into %s", __FUNCTION__);
+	   thiz->ct = "text/xml";
+	   return ERR_ERR;
+       }
+       // 生成动态设置页面
+       int ajax_debug_list(struct ajax_xml_struct *thiz)
+       {
+	   ....
+	   thiz->ct = "text/html";
+	   ....
+	   return ERR_OK;
+       }
+       使用灵活的属性设置，可以完成例如普通文件的传输等功能，使得可修改性更强。
+    5. 参数，目前参数都是用GET方式传递，也就是通过URL进行明文传送。关于URL中过的特殊字符
+       浏览器会自动进行编码后传递过来，因此需要使用moogoose提供的接口将参数解码后才能使用
+       下面是例子：
+       // 生成动态设置页面
+       int ajax_debug_list(struct ajax_xml_struct *thiz)
+       {
+	   struct config_struct *head = configs;
+	   int nr = 0, output_len = 0;
+	   char tag[128] = {0}, val[128] ={0}, de_val[128]={0};
+
+	   mg_get_var(thiz->xml_conn, "t", tag, 128);
+	   mg_get_var(thiz->xml_conn, "v", val, 128);
+
+	   if ( tag[0] && val[0] ) {
+	       mg_url_decode(val, 128, de_val, 128, 0);
+	       log_printf(DBG_LV1, "WEB SET %s: %s", tag, de_val);
+	       if ( de_val[0] ) {
+		   config_write(tag, val);
+	       }
+	   }
+	   ....
+	   return ERR_OK;
+       }
+       首先通过mg_get_var方法获取参数，此时参数如果经过编码的，则无法直接使用，此时使用
+       mg_url_decode方法将URL重新解码为原始数据再进行使用即可。
+配置：
+    1. 配置程序逻辑设计分为两层，系统配置层，用户配置层。用户层配置数据优先级最高，系统
+       配置层次之，系统配置文件固定为ontom.cfg处于程序运行的目录中，你可以在config.c
+       文件的的两个宏CONFIG_DOMAIN_BEGIN和CONFIG_DOMAIN_END之间添加配置数据，并指定
+       默认的数值，以便没有设置该值时使用。
+       CONFIG_DOMAIN_BEGIN
+       //数据名称           |数据类型|用户配置项？|nnn数据状态|数据默认值|   数据值
+       {"user_config_file", C_STRING,   no,     C_INVALID,.cuv.n=0, {"user.cfg"}},
+       CONFIG_DOMAIN_END
+       在ontom.cfg文件中包含可配置的所有非保留配置项，可通过user_config_file指定用户
+       配置文件名，用户配置文件同样也放在程序运行目录。
+    2. 第一点说明了用户配置优先级高于系统优先级，因此可以通过修改用户配置去设置系统。
+    3. 配置格式。关于配置格式可以参照ontom.cfg中相关例子和说明。
+    4. 配置接口。给程序中提供多种配置数据修改方案。第一种通过重叠配置文件实现一次性不可复原
+       的配置；第二种通过提供的onconfig工具进行配置，该工具可以在与监控同一网段内的任意IP
+       上进行操作，具体操作方法可以参考onconfig --help；第三种通过ontom提供的WEB端配置
+       接口，直接使用浏览器进行配置；目前来说后两种的修改只是临时修改，后期可以考虑将这个
+       功能改为永久修改。
+日志：
+    1. 多层运行日志输出模式。日至输出等级有 ERR, WRN，INF，DBG, DBG_LV0, DBG_LV1,
+       DBG_LV2, DBG_LV3。
+    2. 输出控制。其中ERR, WRN, INF，DBG，这四个等级的日志是各种时间段可见的。ERR： 程序
+       出现故障，例如参数错误，逻辑错误等导致程序无法继续运行下去的故障信息；WRN：程序出现
+       错误参数，但不至于程序无法继续运行，只是给出了相应的警告，程序还可按照既定的逻辑
+       运行；INF：程序运行过程称中关键的逻辑、状态转折点会给出相关提示信息，方便把握程序的
+       运行逻辑、位置；DBG：程序中重要的调试信息，出现异常时打印。
+       DBG_LV[0:3], 调试输出信息，可以通过配置选择是否输出调试信息。配置项为
+       debug_lvA, debug_lvB, debug_lvC, debug_lvD。
+系统逻辑:
+    在这里用伪代码形式将系统整体逻辑整理出来, 伪代码如下：
+    BEGIN:
+	try {
+	    系统初始化，读取配置文件，启动服务线程（BMS，UART，http，充电等）
+	} catch ( exceptions ) {
+	    提示出错信息，停止程序。
+	}
+	等待所有线程初始化完成；
+
+	并行：
+	    读读卡器；
+	    和采样盒通信；
+	    和充电机通信；
+	    和后台通信；
+	    和浏览器通信；
+	    充电枪连接后和BMS通信；
+	结束
+
+	if （ 读卡器读取失败 ）｛
+	    try ｛
+		尝试重新初始化；
+	    ｝catch （ failed ） ｛
+		提示出错信息，停止程序；
+	    ｝
+	 ｝
+
+	if （ 采样盒通信故障 ）｛
+	    提示出错信息，停止充电程序；
+	｝
+
+	if（ 充电机通信故障 ）｛
+	    提示出错信息，停止充电程序；
+	｝
+
+	if（ 浏览器通信中断 ）｛
+	    提示出错信息；
+	    try ｛
+		重启浏览器；
+	    ｝ catch （ 失败 ）{
+		提示出错信息，停止充电程序；
+	    }
+	｝
+
+	if （ 有绝缘故障 ）｛
+	    不能充电，提示故障；
+	｝else ｛
+	    if ( 充电枪未连接 ) {
+		不能充电；
+	    } else {
+		if（ 没有刷卡 ）｛
+		    不能充电；
+		｝else {
+		    if ( BMS 通信故障 ） ｛
+			不能充电
+		    ｝ else {
+			进入计费充电程序；
+		    }
+		}
+	    }
+	｝
+
+
+    END
 
