@@ -187,7 +187,7 @@ int set_gpio_output(int pin, int value)
 
 void uarts_async_sigio()
 {
-    log_printf(INF, "SIGIO fetched.");
+    log_printf(INF, "UART: SIGIO fetched.");
 }
 
 // 串口4的超时响应
@@ -201,7 +201,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     p = & (thiz->rx_seed);
 
     if ( self == p ) {
-        log_printf(WRN, "rx packet TIME-OUT.need: %d, fetched: %d",
+        log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: %d",
                    thiz->rx_param.buff.rx_buff[1]+4,
                     thiz->rx_param.payload_size);
         Hachiko_pause(&thiz->rx_seed);
@@ -211,7 +211,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 
     p = & thiz->tx_seed;
     if ( self == p ) {
-        log_printf(DBG_LV1, "packet send done.");
+        log_printf(DBG_LV1, "UART: packet send done.");
         thiz->tx_param.payload_size = 0;
         Hachiko_pause(p);
         memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
@@ -244,7 +244,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      160, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
-            log_printf(ERR, "create uart reciever's timer faile.");
+            log_printf(ERR, "UART: create uart reciever's timer faile.");
         }
         self->tx_seed.private = (void*)self;
         self->tx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
@@ -255,7 +255,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         ret = _Hachiko_new(&self->tx_seed, HACHIKO_AUTO_FEED,
                      2, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
-            log_printf(ERR, "create uart transfer's timer faile.");
+            log_printf(ERR, "UART: create uart transfer's timer faile.");
         }
         break;
     // 串口配置
@@ -269,7 +269,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
         if ( ret == (int)ERR_UART_CONFIG_FAILE ) {
-            log_printf(ERR, "configure uart faile.");
+            log_printf(ERR, "UART: configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
         }
         self->status = BP_UART_STAT_WR;
@@ -286,7 +286,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_SWITCH_2_TX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
         if ( ret != ERR_OK ) {
-            log_printf(DBG_LV1, "set uart to TX mode faile");
+            log_printf(DBG_LV1, "UART: set uart to TX mode faile");
             break;
         }
         break;
@@ -294,7 +294,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_SWITCH_2_RX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
         if ( ret != ERR_OK ) {
-            log_printf(DBG_LV1, "set uart to RX mode faile");
+            log_printf(DBG_LV1, "UART: set uart to RX mode faile");
             break;
         }
         break;
@@ -391,7 +391,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_INVALID ) {
             if ( thiz->init_magic <= 0 ) {
                 thiz->status = BP_UART_STAT_ALIENT;
-                log_printf(ERR, "open UART faile, thread panic.....");
+                log_printf(ERR, "UART: open UART faile, thread panic.....");
                 continue;
             }
 
@@ -404,7 +404,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             ret = thiz->bp_evt_handle(thiz, BP_EVT_CONFIGURE, NULL);
             if ( ret == (int)ERR_UART_OPEN_FAILE ) {
                 thiz->status = BP_UART_STAT_INVALID;
-                log_printf(ERR, "try open %s faile.", thiz->dev_name);
+                log_printf(ERR, "UART: try open %s faile.", thiz->dev_name);
                 thiz->init_magic --;
                 continue;
             }
@@ -412,7 +412,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->status = BP_UART_STAT_INVALID;
                 // 首先关闭串口，然后才能进行下一次尝试
                 thiz->bp_evt_handle(thiz, BP_EVT_KILLED, NULL);
-                log_printf(ERR, "configure %s faile.", thiz->dev_name);
+                log_printf(ERR, "UART: configure %s faile.", thiz->dev_name);
                 thiz->init_magic --;
                 continue;
             }
@@ -441,7 +441,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( ret != ERR_OK ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_KILLED, NULL);
                 thiz->status = BP_UART_STAT_ALIENT;
-                log_printf(ERR, "switch to defaute mode faile, thread panic..");
+                log_printf(ERR, "UART: switch to defaute mode faile, thread panic..");
                 continue;
             }
 
@@ -449,7 +449,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 max_handle = thiz->dev_handle;
             }
 
-            log_printf(INF, "open UART %d:%s correct.",
+            log_printf(INF, "UART: open UART %d:%s correct.",
                        thiz->dev_handle, thiz->dev_name);
             continue;
         }
@@ -478,7 +478,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 nr = 0;
                 memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
                 tcflush(thiz->dev_handle, TCIFLUSH);
-                log_printf(DBG_LV2, "switch to RX mode %d.", errno);
+                log_printf(DBG_LV2, "UART: switch to RX mode %d.", errno);
             }
 
             errno = 0;
@@ -492,7 +492,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
                     log_printf(DBG_LV1,
-                               "RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X"
+                               "UART: RD:%d:%d:%d <%02X %02X %02X %02X %02X %02X %02X"
                                " %02X %02X %02X %02X %02X %02X %02X %02X>",
                                rd, nr, cursor,
                                buff[0], buff[1], buff[2], buff[3],
@@ -505,7 +505,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                      (size_t)(thiz->rx_param.buff.rx_buff[1] + 4) ) {
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
-                    log_printf(DBG_LV1, "recv done.need: %d, fetched: %d",
+                    log_printf(DBG_LV1, "UART: recv done.need: %d, fetched: %d",
                                thiz->rx_param.buff.rx_buff[1]+4,
                             thiz->rx_param.payload_size);
                 }
@@ -521,7 +521,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
-                log_printf(DBG_LV2, "switch to TX mode.");
+                log_printf(DBG_LV2, "UART: switch to TX mode.");
                 continue;
             }
 
@@ -575,7 +575,7 @@ continue_to_send:
                            & thiz->tx_param.buff.tx_buff[cursor],
                            thiz->tx_param.payload_size - cursor);
             if ( retval <= 0 ) {
-                log_printf(ERR, "send error, TX REQUEST AUTOMATIC ABORTED.");
+                log_printf(ERR, "UART: send error, TX REQUEST AUTOMATIC ABORTED.");
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                 thiz->tx_param.payload_size = 0;
@@ -589,7 +589,7 @@ continue_to_send:
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
                 thiz->tx_seed.ttl = thiz->tx_param.payload_size / 10 +
                         (thiz->tx_param.payload_size % 10 ? 1 : 0);
-                log_printf(DBG_LV1, "send data len: %d, TX ttl: %d unit",
+                log_printf(DBG_LV1, "UART: send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
                 Hachiko_resume( & thiz->tx_seed );
@@ -598,7 +598,7 @@ continue_to_send:
                 thiz->tx_param.cursor = retval;
             } else {
                 // Unexpected. Exception
-                log_printf(ERR, "send error, TX AUTO ABORTED.");
+                log_printf(ERR, "UART: send error, TX AUTO ABORTED.");
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                 thiz->tx_param.payload_size = 0;
