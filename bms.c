@@ -159,7 +159,7 @@ static int can_packet_callback(
         break;
     case EVENT_TX_DONE:
         // 数据包发送完成了
-        log_printf(DBG_LV0, "packet sent.");
+        log_printf(DBG_LV0, "BMS: packet sent.");
         break;
     case EVENT_TX_PRE:
         // 决定是否要发送刚刚准备发送的数据包
@@ -357,12 +357,12 @@ int about_packet_reciev_done(struct charge_task *thiz,
         bit_set(thiz, ONTOM_F_BMS_RECONIZED);
         if ( thiz->charge_stage != CHARGE_STAGE_CONFIGURE ) {
             thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
-            log_printf(INF, "CHARGER change stage to CHARGE_STAGE_CONFIGURE");
+            log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CONFIGURE");
         }
         break;
     case PGN_BCP :// 0x000600, BMS 配置报文
         if ( param->buff_payload != 13 ) {
-            log_printf(WRN, "BCP packet size crash, need 13 gave %d",
+            log_printf(WRN, "BMS: BCP packet size crash, need 13 gave %d",
                        param->buff_payload);
             break;
         }
@@ -372,7 +372,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         if ( thiz->bms_config_info.spn2816_max_charge_volatage_single_battery /
                 100.0f > 24.0f ) {
             log_printf(WRN,
-                       "max_charge_volatage_single_battery out of rang(0-24)"
+                       "BMS: max_charge_volatage_single_battery out of rang(0-24)"
                        "gave %.2f V (SPN2816)",
              thiz->bms_config_info.spn2816_max_charge_volatage_single_battery /
                        100.0f);
@@ -381,14 +381,14 @@ int about_packet_reciev_done(struct charge_task *thiz,
 
         if ( thiz->bms_config_info.spn2817_max_charge_current / 10.0f >
              400.0f ) {
-            log_printf(WRN, "max_charge_current out of rang(-400-0)"
+            log_printf(WRN, "BMS: max_charge_current out of rang(-400-0)"
                        "gave %.1f V (SPN2816)",
                      thiz->bms_config_info.spn2817_max_charge_current / 10.0f);
             break;
         }
 
         if ( thiz->bms_config_info.spn2818_total_energy / 10.0f > 1000.0f ) {
-            log_printf(WRN, "total_energy out of rang(0-1000 KW.H)"
+            log_printf(WRN, "BMS: total_energy out of rang(0-1000 KW.H)"
                        "gave %.1f KW.H (SPN2818)",
                      thiz->bms_config_info.spn2818_total_energy / 10.0f);
             break;
@@ -396,13 +396,13 @@ int about_packet_reciev_done(struct charge_task *thiz,
 
         if ( thiz->bms_config_info.spn2819_max_charge_voltage / 10.0f >
                 750.0f ) {
-            log_printf(WRN, "max_charge_voltage out of rang(0-750 V)"
+            log_printf(WRN, "BMS: max_charge_voltage out of rang(0-750 V)"
                        "gave %.1f V (SPN2819)",
                      thiz->bms_config_info.spn2819_max_charge_voltage / 10.0f);
             break;
         }
 
-        log_printf(INF, "BCP done, BSVH: %d V, MAXi: %d A, "
+        log_printf(INF, "BMS: BCP done, BSVH: %d V, MAXi: %d A, "
                    "CAP: %d KW.H, M-V-C: %d V, M-T: %d C, CAP-statu: %d %%",
                    "V: %d V",
                    thiz->bms_config_info.spn2816_max_charge_volatage_single_battery,
@@ -421,22 +421,22 @@ int about_packet_reciev_done(struct charge_task *thiz,
                     "ready" : "<unkown status>");
         if ( thiz->charge_stage != CHARGE_STAGE_CHARGING ) {
             thiz->charge_stage = CHARGE_STAGE_CHARGING;
-            log_printf(INF, "CHARGER change stage to CHARGE_STAGE_CHARGING");
+            log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CHARGING");
         }
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
         memcpy(&thiz->bms_charge_need_now,
                param->buff.rx_buff, sizeof(struct pgn4096_BCL));
         if ( thiz->bms_charge_need_now.spn3072_need_voltage/10.0f > 750 ) {
-            log_printf(WRN, "spn3072 range 0-750V gave: %d V",
+            log_printf(WRN, "BMS: spn3072 range 0-750V gave: %d V",
                        thiz->bms_charge_need_now.spn3072_need_voltage);
         }
         if ( thiz->bms_charge_need_now.spn3073_need_current/10.0f > 400 ) {
-            log_printf(WRN, "spn3073 range -400-0A gave: %d A",
+            log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
                        thiz->bms_charge_need_now.spn3073_need_current);
         }
 
-        log_printf(INF, "PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
+        log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
                    thiz->bms_charge_need_now.spn3072_need_voltage/10.0,
                    thiz->bms_charge_need_now.spn3073_need_current,
                    thiz->bms_charge_need_now.spn3074_charge_mode ==
@@ -450,28 +450,28 @@ int about_packet_reciev_done(struct charge_task *thiz,
                sizeof(struct pgn4352_BCS));
         break;
     case PGN_BSM :// 0x001300, 动力蓄电池状态信息报文
-        log_printf(INF, "PGN_BSM fetched.");
+        log_printf(INF, "BMS: PGN_BSM fetched.");
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
-        log_printf(INF, "PGN_BMV fetched.");
+        log_printf(INF, "BMS: PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
-        log_printf(INF, "PGN_BMT fetched.");
+        log_printf(INF, "BMS: PGN_BMT fetched.");
         break;
     case PGN_BSP :// 0x001700, 动力蓄电池预留报文
-        log_printf(INF, "PGN_BSP fetched.");
+        log_printf(INF, "BMS: PGN_BSP fetched.");
         break;
     case PGN_BST :// 0x001900, BMS 中止充电报文
-        log_printf(INF, "PGN_BST fetched.");
+        log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
-        log_printf(INF, "PGN_BSD fetched.");
+        log_printf(INF, "BMS: PGN_BSD fetched.");
         break;
     case PGN_BEM :// 0x001E00, BMS 错误报文
-        log_printf(INF, "PGN_BEM fetched.");
+        log_printf(INF, "BMS: PGN_BEM fetched.");
         break;
     default:
-        log_printf(WRN, "un-recognized PGN %08X",
+        log_printf(WRN, "BMS: un-recognized PGN %08X",
                    param->can_id);
         break;
     }
@@ -593,7 +593,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             static unsigned int notimplement = 0;
             if ( notimplement % 10000 == 0 ) {
                 log_printf(INF,
-                           "Connection manage for send has not implemented.");
+                           "BMS: Connection manage for send has not implemented.");
             }
             notimplement ++;
         } else {
@@ -625,7 +625,7 @@ void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
     if ( evt == HACHIKO_TIMEOUT ) {
-        log_printf(WRN, "CAN data transfer terminal due to time out.");
+        log_printf(WRN, "BMS: CAN data transfer terminal due to time out.");
         task->can_bms_status = CAN_NORMAL;
     } else if ( evt == HACHIKO_DIE ) {
 
@@ -668,7 +668,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     addr.can_family = PF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
     bind(s, (struct sockaddr *)&addr, sizeof(addr));
-    log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
+    log_printf(INF, "BMS: %s running...s=%d", __FUNCTION__, s);
 
     param.buff.rx_buff = tp_buff;
     param.buff_size = sizeof(tp_buff);
@@ -699,7 +699,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         }
 
         debug_log(DBG_LV1,
-                   "get %dst packet %08X:%02X%02X%02X%02X%02X%02X%02X%02X",
+                   "BMS: get %dst packet %08X:%02X%02X%02X%02X%02X%02X%02X%02X",
                    dbg_packets,
                    frame.can_id,
                    frame.data[0],
@@ -730,7 +730,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              */
             if ( (task->can_bms_status & CAN_TP_RD) != CAN_TP_RD ) {
                 task->can_bms_status = CAN_NORMAL;
-                log_printf(WRN, "timing crashed.");
+                log_printf(WRN, "BMS: timing crashed.");
                 continue;
             }
             Hachiko_feed(&task->can_tp_bomb);
@@ -760,7 +760,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     /*
                      * 数据传输太快，还没将缓冲区的数据发送出去
                      */
-                    log_printf(WRN, "CAN data transfer too fast.");
+                    log_printf(WRN, "BMS: CAN data transfer too fast.");
                     continue;
                 }
                 /* request a connection. TP.CM_RTS
@@ -786,12 +786,12 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                  */
                 if ( tp_packets_size <= 8 ) {
                     log_printf(WRN,
-                         "detect a BMS transfer error, pack size < 8 bytes");
+                         "BMS: detect a BMS transfer error, pack size < 8 bytes");
                     continue;
                 }
                 if ( tp_packets_nr <= 1 ) {
                     log_printf(WRN,
-                               "detect a BMS transfer error, pack count < 2");
+                               "BMS: detect a BMS transfer error, pack count < 2");
                     continue;
                 }
 
