@@ -10,7 +10,7 @@
 #define _CHARGE_INCLUDED_H_
 
 struct charge_task;
-
+struct MDATA_ACK;
 #include "Hachiko.h"
 #include "bms.h"
 
@@ -266,6 +266,7 @@ struct charge_task {
     struct user_card card;
 
     // 扩展测量值
+    struct MDATA_ACK measure;
     struct charge_ex_measure *ex_measure;
     // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
     time_t pre_stamp_ex_measure;
@@ -317,17 +318,19 @@ struct charge_task {
  */
 typedef enum {
     // CAN 数据包发送标记, 当需要发送对应的PGN数据包时，该位被置1，发送完成后清零
-    ONTOM_F_TX_PGN256         = 0x0000,
-    ONTOM_F_TX_PGN1792,
-    ONTOM_F_TX_PGN2048,
-    ONTOM_F_TX_PGN2560,
-    ONTOM_F_TX_PGM4608,
-    ONTOM_F_TX_PGN6656,
-    ONTOM_F_TX_PGN7424,
-    ONTOM_F_TX_PGN7936,
+    F_TX_PGN256         = 0x0000,
+    F_TX_PGN1792,
+    F_TX_PGN2048,
+    F_TX_PGN2560,
+    F_TX_PGM4608,
+    F_TX_PGN6656,
+    F_TX_PGN7424,
+    F_TX_PGN7936,
+    // 扩展测量值刷新标记
+    F_MEASURE_DATA_NEW,
 
     // BMS 已经识别
-    ONTOM_F_BMS_RECONIZED,
+    F_BMS_RECONIZED,
 
     // 系统遥信量
     S_ERROR             = 0x0080,
@@ -480,6 +483,15 @@ struct MDATA_QRY {
     unsigned short crc;
 };
 #pragma pack()
+
+// 扩展测量数据刷新
+void deal_with_measure_data(struct charge_task *);
+// 后台控制逻辑处理
+void deal_with_master_contrl_logig(struct charge_task *);
+// BMS 控制逻辑处理
+void deal_with_BMS_logic(struct charge_task *);
+// 充电动作逻辑处理
+void deal_with_charge_logic(struct charge_task *);
 
 /* 遥信定义
  * 系统共计支持512个遥信量

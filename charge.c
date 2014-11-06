@@ -68,6 +68,42 @@ static inline void wait_for_triger_charge_task(struct charge_task *thiz)
     }
 }
 
+/*
+ * 扩展测量数据刷新
+ * 刷新数据，标记
+ */
+void deal_with_measure_data(struct charge_task *thiz)
+{
+
+}
+
+/*
+ * 后台控制逻辑处理
+ * 刷新数据，标记
+ */
+void deal_with_master_contrl_logig(struct charge_task *thiz)
+{
+
+}
+
+/*
+ * BMS 控制逻辑处理
+ * 刷新数据，标记，刷新下发数据、标记
+ */
+void deal_with_BMS_logic(struct charge_task *thiz)
+{
+
+}
+
+/*
+ * 充电动作逻辑处理
+ * 处理充电动作，设置标记，刷新数据
+ */
+void deal_with_charge_logic(struct charge_task *thiz)
+{
+
+}
+
 /* 充电任务服务线程
  * 充电状态的转换触发条件都由UI转发过来，这样做的目的是为了保证触发唯一和触发条件的同步。
  *
@@ -130,6 +166,15 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         case CHARGE_STAT_EXCEPTION:
             break;
         }
+
+        // 扩展测量数据刷新
+        deal_with_measure_data(task);
+        // 后台控制逻辑处理
+        deal_with_master_contrl_logig(task);
+        // BMS 控制逻辑处理
+        deal_with_BMS_logic(task);
+        // 充电动作逻辑处理
+        deal_with_charge_logic(task);
         usleep(5000);
     }
 
