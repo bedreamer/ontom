@@ -73,6 +73,128 @@ struct user_card {
     void *private;
 };
 
+#pragma pack(1)
+/*
+ * 综合采样盒通信数据定义
+ */
+struct MDATA_ACK {
+    // 数据包起始魔数
+    unsigned char magic[5];
+    // 地址
+    unsigned char addr;
+    // 载荷长度
+    unsigned char len;
+
+    // 母线电压
+    unsigned short V_mx;
+    // 电池电压
+    unsigned short V_bat;
+    // 电池电流
+    unsigned short I_bat;
+    // 温度
+    unsigned short temp;
+    // 湿度
+    unsigned short wet;
+    // 保留字
+    unsigned short resv[2];
+    // 采样盒软件版本号
+    unsigned char  version;
+
+    // 母线电压过高故障，0： 正常，1：过高
+    unsigned char yx_mx_V_high:1;
+    // 母线欠压故障，0: 正常，1：欠压
+    unsigned char yx_mx_V_low:1;
+    // 母线短路故障
+    unsigned char yx_mx_short_fault:1;
+    // 电池电压过高
+    unsigned char yx_bat_V_high:1;
+    // 电池电压过低
+    unsigned char yx_bat_V_low:1;
+    // 电池电流过高
+    unsigned char yx_bat_I_high:1;
+    // 电池链接短路
+    unsigned char yx_bat_short_fault:1;
+    // 电池绝缘故障
+    unsigned char yx_bat_institude_fault:1;
+
+    // 电池反接
+    unsigned char yx_bat_revers_conn:1;
+    // 辅助电源状态
+    unsigned char yx_assit_power_stat:1;
+    // 温度状态，0: 正常，1： 过高
+    unsigned char yx_temprature:1;
+    // 湿度状态，0： 正常，1：过湿
+    unsigned char yx_wet_rate:1;
+    // 交流输入状态，0： 无故障，1： 输入故障
+    unsigned char yx_ac_input:1;
+    // 防雷器故障，0：无故障，1：防雷器故障
+    unsigned char yx_flq:1;
+    // 总输出熔断器故障，0：无故障，1：熔断
+    unsigned char yx_rdq:1;
+    // 一路输出熔断器状态，0： 无故障，1：熔断
+    unsigned char yx_rdq_1:1;
+
+    // 二路输出熔断器状态，0：无故障，1：熔断
+    unsigned char yx_rdq_2:1;
+    unsigned char yx_prtc3_rsv:7;
+
+    unsigned char yx_prtc4_rsv;
+
+    // 交流输入合闸状态，0：分闸，1：合闸
+    unsigned char yx_ac_hezha:1;
+    // 直流输入总开关合闸，0：分闸，1：合闸
+    unsigned char yx_dc_output_hz:1;
+    // 加热状态，0：未加热，1：加热
+    unsigned char yx_heater_stat:1;
+    // 风扇状态，0：未启动，1：启动
+    unsigned char yx_fan_stat:1;
+    // 1#充电枪连接状态，0：未连接，1：链接
+    unsigned char yx_gun_1_conn_stat:1;
+    // 1#充电枪输出合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_1_hezha_stat:1;
+    // 1#充电枪辅助电源合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_1_assit_power_hezha:1;
+    // 2#充电枪连接状态，0：未连接，1：链接
+    unsigned char yx_gun_2_conn_stat:1;
+
+    // 2#充电枪输出合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_2_hezha_stat:1;
+    // 2#充电枪辅助电源合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_2_assit_power_hezha:1;
+    unsigned char yx_run2_rsv:6;
+
+    unsigned char yx_run3_rsv;
+
+    unsigned short crc;
+};
+
+// 下发数据包
+struct MDATA_QRY {
+    // 数据包起始魔数
+    unsigned char magic[5];
+    // 地址
+    unsigned char addr;
+    // 载荷长度
+    unsigned char len;
+
+    // 直流总开关输出闭合，0：断开，1：闭合
+    unsigned char dc_output_hezha:1;
+    // 1#充电枪辅助电源上电，0：断电，1：上电
+    unsigned char gun_1_assit_power_on:1;
+    // 1#充电枪输出开关合闸，0：分闸，1：合闸
+    unsigned char gun_1_output_hezha:1;
+    // 2#充电枪辅助电源上电，0：断电，1：上电
+    unsigned char gun_2_assit_power_on:1;
+    // 2#充电枪输出开关合闸，0：分闸，1：合闸
+    unsigned char gun_2_output_hezha:1;
+    unsigned char cmd_rsv:3;
+
+    unsigned char rsvs[15];
+
+    unsigned short crc;
+};
+#pragma pack()
+
 // 充电扩展测量结果
 struct charge_ex_measure {
     // 数据更新时间戳, 每更新一次，时间戳也随之更新
@@ -361,128 +483,6 @@ void charge_task_destroy(struct charge_task *thiz);
 // 重置充电任务
 void charge_task_reset(struct charge_task *thiz);
 extern struct charge_task *task;
-
-#pragma pack(1)
-/*
- * 综合采样盒通信数据定义
- */
-struct MDATA_ACK {
-    // 数据包起始魔数
-    unsigned char magic[5];
-    // 地址
-    unsigned char addr;
-    // 载荷长度
-    unsigned char len;
-
-    // 母线电压
-    unsigned short V_mx;
-    // 电池电压
-    unsigned short V_bat;
-    // 电池电流
-    unsigned short I_bat;
-    // 温度
-    unsigned short temp;
-    // 湿度
-    unsigned short wet;
-    // 保留字
-    unsigned short resv[2];
-    // 采样盒软件版本号
-    unsigned char  version;
-
-    // 母线电压过高故障，0： 正常，1：过高
-    unsigned char yx_mx_V_high:1;
-    // 母线欠压故障，0: 正常，1：欠压
-    unsigned char yx_mx_V_low:1;
-    // 母线短路故障
-    unsigned char yx_mx_short_fault:1;
-    // 电池电压过高
-    unsigned char yx_bat_V_high:1;
-    // 电池电压过低
-    unsigned char yx_bat_V_low:1;
-    // 电池电流过高
-    unsigned char yx_bat_I_high:1;
-    // 电池链接短路
-    unsigned char yx_bat_short_fault:1;
-    // 电池绝缘故障
-    unsigned char yx_bat_institude_fault:1;
-
-    // 电池反接
-    unsigned char yx_bat_revers_conn:1;
-    // 辅助电源状态
-    unsigned char yx_assit_power_stat:1;
-    // 温度状态，0: 正常，1： 过高
-    unsigned char yx_temprature:1;
-    // 湿度状态，0： 正常，1：过湿
-    unsigned char yx_wet_rate:1;
-    // 交流输入状态，0： 无故障，1： 输入故障
-    unsigned char yx_ac_input:1;
-    // 防雷器故障，0：无故障，1：防雷器故障
-    unsigned char yx_flq:1;
-    // 总输出熔断器故障，0：无故障，1：熔断
-    unsigned char yx_rdq:1;
-    // 一路输出熔断器状态，0： 无故障，1：熔断
-    unsigned char yx_rdq_1:1;
-
-    // 二路输出熔断器状态，0：无故障，1：熔断
-    unsigned char yx_rdq_2:1;
-    unsigned char yx_prtc3_rsv:7;
-
-    unsigned char yx_prtc4_rsv;
-
-    // 交流输入合闸状态，0：分闸，1：合闸
-    unsigned char yx_ac_hezha:1;
-    // 直流输入总开关合闸，0：分闸，1：合闸
-    unsigned char yx_dc_output_hz:1;
-    // 加热状态，0：未加热，1：加热
-    unsigned char yx_heater_stat:1;
-    // 风扇状态，0：未启动，1：启动
-    unsigned char yx_fan_stat:1;
-    // 1#充电枪连接状态，0：未连接，1：链接
-    unsigned char yx_gun_1_conn_stat:1;
-    // 1#充电枪输出合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_1_hezha_stat:1;
-    // 1#充电枪辅助电源合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_1_assit_power_hezha:1;
-    // 2#充电枪连接状态，0：未连接，1：链接
-    unsigned char yx_gun_2_conn_stat:1;
-
-    // 2#充电枪输出合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_2_hezha_stat:1;
-    // 2#充电枪辅助电源合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_2_assit_power_hezha:1;
-    unsigned char yx_run2_rsv:6;
-
-    unsigned char yx_run3_rsv;
-
-    unsigned short crc;
-};
-
-// 下发数据包
-struct MDATA_QRY {
-    // 数据包起始魔数
-    unsigned char magic[5];
-    // 地址
-    unsigned char addr;
-    // 载荷长度
-    unsigned char len;
-
-    // 直流总开关输出闭合，0：断开，1：闭合
-    unsigned char dc_output_hezha:1;
-    // 1#充电枪辅助电源上电，0：断电，1：上电
-    unsigned char gun_1_assit_power_on:1;
-    // 1#充电枪输出开关合闸，0：分闸，1：合闸
-    unsigned char gun_1_output_hezha:1;
-    // 2#充电枪辅助电源上电，0：断电，1：上电
-    unsigned char gun_2_assit_power_on:1;
-    // 2#充电枪输出开关合闸，0：分闸，1：合闸
-    unsigned char gun_2_output_hezha:1;
-    unsigned char cmd_rsv:3;
-
-    unsigned char rsvs[15];
-
-    unsigned short crc;
-};
-#pragma pack()
 
 // 扩展测量数据刷新
 void deal_with_measure_data(struct charge_task *);
