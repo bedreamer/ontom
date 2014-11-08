@@ -322,7 +322,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         } else {
             log_printf(WRN,
                   "BMS not recognized due to invalid BMS VERSION(SPN2565).");
-            bit_clr(thiz, ONTOM_F_BMS_RECONIZED);
+            bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
 
