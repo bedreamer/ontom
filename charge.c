@@ -74,14 +74,16 @@ static inline void wait_for_triger_charge_task(struct charge_task *thiz)
  */
 void deal_with_measure_data(struct charge_task *thiz)
 {
-
+    if ( 0 == bit_read(thiz, F_MEASURE_DATA_NEW) ) {
+        return;
+    }
 }
 
 /*
  * 后台控制逻辑处理
  * 刷新数据，标记
  */
-void deal_with_master_contrl_logig(struct charge_task *thiz)
+void deal_with_master_contrl_logic(struct charge_task *thiz)
 {
 
 }
@@ -123,6 +125,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     //task = charge_task_create();
     task->charge_task_stat = CHARGE_STAT_INVALID;
     memset((char *)task->single, 0, sizeof(task->single));
+    memset((char *)&task->measure, 0, sizeof(task->measure));
 
     while ( ! *done ) {
         switch ( task->charge_task_stat) {
@@ -170,7 +173,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         // 扩展测量数据刷新
         deal_with_measure_data(task);
         // 后台控制逻辑处理
-        deal_with_master_contrl_logig(task);
+        deal_with_master_contrl_logic(task);
         // BMS 控制逻辑处理
         deal_with_BMS_logic(task);
         // 充电动作逻辑处理

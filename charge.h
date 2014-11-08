@@ -452,7 +452,18 @@ typedef enum {
     F_MEASURE_DATA_NEW,
 
     // BMS 已经识别
-    F_BMS_RECONIZED,
+    F_BMS_RECOGNIZED,
+    // 已经发送车辆已经识别数据包
+    F_VEHICLE_RECOGNIZED,
+    // 已经收到BMS准备充电报文
+    F_BMS_READY,
+    // 接收到电池充电总状态报文
+    F_PCK_BAT_STATUS,
+    // 接收到BMS终止充电报文
+    F_PCK_BMS_TRM,
+    // 接收电池充电总状态报文超时
+    F_PCK_BAT_STATUS_TIMEOUT,
+
 
     // 系统遥信量
     S_ERROR             = 0x0080,

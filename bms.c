@@ -354,7 +354,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         if ( ! bit_read(thiz, ONTOM_F_BMS_RECONIZED ) ) {
             // send recognized event from here.
         }
-        bit_set(thiz, ONTOM_F_BMS_RECONIZED);
+        bit_set(thiz, F_BMS_RECOGNIZED);
         if ( thiz->charge_stage != CHARGE_STAGE_CONFIGURE ) {
             thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
             log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CONFIGURE");
@@ -896,9 +896,12 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[0];
 
-    if ( bit_read(thiz, ONTOM_F_BMS_RECONIZED) )
+    if ( bit_read(thiz, F_BMS_RECOGNIZED) ) {
         param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
-    else param->buff.tx_buff[0] = BMS_RECOGNIZED;
+    } else {
+        param->buff.tx_buff[0] = BMS_RECOGNIZED;
+        bit_set(thiz, F_VEHICLE_RECOGNIZED);
+    }
 
     param->buff.tx_buff[1] = 0x01;
     strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
