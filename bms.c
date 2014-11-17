@@ -54,7 +54,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  0x00A000,
+    .pgn        =  0x00A00,
     .prioriy    =  4,
     .datalen    =  1,
     .period     =  250,
