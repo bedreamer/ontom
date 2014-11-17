@@ -908,7 +908,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
     strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
     param->buff.tx_buff[7] = 0xFF;
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id = gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -947,7 +947,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.tx_buff, &cts, sizeof(struct pgn1792_CTS));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -966,7 +966,7 @@ int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
     memcpy((void * __restrict__)param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -984,7 +984,7 @@ int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.tx_buff, &cro, sizeof(struct pgn2560_CRO));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -1004,7 +1004,7 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
     memcpy((void * __restrict__)param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
 
     param->buff_payload = gen->datalen;
-    param->can_id = gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->period << 26 | gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
