@@ -27,7 +27,7 @@
 struct can_pack_generator generator[] = {
     {
     .stage      =  CHARGE_STAGE_HANDSHACKING,
-    .pgn        =  0x000100,
+    .pgn        =  0x00010000,
     .prioriy    =  6,
     .datalen    =  8,
     .period     =  250,
@@ -36,7 +36,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  0x000700,
+    .pgn        =  0x00070000,
     .prioriy    =  6,
     .datalen    =  7,
     .period     =  500,
@@ -45,7 +45,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  0x000800,
+    .pgn        =  0x00080000,
     .prioriy    =  6,
     .datalen    =  6,
     .period     =  250,
@@ -54,7 +54,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  0x00A000,
+    .pgn        =  0x00A00000,
     .prioriy    =  4,
     .datalen    =  1,
     .period     =  250,
@@ -63,7 +63,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_CHARGING,
-    .pgn        =  0x001200,
+    .pgn        =  0x00120000,
     .prioriy    =  6,
     .datalen    =  6,
     .period     =  50,
@@ -72,7 +72,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_CHARGING,
-    .pgn        =  0x001A00,
+    .pgn        =  0x001A0000,
     .prioriy    =  4,
     .datalen    =  4,
     .period     =  10,
@@ -81,7 +81,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_DONE,
-    .pgn        =  0x001D00,
+    .pgn        =  0x001D0000,
     .prioriy    =  6,
     .datalen    =  5,
     .period     =  250,
@@ -90,7 +90,7 @@ struct can_pack_generator generator[] = {
     },
     {
     .stage      =  CHARGE_STAGE_ANY,
-    .pgn        =  0x001F00,
+    .pgn        =  0x001F0000,
     .prioriy    =  2,
     .datalen    =  4,
     .period     =  250,
