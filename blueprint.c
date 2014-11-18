@@ -22,8 +22,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
-#define	SERIAL4_CTRL_PIN	GPIO_TO_PIN(0, 19)
-#define	SERIAL5_CTRL_PIN	GPIO_TO_PIN(0, 20)
+#define	SERIAL4_CTRL_PIN	GPIO_TO_PIN(0, 20)
+#define	SERIAL5_CTRL_PIN	GPIO_TO_PIN(0, 19)
 
 #define	RX_LOW_LEVEL			0
 #define	TX_HIGH_LEVEL			1
