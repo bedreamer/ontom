@@ -291,7 +291,7 @@ static int can_packet_callback(
 int about_packet_reciev_done(struct charge_task *thiz,
                              struct event_struct *param)
 {
-    switch ( param->can_id ) {
+    switch ( param->can_id & 0x00FF00 ) {
     case PGN_CRM :// 0x000100,
         break;
     case PGN_CTS :// 0x000700,
