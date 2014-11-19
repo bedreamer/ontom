@@ -1,0 +1,393 @@
+﻿<html>
+<title>关于ontom</title>
+	<body><pre>
+=========
+ontom 是用来进行充电桩外设监视和控制的核心程序。
+
+<a name="top">索引</a>
+=========
+</pre>
+* <a href="#a1">系统设计原则</a><br>
+* <a href="#a2">刷卡三步确认原则</a><br>
+* <a href="#a3">设置认证流程</a><br>
+* <a href="#a4">内建http服务器的多种用途</a><br>
+* <a href="#a5">串口服务线程工作原理</a><br>
+* <a href="#a6">BMS 工作原理</a><br>
+* <a href="#a7">定时器的使用</a><br>
+* <a href="#a8">AJAX相关</a><br>
+* <a href="#a9">配置</a><br>
+* <a href="#a10">日志</a><br>
+* <a href="#a11">系统逻辑</a><br><pre>
+
+FAQ
+=========
+</pre><a name="a1">系统设计原则</a>：<a href="#top">目录</a><br><pre>
+    1. 以GNU编码风格为主。
+	例如：
+	if ( statment ) {
+	} else if ( statment ) {
+	} else {
+	}
+	结构体名、函数名、变量名除特定写法，全都是小写
+	枚举类型、宏定义，全都用大写
+    2. 以模块化设计原则为主。
+	AJAX模块，定时器模块，HTTP server模块，数据配置模块，日志模块，
+	BMS逻辑模块，串口通信模块等
+    3. 以事件驱动型逻辑为主。
+	BMS，串口通信均采用事件来驱动，包含数据发送的各类可能发生的情况，
+	子模块只需对事件做出响应即可。
+	例如串口：
+	switch ( evt ) {
+	case BP_EVT_INIT:
+	// 在这里错相关初始化动作即可
+	break;
+	....
+	case BP_EVT_TX_REQUEST:
+	// 在这里决定是否需要发送数据包，如有需要将数据送入缓冲区即可
+	break;
+	case BP_EVT_TX_DONE:
+	// 当收到完整的，经过验证有效的数据帧后会受到该事件，可以从缓冲区读出数据。
+	break;
+	...
+	}
+	BMS 事件可能更多一点，会牵涉到多数据包传送，超时等问题，但也都是事件驱动型
+	逻辑。
+</pre><a name="a2">刷卡三步确认原</a>则：<a href="#top">目录</a><br><pre>
+    1. 服务端(ontom)读出卡信息，确认卡号有效后放置于缓冲区。
+    2. 浏览器通过AJAX读取卡信息，确认刷卡有效后，给服务端(ontom)发送刷卡有效回复。
+    3. 服务端收到浏览器端的确认刷卡有效后，置刷卡状态为有效，完成刷卡。
+</pre><a name="a3">设置认证流程</a>：<a href="#top">目录</a><br><pre>
+    1. 浏览器端输入有效长度的密码，并完成椒盐加密，传输至服务端进行验证。
+    2. 服务端通过已知椒盐进行密码验证，返回验证结果。
+    3. 浏览器端通过返回结果确定跳转页面。
+</pre><a name="a4">内建http服务器的多种用途</a>:<a href="#top">目录</a><br><pre>
+    1. AJAX 支持。满足浏览器端和服务器端的时事通信。
+    2. 浏览器端调试接口。可通过浏览器端访问debug.html文件访问、修改当前程序配置数据。
+    3. 支持后期调试扩展。可讲日志输入至浏览器端，方便调试之用。
+</pre><a name="a5">串口服务线程工作原理</a>：<a href="#top">目录</a><br><pre>
+    1. 异步I/O。异步的串口读写方式使得读写功能模块放在一个线程实现成为可能，加上系统逻辑
+       按照事件驱动的方式实现，使得异步I/O从表面上看来原理简单，易于实现和功能的增删。
+    2. 工作模式。串口的工作模式由初始状态决定，若初始状态串口为BP_UART_MASTER，那么串口
+       是主机模式，若初始状态为BP_UART_SLAVE则标识串口为从机模式。和综合采样单元通信时
+       串口为主机模式，采用一问一答式的方式进行数据交换，和后台集中器通信时采用被动回答
+       方式当集中器向监控提出数据请求时，监控根据请求的数据内容返回相应的数据。
+    3. 数据帧格式。串口数据帧格式关乎通信是否完成的判定，当前程序逻辑兼容两种主要的帧格式
+       分别是：
+       格式1： 魔数 + 地址 + 长度 + 数据 + 校验
+       格式2： 地址 + 长度 + 数据 + 校验
+       格式1和格式2主要的区别在与帧头是否有魔数，根据格式1和格式2的特征，将帧格式数据结构
+       归为一类，假定帧都包含魔数，但格式2的魔数长度为0。另外判定真是否接受完成的重要数据
+       是帧数据长度，针对上述两种数据帧的格式特点，需要在数据结构中提供指出标识数据帧长度
+       的字段位置，因此设计了如下的数据结构：
+       // 串口事件参数
+       struct bp_evt_param {
+	   union _unamed {
+	       char *rx_buff;
+	       char *tx_buff;
+	   }buff;
+
+	   // 帧属性，仅在发送帧和接收到正确帧时有效
+	   BP_FRAME_ATTRIB attrib;
+	   // {{帧附加属性
+	   // 帧头魔数长度
+	   unsigned char magic_len;
+	   // 帧数据长度所谓位置索引
+	   unsigned char len_index;
+	   // }}
+
+	   // 缓冲区大小
+	   size_t buff_size;
+	   // 缓冲区载荷大小
+	   size_t payload_size;
+	   // 读写游标
+	   size_t cursor;
+       };
+       在串口I/O 过程中由模块自行设定帧附加属性值，这些值对于判定真是否有效、帧是否接收
+       完成有决定性意义。
+    4. 数据交互。在第一点中指出了，串口通信逻辑采用事件驱动，具体说明可以看第一部分-系统
+       设计原理第3点得例子。
+    5. 关于校验。为了满足灵活的校验方式变更，设计了一个帧校验事件，当检测到数据帧
+       长度接受完成后，会发送数据帧校验事件，在这里，不同的模块可以根据自己的需求确定采用
+       那种校验方式，只需要给系统返回一个校验是否成功的结果即可，系统根据返回结果确定
+       下一步是否应该发送BP_RX_DONE或是BP_RX_ERROR事件。
+</pre><a name="a6">BMS 工作原理</a>：<a href="#top">目录</a><br><pre>
+    1. BMS通过CAN总线进行通信，执行标准为GB/T 27930-2011, SAE J1939-21:2006
+    2. 为了满足多报数据传输的需求，特此设计了基于事件通知的逻辑结构，不同的数据包在完成传输
+       过程中，会发送不同的事件告知处理程序，以下是完整的CAN通信事件定义(bms.h中定义)：
+       /*
+	* 读到一个完整数据包后调用该函数
+	*/
+       typedef enum {
+	   // 无效事件，初始化完成前收到该消息
+	   EVENT_INVALID    = 0,
+
+	   /* 数据包接受完成。系统中存在两个和CAN接口相关的线程，一个
+	    * 是CAN数据读取线程，还有一个是CAN数据发送线程，这两个线程
+	    * 对CAN的操作都是同步的，因此，在读取数据包时读线程会被阻塞
+	    * 因此需要通过该事件来通知系统，已经完成了数据包的读取。
+	    */
+	   EVENT_RX_DONE    = 1,
+
+	   /* 数据包接收错误。在阻塞读取CAN数据包时，发生数据包读取错误，
+	    * 会收到该事件，表征数据包有问题，应该作相应处理。
+	    */
+	   EVENT_RX_ERROR   = 2,
+
+	   /* 数据包发送请求。系统中CAN数据的发送线程是同步的，可以通过
+	    * 该事件来提醒系统，目前可以进行数据包的发送，若系统有数据包发送
+	    * 则设定发送数据，交由发送县城进行发送，若没有数据要发送，则返回一个
+	    * 不需要发送的结果即可。
+	    */
+	   EVENT_TX_REQUEST = 3,
+
+	   /* 连接管理模式下的请求发送数据包，进行连接数据控制。
+	    */
+	   EVENT_TX_TP_RTS = 4,
+	   /* 连接管理模式下的准备发送数据包，进行连接数据控制。
+	    */
+	   EVENT_TX_TP_CTS = 5,
+	   /* 连接管理模式下的接收数据包完成应答，进行连接数据控制。
+	    */
+	   EVENT_TX_TP_ACK = 6,
+	   /* 连接管理模式下的传输中止，进行连接数据控制。
+	    */
+	   EVENT_TX_TP_ABRT= 7,
+
+	   /* 数据包准备发送。当EVENT_TX_REQUEST返回结果是需要发送时，经发送线程
+	    * 经发送线程确认后，将会受到该消息，表示发送线程已经准备发送该消息了，此时
+	    * 可以返回取消发送指令，实现数据包的取消发送。
+	    */
+	   EVENT_TX_PRE     = 8,
+
+	   /* 数据包发送完成。当确认后的数据包发送完成后，将会受到该消息，表征数据包
+	    * 已经正确的发送完成。
+	    */
+	   EVENT_TX_DONE    = 9,
+
+	   /* 数据包发送失败。当确认后的数据包发送失败后，将会受到改小。
+	    */
+	   EVENT_TX_FAILS   = 10,
+
+	   // CAN 消息函数初始化。当第一次运行函数时将会收到该消息，可重复发送。
+	   EVENT_CAN_INIT   = 11,
+
+	   // CAN 消息复位。再次执行初始化操作。
+	   EVENT_CAN_RESET  = 12
+       }EVENT_CAN;
+    3. 由于CAN数据包是自由发送，因此需要设计一个发送数据包的触发器引擎，该数据结构定义在
+       文件charge.h中，结构如下：
+       // 通信报文生成依据
+       struct can_pack_generator {
+	   // 所属阶段
+	   CHARGE_STAGE stage;
+	   // 生成PGN
+	   unsigned int pgn;
+	   // 数据包优先级
+	   unsigned int prioriy;
+	   // 数据包长度
+	   unsigned int datalen;
+	   // 数据包发送周期
+	   unsigned int period;
+	   // 心跳计数
+	   unsigned int heartbeat;
+	   // 数据包名称
+	   const char *mnemonic;
+       };
+       可以看到属性定义中包含所属阶段的属性，这是由于在不同的充电阶段，监控需要发送不同的
+       的数据包，通过这个属性就可以区分出来。
+
+</pre><a name="a7">定时器的使用</a>：<a href="#top">目录</a><br><pre>
+    1. 为了适应循环定时、单次定时的需求，定时器分为自动喂狗和一次性定时器。
+    2. 定时器的粒度为单次10ms，即每10ms由系统触发一次，然后由Hachiko实现定时器计数。
+    计时器有如下的数据结构：
+    struct Hachiko_food {
+	// 定时器事件回调
+	void (*Hachiko_notify_proc)(Hachiko_EVT evt, void *private,
+				    const struct Hachiko_food *self);
+	// 定时器类型
+	Hachiko_Type type;
+	// 定时器时长, 最小1ms的精度，根据设置而定，默认为10ms
+	unsigned int ttl;
+	// 定时器剩余时长
+	volatile unsigned int remain;
+	// 定时器状态
+	Hachiko_status status;
+	// 私有数据
+	void *private;
+    };
+    使用定时器需要注册一个事件回调函数，当定时器超时、或遇到其他的事件时会通过注册的回调
+    函数通知注册者。
+    3. 关于定时器状态优先级，定时器有4个有效状态：
+    typedef enum {
+	// 无效定时器, 初始状态
+	HACHIKO_INVALID   = 0x00,
+	// 正常使用
+	HACHIKO_NORMAL    = 0x01,
+	// 计时器暂停
+	HACHIKO_PAUSE     = 0x02,
+	// 计时器恢复
+	HACHIKO_RESUME    = 0x03,
+	// 计时器死亡，已经删除
+	HACHIKO_KILLED    = 0x04
+    }Hachiko_status;
+    按照其值从大到小排列，优先级依次降低，因为优先级高的需要更快的被响应，因此:
+    if ( pool[i]->status == HACHIKO_INVALID ) continue;
+    if ( pool[i]->status == HACHIKO_KILLED ) {
+	pool[i] = NULL;
+	refresh ++;
+	log_printf(DBG_LV3, "HACHIKO: watch dog killed.");
+	continue;
+    }
+    if ( pool[i]->status == HACHIKO_RESUME ) {
+	Hachiko_feed(pool[i]);
+	pool[i]->status = HACHIKO_NORMAL;
+	continue;
+    }
+    if ( pool[i]->status == HACHIKO_PAUSE ) {
+	Hachiko_feed(pool[i]);
+	continue;
+    }
+    上面代码摘自，定时器处理逻辑的有限判断顺序, 删除定时器优先级排在最高，因为此时定时器
+    已经被判为死亡，没有继续处理的需要了，然后是恢复定时器，定时器从暂定状态回到普通状态
+    和定时器从普通状态转变为暂停状态顺序可以更换。但需要注意的时，当状态发生改变后需要
+    重新进行喂狗操作。
+</pre><a name="a8">AJAX相关</a>：<a href="#top">目录</a><br><pre>
+    1. 在此鸣谢： mongoose 开发组。
+    2. 提供监控程序内部变量监视，修改，查询接口。
+    3. 修改了mongoose缓冲区大小，主要更改了缓冲区大小从原来的2K修改为8K，用来适应较大
+       的输出文件，例如调试文件/debug.html
+    4. HTTP返回头中添加了返回文件类型，这个属性是后来加上的，主要目的是为了适配xml文件
+       和html文件，也就是真正在用的AJAX请求文件和调试文件。通过ct属性进行设置，例如：
+       // 返回告警信息 alarm.xml
+       int ajax_alarm_xml_proc(struct ajax_xml_struct  *thiz)
+       {
+	   log_printf(DBG, "get into %s", __FUNCTION__);
+	   thiz->ct = "text/xml";
+	   return ERR_ERR;
+       }
+       // 生成动态设置页面
+       int ajax_debug_list(struct ajax_xml_struct *thiz)
+       {
+	   ....
+	   thiz->ct = "text/html";
+	   ....
+	   return ERR_OK;
+       }
+       使用灵活的属性设置，可以完成例如普通文件的传输等功能，使得可修改性更强。
+    5. 参数，目前参数都是用GET方式传递，也就是通过URL进行明文传送。关于URL中过的特殊字符
+       浏览器会自动进行编码后传递过来，因此需要使用moogoose提供的接口将参数解码后才能使用
+       下面是例子：
+       // 生成动态设置页面
+       int ajax_debug_list(struct ajax_xml_struct *thiz)
+       {
+	   struct config_struct *head = configs;
+	   int nr = 0, output_len = 0;
+	   char tag[128] = {0}, val[128] ={0}, de_val[128]={0};
+
+	   mg_get_var(thiz->xml_conn, "t", tag, 128);
+	   mg_get_var(thiz->xml_conn, "v", val, 128);
+
+	   if ( tag[0] && val[0] ) {
+	       mg_url_decode(val, 128, de_val, 128, 0);
+	       log_printf(DBG_LV1, "WEB SET %s: %s", tag, de_val);
+	       if ( de_val[0] ) {
+		   config_write(tag, val);
+	       }
+	   }
+	   ....
+	   return ERR_OK;
+       }
+       首先通过mg_get_var方法获取参数，此时参数如果经过编码的，则无法直接使用，此时使用
+       mg_url_decode方法将URL重新解码为原始数据再进行使用即可。
+</pre><a name="a9">配置</a>：<a href="#top">目录</a><br><pre>
+    1. 配置程序逻辑设计分为两层，系统配置层，用户配置层。用户层配置数据优先级最高，系统
+       配置层次之，系统配置文件固定为ontom.cfg处于程序运行的目录中，你可以在config.c
+       文件的的两个宏CONFIG_DOMAIN_BEGIN和CONFIG_DOMAIN_END之间添加配置数据，并指定
+       默认的数值，以便没有设置该值时使用。
+       CONFIG_DOMAIN_BEGIN
+       //数据名称           |数据类型|用户配置项？|nnn数据状态|数据默认值|   数据值
+       {"user_config_file", C_STRING,   no,     C_INVALID,.cuv.n=0, {"user.cfg"}},
+       CONFIG_DOMAIN_END
+       在ontom.cfg文件中包含可配置的所有非保留配置项，可通过user_config_file指定用户
+       配置文件名，用户配置文件同样也放在程序运行目录。
+    2. 第一点说明了用户配置优先级高于系统优先级，因此可以通过修改用户配置去设置系统。
+    3. 配置格式。关于配置格式可以参照ontom.cfg中相关例子和说明。
+    4. 配置接口。给程序中提供多种配置数据修改方案。第一种通过重叠配置文件实现一次性不可复原
+       的配置；第二种通过提供的onconfig工具进行配置，该工具可以在与监控同一网段内的任意IP
+       上进行操作，具体操作方法可以参考onconfig --help；第三种通过ontom提供的WEB端配置
+       接口，直接使用浏览器进行配置；目前来说后两种的修改只是临时修改，后期可以考虑将这个
+       功能改为永久修改。
+</pre><a name="a10">日志</a>：<a href="#top">目录</a><br><pre>
+    1. 多层运行日志输出模式。日至输出等级有 ERR, WRN，INF，DBG, DBG_LV0, DBG_LV1,
+       DBG_LV2, DBG_LV3。
+    2. 输出控制。其中ERR, WRN, INF，DBG，这四个等级的日志是各种时间段可见的。ERR： 程序
+       出现故障，例如参数错误，逻辑错误等导致程序无法继续运行下去的故障信息；WRN：程序出现
+       错误参数，但不至于程序无法继续运行，只是给出了相应的警告，程序还可按照既定的逻辑
+       运行；INF：程序运行过程称中关键的逻辑、状态转折点会给出相关提示信息，方便把握程序的
+       运行逻辑、位置；DBG：程序中重要的调试信息，出现异常时打印。
+       DBG_LV[0:3], 调试输出信息，可以通过配置选择是否输出调试信息。配置项为
+       debug_lvA, debug_lvB, debug_lvC, debug_lvD。
+</pre><a name="a11">系统逻辑</a>:<a href="#top">目录</a><br><pre>
+    在这里用伪代码形式将系统整体逻辑整理出来, 伪代码如下：
+    BEGIN:
+	try {
+	    系统初始化，读取配置文件，启动服务线程（BMS，UART，http，充电等）
+	} catch ( exceptions ) {
+	    提示出错信息，停止程序。
+	}
+	等待所有线程初始化完成；
+
+	并行：
+	    读读卡器；
+	    和采样盒通信；
+	    和充电机通信；
+	    和后台通信；
+	    和浏览器通信；
+	    充电枪连接后和BMS通信；
+	结束
+
+	if （ 读卡器读取失败 ）｛
+	    try ｛
+		尝试重新初始化；
+	    ｝catch （ failed ） ｛
+		提示出错信息，停止程序；
+	    ｝
+	 ｝
+
+	if （ 采样盒通信故障 ）｛
+	    提示出错信息，停止充电程序；
+	｝
+
+	if（ 充电机通信故障 ）｛
+	    提示出错信息，停止充电程序；
+	｝
+
+	if（ 浏览器通信中断 ）｛
+	    提示出错信息；
+	    try ｛
+		重启浏览器；
+	    ｝ catch （ 失败 ）{
+		提示出错信息，停止充电程序；
+	    }
+	｝
+
+	if （ 有绝缘故障 ）｛
+	    不能充电，提示故障；
+	｝else ｛
+	    if ( 充电枪未连接 ) {
+		不能充电；
+	    } else {
+		if（ 没有刷卡 ）｛
+		    不能充电；
+		｝else {
+		    if ( BMS 通信故障 ） ｛
+			不能充电
+		    ｝ else {
+			进入计费充电程序；
+		    }
+		}
+	    }
+	｝
+    END<br><pre>
+    </body>
+</html>
