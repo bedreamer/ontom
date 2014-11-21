@@ -32,8 +32,6 @@ struct can_pack_generator generator[] = {
     .datalen    =  8,
     .period     =  250,
     .heartbeat   =  0,
-    .silence    =  0,
-    .silence_tolerate = 250,
     .mnemonic   =  "CRM"
     },
     {
