@@ -596,55 +596,55 @@ int about_packet_reciev_done(struct charge_task *thiz,
         memcpy(&thiz->bms_battery_status, param->buff.rx_buff,
                sizeof(struct pgn4864_BSM));
         if ( SINGLE_BATTERY_VOLTAGE_HIGH ==
-             thiz->bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_HIGH){
+             (thiz->bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_HIGH)){
         }
         if (SINGLE_BATTERY_VOLTAGE_LOW ==
-             thiz->bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_LOW){
+             (thiz->bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_LOW)){
 
         }
 
         if (BATTERY_CHARGE_CURRENT_HIGH ==
-             thiz->bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_HIGH){
+             (thiz->bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_HIGH)){
 
         }
         if (BATTERY_CHARGE_CURRENT_LOW ==
-             thiz->bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_LOW){
+             (thiz->bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_LOW)){
 
         }
 
         if (BATTERY_TEMPRATURE_HIGH ==
-                thiz->bms_battery_status.remote_single&BATTERY_TEMPRATURE_HIGH){
+                (thiz->bms_battery_status.remote_single&BATTERY_TEMPRATURE_HIGH)){
 
         }
         if (BATTERY_TEMPRATURE_LOW ==
-                thiz->bms_battery_status.remote_single&BATTERY_TEMPRATURE_LOW) {
+                (thiz->bms_battery_status.remote_single&BATTERY_TEMPRATURE_LOW)) {
 
         }
 
         if (INSULATION_FAULT ==
-                thiz->bms_battery_status.remote_single&INSULATION_FAULT){
+                (thiz->bms_battery_status.remote_single&INSULATION_FAULT)){
 
         }
         if (INSULATION_UNRELIABLE==
-                thiz->bms_battery_status.remote_single&INSULATION_UNRELIABLE){
+                (thiz->bms_battery_status.remote_single&INSULATION_UNRELIABLE)){
 
         }
 
         if (CONNECTOR_STATUS_FAULT==
-                thiz->bms_battery_status.remote_single&CONNECTOR_STATUS_FAULT){
+                (thiz->bms_battery_status.remote_single&CONNECTOR_STATUS_FAULT)){
 
         }
         if (CONNECTOR_STATUS_UNRELIABLE==
-                thiz->bms_battery_status.remote_single&CONNECTOR_STATUS_UNRELIABLE){
+                (thiz->bms_battery_status.remote_single&CONNECTOR_STATUS_UNRELIABLE)){
 
         }
 
         if (CHARGE_ALLOWED==
-                thiz->bms_battery_status.remote_single&CHARGE_ALLOWED){
+                (thiz->bms_battery_status.remote_single&CHARGE_ALLOWED)){
 
         }
         if (CHARGE_FORBIDEN==
-                thiz->bms_battery_status.remote_single&CHARGE_FORBIDEN){
+                (thiz->bms_battery_status.remote_single&CHARGE_FORBIDEN)){
 
         }
         break;
