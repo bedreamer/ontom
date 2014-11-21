@@ -277,8 +277,8 @@ static int can_packet_callback(
         thiz->can_heart_beat.Hachiko_notify_proc=
                 Hachiko_packet_heart_beart_notify_proc;
         Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 1, NULL);
-        //thiz->charge_stage = CHARGE_STAGE_HANDSHACKING;
-        thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
+        thiz->charge_stage = CHARGE_STAGE_HANDSHACKING;
+        //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
