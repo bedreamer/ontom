@@ -104,7 +104,7 @@ struct bms_statistics statistics[] = {
     {
     .can_pgn = PGN_CRM,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
@@ -116,19 +116,19 @@ struct bms_statistics statistics[] = {
     {
     .can_pgn = PGN_BCP,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 500,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_CTS,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_CML,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
@@ -140,13 +140,13 @@ struct bms_statistics statistics[] = {
     {
     .can_pgn = PGN_CRO,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_BCL,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 50,
     .can_counter = 0
     },
     {
@@ -158,7 +158,7 @@ struct bms_statistics statistics[] = {
     {
     .can_pgn = PGN_CCS,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
@@ -170,31 +170,31 @@ struct bms_statistics statistics[] = {
     {
     .can_pgn = PGN_BMV,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 1000,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_BMT,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 1000,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_BSP,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 1000,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_BST,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 10,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_CST,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
@@ -206,19 +206,19 @@ struct bms_statistics statistics[] = {
     {
     .can_pgn = PGN_CSD,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_BEM,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     },
     {
     .can_pgn = PGN_CEM,
     .can_silence = 0,
-    .can_tolerate_silence = 250,
+    .can_tolerate_silence = 0,
     .can_counter = 0
     }
 };
@@ -230,6 +230,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
     if (evt == HACHIKO_TIMEOUT ) {
         int i = 0;
         struct can_pack_generator *thiz;
+        struct bms_statistics *me;
         for ( i = 0;
               (unsigned int)i < sizeof(generator) / sizeof(struct can_pack_generator); i++ ) {
             thiz = &generator[i];
@@ -242,6 +243,19 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
             } else {
                 thiz->heartbeat = 0;
             }
+        }
+
+        /*
+         * 为了能够侦探到接受数据包的超时事件，需要在这里进行一个计数操作
+         * 当can_silence 计数大于等于 can_tolerate_silence 时认为对应数据包接收超时，需要在BMS逻辑主线程
+         * 中做相应处理.
+         *
+         * BEM和CEM不在超时统计范围内
+         */
+        for ( i = 0;
+              (unsigned int)i < (sizeof(statistics) / sizeof(struct bms_statistics) ) - 2; i++ ) {
+            me = &statistics[i];
+            me->can_silence ++;
         }
     }
 }
@@ -1103,7 +1117,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
     strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
     param->buff.tx_buff[7] = 0xFF;
     param->buff_payload = gen->datalen;
-    param->can_id = gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id = gen->prioriy << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -1142,7 +1156,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.tx_buff, &cts, sizeof(struct pgn1792_CTS));
 
     param->buff_payload = gen->datalen;
-    param->can_id =  gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->prioriy << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -1161,7 +1175,7 @@ int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
     memcpy((void * __restrict__)param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
 
     param->buff_payload = gen->datalen;
-    param->can_id =  gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->prioriy << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -1179,7 +1193,7 @@ int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
     memcpy(param->buff.tx_buff, &cro, sizeof(struct pgn2560_CRO));
 
     param->buff_payload = gen->datalen;
-    param->can_id =  gen->period << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->prioriy << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
@@ -1199,7 +1213,7 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
     memcpy((void * __restrict__)param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
 
     param->buff_payload = gen->datalen;
-    param->can_id =  gen->period << 26 | gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->prioriy << 26 | gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
