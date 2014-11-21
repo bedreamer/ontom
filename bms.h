@@ -461,6 +461,18 @@ struct event_struct {
     unsigned int buff_payload;
 };
 
+// BMS通信统计技术结构
+struct bms_statistics {
+    // 数据包PGN
+    CAN_PGN can_pgn;
+    // 数据包静默时间，只针对接受数据包有效
+    unsigned int can_silence;
+    // 接受数据包容忍的沉默时常，针对接收数据有效
+    unsigned int can_tolerate_silence;
+    // 计数器，接收或发送的次数
+    unsigned int can_counter;
+};
+
 int about_packet_reciev_done(struct charge_task *thiz,
                              struct event_struct *param);
 int gen_packet_PGN256(struct charge_task * thiz,

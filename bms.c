@@ -32,6 +32,8 @@ struct can_pack_generator generator[] = {
     .datalen    =  8,
     .period     =  250,
     .heartbeat   =  0,
+    .silence    =  0,
+    .silence_tolerate = 250,
     .mnemonic   =  "CRM"
     },
     {
@@ -99,6 +101,130 @@ struct can_pack_generator generator[] = {
     }
 };
 
+// CAN 数据包统计结构
+struct bms_statistics statistics[] = {
+    {
+    .can_pgn = PGN_CRM,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BRM,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BCP,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_CTS,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_CML,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BRO,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_CRO,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BCL,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BCS,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_CCS,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BSM,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BMV,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BMT,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BSP,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BST,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_CST,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BSD,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_CSD,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_BEM,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    },
+    {
+    .can_pgn = PGN_CEM,
+    .can_silence = 0,
+    .can_tolerate_silence = 250,
+    .can_counter = 0
+    }
+};
+
 // 数据包超时心跳包, 定时器自动复位, 10ms(一个单位时间)一次
 void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
@@ -144,6 +270,7 @@ static int can_packet_callback(
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
+        // 当发生通信中断时会收到该事件
         break;
     case EVENT_INVALID:
         // 无效事件，事件填充
@@ -449,9 +576,79 @@ int about_packet_reciev_done(struct charge_task *thiz,
         log_printf(INF, "PGN_BCS fetched.");
         memcpy(&thiz->bms_all_battery_status, param->buff.rx_buff,
                sizeof(struct pgn4352_BCS));
+        if (thiz->bms_all_battery_status.spn3075_charge_voltage/10.0 > 750.0f) {
+            log_printf(WRN, "BMS: spn3075 range 0-750 gave: %.1f V",
+                     thiz->bms_all_battery_status.spn3075_charge_voltage/10.0);
+        }
+        if (thiz->bms_all_battery_status.spn3076_charge_current/10.0 > 400.0f) {
+            log_printf(WRN, "BMS: spn3076 range -400-0 gave: %.1f V",
+                   -(thiz->bms_all_battery_status.spn3076_charge_current/10.0));
+        }
+        if (thiz->bms_all_battery_status.spn3077_max_v_g_number/100.0 > 24.0 ) {
+            log_printf(WRN, "BMS: spn3077 range 0-24 gave: %.1f V",
+                   -(thiz->bms_all_battery_status.spn3077_max_v_g_number/100.0));
+        }
+        if (thiz->bms_all_battery_status.spn3078_soc > 100 ) {
+            log_printf(WRN, "BMS: spn3078 range 0%%-100%% gave: %d%%",
+                   -(thiz->bms_all_battery_status.spn3078_soc));
+        }
         break;
     case PGN_BSM :// 0x001300, 动力蓄电池状态信息报文
         log_printf(INF, "BMS: PGN_BSM fetched.");
+        memcpy(&thiz->bms_battery_status, param->buff.rx_buff,
+               sizeof(struct pgn4864_BSM));
+        if ( SINGLE_BATTERY_VOLTAGE_HIGH ==
+             thiz->bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_HIGH){
+        }
+        if (SINGLE_BATTERY_VOLTAGE_LOW ==
+             thiz->bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_LOW){
+
+        }
+
+        if (BATTERY_CHARGE_CURRENT_HIGH ==
+             thiz->bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_HIGH){
+
+        }
+        if (BATTERY_CHARGE_CURRENT_LOW ==
+             thiz->bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_LOW){
+
+        }
+
+        if (BATTERY_TEMPRATURE_HIGH ==
+                thiz->bms_battery_status.remote_single&BATTERY_TEMPRATURE_HIGH){
+
+        }
+        if (BATTERY_TEMPRATURE_LOW ==
+                thiz->bms_battery_status.remote_single&BATTERY_TEMPRATURE_LOW) {
+
+        }
+
+        if (INSULATION_FAULT ==
+                thiz->bms_battery_status.remote_single&INSULATION_FAULT){
+
+        }
+        if (INSULATION_UNRELIABLE==
+                thiz->bms_battery_status.remote_single&INSULATION_UNRELIABLE){
+
+        }
+
+        if (CONNECTOR_STATUS_FAULT==
+                thiz->bms_battery_status.remote_single&CONNECTOR_STATUS_FAULT){
+
+        }
+        if (CONNECTOR_STATUS_UNRELIABLE==
+                thiz->bms_battery_status.remote_single&CONNECTOR_STATUS_UNRELIABLE){
+
+        }
+
+        if (CHARGE_ALLOWED==
+                thiz->bms_battery_status.remote_single&CHARGE_ALLOWED){
+
+        }
+        if (CHARGE_FORBIDEN==
+                thiz->bms_battery_status.remote_single&CHARGE_FORBIDEN){
+
+        }
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
         log_printf(INF, "BMS: PGN_BMV fetched.");

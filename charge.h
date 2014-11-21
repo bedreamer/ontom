@@ -432,7 +432,7 @@ struct charge_task {
     // BMS 电池充电总状态信息
     struct pgn4352_BCS bms_all_battery_status;
     // BMS 动力蓄电池状态信息
-    //struct pgn4864_BSM bms_battery_status;
+    struct pgn4864_BSM bms_battery_status;
 };
 
 /* 系统信号定义
