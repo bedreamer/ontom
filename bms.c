@@ -236,7 +236,8 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
             thiz = &generator[i];
             if ( thiz->stage == task->charge_stage ) {
                 if ( thiz->heartbeat < thiz->period ) {
-                    thiz->heartbeat += 10;
+                    //thiz->heartbeat += 10;
+                    thiz->heartbeat += 1;
                 } else {
                     thiz->heartbeat = thiz->period;
                 }
