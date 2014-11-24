@@ -310,6 +310,35 @@ static int can_packet_callback(
         /*
          * 在这里进行CAN数据包的发送处理
          * 进行数据包发送的条件是：充电枪物理连接正常，进入车辆识别过程，或充电过程。
+         *
+         * 数据包的发送，优先级最高的是错误报文输出，若是遇到周期性发送的数据包在发送
+         * 时序上有重叠的问题，那么在这里的处理方式是，先到先处理，例如在若干个循环内
+         * 数据包A，B的发送周期是10ms, 30ms，那么A，B的发送时时序应该是如下方式
+         * T (ms)      数据包
+         * |             |
+         * 0             A
+         * 0  + $$       B
+         * |             |
+         * |             |
+         * 10            A
+         * |             |
+         * |             |
+         * 20            A
+         * |             |
+         * |             |
+         * 30            A
+         * 30 + $$       B
+         * |             |
+         * |             |
+         * ...          ...
+         *
+         * $$ 表示最小的循环控制周期，一般来说是绝对小于数据包的发送周期的
+         * 所以会有如下的控制逻辑结构
+         * if ( ... ) {
+         * } else if ( ... ) {
+         * } else if ( ... ) {
+         * } else ;
+         * 在若干个循环控制周期内，数据包都能按照既定的周期发送完成.
          */
         switch ( thiz->charge_stage ) {
         case CHARGE_STAGE_INVALID:
@@ -1107,7 +1136,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[0];
 
-    if ( bit_read(thiz, F_BMS_RECOGNIZED) ) {
+    if ( 0 == bit_read(thiz, F_BMS_RECOGNIZED) ) {
         param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
     } else {
         param->buff.tx_buff[0] = BMS_RECOGNIZED;
