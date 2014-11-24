@@ -302,7 +302,8 @@ static int can_packet_callback(
         // 数据包发送完成了
         log_printf(DBG_LV0, "BMS: packet sent. %08X", param->can_id);
         if ( thiz->charge_stage == CHARGE_STAGE_HANDSHACKING &&
-             bit_read(thiz, F_BMS_RECOGNIZED ) ) {
+             bit_read(thiz, F_BMS_RECOGNIZED ) &&
+             bit_read(thiz, F_VEHICLE_RECOGNIZED )) {
             thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
             log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CONFIGURE");
         }
