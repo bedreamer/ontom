@@ -301,6 +301,11 @@ static int can_packet_callback(
     case EVENT_TX_DONE:
         // 数据包发送完成了
         log_printf(DBG_LV0, "BMS: packet sent. %08X", param->can_id);
+        if ( thiz->charge_stage != CHARGE_STAGE_HANDSHACKING &&
+             bit_read(thiz, F_BMS_RECOGNIZED ) ) {
+            thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
+            log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CONFIGURE");
+        }
         break;
     case EVENT_TX_PRE:
         // 决定是否要发送刚刚准备发送的数据包
@@ -525,10 +530,6 @@ int about_packet_reciev_done(struct charge_task *thiz,
             // send recognized event from here.
         }
         bit_set(thiz, F_BMS_RECOGNIZED);
-        if ( thiz->charge_stage != CHARGE_STAGE_CONFIGURE ) {
-            thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
-            log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CONFIGURE");
-        }
         break;
     case PGN_BCP :// 0x000600, BMS 配置报文
         if ( param->buff_payload != 13 ) {
