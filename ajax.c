@@ -122,7 +122,7 @@ static inline int xml_gen_system_error(char *buff)
     static int magic = 0;
     char errbuff[2048];
 #define MAX_ERR  16
-
+#if 0
     if ( magic++ % 3 == 0 ) {
         return sprintf(buff,
                        "<error>\r\n"
@@ -147,7 +147,7 @@ static inline int xml_gen_system_error(char *buff)
                        "</error>\r\n"
                        );
     } else return 0;
-
+#endif
 
     // 优先级较高的故障必须放置在前面进行判断
     // 绝缘故障
