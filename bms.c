@@ -306,7 +306,7 @@ static int can_packet_callback(
              bit_read(thiz, F_VEHICLE_RECOGNIZED ) &&
              thiz->charge_stage == CHARGE_STAGE_HANDSHACKING) {
             thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
-            log_printf(INF, "BMS: CHARGER change stage to "GRN("CHARGE_STAGE_CONFIGURE"));
+            log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CONFIGURE"));
         }
         if ( (param->can_id & 0x00FF0000) == (PGN_CRO << 8) &&
              bit_read(thiz, F_CHARGER_READY) &&
@@ -314,7 +314,7 @@ static int can_packet_callback(
              thiz->charge_stage == CHARGE_STAGE_CONFIGURE ) {
             thiz->charge_stage = CHARGE_STAGE_CHARGING;
             log_printf(INF,
-              "BMS: CHARGER change stage to "GRN("CHARGE_STAGE_CHARGING"));
+              "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CHARGING"));
         }
         break;
     case EVENT_TX_PRE:
