@@ -603,7 +603,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         if ( param->buff.rx_buff[0] == 0x00 ) {
             bit_clr(thiz, F_BMS_READY);
             bit_clr(thiz, F_CHARGER_READY);
-        } else if ( param->buff.rx_buff[0] = 0xAA ) {
+        } else if ( param->buff.rx_buff[0] == 0xAA ) {
             bit_set(thiz, F_BMS_READY);
             bit_set(thiz, F_CHARGER_READY);
         } else {
