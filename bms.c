@@ -301,11 +301,20 @@ static int can_packet_callback(
     case EVENT_TX_DONE:
         // 数据包发送完成了
         log_printf(DBG_LV0, "BMS: packet sent. %08X", param->can_id);
-        if ( thiz->charge_stage == CHARGE_STAGE_HANDSHACKING &&
+        if ( (param->can_id & 0x00FF0000) == PGN_CRM &&
              bit_read(thiz, F_BMS_RECOGNIZED ) &&
-             bit_read(thiz, F_VEHICLE_RECOGNIZED )) {
+             bit_read(thiz, F_VEHICLE_RECOGNIZED ) &&
+             thiz->charge_stage == CHARGE_STAGE_HANDSHACKING) {
             thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
             log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CONFIGURE");
+        }
+        if ( (param->can_id & 0x00FF0000) == PGN_CRO &&
+             bit_read(thiz, F_CHARGER_READY) &&
+             bit_read(thiz, F_BMS_READY ) &&
+             thiz->charge_stage == CHARGE_STAGE_CONFIGURE ) {
+            thiz->charge_stage = CHARGE_STAGE_CHARGING;
+            log_printf(INF,
+              "BMS: CHARGER change stage to CHARGE_STAGE_CHARGING");
         }
         break;
     case EVENT_TX_PRE:
@@ -591,9 +600,14 @@ int about_packet_reciev_done(struct charge_task *thiz,
                     "not ready" :
                     param->buff.rx_buff[0] == 0xAA ?
                     "ready" : "<unkown status>");
-        if ( thiz->charge_stage != CHARGE_STAGE_CHARGING ) {
-            thiz->charge_stage = CHARGE_STAGE_CHARGING;
-            log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CHARGING");
+        if ( param->buff.rx_buff[0] == 0x00 ) {
+            bit_clr(thiz, F_BMS_READY);
+            bit_clr(thiz, F_CHARGER_READY);
+        } else if ( param->buff.rx_buff[0] = 0xAA ) {
+            bit_set(thiz, F_BMS_READY);
+            bit_set(thiz, F_CHARGER_READY);
+        } else {
+            log_printf(WRN, "BMS: wrong can package data.")
         }
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
@@ -1182,7 +1196,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
     cts.spn2823_bcd_year_h = (((p->tm_year / 100 ) & 0x0F ) << 4) |
             ((p->tm_year % 100) & 0x0F);
     cts.spn2823_bcd_year_l = (((p->tm_year / 10 ) & 0x0F ) << 4) |
-            ((p->tm_year % 10) & 0x0F);;
+            ((p->tm_year % 10) & 0x0F);
 
     memset(param->buff.tx_buff, 0xFF, 8);
     memcpy(param->buff.tx_buff, &cts, sizeof(struct pgn1792_CTS));
