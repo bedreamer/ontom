@@ -607,7 +607,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
             bit_set(thiz, F_BMS_READY);
             bit_set(thiz, F_CHARGER_READY);
         } else {
-            log_printf(WRN, "BMS: wrong can package data.")
+            log_printf(WRN, "BMS: wrong can package data.");
         }
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
