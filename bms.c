@@ -1259,7 +1259,7 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
     memcpy((void * __restrict__)param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
 
     param->buff_payload = gen->datalen;
-    param->can_id =  gen->prioriy << 26 | gen->pgn | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+    param->can_id =  gen->prioriy << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
     return 0;
