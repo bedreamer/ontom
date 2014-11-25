@@ -301,14 +301,14 @@ static int can_packet_callback(
     case EVENT_TX_DONE:
         // 数据包发送完成了
         log_printf(DBG_LV0, "BMS: packet sent. %08X", param->can_id);
-        if ( (param->can_id & 0x00FF0000) == PGN_CRM &&
+        if ( (param->can_id & 0x00FF0000) == (PGN_CRM << 8) &&
              bit_read(thiz, F_BMS_RECOGNIZED ) &&
              bit_read(thiz, F_VEHICLE_RECOGNIZED ) &&
              thiz->charge_stage == CHARGE_STAGE_HANDSHACKING) {
             thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
             log_printf(INF, "BMS: CHARGER change stage to CHARGE_STAGE_CONFIGURE");
         }
-        if ( (param->can_id & 0x00FF0000) == PGN_CRO &&
+        if ( (param->can_id & 0x00FF0000) == (PGN_CRO << 8) &&
              bit_read(thiz, F_CHARGER_READY) &&
              bit_read(thiz, F_BMS_READY ) &&
              thiz->charge_stage == CHARGE_STAGE_CONFIGURE ) {
