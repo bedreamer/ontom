@@ -1166,6 +1166,9 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
     param->can_id = gen->prioriy << 26 | gen->pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
     param->evt_param = EVT_RET_OK;
+
+    statistics[I_BRM].can_counter ++;
+
     return 0;
 }
 
