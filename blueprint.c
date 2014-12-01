@@ -461,6 +461,8 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 帧校验失败
     case BP_EVT_FRAME_CHECK_ERROR:
         break;
+    default:
+        break;
     }
     return ret;
 }
@@ -497,6 +499,8 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 帧校验失败
     case BP_EVT_FRAME_CHECK_ERROR:
         break;
+    default:
+        break;
     }
     return ret;
 }
@@ -532,6 +536,8 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 帧校验失败
     case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
         break;
     }
     return ret;
