@@ -184,7 +184,7 @@ struct bp_uart {
     char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
 
     // 使用者信息
-    struct bp_user **users;
+    struct bp_user *users;
     // 当前使用者
     struct bp_user *master;
 };
