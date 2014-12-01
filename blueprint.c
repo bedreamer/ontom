@@ -24,7 +24,7 @@ struct bp_uart uarts[2];
 struct bp_user *down_user[] = {
     {50, NULL}, // 采样盒
     {50, NULL}, // 充电机
-    NULL
+    {0,  NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user *up_user[] = {
@@ -258,7 +258,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.buff_size = sizeof(self->rx_buff);
 
         self->users = down_user;
-        self->master = self->users[0];
+        self->master = &self->users[0];
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      160, HACHIKO_PAUSE, (void*)self);
