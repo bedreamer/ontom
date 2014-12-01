@@ -18,16 +18,23 @@
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
+static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
 // 共计两个串口
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user *down_user[] = {
-    {50, NULL}, // 采样盒
-    {50, NULL}, // 充电机
+    {50, uart4_simple_box_evt_handle}, // 充电机
+    {50, uart4_charger_evt_handle},    // 采样盒
     {0,  NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user *up_user[] = {
+    {50, uart5_background_evt_handle},    // 采样盒
     NULL
 };
 
@@ -215,9 +222,9 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
                    thiz->rx_param.buff.rx_buff[1]+4,
                     thiz->rx_param.payload_size);
         if ( thiz->rx_param.payload_size == 0 ) {
-            uart4_bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
+            thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
         } else {
-            uart4_bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
+            thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
         }
         Hachiko_pause(&thiz->rx_seed);
         thiz->status = BP_UART_STAT_WR;
@@ -245,7 +252,10 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret;
+    int ret = ERR_OK;
+    int i;
+    struct bp_user *u;
+
     switch ( evt ) {
     // 串口数据结构初始化
     case BP_EVT_INIT:
@@ -320,6 +330,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
+        if ( self->master && self->master->user_evt_handle ) {
+            ret = self->master->user_evt_handle(self, BP_EVT_RX_DATA, param);
+        }
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
@@ -332,11 +345,38 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
          * 的重叠问题，所以采用了魔数方式填充数据帧头，魔数长度不定，因此需要在数据帧定义
          * 的数据结构中加上帧头的魔数长度描述
          */
+        if ( self->master && self->master->user_evt_handle ) {
+            ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME, param);
+        }
         break;
 
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         if ( param->payload_size ) return ERR_ERR;
+
+        u = self->users;
+        for ( ; u->user_evt_handle; u ++ ) {
+            if ( u->seed < u->frame_freq ) {
+                u->seed ++;
+            }
+        }
+
+        for ( ; u->user_evt_handle; u ++ ) {
+            if ( u->seed >= u->frame_freq ) {
+                self->master = u;
+                /*
+                 * 需要在私有事件处理过程中进行事件处理，数据填充
+                 * 数据填充格式按照下面的步骤进行：
+                 * param->attrib = BP_FRAME_UNSTABLE;
+                 *    ......
+                 * memcpy(param->buff.tx_buff, &qry, sizeof(qry));
+                 * param->payload_size = sizeof(qry);
+                 */
+                ret = u->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
+                break;
+            }
+        }
+#if 0
         param->attrib = BP_FRAME_UNSTABLE;
         struct MDATA_QRY qry;
         qry.magic[0] = 0xF0;
@@ -349,21 +389,34 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         qry.crc = 0xFFFF;
         memcpy(param->buff.tx_buff, &qry, sizeof(qry));
         param->payload_size = sizeof(qry);
+#endif
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
+        if ( self->master && self->master->user_evt_handle ) {
+            ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_CONFIRM, param);
+        }
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
+        if ( self->master && self->master->user_evt_handle ) {
+            ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_DONE, param);
+        }
         break;
 
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
         log_printf(DBG_LV1, "UART: no data fetched.");
+        if ( self->master && self->master->user_evt_handle ) {
+            ret = self->master->user_evt_handle(self, BP_EVT_RX_BYTE_TIMEOUT, param);
+        }
         break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         log_printf(DBG_LV1, "UART: not all data fetched yet.");
+        if ( self->master && self->master->user_evt_handle ) {
+            ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME_TIMEOUT, param);
+        }
         break;
 
     // 串口IO错误
@@ -373,8 +426,118 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_FRAME_CHECK_ERROR:
         break;
     }
-    return ERR_OK;
+    return ret;
 }
+
+static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_OK;
+    switch (evt) {
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+        break;
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    }
+    return ret;
+}
+
+static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_OK;
+    switch (evt) {
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+        break;
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    }
+    return ret;
+}
+
+static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_OK;
+    switch (evt) {
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+        break;
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    }
+    return ret;
+}
+
+
 
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {

@@ -125,6 +125,8 @@ struct bp_user {
      * 该值越大，发送频率越高
      */
     unsigned char frame_freq;
+    // 计时种子
+    unsigned char seed;
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：
