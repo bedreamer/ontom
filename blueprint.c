@@ -30,7 +30,7 @@ struct bp_uart uarts[2];
 struct bp_user *down_user[] = {
     {50, uart4_simple_box_evt_handle}, // 充电机
     {50, uart4_charger_evt_handle},    // 采样盒
-    {0,  NULL},
+    {0,  NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user *up_user[] = {
@@ -354,14 +354,13 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_TX_FRAME_REQUEST:
         if ( param->payload_size ) return ERR_ERR;
 
-        u = self->users;
-        for ( ; u->user_evt_handle; u ++ ) {
+        for ( u = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed < u->frame_freq ) {
                 u->seed ++;
             }
         }
 
-        for ( ; u->user_evt_handle; u ++ ) {
+        for ( u = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed >= u->frame_freq ) {
                 self->master = u;
                 /*
