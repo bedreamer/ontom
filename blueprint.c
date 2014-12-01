@@ -30,7 +30,7 @@ struct bp_uart uarts[2];
 struct bp_user *down_user[] = {
     {50, uart4_simple_box_evt_handle}, // 充电机
     {50, uart4_charger_evt_handle},    // 采样盒
-    {0,  NULL}
+    {0,  NULL},
 };
 // 串口5 使用者为上位机
 struct bp_user *up_user[] = {
