@@ -115,6 +115,43 @@ struct bp_evt_param {
 };
 
 /*
+ * 串口使用者
+ *
+ * 同一个串口可能会有多个设备使用，
+ * 该结构主要用来描述主动设备下挂接的从动设备相关信息
+ */
+struct bp_user {
+    /* 帧频率，取值范围0-100
+     * 该值越大，发送频率越高
+     */
+    unsigned char frame_freq;
+
+    // 使用者事件通知响应函数
+    // 可接受的事件包括：
+    // 串口接收到新数据
+    // BP_EVT_RX_DATA               = 0x10,
+    // 串口收到完整的数据帧
+    // BP_EVT_RX_FRAME,
+    // 串口发送数据请求
+    // BP_EVT_TX_FRAME_REQUEST      = 0x20,
+    // 串口发送确认
+    // BP_EVT_TX_FRAME_CONFIRM,
+    // 串口数据发送完成事件
+    // BP_EVT_TX_FRAME_DONE,
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    // BP_EVT_RX_BYTE_TIMEOUT       = 0x40,
+    // 串口接收帧超时, 接受的数据不完整
+    // BP_EVT_RX_FRAME_TIMEOUT,
+    // 串口IO错误
+    // BP_EVT_IO_ERROR              = 0x80,
+    // 帧校验失败
+    // BP_EVT_FRAME_CHECK_ERROR
+
+    int (*user_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
+                           struct bp_evt_param *param);
+};
+
+/*
  * 串口描述结构
  */
 struct bp_uart {
@@ -145,6 +182,11 @@ struct bp_uart {
     struct bp_evt_param tx_param;
     // 发送缓冲区
     char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
+
+    // 使用者信息
+    struct bp_user **users;
+    // 当前使用者
+    struct bp_user *master;
 };
 
 #endif // _BLUE_PRINT_INCLUED_H_

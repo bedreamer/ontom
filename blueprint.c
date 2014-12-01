@@ -18,8 +18,18 @@
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
-
+// 共计两个串口
 struct bp_uart uarts[2];
+// 串口4 使用者为充电机和采样盒
+struct bp_user *down_user[] = {
+    {50, NULL}, // 采样盒
+    {50, NULL}, // 充电机
+    NULL
+};
+// 串口5 使用者为上位机
+struct bp_user *up_user[] = {
+    NULL
+};
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
 #define	SERIAL4_CTRL_PIN	GPIO_TO_PIN(0, 19)
@@ -246,6 +256,10 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.cursor = 0;
         self->rx_param.payload_size = 0;
         self->rx_param.buff_size = sizeof(self->rx_buff);
+
+        self->users = down_user;
+        self->master = self->users[0];
+
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      160, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
