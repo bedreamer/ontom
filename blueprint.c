@@ -204,6 +204,11 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: %d",
                    thiz->rx_param.buff.rx_buff[1]+4,
                     thiz->rx_param.payload_size);
+        if ( thiz->rx_param.payload_size == 0 ) {
+            uart4_bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
+        } else {
+            uart4_bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
+        }
         Hachiko_pause(&thiz->rx_seed);
         thiz->status = BP_UART_STAT_WR;
         return;
@@ -340,9 +345,11 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
+        log_printf(DBG_LV1, "UART: no data fetched.");
         break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(DBG_LV1, "UART: not all data fetched yet.");
         break;
 
     // 串口IO错误
