@@ -67,6 +67,8 @@ CONFIG_DOMAIN_BEGIN
 {"system_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
 {"manufacturer_passwd",         C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"8989889"}},
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
+   // 充电模块个数
+{"charge_module_nr",            C_INT,      yes,    C_VALID,    .cub.i=14,      {"14"}},
 // 系统参数不应该出现在配置文件中, 仅供程序内部使用, 不公开
 {"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"thread_bms_write_service",    C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},

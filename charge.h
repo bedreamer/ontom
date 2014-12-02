@@ -210,6 +210,42 @@ struct charge_ex_measure {
     double wet_degree;
 };
 
+// 充电屏数据读写数据结构
+struct charger_config_03h_04h_10h {
+
+};
+
+// 充电屏数据结构
+struct charger_config_10h {
+    // 充电模块个数
+    unsigned int charger_module_nr;
+    // 充电屏编号
+    unsigned short charger_sn;
+    // 充电机组充电状态
+    unsigned short charger_status;
+    // 充电机组最高输出电压
+    unsigned short charger_max_v_out;
+    // 充电机组最低输出电压
+    unsigned short charger_min_v_out;
+    // 充电机组最大输出电流
+    unsigned short charger_max_i_out;
+    // 充电机组实际输出电压值
+    unsigned short charger_v_out;
+    // 充电机组实际输出电流值
+    unsigned short charger_i_out;
+
+    // 充电机模块输出电压
+    unsigned short *charge_module_v;
+    // 充电机模块输出电流
+    unsigned short *charge_module_i;
+    // 充电机模块温度
+    unsigned short *charge_module_t;
+    // 充电机模块状态
+    unsigned short *charge_module_status;
+    // 充电机模块机身编号
+    unsigned short *charge_module_sn[6];
+};
+
 // 充电计费模式
 typedef enum {
     // 无效充电模式，默认值
@@ -392,6 +428,8 @@ struct charge_task {
     struct charge_ex_measure *ex_measure;
     // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
     time_t pre_stamp_ex_measure;
+    // 充电屏信息
+    struct charger_config_10h chargers;
 
     /* 当前正在使用的充电枪编号
      * 由于目前系统配置为只能一把枪独占式充电，因此必须指明枪的编号

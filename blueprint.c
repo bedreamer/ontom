@@ -432,7 +432,11 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
+    struct MDATA_QRY qry;
+
     switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
         break;
@@ -441,6 +445,19 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        qry.magic[0] = 0x0F;
+        qry.magic[1] = 0x1E;
+        qry.magic[2] = 0x2D;
+        qry.magic[3] = 0x3C;
+        qry.magic[4] = 0x4B;
+        qry.addr = 0x05;
+        qry.len = 16;
+        qry.crc = 0xFFFF;
+        memcpy(param->buff.tx_buff, &qry, sizeof(qry));
+        param->payload_size = sizeof(qry);
+        ret = ERR_OK;
+        log_printf(INF, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -461,6 +478,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_FRAME_CHECK_ERROR:
         break;
     default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
         break;
     }
     return ret;
@@ -470,7 +488,11 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
+    struct MDATA_QRY qry;
+
     switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
         break;
@@ -479,6 +501,19 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        qry.magic[0] = 0xF0;
+        qry.magic[1] = 0xE1;
+        qry.magic[2] = 0xD2;
+        qry.magic[3] = 0xC3;
+        qry.magic[4] = 0xB4;
+        qry.addr = 0x05;
+        qry.len = 16;
+        qry.crc = 0xFFFF;
+        memcpy(param->buff.tx_buff, &qry, sizeof(qry));
+        param->payload_size = sizeof(qry);
+        ret = ERR_OK;
+        log_printf(INF, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -499,6 +534,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_FRAME_CHECK_ERROR:
         break;
     default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
         break;
     }
     return ret;
@@ -509,6 +545,8 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 {
     int ret = ERR_ERR;
     switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
         break;
@@ -537,6 +575,7 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_FRAME_CHECK_ERROR:
         break;
     default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
         break;
     }
     return ret;
@@ -688,6 +727,24 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                                buff[4], buff[5], buff[6], buff[7],
                                buff[0+8], buff[1+8], buff[2+8], buff[3+8],
                                buff[4+8], buff[5+8], buff[6+8], buff[7+8]);
+                }
+                ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
+                                          &thiz->rx_param);
+                switch ( ret ) {
+                // 数据接收，校验完成, 完成数据接收过程，停止接收
+                case ERR_OK:
+                    log_printf(DBG_LV2, "UART: fetched a new frame.");
+                    break;
+                // 数据接收完成，但校验失败, 停止接收
+                case ERR_FRAME_CHECK_ERR:
+                    log_printf(DBG_LV2,
+                               "UART: lenth fetched but check "RED("faile."));
+                    break;
+                // 数据接收长度不足，继续接收
+                case ERR_FRAME_CHECK_DATA_TOO_SHORT:
+                    break;
+                default:
+                    break;
                 }
 
                 if ( thiz->rx_param.payload_size >=
