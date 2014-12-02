@@ -463,6 +463,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
@@ -519,6 +520,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
