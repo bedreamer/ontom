@@ -786,6 +786,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
                  thiz->tx_param.payload_size > 0 ) {
                 // 前一次没有发送完成， 继续发送
+                log_printf(DBG_LV0, "UART: goto continue_to_send");
                 goto continue_to_send;
             }
             if ( thiz->tx_param.payload_size ) {
