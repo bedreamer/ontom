@@ -396,12 +396,16 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_TX_FRAME_CONFIRM:
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_CONFIRM, param);
+        } else {
+            log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_CONFIRM")" without signal procedu.");
         }
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_DONE, param);
+        } else {
+            log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_DONE")" without signal procedu.");
         }
         break;
 
@@ -410,6 +414,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         log_printf(DBG_LV1, "UART: no data fetched.");
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_RX_BYTE_TIMEOUT, param);
+        } else {
+            log_printf(WRN, "UART: "RED("BP_EVT_RX_BYTE_TIMEOUT")" without signal procedu.");
         }
         break;
     // 串口接收帧超时, 接受的数据不完整
@@ -417,6 +423,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         log_printf(DBG_LV1, "UART: not all data fetched yet.");
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME_TIMEOUT, param);
+        } else {
+            log_printf(WRN, "UART: "RED("BP_EVT_RX_FRAME_TIMEOUT")" without signal procedu.");
         }
         break;
 
