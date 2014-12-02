@@ -372,6 +372,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                  * param->payload_size = sizeof(qry);
                  */
                 ret = u->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
+                u->seed = 0;
                 break;
             }
         }
