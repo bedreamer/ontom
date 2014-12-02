@@ -507,7 +507,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_OK;
+    int ret = ERR_ERR;
     switch (evt) {
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
