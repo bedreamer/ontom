@@ -354,7 +354,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        log_printf(DBG_LV0, "UART: get into fucking here.");
+        log_printf(DBG_LV0, "UART: get into fucking here. %d",
+                   param->payload_size);
         if ( param->payload_size ) return ERR_ERR;
 
         for ( u = self->users; u->user_evt_handle; u ++ ) {
