@@ -314,6 +314,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
+        self->master->seed = 0;
         if ( ret != ERR_OK ) {
             log_printf(DBG_LV1, "UART: set uart to TX mode faile");
             break;
@@ -322,6 +323,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
+        self->master->seed = 0;
         if ( ret != ERR_OK ) {
             log_printf(DBG_LV1, "UART: set uart to RX mode faile");
             break;
@@ -361,7 +363,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
 
         for ( u = self->users; u->user_evt_handle; u ++ ) {
-            if ( u->seed >= u->frame_freq ) {
+            if ( u->seed > u->frame_freq ) {
                 self->master = u;
                 /*
                  * 需要在私有事件处理过程中进行事件处理，数据填充
@@ -372,7 +374,6 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                  * param->payload_size = sizeof(qry);
                  */
                 ret = u->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
-                u->seed = 0;
                 break;
             }
         }
