@@ -791,7 +791,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 goto continue_to_send;
             }
             if ( thiz->tx_param.payload_size ) {
-                log_printf(DBG_LV0, "UART: continue becouse: thiz->tx_param.payload_size > 0"s);
+                log_printf(DBG_LV0, "UART: continue becouse: thiz->tx_param.payload_size > 0");
                 continue;
             }
 
