@@ -27,13 +27,13 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 // 共计两个串口
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
-struct bp_user *down_user[] = {
+struct bp_user down_user[] = {
     {50, 0, uart4_simple_box_evt_handle}, // 充电机
     {50, 0, uart4_charger_evt_handle},    // 采样盒
     {0,  0, NULL}
 };
 // 串口5 使用者为上位机
-struct bp_user *up_user[] = {
+struct bp_user up_user[] = {
     {50, 0, uart5_background_evt_handle},    // 采样盒
     NULL
 };
@@ -371,9 +371,6 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                  * memcpy(param->buff.tx_buff, &qry, sizeof(qry));
                  * param->payload_size = sizeof(qry);
                  */
-                log_printf(DBG_LV1, "UART: evt_proc %p",
-                           u->user_evt_handle);
-                break;
                 ret = u->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
                 break;
             }
