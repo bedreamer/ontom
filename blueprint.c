@@ -371,6 +371,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                  * memcpy(param->buff.tx_buff, &qry, sizeof(qry));
                  * param->payload_size = sizeof(qry);
                  */
+                log_printf(DBG_LV1, "UART: evt_proc %p",
+                           u->user_evt_handle);
+                break;
                 ret = u->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
                 break;
             }
