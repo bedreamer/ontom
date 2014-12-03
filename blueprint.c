@@ -20,6 +20,12 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
+static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
 static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
@@ -28,8 +34,11 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {100, 0, 5, 0, uart4_simple_box_evt_handle}, // 充电机
-    {100, 0, 5, 0, uart4_charger_evt_handle},    // 采样盒
+    {100, 0, 5, 0, uart4_simple_box_evt_handle},     // 采样
+    {100, 0, 5, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
+    {100, 0, 5, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
+    {100, 0, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+    {100, 0, 5, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
     {0,  0, 0, 0, NULL}
 };
 // 串口5 使用者为上位机
@@ -448,6 +457,207 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 }
 
 static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    struct MDATA_QRY qry;
+    char buff[8];
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        ret = ERR_ERR;
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        qry.magic[0] = 0x0F;
+        qry.magic[1] = 0x1E;
+        qry.magic[2] = 0x2D;
+        qry.magic[3] = 0x3C;
+        qry.magic[4] = 0x4B;
+        qry.addr = 0x05;
+        qry.len = 16;
+        qry.crc = 0xFFFF;
+        buff[0] = 0x01;
+        buff[1] = 0x04;
+        buff[2] = buff[3] = 0x00;
+        buff[4] = 0x00;
+        buff[5] = 0x06;
+        buff[6] = 0x70;
+        buff[7] = 0x08;
+        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+        param->payload_size = sizeof(buff);
+        ret = ERR_OK;
+        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(INF, "UART: done");
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+        break;
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    struct MDATA_QRY qry;
+    char buff[8];
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        ret = ERR_ERR;
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        qry.magic[0] = 0x0F;
+        qry.magic[1] = 0x1E;
+        qry.magic[2] = 0x2D;
+        qry.magic[3] = 0x3C;
+        qry.magic[4] = 0x4B;
+        qry.addr = 0x05;
+        qry.len = 16;
+        qry.crc = 0xFFFF;
+        buff[0] = 0x01;
+        buff[1] = 0x04;
+        buff[2] = buff[3] = 0x00;
+        buff[4] = 0x00;
+        buff[5] = 0x06;
+        buff[6] = 0x70;
+        buff[7] = 0x08;
+        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+        param->payload_size = sizeof(buff);
+        ret = ERR_OK;
+        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(INF, "UART: done");
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+        break;
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    struct MDATA_QRY qry;
+    char buff[8];
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        ret = ERR_ERR;
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        qry.magic[0] = 0x0F;
+        qry.magic[1] = 0x1E;
+        qry.magic[2] = 0x2D;
+        qry.magic[3] = 0x3C;
+        qry.magic[4] = 0x4B;
+        qry.addr = 0x05;
+        qry.len = 16;
+        qry.crc = 0xFFFF;
+        buff[0] = 0x01;
+        buff[1] = 0x04;
+        buff[2] = buff[3] = 0x00;
+        buff[4] = 0x00;
+        buff[5] = 0x06;
+        buff[6] = 0x70;
+        buff[7] = 0x08;
+        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+        param->payload_size = sizeof(buff);
+        ret = ERR_OK;
+        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(INF, "UART: done");
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+        break;
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
