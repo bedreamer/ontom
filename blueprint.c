@@ -28,14 +28,14 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {100, 0, uart4_simple_box_evt_handle}, // 充电机
-    {100, 0, uart4_charger_evt_handle},    // 采样盒
-    {0,  0, NULL}
+    {100, 0, 5, 0, uart4_simple_box_evt_handle}, // 充电机
+    {100, 0, 5, 0, uart4_charger_evt_handle},    // 采样盒
+    {0,  0, 0, 0, NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user up_user[] = {
-    {100, 0, uart5_background_evt_handle},    // 采样盒
-    NULL
+    {100, 0, 5, 0, uart5_background_evt_handle},    // 采样盒
+    {0,  0, 0, 0, NULL}
 };
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))

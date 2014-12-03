@@ -509,6 +509,8 @@ typedef enum {
     S_ERROR             = 0x0080,
     // 辅助电源故障
     S_ASSIT_POWER_DOWN,
+    // 充电屏监控通信中断
+    S_CHARGER_COMM_DOWN,
     // 采样单元通信中断
     S_MEASURE_COMM_DOWN,
     // 1# 充电枪物理连接故障
