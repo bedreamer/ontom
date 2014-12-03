@@ -486,7 +486,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         buff[7] = 0xE1;
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
 
-        self->rx_param.need_bytes = 205;
+        self->rx_param.need_bytes = 74;
 
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
