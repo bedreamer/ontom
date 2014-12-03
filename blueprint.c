@@ -404,6 +404,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
+        if ( self->master ) {
+            self->master->seed = 0;
+        }
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_DONE, param);
         } else {
