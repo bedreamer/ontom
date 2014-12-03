@@ -452,6 +452,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
+        ret = ERR_ERR;
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
@@ -510,6 +511,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
+        ret = ERR_ERR;
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
