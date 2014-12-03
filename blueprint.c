@@ -358,7 +358,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         log_printf(DBG_LV0, "UART: get into fucking here. %d",
                    param->payload_size);
         if ( param->payload_size ) return ERR_ERR;
-#if 0
+#if 1
 
         for ( u = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed < u->frame_freq ) {
