@@ -549,6 +549,9 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
+
+        self->rx_param.need_bytes = 34;
+
         log_printf(INF, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
@@ -613,6 +616,9 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         buff[5] = 0x06;
         buff[6] = 0x70;
         buff[7] = 0x08;
+
+        self->rx_param.need_bytes = 22;
+
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
@@ -680,6 +686,9 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
         buff[5] = 0x06;
         buff[6] = 0x70;
         buff[7] = 0x08;
+
+        self->rx_param.need_bytes = 16;
+
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
