@@ -320,6 +320,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口数据帧校验
     case BP_EVT_FRAME_CHECK:
         ret = ERR_ERR;
+        if ( self->master && self->master->user_evt_handle ) {
+            ret = self->master->user_evt_handle(self, BP_EVT_FRAME_CHECK, param);
+        }
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
@@ -519,6 +522,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     return ret;
 }
 
+// 配置数据
 static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
@@ -581,6 +585,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     return ret;
 }
 
+// 模块操作
 static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
@@ -651,6 +656,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     return ret;
 }
 
+// 系统校时
 static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
