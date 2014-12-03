@@ -505,9 +505,9 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
-        break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -568,9 +568,9 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
-        break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -639,9 +639,9 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
-        break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -710,9 +710,9 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
-        break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -769,9 +769,9 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
-        break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -810,9 +810,9 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
-        break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -826,8 +826,6 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     }
     return ret;
 }
-
-
 
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
