@@ -361,13 +361,13 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 #if 1
 
         for ( u = self->users; u->user_evt_handle; u ++ ) {
-            if ( u->seed < u->frame_freq ) {
+            if ( u->seed <= u->frame_freq ) {
                 u->seed ++;
             }
         }
 
         for ( u = self->users; u->user_evt_handle; u ++ ) {
-            if ( u->seed > u->frame_freq ) {
+            if ( u->seed > u->frame_freq && self->master != u ) {
                 self->master = u;
                 /*
                  * 需要在私有事件处理过程中进行事件处理，数据填充
