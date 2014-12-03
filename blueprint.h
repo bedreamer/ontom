@@ -106,6 +106,9 @@ struct bp_evt_param {
     unsigned char len_index;
     // }}
 
+    // 接收数据包需求长度
+    size_t need_bytes;
+
     // 缓冲区大小
     size_t buff_size;
     // 缓冲区载荷大小

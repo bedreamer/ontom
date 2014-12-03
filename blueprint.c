@@ -228,7 +228,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 
     if ( self == p ) {
         log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: %d",
-                   thiz->rx_param.buff.rx_buff[1]+4,
+                   thiz->rx_param.need_bytes,
                     thiz->rx_param.payload_size);
         if ( thiz->rx_param.payload_size == 0 ) {
             thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
@@ -456,6 +456,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     return ret;
 }
 
+// 只读数据段
 static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
@@ -476,22 +477,17 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        qry.magic[0] = 0x0F;
-        qry.magic[1] = 0x1E;
-        qry.magic[2] = 0x2D;
-        qry.magic[3] = 0x3C;
-        qry.magic[4] = 0x4B;
-        qry.addr = 0x05;
-        qry.len = 16;
-        qry.crc = 0xFFFF;
         buff[0] = 0x01;
         buff[1] = 0x04;
         buff[2] = buff[3] = 0x00;
         buff[4] = 0x00;
-        buff[5] = 0x06;
-        buff[6] = 0x70;
-        buff[7] = 0x08;
+        buff[5] = 0x64;
+        buff[6] = 0xF1;
+        buff[7] = 0xE1;
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
+
+        self->rx_param.need_bytes = 205;
+
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
         log_printf(INF, "UART: %s sent", __FUNCTION__);
@@ -543,14 +539,6 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        qry.magic[0] = 0x0F;
-        qry.magic[1] = 0x1E;
-        qry.magic[2] = 0x2D;
-        qry.magic[3] = 0x3C;
-        qry.magic[4] = 0x4B;
-        qry.addr = 0x05;
-        qry.len = 16;
-        qry.crc = 0xFFFF;
         buff[0] = 0x01;
         buff[1] = 0x04;
         buff[2] = buff[3] = 0x00;
