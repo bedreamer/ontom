@@ -310,6 +310,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口数据帧校验
     case BP_EVT_FRAME_CHECK:
+        ret = ERR_ERR;
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
