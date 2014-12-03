@@ -452,6 +452,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 {
     int ret = ERR_ERR;
     struct MDATA_QRY qry;
+    char buff[8];
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -474,8 +475,15 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         qry.addr = 0x05;
         qry.len = 16;
         qry.crc = 0xFFFF;
-        memcpy(param->buff.tx_buff, &qry, sizeof(qry));
-        param->payload_size = sizeof(qry);
+        buff[0] = 0x01;
+        buff[1] = 0x04;
+        buff[2] = buff[3] = 0x00;
+        buff[4] = 0x00;
+        buff[5] = 0x06;
+        buff[6] = 0x70;
+        buff[7] = 0x08;
+        memcpy(param->buff.tx_buff, buff, sizeofbuff);
+        param->payload_size = sizeof(buff);
         ret = ERR_OK;
         log_printf(INF, "UART: %s sent", __FUNCTION__);
         break;
