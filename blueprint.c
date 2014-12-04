@@ -464,7 +464,6 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    struct MDATA_QRY qry;
     char buff[8];
 
     switch (evt) {
@@ -527,7 +526,6 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    struct MDATA_QRY qry;
     char buff[8];
 
     switch (evt) {
@@ -590,7 +588,6 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    struct MDATA_QRY qry;
     char buff[8];
 
     switch (evt) {
@@ -606,14 +603,6 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        qry.magic[0] = 0x0F;
-        qry.magic[1] = 0x1E;
-        qry.magic[2] = 0x2D;
-        qry.magic[3] = 0x3C;
-        qry.magic[4] = 0x4B;
-        qry.addr = 0x05;
-        qry.len = 16;
-        qry.crc = 0xFFFF;
         buff[0] = 0x01;
         buff[1] = 0x04;
         buff[2] = buff[3] = 0x00;
@@ -661,7 +650,6 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    struct MDATA_QRY qry;
     char buff[8];
 
     switch (evt) {
@@ -677,14 +665,6 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        qry.magic[0] = 0x0F;
-        qry.magic[1] = 0x1E;
-        qry.magic[2] = 0x2D;
-        qry.magic[3] = 0x3C;
-        qry.magic[4] = 0x4B;
-        qry.addr = 0x05;
-        qry.len = 16;
-        qry.crc = 0xFFFF;
         buff[0] = 0x01;
         buff[1] = 0x04;
         buff[2] = buff[3] = 0x00;
