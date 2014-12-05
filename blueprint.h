@@ -107,6 +107,7 @@ struct bp_evt_param {
     // }}
 
     // 接收数据包需求长度
+    // 需要接收数据包的预期长度
     size_t need_bytes;
 
     // 缓冲区大小
