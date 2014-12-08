@@ -832,7 +832,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         thiz->init_magic = 5;
     }
     if ( SIG_ERR == signal(SIGIO, uarts_async_sigio) ) {
-        log_printf(ERR, "UART: signal(SIGIO, uarts_async_sigio) failed!!!");
+        log_printf(ERR, "UART: signal(SIGIO, uarts_async_sigio) failed!!!"
+                   "errno: %d", errno);
     }
 
     while ( ! *done ) {
