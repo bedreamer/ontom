@@ -230,6 +230,9 @@ void uarts_async_sigio(int param)
             // 主动设备，需要进行接收超时判定
             Hachiko_resume(&thiz->rx_seed);
         }
+    } else{
+        log_printf(DBG_LV1, "UART: hw_status: %X, payload: %d",
+                   thiz->hw_status, thiz->tx_param.payload_size);
     }
 }
 
