@@ -220,7 +220,7 @@ void uarts_async_sigio(int param)
     struct Hachiko_food *p;
     p = & (thiz->tx_seed);
 
-    log_printf(INF, "UART: SIGIO fetched. %d", param);
+    log_printf(INF, "UART: "RED("SIGIO")" fetched. %d", param);
     if ( BP_UART_STAT_WR == thiz->hw_status && thiz->tx_param.payload_size ) {
         thiz->tx_param.payload_size = 0;
         Hachiko_pause(p);
