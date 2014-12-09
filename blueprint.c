@@ -43,7 +43,7 @@ struct bp_user down_user[] = {
 };
 // 串口5 使用者为上位机
 struct bp_user up_user[] = {
-    {100, 0, 5, 0, uart5_background_evt_handle},    // 采样盒
+    {100, 0, 5, 0, NULL/*uart5_background_evt_handle*/},    // 采样盒
     {0,  0, 0, 0, NULL}
 };
 
