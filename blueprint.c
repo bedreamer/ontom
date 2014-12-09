@@ -216,7 +216,7 @@ int set_gpio_output(int pin, int value)
  */
 void uarts_async_sigio(int param)
 {
-    struct bp_uart * thiz = &uart[0];
+    struct bp_uart * thiz = &uarts[0];
     struct Hachiko_food *p;
     p = & (thiz->rx_seed);
 
