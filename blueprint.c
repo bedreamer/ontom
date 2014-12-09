@@ -211,9 +211,9 @@ int set_gpio_output(int pin, int value)
     return ERR_OK;
 }
 
-void uarts_async_sigio()
+void uarts_async_sigio(int param)
 {
-    log_printf(INF, "UART: SIGIO fetched.");
+    log_printf(INF, "UART: SIGIO fetched. %d", param);
 }
 
 // 串口4的超时响应
