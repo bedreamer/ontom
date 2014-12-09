@@ -1027,6 +1027,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_WR ) {
 
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
+                tcflush(thiz->dev_handle, TCOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
