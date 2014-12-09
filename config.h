@@ -15,6 +15,9 @@
     #define CONFIG_DEBUG_ZEUS    0
 #endif
 
+// 配置串口是否接收SIGIO事件
+#define CONFIG_SUPPORT_SIGIO     0
+
 //}}}}}}}}}}}}}
 
 #ifndef bool

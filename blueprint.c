@@ -216,6 +216,7 @@ int set_gpio_output(int pin, int value)
  */
 void uarts_async_sigio(int param)
 {
+#if (CONFIG_SUPPORT_SIGIO > 0)
     struct bp_uart * thiz = &uarts[0];
     struct Hachiko_food *p;
     p = & (thiz->tx_seed);
@@ -235,6 +236,7 @@ void uarts_async_sigio(int param)
         log_printf(DBG_LV1, "UART: hw_status: %X, payload: %d",
                    thiz->hw_status, thiz->tx_param.payload_size);
     }
+#endif
 }
 
 // 串口4的超时响应
@@ -261,7 +263,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         return;
     }
 
-#if 0
+#if (CONFIG_SUPPORT_SIGIO > 0)
     /*
      * 串口发送完成事件由系统提供SIGIO信号来确定，具体逻辑见函数
      *  void uarts_async_sigio(int param)
@@ -866,10 +868,13 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         // 出错误后尝试的次数
         thiz->init_magic = 5;
     }
+
+#if (CONFIG_SUPPORT_SIGIO > 0)
     if ( SIG_ERR == signal(SIGIO, uarts_async_sigio) ) {
         log_printf(ERR, "UART: signal(SIGIO, uarts_async_sigio) failed!!!"
                    "errno: %d", errno);
     }
+#endif
 
     while ( ! *done ) {
         usleep(3000);
