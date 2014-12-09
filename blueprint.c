@@ -43,7 +43,7 @@ struct bp_user down_user[] = {
 };
 // 串口5 使用者为上位机
 struct bp_user up_user[] = {
-    {100, 0, 5, 0, NULL/*uart5_background_evt_handle*/},    // 采样盒
+    {100, 0, 5, 0, uart5_background_evt_handle},    // 采样盒
     {0,  0, 0, 0, NULL}
 };
 
@@ -344,6 +344,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             return ERR_UART_CONFIG_FAILE;
         }
         self->status = BP_UART_STAT_WR;
+        self->hw_status = BP_UART_STAT_INVALID;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
