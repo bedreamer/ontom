@@ -304,6 +304,10 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         }
+        if ( -1 == fcntl(self->dev_handle, F_SETFL, FASYNC) ) {
+            log_printf(ERR,
+                    "UART: set uart to async mode failed!!! errno: %d", errno);
+        }
 
         ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
         if ( ret == (int)ERR_UART_CONFIG_FAILE ) {
