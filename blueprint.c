@@ -222,6 +222,7 @@ void uarts_async_sigio(int param)
 
     log_printf(INF, "UART: "RED("SIGIO")" fetched. %d", param);
     if ( BP_UART_STAT_WR == thiz->hw_status && thiz->tx_param.payload_size ) {
+        thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
         thiz->tx_param.payload_size = 0;
         Hachiko_pause(p);
         memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
@@ -449,7 +450,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_CONFIRM, param);
         } else {
-            log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_CONFIRM")" without signal procedu.");
+            log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_CONFIRM")" without signal procedure.");
         }
         break;
     // 串口数据发送完成事件
@@ -460,7 +461,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_DONE, param);
         } else {
-            log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_DONE")" without signal procedu.");
+            log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_DONE")" without signal procedure.");
         }
         break;
 
@@ -470,7 +471,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_RX_BYTE_TIMEOUT, param);
         } else {
-            log_printf(WRN, "UART: "RED("BP_EVT_RX_BYTE_TIMEOUT")" without signal procedu.");
+            log_printf(WRN, "UART: "RED("BP_EVT_RX_BYTE_TIMEOUT")" without signal procedure.");
         }
         break;
     // 串口接收帧超时, 接受的数据不完整
@@ -479,7 +480,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME_TIMEOUT, param);
         } else {
-            log_printf(WRN, "UART: "RED("BP_EVT_RX_FRAME_TIMEOUT")" without signal procedu.");
+            log_printf(WRN, "UART: "RED("BP_EVT_RX_FRAME_TIMEOUT")" without signal procedure.");
         }
         break;
 
@@ -534,7 +535,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: done");
+        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -596,7 +597,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: done");
+        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -658,7 +659,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: done");
+        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -720,7 +721,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: done");
+        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -779,7 +780,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: done");
+        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
