@@ -211,9 +211,26 @@ int set_gpio_output(int pin, int value)
     return ERR_OK;
 }
 
+/*
+ * 串口4作为互动设备是需要该信号的，因此在这里可以不用做判断是那个串口产生了该信号
+ */
 void uarts_async_sigio(int param)
 {
+    struct bp_uart * thiz = &uart[0];
+    struct Hachiko_food *p;
+    p = & (thiz->rx_seed);
+
     log_printf(INF, "UART: SIGIO fetched. %d", param);
+    if ( BP_UART_STAT_WR == thiz->hw_status && thiz->tx_param.payload_size ) {
+        thiz->tx_param.payload_size = 0;
+        Hachiko_pause(p);
+        memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
+        thiz->status = BP_UART_STAT_RD;
+        if ( thiz->role == BP_UART_MASTER ) {
+            // 主动设备，需要进行接收超时判定
+            Hachiko_resume(&thiz->rx_seed);
+        }
+    }
 }
 
 // 串口4的超时响应
@@ -240,6 +257,12 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         return;
     }
 
+#if 1
+    /*
+     * 串口发送完成事件由系统提供SIGIO信号来确定，具体逻辑见函数
+     *  void uarts_async_sigio(int param)
+     */
+#else
     p = & thiz->tx_seed;
     if ( self == p ) {
         log_printf(DBG_LV1, "UART: packet send done.");
@@ -253,6 +276,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         }
         return;
     }
+#endif
 }
 
 /*
