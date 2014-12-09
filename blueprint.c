@@ -303,6 +303,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                                 O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
+        } else {
+            log_printf(DBG, "UART: self->dev_handle: %d", self->bp_evt_handle);
         }
         if ( -1 == fcntl(self->dev_handle, F_SETFL, FASYNC) ) {
             log_printf(ERR,
