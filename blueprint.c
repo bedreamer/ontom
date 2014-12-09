@@ -261,7 +261,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         return;
     }
 
-#if 1
+#if 0
     /*
      * 串口发送完成事件由系统提供SIGIO信号来确定，具体逻辑见函数
      *  void uarts_async_sigio(int param)
