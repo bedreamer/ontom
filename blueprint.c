@@ -218,7 +218,7 @@ void uarts_async_sigio(int param)
 {
     struct bp_uart * thiz = &uarts[0];
     struct Hachiko_food *p;
-    p = & (thiz->rx_seed);
+    p = & (thiz->tx_seed);
 
     log_printf(INF, "UART: SIGIO fetched. %d", param);
     if ( BP_UART_STAT_WR == thiz->hw_status && thiz->tx_param.payload_size ) {
