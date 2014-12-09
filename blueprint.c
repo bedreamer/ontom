@@ -1053,6 +1053,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
 
             tcflush(thiz->dev_handle, TCOFLUSH);
+            tcflush(thiz->dev_handle, TCIFLUSH);
 
             thiz->tx_param.buff.tx_buff = thiz->tx_buff;
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
