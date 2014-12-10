@@ -578,4 +578,34 @@ static inline int bit_read(struct charge_task *tsk, ONTOM_FLAG_SINGLE single)
     return (* byte & (1 << (single % 8 ))) ? 1 : 0;
 }
 
+//1字节crc16计算
+static inline void calc_crc16(unsigned short *crc, unsigned short  crcbuf)
+{
+     unsigned char  i,TT;
+
+    *crc=*crc^crcbuf;
+    for(i=0;i<8;i++)
+    {
+        TT=*crc&1;
+        *crc=*crc>>1;
+        *crc=*crc&0x7fff;
+        if (TT==1)
+            (*crc)=(*crc)^0xa001;
+        *crc=*crc&0xffff;
+    }
+}
+
+//多字节CRC16计算
+static inline unsigned short load_crc(unsigned short cnt, char *dat)
+{
+     unsigned short i;
+     unsigned short crc=0xffff;
+    for(i=0;i<cnt&&i<0xff;i++)
+    {
+        WDTCNSET;
+        calc_crc16(&crc,dat[i]);
+    }
+    return crc;
+}
+
 #endif /*_CHARGE_INCLUDED_H_*/
