@@ -760,6 +760,11 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
+            log_printf(INF, "UART: 综合采样和通信恢复.");
+        }
+        bit_clr(task, S_MEASURE_COMM_DOWN);
+        self->master->died = 0;
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -789,6 +794,14 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        if ( self->master->died < self->master->died_line ) {
+            self->master->died ++;
+        } else {
+            if ( ! bit_read(task, S_MEASURE_COMM_DOWN) ) {
+                log_printf(ERR, "UART: 综合采样盒通信中断, 请排查故障, 已禁止充电");
+            }
+            bit_set(task, S_MEASURE_COMM_DOWN);
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
