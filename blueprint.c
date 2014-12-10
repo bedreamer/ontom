@@ -252,6 +252,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     p = & (thiz->rx_seed);
 
     if ( self == p ) {
+        Hachiko_pause(&thiz->rx_seed);
         if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
             log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: %d",
                        thiz->rx_param.need_bytes,
@@ -266,7 +267,6 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         } else {
             thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
         }
-        Hachiko_pause(&thiz->rx_seed);
         thiz->status = BP_UART_STAT_WR;
         return;
     }
