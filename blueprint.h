@@ -128,9 +128,9 @@ struct bp_user {
     /* 帧频率，取值范围0-100
      * 该值越大，发送频率越高
      */
-    unsigned char frame_freq;
+    unsigned int frame_freq;
     // 计时种子
-    unsigned char seed;
+    unsigned int seed;
     // 允许连续丢帧的最大次数
     unsigned char died_line;
     // 连续丢失数据的次数
