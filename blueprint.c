@@ -644,7 +644,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         } else {
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 1 ] |
-                    param->buff.rx_buff[ param->need_bytes - 2];
+                    param->buff.rx_buff[ param->need_bytes - 2] << 8;
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
