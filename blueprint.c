@@ -34,10 +34,12 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
+    {3300, 0, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+#if 0
     {3200, 0, 5, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
     {3400, 0, 5, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
     {3100, 0, 5, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
-    {3300, 0, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+#endif
     {6910, 0, 5, 0, uart4_simple_box_evt_handle},     // 采样
     {0,  0, 0, 0, NULL}
 };
