@@ -602,7 +602,6 @@ static inline unsigned short load_crc(unsigned short cnt, char *dat)
      unsigned short crc=0xffff;
     for(i=0;i<cnt&&i<0xff;i++)
     {
-        WDTCNSET;
         calc_crc16(&crc,dat[i]);
     }
     return crc;
