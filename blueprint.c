@@ -1035,8 +1035,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     break;
                 }
 
-                if ( thiz->rx_param.payload_size >=
-                     (size_t)(thiz->rx_param.buff.rx_buff[1] + 4) ) {
+                if ( thiz->rx_param.payload_size >= thiz->rx_param.need_bytes
+                     /*(size_t)(thiz->rx_param.buff.rx_buff[1] + 4)*/ ) {
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
                     log_printf(DBG_LV1, "UART: recv done.need: %d, fetched: %d",
