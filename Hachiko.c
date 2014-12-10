@@ -6,6 +6,8 @@
  *  http://man7.org/linux/man-pages/man2/timer_create.2.html
  *  http://linux.die.net/man/2/timer_settime
  *
+ * 定时器粒度调整，为了满足串口快速切换和发送数据完成的判断，所以将定时器的分辨率从10ms
+ * 提高到1ms。
  */
 #include <stdlib.h>
 #include <unistd.h>

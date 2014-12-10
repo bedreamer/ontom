@@ -16,7 +16,7 @@
 #endif
 
 // 配置串口是否接收SIGIO事件
-#define CONFIG_SUPPORT_SIGIO     0
+#define CONFIG_SUPPORT_SIGIO     1
 
 //}}}}}}}}}}}}}
 
