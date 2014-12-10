@@ -1035,7 +1035,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 case ERR_OK:
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
-                    log_printf(DBG_LV2, "UART: fetched a new frame.");
+                    log_printf(DBG_LV2, "UART: fetched a "GRN("new")" frame.");
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
