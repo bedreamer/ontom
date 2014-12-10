@@ -157,9 +157,9 @@ void Hachiko_init()
 
     /* Start the timer , 默认10ms*/
     freq_nanosecs = atoll(config_read("HachikoTTL"));
-    if ( freq_nanosecs <= 1000000 ) {
-        freq_nanosecs = 1000000;
-        // 定时器最小分辨率为1ms
+    if ( freq_nanosecs <= 100000 ) {
+        freq_nanosecs = 100000;
+        // 定时器最小分辨率为0.1ms
     }
     its.it_value.tv_sec = freq_nanosecs / 1000000000;
     its.it_value.tv_nsec = freq_nanosecs % 1000000000;
