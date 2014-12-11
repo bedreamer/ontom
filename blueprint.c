@@ -264,8 +264,10 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         }
         if ( thiz->rx_param.payload_size == 0 ) {
             thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
-        } else {
+        } else if ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
             thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
+        } else {
+            // all thing is ok.
         }
         thiz->status = BP_UART_STAT_WR;
         return;
