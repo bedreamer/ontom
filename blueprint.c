@@ -293,6 +293,21 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 #endif
 }
 
+// 串口4的发送节奏定时器
+void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self)
+{
+    struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
+    struct Hachiko_food *p;
+    struct bp_user *u;
+
+    for ( u = thiz->users; u->user_evt_handle; u ++ ) {
+        if ( u->seed <= u->frame_freq ) {
+            u->seed ++;
+        }
+    }
+}
+
 /*
  * 串口事件响应函数
  */
@@ -322,6 +337,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart reciever's timer faile.");
         }
+
         self->tx_seed.private = (void*)self;
         self->tx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
         self->tx_param.payload_size = 0;
@@ -332,6 +348,14 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      2, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart transfer's timer faile.");
+        }
+
+        self->tx_speed.private = (void*)self;
+        self->tx_speed.Hachiko_notify_proc = uart4_Hachiko_speed_proc;
+        ret = _Hachiko_new(&self->tx_speed, HACHIKO_AUTO_FEED,
+                     12, HACHIKO_PAUSE, (void*)self);
+        if ( ret != ERR_OK ) {
+            log_printf(ERR, "UART: create uart transfer's speed timer faile.");
         }
         break;
     // 串口配置
@@ -357,6 +381,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
         self->status = BP_UART_STAT_WR;
         self->hw_status = BP_UART_STAT_INVALID;
+
+        // 开始发送节奏计数
+        Hachiko_resume(&self->tx_speed);
         break;
     // 关闭串口
     case BP_EVT_KILLED:
@@ -417,13 +444,13 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                    param->payload_size);
         if ( param->payload_size ) return ERR_ERR;
 #if 1
-
+/*
         for ( u = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed <= u->frame_freq ) {
                 u->seed ++;
             }
         }
-
+*/
         for ( u = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed > u->frame_freq && self->master != u ) {
                 self->master = u;
@@ -1108,7 +1135,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                 thiz->tx_param.payload_size = 0;
                 thiz->tx_param.cursor = 0;
-                log_printf(DBG, "fasdfafasdfadsfadsfadsfasdf");
                 continue;
             }
 

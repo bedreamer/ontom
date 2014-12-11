@@ -179,10 +179,12 @@ struct bp_uart {
     int (*bp_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
                          struct bp_evt_param *param);
     BP_UART_ROLE role;
-    // 接收定时器
+    // 接收超时定时器
     struct Hachiko_food rx_seed;
-    // 发送定时器
+    // 发送完成定时器
     struct Hachiko_food tx_seed;
+    // 发送节奏定时器
+    struct Hachiko_food tx_speed;
 
     // 接收参数
     struct bp_evt_param rx_param;
