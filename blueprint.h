@@ -134,7 +134,7 @@ struct bp_user {
     // 允许连续丢帧的最大次数
     unsigned char died_line;
     // 连续丢失数据的次数
-    unsigned char died;
+    unsigned int died;
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：

@@ -845,9 +845,11 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master->died < self->master->died_line ) {
             self->master->died ++;
         } else {
+            self->master->died ++;
             if ( ! bit_read(task, S_MEASURE_COMM_DOWN) ) {
             }
-            log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障, 已禁止充电"));
+            log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
+                                        " 已禁止充电(%d)."), self->master->died);
             bit_set(task, S_MEASURE_COMM_DOWN);
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
