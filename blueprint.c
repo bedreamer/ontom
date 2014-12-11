@@ -298,7 +298,6 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
     struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
-    struct Hachiko_food *p;
     struct bp_user *u;
 
     for ( u = thiz->users; u->user_evt_handle; u ++ ) {
@@ -306,6 +305,7 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
             u->seed ++;
         }
     }
+    log_printf(DBG, "fasdf----------------------------");
 }
 
 /*
