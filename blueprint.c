@@ -303,9 +303,10 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
     for ( u = thiz->users; u->user_evt_handle; u ++ ) {
         if ( u->seed <= u->frame_freq ) {
             u->seed ++;
+        } else {
+            log_printf(DBG, "fsdfasdfsdf %d-%d", u->frame_freq, u->seed);
         }
     }
-    log_printf(DBG, "fasdf----------------------------");
 }
 
 /*
@@ -463,8 +464,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                  * param->payload_size = sizeof(qry);
                  */
                 ret = u->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
-                log_printf(INF, "UART: ret: %d, load: %d",
-                           ret, param->payload_size);
+                log_printf(DBG_LV2, "UART: ret: %d, load: %d", ret, param->payload_size);
                 break;
             }
         }
