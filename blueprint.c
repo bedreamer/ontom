@@ -1106,6 +1106,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 tcflush(thiz->dev_handle, TCOFLUSH);
+                tcflush(thiz->dev_handle, TCIFLUSH);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
                 log_printf(DBG_LV1, "UART: switch to TX mode.");
@@ -1122,10 +1123,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 log_printf(DBG_LV0, "UART: continue becouse: thiz->tx_param.payload_size > 0");
                 continue;
             }
-
-            tcflush(thiz->dev_handle, TCOFLUSH);
-            tcflush(thiz->dev_handle, TCIFLUSH);
-            log_printf(INF, "UART: system buffer CLAEN-UP "GRN("done"));
 
             thiz->tx_param.buff.tx_buff = thiz->tx_buff;
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
