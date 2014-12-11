@@ -827,6 +827,8 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         qry.crc = 0x8e40;
         memcpy(param->buff.tx_buff, &qry, sizeof(qry));
         param->payload_size = sizeof(qry);
+
+        self->rx_param.need_bytes = 32;
         ret = ERR_OK;
         log_printf(INF, "UART: "RED("%s")" sent", __FUNCTION__);
         break;
