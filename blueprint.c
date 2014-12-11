@@ -303,8 +303,6 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
     for ( u = thiz->users; u->user_evt_handle; u ++ ) {
         if ( u->seed <= u->frame_freq ) {
             u->seed ++;
-        } else {
-            log_printf(DBG, "%pfsdfasdfsdf %d-%d", u->user_evt_handle, u->frame_freq, u->seed);
         }
     }
 }
@@ -330,7 +328,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.payload_size = 0;
         self->rx_param.buff_size = sizeof(self->rx_buff);
 
-        self->users = down_user;
+        self->users = &down_user[0];
         self->master = &self->users[0];
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
