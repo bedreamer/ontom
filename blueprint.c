@@ -824,7 +824,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         qry.magic[4] = 0xB4;
         qry.addr = 0x05;
         qry.len = 16;
-        qry.crc = 0xFFFF;
+        qry.crc = 0x408E;
         memcpy(param->buff.tx_buff, &qry, sizeof(qry));
         param->payload_size = sizeof(qry);
         ret = ERR_OK;
