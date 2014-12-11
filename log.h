@@ -15,8 +15,8 @@
 
 int log_printf(unsigned int level, const char *fmt, ...);
 #define GRN(s) "\033[32m"s"\033[0m"
-#define RED(s) "\033[33m"s"\033[0m"
-#define YEL(s) "\033[31m"s"\033[0m"
+#define RED(s) "\033[31m"s"\033[0m"
+#define YEL(s) "\033[33m"s"\033[0m"
 #define debug_log log_printf
 
 #endif
