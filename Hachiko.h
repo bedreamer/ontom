@@ -2,7 +2,7 @@
  */
 #ifndef _HACHIKO_INCLUDED_H_
 #define _HACHIKO_INCLUDED_H_
-
+#include "log.h"
 struct Hachiko_food;
 
 typedef enum {
