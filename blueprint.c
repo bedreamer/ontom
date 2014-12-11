@@ -34,7 +34,7 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {3300, 0, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+    {3300, 3000, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
 #if 0
     {3200, 0, 5, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
     {3400, 0, 5, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
@@ -1074,8 +1074,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_WR ) {
 
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
-                tcflush(thiz->dev_handle, TCOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+                tcflush(thiz->dev_handle, TCOFLUSH);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
                 log_printf(DBG_LV1, "UART: switch to TX mode.");
