@@ -1010,7 +1010,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 nr = 0;
                 memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
                 tcflush(thiz->dev_handle, TCIFLUSH);
-                log_printf(DBG_LV1, "UART: switch to RX mode %d.", errno);
+                log_printf(DBG_LV1, "UART: switch to RX mode.");
             }
 
             errno = 0;
@@ -1108,6 +1108,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                 thiz->tx_param.payload_size = 0;
                 thiz->tx_param.cursor = 0;
+                log_printf(DBG, "fasdfafasdfadsfadsfadsfasdf");
                 continue;
             }
 
