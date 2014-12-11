@@ -1010,7 +1010,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 nr = 0;
                 memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
                 tcflush(thiz->dev_handle, TCIFLUSH);
-                log_printf(DBG_LV0, "UART: switch to RX mode %d.", errno);
+                log_printf(DBG_LV1, "UART: switch to RX mode %d.", errno);
             }
 
             errno = 0;
