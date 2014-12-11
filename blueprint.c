@@ -837,7 +837,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
         if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
-            log_printf(INF, "UART: 综合采样和通信恢复.");
+            log_printf(INF, "UART: "GRN("综合采样和通信恢复."));
         }
         bit_clr(task, S_MEASURE_COMM_DOWN);
         self->master->died = 0;
