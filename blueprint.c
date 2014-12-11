@@ -304,7 +304,7 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
         if ( u->seed <= u->frame_freq ) {
             u->seed ++;
         }
-        log_printf(DBG, "%p: %d-%d", u->user_evt_handle, u->frame_freq, u->seed);
+        //log_printf(DBG, "%p: %d-%d", u->user_evt_handle, u->frame_freq, u->seed);
     }
 }
 
