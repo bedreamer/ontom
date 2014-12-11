@@ -254,11 +254,11 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     if ( self == p ) {
         Hachiko_pause(&thiz->rx_seed);
         if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
-            log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: %d",
+            log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
                        thiz->rx_param.need_bytes,
                         thiz->rx_param.payload_size);
         } else {
-            log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "RED("%d"),
+            log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d"),
                        thiz->rx_param.need_bytes,
                         thiz->rx_param.payload_size);
         }
