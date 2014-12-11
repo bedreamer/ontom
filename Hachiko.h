@@ -90,6 +90,7 @@ static inline void Hachiko_resume(struct Hachiko_food *dog)
 
 static inline void Hachiko_feed(struct Hachiko_food *dog)
 {
+    log_printf(DBG_LV2, "HACHIKO: ttl: %d seed: %d", dog->ttl, dog->remain);
     dog->remain = dog->ttl;
 }
 
