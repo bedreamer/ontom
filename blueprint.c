@@ -505,6 +505,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
         if ( self->master && self->master->user_evt_handle ) {
             self->master->sent_frames ++;
+            log_printf(INF, "BP_EVT_TX_FRAME_DONE");
             ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_DONE, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_DONE")" without signal procedure.");
