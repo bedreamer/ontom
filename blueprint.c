@@ -333,7 +333,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.buff_size = sizeof(self->rx_buff);
 
         self->users = &down_user[0];
-        self->master = NULL;
+        self->master = &self->users[0];
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      1600, HACHIKO_PAUSE, (void*)self);
@@ -403,7 +403,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
-        self->master->seed = 0;
+        if ( self->master ) {
+            self->master->seed = 0;
+        }
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: set uart to TX mode faile");
             break;
@@ -412,7 +414,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
-        self->master->seed = 0;
+        if ( self->master ) {
+            self->master->seed = 0;
+        }
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: set uart to RX mode faile");
             break;
