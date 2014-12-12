@@ -282,6 +282,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     p = & thiz->tx_seed;
     if ( self == p ) {
         log_printf(DBG_LV0, "UART: packet send done.");
+        thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
         thiz->tx_param.payload_size = 0;
         Hachiko_pause(p);
         memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
