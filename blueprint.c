@@ -442,8 +442,6 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        log_printf(DBG_LV0, "UART: get into fucking here. %d",
-                   param->payload_size);
         if ( param->payload_size ) return ERR_ERR;
 #if 1
 /*
@@ -1174,11 +1172,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
                  thiz->tx_param.payload_size > 0 ) {
                 // 前一次没有发送完成， 继续发送
-                log_printf(DBG_LV0, "UART: goto continue_to_send");
+                //log_printf(DBG_LV0, "UART: goto continue_to_send");
                 goto continue_to_send;
             }
             if ( thiz->tx_param.payload_size ) {
-                log_printf(DBG_LV0, "UART: continue becouse: thiz->tx_param.payload_size > 0");
+                //log_printf(DBG_LV0, "UART: continue becouse: thiz->tx_param.payload_size > 0");
                 continue;
             }
 
