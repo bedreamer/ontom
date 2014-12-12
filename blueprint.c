@@ -333,7 +333,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.buff_size = sizeof(self->rx_buff);
 
         self->users = &down_user[0];
-        self->master = &self->users[0];
+        self->master =NULL;// &self->users[0];
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      1600, HACHIKO_PAUSE, (void*)self);
