@@ -261,6 +261,21 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
             log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d"),
                        thiz->rx_param.need_bytes,
                         thiz->rx_param.payload_size);
+            log_printf(DBG_LV0,
+                       "UART: RD:<"
+                       "%02X %02X %02X %02X %02X %02X %02X %02X "
+                       "%02X %02X %02X %02X %02X %02X %02X %02X "
+                       "%02X %02X %02X %02X>",
+                       thiz->rx_param.buff.rx_buff[0], thiz->rx_param.buff.rx_buff[1],
+                       thiz->rx_param.buff.rx_buff[2], thiz->rx_param.buff.rx_buff[3],
+                       thiz->rx_param.buff.rx_buff[4], thiz->rx_param.buff.rx_buff[5],
+                       thiz->rx_param.buff.rx_buff[6], thiz->rx_param.buff.rx_buff[7],
+                       thiz->rx_param.buff.rx_buff[0+8], thiz->rx_param.buff.rx_buff[1+8],
+                       thiz->rx_param.buff.rx_buff[2+8], thiz->rx_param.buff.rx_buff[3+8],
+                       thiz->rx_param.buff.rx_buff[4+8], thiz->rx_param.buff.rx_buff[5+8],
+                       thiz->rx_param.buff.rx_buff[6+8], thiz->rx_param.buff.rx_buff[7+8],
+                       thiz->rx_param.buff.rx_buff[8+8], thiz->rx_param.buff.rx_buff[9+8],
+                       thiz->rx_param.buff.rx_buff[10+8], thiz->rx_param.buff.rx_buff[11+8]);
         }
         if ( thiz->rx_param.payload_size == 0 ) {
             thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
