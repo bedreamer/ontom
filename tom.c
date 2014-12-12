@@ -142,7 +142,7 @@ int main()
            );
     printf( "           \nCopyright © 2014 杭州奥能电源设备股份有限公司版权所有\n");
     printf( "                            %s %s\n\n", __DATE__, __TIME__);
-    printf("系统启动中.....");
+    printf("系统启动中.....\n\n\n\n");
 
     // 读取配置文件的顺序必须是
     // 1. 系统配置文件
