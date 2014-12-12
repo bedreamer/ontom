@@ -1254,10 +1254,10 @@ continue_to_send:
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
                 thiz->tx_seed.ttl = thiz->tx_param.payload_size +
                         (thiz->tx_param.payload_size % 10 ? 1 : 0);
+                Hachiko_resume( & thiz->tx_seed );
                 log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
-                Hachiko_resume( & thiz->tx_seed );
             } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送了一部分
                 thiz->tx_param.cursor = retval;
