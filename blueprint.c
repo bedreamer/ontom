@@ -1276,7 +1276,7 @@ continue_to_send:
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
                 thiz->tx_seed.ttl = thiz->tx_param.payload_size +
-                        (thiz->tx_param.payload_size % 10 ? 1 : 0) - 5;
+                        (thiz->tx_param.payload_size % 10 ? 1 : 0) - 3;
                 Hachiko_resume( & thiz->tx_seed );
                 log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
