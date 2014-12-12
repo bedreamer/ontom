@@ -34,13 +34,13 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {1300, 300, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+    {1000, 300, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
 #if 0
     {3200, 0, 5, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
     {3400, 0, 5, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
     {3100, 0, 5, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
 #endif
-    {2910, 0, 5, 0, uart4_simple_box_evt_handle},     // 采样
+    {1500, 0, 5, 0, uart4_simple_box_evt_handle},     // 采样
     {0,  0, 0, 0, NULL}
 };
 // 串口5 使用者为上位机
@@ -542,7 +542,20 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
-        ret = ERR_OK;
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
@@ -604,7 +617,20 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
-        ret = ERR_ERR;
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
