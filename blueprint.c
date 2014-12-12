@@ -465,7 +465,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                  * param->payload_size = sizeof(qry);
                  */
                 ret = u->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
-                log_printf(DBG_LV2, "UART: ret: %d, load: %d", ret, param->payload_size);
+                log_printf(DBG_LV0, "UART: ret: %d, load: %d", ret, param->payload_size);
                 break;
             }
         }
@@ -1126,7 +1126,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 case ERR_OK:
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
-                    log_printf(DBG_LV2, "UART: fetched a "GRN("new")" frame.");
+                    log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
                                                           &thiz->rx_param);
                     break;
