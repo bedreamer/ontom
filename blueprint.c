@@ -1107,7 +1107,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     thiz->rx_param.payload_size += rd;
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
-                    log_printf(DBG_LV1,
+                    log_printf(DBG_LV0,
                                "UART: RD:%d:%d:%d <"
                                "%02X %02X %02X %02X %02X %02X %02X %02X "
                                "%02X %02X %02X %02X %02X %02X %02X %02X "
