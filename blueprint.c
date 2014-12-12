@@ -1094,7 +1094,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 nr = 0;
                 memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
                 tcflush(thiz->dev_handle, TCIFLUSH);
-                log_printf(DBG_LV1, "UART: switch to RX mode.");
+                log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
             errno = 0;
@@ -1167,7 +1167,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 tcflush(thiz->dev_handle, TCIFLUSH);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
-                log_printf(DBG_LV1, "UART: switch to TX mode.");
+                log_printf(DBG_LV0, "UART: switch to TX mode.");
                 continue;
             }
 
@@ -1235,7 +1235,7 @@ continue_to_send:
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
                 thiz->tx_seed.ttl = thiz->tx_param.payload_size +
                         (thiz->tx_param.payload_size % 10 ? 1 : 0) + 1;
-                log_printf(DBG_LV1, "UART: send data len: %d, TX ttl: %d unit",
+                log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
                 Hachiko_resume( & thiz->tx_seed );
