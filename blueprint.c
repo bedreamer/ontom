@@ -471,7 +471,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             }
         }
         ret = hit->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
-        log_printf(DBG_LV0, "UART: ret: %d, load: %d", ret, param->payload_size);
+        log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
+                   ret, param->payload_size, hit->sent_frames);
         break;
 #else
         param->attrib = BP_FRAME_UNSTABLE;
