@@ -16,7 +16,9 @@
 #endif
 
 // 配置串口是否接收SIGIO事件
-#define CONFIG_SUPPORT_SIGIO     0
+#define CONFIG_SUPPORT_SIGIO           0
+// 采用真发送均衡算法
+#define CONFIG_SUPPORT_FRAME_BALANCE   1
 
 //}}}}}}}}}}}}}
 

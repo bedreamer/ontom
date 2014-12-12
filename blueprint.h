@@ -125,7 +125,7 @@ struct bp_evt_param {
  * 该结构主要用来描述主动设备下挂接的从动设备相关信息
  */
 struct bp_user {
-    /* 帧频率，取值范围0-100
+    /* 帧频率，取值范围0-10000, 所有使用者帧率加和为10000
      * 该值越大，发送频率越高
      */
     unsigned int frame_freq;
@@ -135,6 +135,9 @@ struct bp_user {
     unsigned char died_line;
     // 连续丢失数据的次数
     unsigned int died;
+
+    // 已经发送的帧数
+    unsigned int sent_frames;
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：

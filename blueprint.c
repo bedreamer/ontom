@@ -34,19 +34,19 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {1000, 300, 5, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+    {1000, 300, 5, 0, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
 #if 1
-    {1200, 0, 5, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
-    {1400, 0, 5, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
-    {1100, 0, 5, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
+    {1200, 0, 5, 0, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
+    {1400, 0, 5, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
+    {1100, 0, 5, 0, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
 #endif
-    {1500, 0, 5, 0, uart4_simple_box_evt_handle},     // 采样
-    {0,  0, 0, 0, NULL}
+    {1500, 0, 5, 0, 0, uart4_simple_box_evt_handle},     // 采样
+    {0,  0, 0, 0, 0, NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user up_user[] = {
-    {100, 0, 5, 0, uart5_background_evt_handle},    // 采样盒
-    {0,  0, 0, 0, NULL}
+    {100, 0, 5, 0, 0, uart5_background_evt_handle},    // 采样盒
+    {0,  0, 0, 0, 0, NULL}
 };
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
@@ -318,7 +318,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 {
     int ret = ERR_OK;
     int i;
-    struct bp_user *u;
+    struct bp_user *u, *hit;
 
     switch ( evt ) {
     // 串口数据结构初始化
@@ -443,14 +443,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         if ( param->payload_size ) return ERR_ERR;
-#if 1
-/*
-        for ( u = self->users; u->user_evt_handle; u ++ ) {
-            if ( u->seed <= u->frame_freq ) {
-                u->seed ++;
-            }
-        }
-*/
+#if (CONFIG_SUPPORT_FRAME_BALANCE == 0)
         for ( u = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed > u->frame_freq && self->master != u ) {
                 self->master = u;
@@ -467,6 +460,19 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                 break;
             }
         }
+#elif ( CONFIG_SUPPORT_FRAME_BALANCE == 1 )
+        /*
+         * 采用帧发送均衡算法，该串口上的使用者帧率之和为10000
+         */
+        for ( u = self->users, hit = self->users; u->user_evt_handle; u ++ ) {
+            if ( u->seed > u->frame_freq && self->master != u &&
+                 u->sent_frames < hit->sent_frames ) {
+                hit = u;
+            }
+        }
+        ret = hit->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
+        log_printf(DBG_LV0, "UART: ret: %d, load: %d", ret, param->payload_size);
+        break;
 #else
         param->attrib = BP_FRAME_UNSTABLE;
         struct MDATA_QRY qry;
@@ -496,6 +502,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             self->master->seed = 0;
         }
         if ( self->master && self->master->user_evt_handle ) {
+            self->master->sent_frames ++;
             ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_DONE, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_DONE")" without signal procedure.");
