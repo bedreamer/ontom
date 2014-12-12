@@ -471,6 +471,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                 hit = u;
             }
         }
+        self->master = hit;
         ret = hit->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
         log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
                    ret, param->payload_size, hit->sent_frames);
