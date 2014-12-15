@@ -135,11 +135,15 @@ struct bp_user {
     unsigned char died_line;
     // 连续丢失数据的次数
     unsigned int died;
+    // 累计超时丢帧数
+    unsigned int died_total;
 
     // 已经发送的帧数
     unsigned int sent_frames;
     // 帧校验失败次数
     unsigned int check_err_cnt;
+    // 累计帧校验失败次数
+    unsigned int check_err_total;
     // 已经接收帧数
     unsigned int rcv_ok_cnt;
 

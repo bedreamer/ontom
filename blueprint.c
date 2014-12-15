@@ -35,19 +35,19 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {800, 300, 5, 0, 0, 0, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+    {800, 300, 5, 0, 0, 0, 0, 0, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
 #if 1
-    {1200, 0, 5, 0, 0, 0, 0,uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
-    {1000, 0, 2, 0, 0, 0, 0,uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
-    {500, 0, 5, 0, 0, 0, 0,uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
+    {1200, 0, 5, 0, 0, 0, 0, 0, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
+    {1000, 0, 2, 0, 0, 0, 0, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
+    {500, 0, 5, 0, 0, 0, 0, 0, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
 #endif
-    {500, 0, 5, 0, 0, 0, 0,uart4_simple_box_evt_handle},     // 采样
-    {0,  0, 0, 0, 0, 0, 0,NULL}
+    {500, 0, 5, 0, 0, 0, 0, 0, 0, uart4_simple_box_evt_handle},     // 采样
+    {0,  0, 0, 0, 0, 0, 0, 0, 0, NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user up_user[] = {
-    {100, 0, 5, 0, 0, 0, 0,uart5_background_evt_handle},    // 采样盒
-    {0,  0, 0, 0, 0, 0, 0,NULL}
+    {100, 0, 5, 0, 0, 0, 0, 0, 0, uart5_background_evt_handle},    // 采样盒
+    {0,  0, 0, 0, 0, 0, 0, 0, 0, NULL}
 };
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
@@ -1340,8 +1340,10 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
         output_len += sprintf(&thiz->iobuff[output_len], "\"seed\":%d,", me->seed);
         output_len += sprintf(&thiz->iobuff[output_len], "\"died_line\":%d,", me->died_line);
         output_len += sprintf(&thiz->iobuff[output_len], "\"died\":%d,", me->died);
+        output_len += sprintf(&thiz->iobuff[output_len], "\"died_total\":%d,", me->died_total\);
         output_len += sprintf(&thiz->iobuff[output_len], "\"sent\":%d,", me->sent_frames);
         output_len += sprintf(&thiz->iobuff[output_len], "\"checkerr\":%d,", me->check_err_cnt);
+        output_len += sprintf(&thiz->iobuff[output_len], "\"check_err_total\":%d,", me->check_err_total);
         output_len += sprintf(&thiz->iobuff[output_len], "\"recv_cnt\":%d}", me->rcv_ok_cnt);
         if ( (me + 1)->user_evt_handle ) {
             output_len += sprintf(&thiz->iobuff[output_len], ",");
