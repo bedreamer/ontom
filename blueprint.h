@@ -206,6 +206,8 @@ struct bp_uart {
     // 发送缓冲区
     char tx_buff[CONFIG_BP_IO_BUFF_SIZE];
 
+    // 发送序列
+    unsigned int sequce;
     // 使用者信息
     struct bp_user *users;
     // 当前使用者

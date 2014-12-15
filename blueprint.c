@@ -35,7 +35,7 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {50 * 100, 0, 3, 0, 0, 0, 0, 0, 0, uart4_simple_box_evt_handle},     // 采样
+    {50 * 100,    0, 3, 0, 0, 0, 0, 0, 0, uart4_simple_box_evt_handle},     // 采样
     {50 * 100, 1000, 5, 0, 0, 0, 0, 0, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
 #if 1
     {50 * 100, 2000, 5, 0, 0, 0, 0, 0, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
@@ -350,6 +350,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->users = &down_user[0];
         self->master =NULL;// &self->users[0];
+        self->sequce = 0;
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      1600, HACHIKO_PAUSE, (void*)self);
@@ -1206,6 +1207,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     break;
                 // 数据接收长度不足，继续接收
                 case ERR_FRAME_CHECK_DATA_TOO_SHORT:
+                    if ( rd > 0 ) {
+                        thiz->bp_evt_handle(thiz, BP_EVT_RX_DATA, &thiz->rx_param);
+                    }
                     break;
                 default:
                     break;
@@ -1256,6 +1260,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             // 减缓节奏
             usleep(200 * 1000);
+            thiz->sequce ++;
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
             if ( ret != ERR_OK || thiz->tx_param.payload_size <= 0 ||
