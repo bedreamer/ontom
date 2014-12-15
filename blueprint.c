@@ -460,6 +460,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME, param);
         }
 
+        self->master->rcv_ok_cnt ++;
         self->master->check_err_cnt = 0;
         self->master->died = 0;
         break;
