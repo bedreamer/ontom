@@ -1329,7 +1329,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
             return ERR_ERR;
          }
         output_len += sprintf(&thiz->iobuff[output_len], "\"freq\":%d,", me->frame_freq);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"seed\":%d", me->seed);
+        output_len += sprintf(&thiz->iobuff[output_len], "\"seed\":%d,", me->seed);
         output_len += sprintf(&thiz->iobuff[output_len], "\"died_line\":%d,", me->died_line);
         output_len += sprintf(&thiz->iobuff[output_len], "\"died\":%d,", me->died);
         output_len += sprintf(&thiz->iobuff[output_len], "\"sent\":%d}", me->sent_frames);
