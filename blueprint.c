@@ -1318,6 +1318,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
          } else if (me->user_evt_handle == uart4_charger_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信\",");
          } else {
+            log_printf(ERR, "AJAX: bad request abort UART debug page.");
             return ERR_ERR;
          }
         output_len += sprintf(&thiz->iobuff[output_len], "\"freq\":%d,", me->frame_freq);
