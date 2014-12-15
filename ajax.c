@@ -20,6 +20,7 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_debug_list(struct ajax_xml_struct *thiz);
 int ajax_debug_commit(struct ajax_xml_struct *thiz);
+int ajax_uart_debug_page(struct ajax_xml_struct *thiz);
 
 struct xml_generator {
 	// xml 文件名
@@ -39,6 +40,8 @@ struct xml_generator {
     // 调试接口
     {"/debug/list.html",        ajax_debug_list},
     {"/debug/commit.html",      ajax_debug_commit},
+    // 生成串口通信统计页面
+    {"/debug/uart.json",        ajax_uart_debug_page},
     {"", NULL}
 };
 
