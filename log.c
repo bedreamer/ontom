@@ -36,7 +36,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
         break;
     case WRN:
         printf("\033[33m[WRN@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
-               (unsigned int)gettid(),
+               (unsigned int)pthread_self(),
                p->tm_year + 1990,
                p->tm_mon,
                p->tm_mday,
