@@ -1253,7 +1253,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             thiz->tx_param.cursor = 0;
 
             // 减缓节奏
-            usleep(100 * 1000);
+            usleep(200 * 1000);
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
             if ( ret != ERR_OK || thiz->tx_param.payload_size <= 0 ||
