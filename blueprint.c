@@ -534,7 +534,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             self->master->seed = 0;
         }
         if ( self->master && self->master->user_evt_handle ) {
-            self->master->sent_frames ++;
+            //self->master->sent_frames ++;
             log_printf(DBG_LV0, "BP_EVT_TX_FRAME_DONE %p, %d",
                        self->master,
                        self->master->sent_frames);
@@ -1189,13 +1189,13 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
                                                           &thiz->rx_param);
-                    thiz->master->rcv_ok_cnt ++;
+                    //thiz->master->rcv_ok_cnt ++;
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
                     thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
                                                               &thiz->rx_param);
-                    thiz->master->check_err_cnt ++;
+                    //thiz->master->check_err_cnt ++;
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
                     log_printf(DBG_LV2,
