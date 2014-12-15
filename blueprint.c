@@ -1303,41 +1303,11 @@ continue_to_send:
 // 生成串口通信统计页面
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 {
-    struct config_struct *head = configs;
-    int nr = 0, output_len = 0, i;
+    int output_len = 0;
     struct bp_user *me = &down_user[0];
 
     thiz->ct = "application/json";
-    output_len = sprintf(&thiz->iobuff[output_len],
-                            "<html><title>直流充电桩内部调试接口</title>"
-                            "<script>function c(e,t){"
-                            "window.location.href=\"list.html?t=\""
-                            "+document.getElementById(t).innerHTML+\"&v=\""
-                            "+document.getElementById(e).value;"
-                            "}</script>"
-                            "<body><table border=\"1px\" align=\"center\">");
-    for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
-        log_printf(DBG_LV1, "get configure list from WEB. %d:%p:%d", nr, head, output_len);
-        output_len += sprintf(&thiz->iobuff[output_len], "<tr><td id=\"t%d\">%s</td>",
-                              nr,
-                              head->config_name);
-        output_len += sprintf(&thiz->iobuff[output_len],
-                              "<td>%s</td>",
-                              value_type[(unsigned int)(head->config_type)]);
-        output_len += sprintf(&thiz->iobuff[output_len],
-                              "<td><input id=\"e%d\" type=\"text\" value=\"%s\""
-                              "/><a href=\"javascript:c(\'e%d\',\'t%d\')\">SET</a></td></tr>",
-                              nr,
-                              head->config_value, nr, nr);
-        continue;
-        output_len += sprintf(&thiz->iobuff[output_len],
-        "<td><a href=\"/debug/list.html?mode=set&tag=%s&seed=%s\"></td>",
-                                 head->config_name, head->config_value);
-    }
-    log_printf(DBG_LV0, "general done..");
 
-    output_len += sprintf(&thiz->iobuff[output_len], "</table></body></html>");
-    output_len += sprintf(&thiz->iobuff[output_len], "")
     for (; me->user_evt_handle; me ++ ) {
         switch ( me->user_evt_handle ) {
         case uart4_charger_module_evt_handle:
