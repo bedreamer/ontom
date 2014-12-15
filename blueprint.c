@@ -1312,11 +1312,13 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
         if (me->user_evt_handle == uart4_charger_module_evt_handle ) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"模块操作\",");
          } else if (me->user_evt_handle == uart4_charger_config_evt_handle) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控配置信息\",");
+            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控配置\",");
          } else if (me->user_evt_handle == uart4_charger_date_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"日期配置\",");
          } else if (me->user_evt_handle == uart4_charger_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信\",");
+         } else if ( me->user_evt_handle == uart4_simple_box_evt_handle) {
+            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"综合采样\",");
          } else {
             log_printf(ERR, "AJAX: bad request abort UART debug page. %p:(%p:%p:%p:%p)",
                        me->user_evt_handle,
