@@ -1308,7 +1308,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 
     thiz->ct = "application/json";
 
-    output_len += sprintf(&thiz->iobuff[output_len], "[");
+    output_len += sprintf(&thiz->iobuff[output_len], "{\"uartuaers\":[");
     for (; me->user_evt_handle; me ++ ) {
         if (me->user_evt_handle == uart4_charger_module_evt_handle ) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"模块操作\",");
@@ -1337,7 +1337,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
         if ( (me + 1)->user_evt_handle ) {
             output_len += sprintf(&thiz->iobuff[output_len], ",");
         } else {
-            output_len += sprintf(&thiz->iobuff[output_len], "]");
+            output_len += sprintf(&thiz->iobuff[output_len], "]}");
         }
     }
 
