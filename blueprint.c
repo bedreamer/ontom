@@ -1309,17 +1309,17 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
 
     for (; me->user_evt_handle; me ++ ) {
-        switch ( me->user_evt_handle ) {
-        case uart4_charger_module_evt_handle:
+        switch ( (unsigned int)(me->user_evt_handle) ) {
+        case (unsigned int)(uart4_charger_module_evt_handle:
             output_len += spintf(&thiz->iobuff[output_len], "{\"obj\":\"模块操作\",");
             break;
-        case uart4_charger_config_evt_handle:
+        case (unsigned int)(uart4_charger_config_evt_handle):
             output_len += spintf(&thiz->iobuff[output_len], "{\"obj\":\"监控配置信息\",");
             break;
-        case uart4_charger_date_evt_handle:
+        case (unsigned int)(uart4_charger_date_evt_handle):
             output_len += spintf(&thiz->iobuff[output_len], "{\"obj\":\"日期配置\",");
             break;
-        case uart4_charger_evt_handle:
+        case (unsigned int)(uart4_charger_evt_handle):
             output_len += spintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信\",");
             break;
         default:
