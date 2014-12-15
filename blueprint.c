@@ -420,7 +420,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_SWITCH_2_TX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
         if ( self->master ) {
-            self->master->seed = 0;
+            //self->master->seed = 0;
         }
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: set uart to TX mode faile");
@@ -431,7 +431,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_SWITCH_2_RX:
         ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
         if ( self->master ) {
-            self->master->seed = 0;
+            //self->master->seed = 0;
         }
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: set uart to RX mode faile");
@@ -498,6 +498,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
         if ( self->master != hit ) {
             self->master = hit;
+            self->master->seed = 0;
             ret = hit->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
             log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
                        ret, param->payload_size, hit->sent_frames);
@@ -533,7 +534,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->master->sent_frames ++;
 
         if ( self->master ) {
-            self->master->seed = 0;
+            //self->master->seed = 0;
         }
         if ( self->master && self->master->user_evt_handle ) {
             //self->master->sent_frames ++;
