@@ -1335,8 +1335,8 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
         output_len += sprintf(&thiz->iobuff[output_len], "\"seed\":%d,", me->seed);
         output_len += sprintf(&thiz->iobuff[output_len], "\"died_line\":%d,", me->died_line);
         output_len += sprintf(&thiz->iobuff[output_len], "\"died\":%d,", me->died);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"sent\":%d}", me->sent_frames);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"checkerr\":%d}", me->check_err_cnt);
+        output_len += sprintf(&thiz->iobuff[output_len], "\"sent\":%d,", me->sent_frames);
+        output_len += sprintf(&thiz->iobuff[output_len], "\"checkerr\":%d,", me->check_err_cnt);
         output_len += sprintf(&thiz->iobuff[output_len], "\"recv_cnt\":%d}", me->rcv_ok_cnt);
         if ( (me + 1)->user_evt_handle ) {
             output_len += sprintf(&thiz->iobuff[output_len], ",");
