@@ -138,6 +138,10 @@ struct bp_user {
 
     // 已经发送的帧数
     unsigned int sent_frames;
+    // 帧校验失败次数
+    unsigned int check_err_cnt;
+    // 已经接收帧数
+    unsigned int rcv_ok_cnt;
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：
