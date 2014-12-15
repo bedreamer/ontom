@@ -459,6 +459,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME, param);
         }
+
+        self->master->check_err_cnt = 0;
+        self->master->died = 0;
         break;
 
     // 串口发送数据请求
@@ -525,6 +528,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
+        self->master->sent_frames ++;
+
         if ( self->master ) {
             self->master->seed = 0;
         }
@@ -541,6 +546,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
+        self->master->died ++;
+        self->master->died_total ++;
+
         log_printf(DBG_LV1, "UART: no data fetched.");
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_RX_BYTE_TIMEOUT, param);
@@ -550,6 +558,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        self->master->died ++;
+        self->master->died_total ++;
+
         log_printf(DBG_LV1, "UART: not all data fetched yet.");
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME_TIMEOUT, param);
@@ -563,6 +574,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 帧校验失败
     case BP_EVT_FRAME_CHECK_ERROR:
+        self->master->check_err_cnt ++;
+        self->master->check_err_total ++;
+
         log_printf(DBG_LV1, "UART: all data fetched but CRC check failed.");
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, BP_EVT_FRAME_CHECK_ERROR, param);
@@ -634,7 +648,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        self->master->died ++;
+        //self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -710,7 +724,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        self->master->died ++;
+        //self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -787,7 +801,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        self->master->died ++;
+        //self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -863,7 +877,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        self->master->died ++;
+        //self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -944,9 +958,9 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         if ( self->master->died < self->master->died_line ) {
-            self->master->died ++;
+            //self->master->died ++;
         } else {
-            self->master->died ++;
+            //self->master->died ++;
             if ( ! bit_read(task, S_MEASURE_COMM_DOWN) ) {
             }
             log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
@@ -994,7 +1008,7 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        self->master->died ++;
+        //self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
