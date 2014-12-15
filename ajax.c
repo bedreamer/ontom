@@ -61,7 +61,7 @@ int ajax_gen_xml(struct ajax_xml_struct *thiz)
         cursor = xmls;
 
         for ( ; cursor->xml_gen_proc ; cursor ++ ) {
-            log_printf(DBG, "%s:%s", thiz->xml_name, cursor->xml_name);
+            log_printf(DBG_LV0, "%s:%s", thiz->xml_name, cursor->xml_name);
             if ( 0 != strcmp(thiz->xml_name, cursor->xml_name) ) continue;
             return cursor->xml_gen_proc(thiz);
 		}
