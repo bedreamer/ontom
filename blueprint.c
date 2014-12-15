@@ -634,6 +634,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -709,6 +710,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -785,6 +787,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -860,6 +863,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -990,6 +994,7 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
