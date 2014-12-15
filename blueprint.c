@@ -38,7 +38,7 @@ struct bp_user down_user[] = {
     {800, 300, 5, 0, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
 #if 1
     {1200, 0, 5, 0, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
-    {10 * 60 * 1000, 0, 2, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
+    {1000, 0, 2, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
     {500, 0, 5, 0, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
 #endif
     {500, 0, 5, 0, 0, uart4_simple_box_evt_handle},     // 采样
