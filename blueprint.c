@@ -41,7 +41,7 @@ struct bp_user down_user[] = {
     {1000, 0, 2, 0, 0, 0, 0, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
     {1000, 0, 5, 0, 0, 0, 0, 0, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
 #endif
-    {1000, 0, 5, 0, 0, 0, 0, 0, 0, uart4_simple_box_evt_handle},     // 采样
+    {1000, 0, 3, 0, 0, 0, 0, 0, 0, uart4_simple_box_evt_handle},     // 采样
     {0,  0, 0, 0, 0, 0, 0, 0, 0, NULL}
 };
 // 串口5 使用者为上位机
