@@ -16,14 +16,13 @@ int log_printf(unsigned int level, const char *fmt, ...)
     time_t timep;
     struct tm *p;
 
-    time(&timep);
-    p =localtime(&timep);
 	va_start(ap, fmt);
-	vsnprintf(buff, sizeof(buff), fmt, ap);
-	va_end(ap);
 
     switch (level) {
     case INF:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         printf("\033[32m[INF@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                (unsigned int)pthread_self(),
                p->tm_year + 1990,
@@ -35,6 +34,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
                buff);
         break;
     case WRN:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         printf("\033[33m[WRN@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                (unsigned int)pthread_self(),
                p->tm_year + 1990,
@@ -46,6 +48,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
                buff);
         break;
     case ERR:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         printf("\033[31m[ERR@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                (unsigned int)pthread_self(),
                p->tm_year + 1990,
@@ -57,6 +62,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
                buff);
         break;
     case DBG:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         printf("\033[34m[DBG@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
                (unsigned int)pthread_self(),
                p->tm_year + 1990,
@@ -68,6 +76,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
                 buff);
         break;
     case DBG_LV0:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvA");
         if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
@@ -85,6 +96,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
                buff);
         break;
     case DBG_LV1:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvB");
         if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
@@ -102,6 +116,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
                buff);
         break;
     case DBG_LV2:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvC");
         if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
@@ -119,6 +136,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
                buff);
         break;
     case DBG_LV3:
+        time(&timep);
+        p =localtime(&timep);
+        vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvD");
         if ( cfg == NULL ) return 1;
         if ( strcmp(cfg, "false") == 0 ||
@@ -139,5 +159,6 @@ int log_printf(unsigned int level, const char *fmt, ...)
         //return printf("%s\n", buff);
         break;
     }
+    va_end(ap);
     return 0;
 }
