@@ -652,7 +652,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -728,7 +728,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
 
         self->rx_param.need_bytes = 17;
 
-        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -805,7 +805,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -881,7 +881,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -961,7 +961,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->rx_param.need_bytes = 32;
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
