@@ -515,6 +515,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
                        ret, param->payload_size, hit->sent_frames);
         } else {
+            self->sequce --;
             ret = ERR_ERR;
         }
         break;
