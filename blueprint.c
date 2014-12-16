@@ -499,7 +499,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         //self->master = NULL;
         self->sequce ++;
         nr = (sizeof(down_user) - sizeof(struct bp_user)) / sizeof(struct bp_user);
-        log_printf(ERR, "dfasdfasdfas;dlgja;    %d", nr);
+        i = self->sequce % nr;
+        log_printf(ERR, "dfasdfasdfas;dlgja;    %d : %d", nr, i);
+        hit = down_user[ i ];
         for ( u = self->users, hit = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed > u->frame_freq && self->master != u &&
                  u->sent_frames < hit->sent_frames ) {
