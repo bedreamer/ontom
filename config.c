@@ -79,10 +79,10 @@ CONFIG_DOMAIN_BEGIN
 {"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"10000000"}},
 // 线程栈大小，单位KB
 {"thread_stack_size",           C_INT,      no,     C_VALID,    .cuv.i=0,       {"1024"}},
-{"debug_lvA",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
-{"debug_lvB",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
-{"debug_lvC",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
-{"debug_lvD",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"TRUE"}},
+{"debug_lvA",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
+{"debug_lvB",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
+{"debug_lvC",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
+{"debug_lvD",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
 
 
 // 开始充电任务的刷卡卡号
