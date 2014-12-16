@@ -340,7 +340,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_OK;
-    int i;
+    int i, nr;
     struct bp_user *u, *hit;
 
     switch ( evt ) {
@@ -497,6 +497,9 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
          * 采用帧发送均衡算法，该串口上的使用者帧率之和为10000
          */
         //self->master = NULL;
+        self->sequce ++;
+        nr = (sizeof(down_user) - sizeof(struct bp_user)) / sizeof(struct bp_user);
+        log_printf(ERR, "dfasdfasdfas;dlgja;    %d", nr);
         for ( u = self->users, hit = self->users; u->user_evt_handle; u ++ ) {
             if ( u->seed > u->frame_freq && self->master != u &&
                  u->sent_frames < hit->sent_frames ) {
