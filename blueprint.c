@@ -297,6 +297,12 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 #else
     p = & thiz->tx_seed;
     if ( self == p ) {
+        static bp_user *pre = NULL;
+        if ( thiz->master != pre ) {
+            pre = thiz->master;
+        } else {
+            log_printf(WRN, "HACHIKO: renter....");
+        }
         log_printf(DBG_LV0, "UART: packet send done.");
         thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
         thiz->tx_param.payload_size = 0;
