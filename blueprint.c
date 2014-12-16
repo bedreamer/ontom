@@ -1179,7 +1179,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             cursor = thiz->rx_param.cursor;
             do {
                 rd = read(thiz->dev_handle,
-                          &thiz->rx_param.buff.rx_buff[cursor], 256);
+                          &thiz->rx_param.buff.rx_buff[cursor], 32);
                 if ( rd > 0 ) {
                     Hachiko_feed(&thiz->rx_seed);
                     thiz->rx_param.payload_size += rd;
