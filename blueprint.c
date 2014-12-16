@@ -297,6 +297,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 #else
     p = & thiz->tx_seed;
     if ( self == p ) {
+        Hachiko_pause(p);
         static struct bp_user *pre = NULL;
         if ( thiz->master != pre ) {
             pre = thiz->master;
@@ -306,7 +307,6 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         log_printf(DBG_LV0, "UART: packet send done.");
         thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
         thiz->tx_param.payload_size = 0;
-        Hachiko_pause(p);
         memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
         thiz->status = BP_UART_STAT_RD;
         if ( thiz->role == BP_UART_MASTER ) {
