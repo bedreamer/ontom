@@ -660,7 +660,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -736,7 +736,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -813,7 +813,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -889,7 +889,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -969,7 +969,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
-        log_printf(INF, "UART: %s packet send done", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
