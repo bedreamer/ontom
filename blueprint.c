@@ -248,6 +248,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 {
     struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
     struct Hachiko_food *p;
+    static bp_user *pre = NULL;
 
     if ( evt != HACHIKO_TIMEOUT ) return;
     p = & (thiz->rx_seed);
@@ -297,7 +298,6 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 #else
     p = & thiz->tx_seed;
     if ( self == p ) {
-        static bp_user *pre = NULL;
         if ( thiz->master != pre ) {
             pre = thiz->master;
         } else {
