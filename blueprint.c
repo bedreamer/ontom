@@ -262,7 +262,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
             log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d"),
                        thiz->rx_param.need_bytes,
                         thiz->rx_param.payload_size);
-            log_printf(DBG_LV0,
+            log_printf(DBG_LV1,
                        "UART: RD:<"
                        "%02X %02X %02X %02X %02X %02X %02X %02X "
                        "%02X %02X %02X %02X %02X %02X %02X %02X "
@@ -1185,7 +1185,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     thiz->rx_param.payload_size += rd;
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
-                    log_printf(DBG_LV0,
+                    log_printf(DBG_LV1,
                                "UART: RD:%d:%d:%d <"
                                "%02X %02X %02X %02X %02X %02X %02X %02X "
                                "%02X %02X %02X %02X %02X %02X %02X %02X "
