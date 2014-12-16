@@ -500,7 +500,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->sequce ++;
         nr = (sizeof(down_user) - sizeof(struct bp_user)) / sizeof(struct bp_user);
         i = self->sequce % nr;
-        log_printf(ERR, "dfasdfasdfas;dlgja;    %d : %d", nr, i);
+        log_printf(DBG_LV0, "下一个发送序列为: %d", i);
         hit = &down_user[ i ];
         /*
         for ( u = self->users, hit = self->users; u->user_evt_handle; u ++ ) {
@@ -518,7 +518,6 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                        ret, param->payload_size, hit->sent_frames);
         } else {
             self->sequce --;
-            log_printf(ERR, "fasdfadfasdfgasdgasdgasdgasdgasdgasdgasdfasdfg");
             ret = ERR_ERR;
         }
         break;
