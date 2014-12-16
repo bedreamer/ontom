@@ -985,6 +985,9 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                                         " 已禁止充电(%d)."), self->master->died);
             bit_set(task, S_MEASURE_COMM_DOWN);
         }
+        if ( self->master->died %2 == 0 ) {
+            self->sequce --;
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
