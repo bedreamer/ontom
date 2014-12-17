@@ -192,7 +192,8 @@ struct MDATA_QRY {
 #else
     unsigned char cmd_rsv;
 #endif
-    unsigned char rsvs[15];
+    unsigned char cmd_copy;
+    unsigned char rsvs[14];
 
     unsigned short crc;
 };
