@@ -690,7 +690,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
 {
     int ret = ERR_ERR;
     unsigned int val;
-    char buff[8], nr = 0, s;
+    char buff[32], nr = 0, s;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -749,8 +749,8 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         // CRC
         buff[nr ++] = load_crc(s, buff) >> 8;
         buff[nr ++] = load_crc(s, buff);
-        memcpy(param->buff.tx_buff, buff, sizeof(buff));
-        param->payload_size = sizeof(buff);
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
         ret = ERR_OK;
 
         self->rx_param.need_bytes = 8;
