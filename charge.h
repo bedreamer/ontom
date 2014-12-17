@@ -189,7 +189,7 @@ struct MDATA_QRY {
     // 2#充电枪输出开关合闸，0：分闸，1：合闸
     unsigned char gun_2_output_hezha:1;
     unsigned char cmd_rsv:3;
-#elif
+#else
     unsigned char cmd_rsv;
 #endif
     unsigned char rsvs[15];
