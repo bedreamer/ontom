@@ -607,4 +607,18 @@ static inline unsigned short load_crc(unsigned short cnt, char *dat)
     return crc;
 }
 
+// 大端转小段
+static inline unsigned short b2l(unsigned short b)
+{
+    unsigned char h = b >> 8, l = b & 0xFF;
+    return (l << 8 | h);
+}
+
+// 小端转大端
+static inline unsigned short l2b(unsigned short l)
+{
+    unsigned char h = b >> 8, l = b & 0xFF;
+    return (l << 8 | h);
+}
+
 #endif /*_CHARGE_INCLUDED_H_*/
