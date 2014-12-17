@@ -994,7 +994,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->rx_param.need_bytes = 32;
         ret = ERR_OK;
-        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+        log_printf(INF, "UART: %s sent %d", __FUNCTION__, sizeof(qry));
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
