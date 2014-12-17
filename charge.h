@@ -13,6 +13,7 @@ struct charge_task;
 struct MDATA_ACK;
 #include "Hachiko.h"
 #include "bms.h"
+#include "config.h"
 
 // 无效时戳，初始化时默认赋值， 用于time_t默认值
 #define INVALID_TIMESTAMP  0x00000000
