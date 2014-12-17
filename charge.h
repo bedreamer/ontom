@@ -615,9 +615,9 @@ static inline unsigned short b2l(unsigned short b)
 }
 
 // 小端转大端
-static inline unsigned short l2b(unsigned short l)
+static inline unsigned short l2b(unsigned short t)
 {
-    unsigned char h = b >> 8, l = b & 0xFF;
+    unsigned char h = t >> 8, l = t & 0xFF;
     return (l << 8 | h);
 }
 
