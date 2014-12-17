@@ -971,6 +971,8 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
         bit_clr(task, S_MEASURE_COMM_DOWN);
         self->master->died = 0;
+
+        memcpy(&task->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -1419,6 +1421,32 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 
     // 充电机遥信，遥测量
     output_len += sprintf(&thiz->iobuff[output_len], ", \"chargers\":{");
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_sn\":\"%04X\",", task->chargers.charger_sn);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_status\":\"%04X\",", task->chargers.charger_status);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_self_status\":\"%04X\",", task->chargers.charger_self_status);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_v_out\":%d,", b2l(task->chargers.charger_max_v_out));
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_min_v_out\":%d,", b2l(task->chargers.charger_min_v_out));
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_i_out\":%d,", b2l(task->chargers.charger_max_i_out));
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_v_out\":%d,", b2l(task->chargers.charger_v_out));
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_i_out\":%d,", b2l(task->chargers.charger_i_out));
+    output_len += sprintf(&thiz->iobuff[output_len], "\"modules\":[");
+    for (i=0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+        output_len += sprintf(&thiz->iobuff[output_len], "{\"voltage\":%d,", b2l(task->chargers.charge_module_v[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "\"current\":%d,", b2l(task->chargers.charge_module_i[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "\"temp\":%d,", b2l(task->chargers.charge_module_t[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "\"sn\":\"%04X%04X%04X\"}",
+                              b2l(task->chargers.charge_module_sn[i][0]),
+                              b2l(task->chargers.charge_module_sn[i][1]),
+                              b2l(task->chargers.charge_module_sn[i][2]));
+        if ( i != CONFIG_SUPPORT_CHARGE_MODULE - 1 ) {
+            output_len += sprintf(&thiz->iobuff[output_len], ",");
+        }
+    }
+    output_len += sprintf(&thiz->iobuff[output_len], "]");
+    output_len += sprintf(&thiz->iobuff[output_len], "}");
+
+    // 扩展采样盒
+    output_len += sprintf(&thiz->iobuff[output_len], ", \"samplingbox":{");
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_sn\":\"%04X\",", task->chargers.charger_sn);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_status\":\"%04X\",", task->chargers.charger_status);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_self_status\":\"%04X\",", task->chargers.charger_self_status);
