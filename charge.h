@@ -176,6 +176,7 @@ struct MDATA_QRY {
     unsigned char addr;
     // 载荷长度
     unsigned char len;
+    unsigned char ll;
 
     // 直流总开关输出闭合，0：断开，1：闭合
     unsigned char dc_output_hezha:1;
