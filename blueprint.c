@@ -1350,7 +1350,7 @@ continue_to_send:
 // 生成串口通信统计页面
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 {
-    int output_len = 0;
+    int output_len = 0, i;
     struct bp_user *me = &down_user[0];
 
     thiz->ct = "application/json";
@@ -1401,7 +1401,21 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_min_v_out\":%d,", b2l(task->chargers.charger_min_v_out));
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_i_out\":%d,", b2l(task->chargers.charger_max_i_out));
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_v_out\":%d,", b2l(task->chargers.charger_v_out));
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_i_out\":%d", b2l(task->chargers.charger_i_out));
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_i_out\":%d,", b2l(task->chargers.charger_i_out));
+    output_len += sprintf(&thiz->iobuff[output_len], "\"modules\":[");
+    for (i=0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+        output_len += sprintf(&thiz->iobuff[output_len], "{voltage:%d,", b2l(task->chargers.charger_v_out[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "{current:%d,", b2l(task->chargers.charger_i_out[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "{temp:%d,", b2l(task->chargers.charge_module_t[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "{sn:\"%04X%04X%04X\"",
+                              b2l(task->chargers.charger_sn[i][0]),
+                              b2l(task->chargers.charger_sn[i][1]),
+                              b2l(task->chargers.charger_sn[i][2]));
+        if ( i != CONFIG_SUPPORT_CHARGE_MODULE - 1 ) {
+            output_len += sprintf(&thiz->iobuff[output_len], ",");
+        }
+    }
+    output_len += sprintf(&thiz->iobuff[output_len], "]");
     output_len += sprintf(&thiz->iobuff[output_len], "}");
 
     // 终结符
