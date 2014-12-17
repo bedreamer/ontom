@@ -747,8 +747,8 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         s = nr;
 
         // CRC
-        buff[nr ++] = load_crc(s, buff) >> 8;
         buff[nr ++] = load_crc(s, buff);
+        buff[nr ++] = load_crc(s, buff) >> 8;
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
         ret = ERR_OK;
