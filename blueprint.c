@@ -1396,7 +1396,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], ", \"chargers\":{");
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_sn\":\"%04X\",", task->chargers.charger_sn);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_status\":\"%04X\",", task->chargers.charger_status);
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_self_status\":\"%04X\",", task->chargers.charger_self_status\);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_self_status\":\"%04X\",", task->chargers.charger_self_status);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_v_out\":%d,", b2l(task->chargers.charger_max_v_out));
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_min_v_out\":%d,", b2l(task->chargers.charger_min_v_out));
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_i_out\":%d,", b2l(task->chargers.charger_max_i_out));
