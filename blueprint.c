@@ -723,7 +723,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         buff[nr ++] = 0x00;
         buff[nr ++] = 0x13;
         buff[nr ++] = 0x00;
-        buff[nr ++] = 0x03;
+        buff[nr ++] = 0x04;
         buff[nr ++] = 0x08;
 
         val = (unsigned int)atoi(config_read("初始电压"));
