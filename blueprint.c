@@ -942,7 +942,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    struct MDATA_QRY qry = {0};
+    volatile struct MDATA_QRY qry = {0};
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -994,7 +994,9 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->rx_param.need_bytes = 32;
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent %d %04X", __FUNCTION__, sizeof(qry), load_crc(23, param->buff.tx_buff));
+        log_printf(INF, "UART: %s sent %d %04X:%04X", __FUNCTION__, sizeof(qry),
+                   load_crc(23, param->buff.tx_buff),
+                   load_crc(23, (char *)&qry));
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
