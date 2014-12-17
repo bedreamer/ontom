@@ -988,7 +988,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         qry.gun_1_assit_power_on = 1;
         qry.gun_1_output_hezha = 1;
         qry.crc = load_crc(23, (char *)&qry);
-        qry.crc = l2b(qry.crc);
+        //qry.crc = l2b(qry.crc);
         memcpy(param->buff.tx_buff, &qry, sizeof(qry));
         param->payload_size = sizeof(qry);
 
