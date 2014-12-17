@@ -635,7 +635,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
-        memcpy(&task->chargers, param->buff.rx_buff[3],
+        memcpy(&task->chargers, &param->buff.rx_buff[3],
                 sizeof(struct charger_config_10h));
         break;
     // 串口发送数据请求
