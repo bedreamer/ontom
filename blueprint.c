@@ -994,7 +994,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->rx_param.need_bytes = 32;
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent %d", __FUNCTION__, sizeof(qry));
+        log_printf(DBG_LV3, "UART: %s sent %d", __FUNCTION__, sizeof(qry));
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -1354,7 +1354,7 @@ continue_to_send:
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
-                thiz->tx_seed.ttl = thiz->tx_param.payload_size /*+
+                thiz->tx_seed.ttl = thiz->tx_param.payload_size + 5/*+
                         (thiz->tx_param.payload_size % 10 ? 1 : 0)*/;
                 Hachiko_resume( & thiz->tx_seed );
                 log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
