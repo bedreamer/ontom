@@ -987,14 +987,14 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         qry.dc_output_hezha = 1;
         qry.gun_1_assit_power_on = 1;
         //qry.gun_1_output_hezha = 1;
-        qry.crc = load_crc(23, (char *)&qry);
+        qry.crc = 0x00;
         //qry.crc = l2b(qry.crc);
         memcpy(param->buff.tx_buff, &qry, sizeof(qry));
         param->payload_size = sizeof(qry);
 
         self->rx_param.need_bytes = 32;
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent %d %04X", __FUNCTION__, sizeof(qry), qry.crc);
+        log_printf(INF, "UART: %s sent %d %04X", __FUNCTION__, sizeof(qry), load_crc(23, (char *)&qry));
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
