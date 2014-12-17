@@ -684,12 +684,13 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     return ret;
 }
 
-// 配置数据
+// 配置数据,系统需求电压，需求电流配置
 static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    char buff[8];
+    unsigned int val;
+    char buff[8], nr = 0, s;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -717,18 +718,42 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        buff[0] = 0x01;
-        buff[1] = 0x04;
-        buff[2] = buff[3] = 0x00;
-        buff[4] = 0x00;
-        buff[5] = 0x06;
-        buff[6] = 0x70;
-        buff[7] = 0x08;
+        buff[nr ++] = 0x01;
+        buff[nr ++] = 0x10;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x13;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x03;
+        buff[nr ++] = 0x08;
+
+        val = (unsigned int)atoi(config_read("初始电压"));
+        // 初始电压
+        buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = l2b((unsigned short)val);
+
+        // 充电命令
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x01;
+
+        val = (unsigned int)atoi(config_read("需求电压"));
+        // 需求电压
+        buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = l2b((unsigned short)val);
+
+        val = (unsigned int)atoi(config_read("需求电流"));
+        // 需求电流
+        buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = l2b((unsigned short)val);
+        s = nr;
+
+        // CRC
+        buff[nr ++] = load_crc(s, buff) >> 8;
+        buff[nr ++] = load_crc(s, buff);
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
         ret = ERR_OK;
 
-        self->rx_param.need_bytes = 17;
+        self->rx_param.need_bytes = 8;
 
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
