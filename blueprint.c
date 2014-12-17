@@ -1446,7 +1446,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "}");
 
     // 扩展采样盒
-    output_len += sprintf(&thiz->iobuff[output_len], ", \"samplingbox":{");
+    output_len += sprintf(&thiz->iobuff[output_len], ", \"samplingbox\":{");
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_sn\":\"%04X\",", task->chargers.charger_sn);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_status\":\"%04X\",", task->chargers.charger_status);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_self_status\":\"%04X\",", task->chargers.charger_self_status);
