@@ -1404,8 +1404,8 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_i_out\":%d,", b2l(task->chargers.charger_i_out));
     output_len += sprintf(&thiz->iobuff[output_len], "\"modules\":[");
     for (i=0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
-        output_len += sprintf(&thiz->iobuff[output_len], "{voltage:%d,", b2l(task->chargers.charger_v_out[i]));
-        output_len += sprintf(&thiz->iobuff[output_len], "{current:%d,", b2l(task->chargers.charger_i_out[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "{voltage:%d,", b2l(task->chargers.charge_module_v[i]));
+        output_len += sprintf(&thiz->iobuff[output_len], "{current:%d,", b2l(task->chargers.charge_module_i[i]));
         output_len += sprintf(&thiz->iobuff[output_len], "{temp:%d,", b2l(task->chargers.charge_module_t[i]));
         output_len += sprintf(&thiz->iobuff[output_len], "{sn:\"%04X%04X%04X\"",
                               b2l(task->chargers.charger_sn[i][0]),
