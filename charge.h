@@ -177,8 +177,7 @@ struct MDATA_QRY {
     unsigned char addr;
     // 载荷长度
     unsigned char len;
-    unsigned char ll;
-
+#if 0
     // 直流总开关输出闭合，0：断开，1：闭合
     unsigned char dc_output_hezha:1;
     // 1#充电枪辅助电源上电，0：断电，1：上电
@@ -190,7 +189,9 @@ struct MDATA_QRY {
     // 2#充电枪输出开关合闸，0：分闸，1：合闸
     unsigned char gun_2_output_hezha:1;
     unsigned char cmd_rsv:3;
-
+#elif
+    unsigned char cmd_rsv;
+#endif
     unsigned char rsvs[15];
 
     unsigned short crc;
