@@ -942,7 +942,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    struct MDATA_QRY qry;
+    struct MDATA_QRY qry = {0};
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
