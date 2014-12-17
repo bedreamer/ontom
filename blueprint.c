@@ -1393,7 +1393,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     }
 
     // 充电机遥信，遥测量
-    output_len += sprintf(&thiz->iobuff[output_len], ", chargers:[");
+    output_len += sprintf(&thiz->iobuff[output_len], ", chargers:{");
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_sn\":\"%08X\",", task->chargers.charger_sn);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_status\":\"%08X\",", task->chargers.charger_status);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_v_out\":%d,", task->chargers.charger_max_v_out);
@@ -1401,7 +1401,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_i_out\":%d,", task->chargers.charger_max_i_out);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_v_out\":%d,", task->chargers.charger_v_out);
     output_len += sprintf(&thiz->iobuff[output_len], "\"charger_i_out\":%d", task->chargers.charger_i_out);
-    output_len += sprintf(&thiz->iobuff[output_len], "]");
+    output_len += sprintf(&thiz->iobuff[output_len], "}");
 
     // 终结符
     output_len += sprintf(&thiz->iobuff[output_len], "}");
