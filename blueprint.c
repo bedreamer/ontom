@@ -728,8 +728,8 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
 
         val = (unsigned int)atoi(config_read("初始电压"));
         // 初始电压
-        buff[nr ++] = l2b((unsigned short)val);
         buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = l2b((unsigned short)val);
 
         // 充电命令
         buff[nr ++] = 0x00;
@@ -737,13 +737,13 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
 
         val = (unsigned int)atoi(config_read("需求电压"));
         // 需求电压
-        buff[nr ++] = l2b((unsigned short)val);
         buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = l2b((unsigned short)val);
 
         val = (unsigned int)atoi(config_read("需求电流"));
         // 需求电流
-        buff[nr ++] = l2b((unsigned short)val);
         buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = l2b((unsigned short)val);
         s = nr;
 
         // CRC
