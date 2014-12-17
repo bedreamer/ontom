@@ -222,6 +222,8 @@ struct charger_config_10h {
     unsigned short charger_sn;
     // 充电机组充电状态
     unsigned short charger_status;
+    // 充电及自身状态
+    unsigned short charger_self_status;
     // 充电机组最高输出电压
     unsigned short charger_max_v_out;
     // 充电机组最低输出电压
