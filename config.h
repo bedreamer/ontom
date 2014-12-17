@@ -19,6 +19,8 @@
 #define CONFIG_SUPPORT_SIGIO           0
 // 采用真发送均衡算法
 #define CONFIG_SUPPORT_FRAME_BALANCE   1
+// 支持的充电模块个数
+#define CONFIG_SUPPORT_CHARGE_MODULE   14
 
 //}}}}}}}}}}}}}
 

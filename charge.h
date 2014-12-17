@@ -217,8 +217,7 @@ struct charger_config_03h_04h_10h {
 
 // 充电屏数据结构
 struct charger_config_10h {
-    // 充电模块个数
-    unsigned int charger_module_nr;
+    // {{ 充电屏监控返回数据
     // 充电屏编号
     unsigned short charger_sn;
     // 充电机组充电状态
@@ -235,15 +234,16 @@ struct charger_config_10h {
     unsigned short charger_i_out;
 
     // 充电机模块输出电压
-    unsigned short *charge_module_v;
+    unsigned short charge_module_v[CONFIG_SUPPORT_CHARGE_MODULE];
     // 充电机模块输出电流
-    unsigned short *charge_module_i;
+    unsigned short charge_module_i[CONFIG_SUPPORT_CHARGE_MODULE];
     // 充电机模块温度
-    unsigned short *charge_module_t;
+    unsigned short charge_module_t[CONFIG_SUPPORT_CHARGE_MODULE];
     // 充电机模块状态
-    unsigned short *charge_module_status;
+    unsigned short charge_module_status[CONFIG_SUPPORT_CHARGE_MODULE/2];
     // 充电机模块机身编号
-    unsigned short *charge_module_sn[6];
+    unsigned short charge_module_sn[CONFIG_SUPPORT_CHARGE_MODULE/2][3];
+    // }}
 };
 
 // 充电计费模式

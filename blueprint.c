@@ -635,6 +635,8 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        memcpy(&task->chargers, param->buff.rx_buff[3],
+                sizeof(struct charger_config_10h));
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -940,7 +942,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
         if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
-            log_printf(INF, "UART: "GRN("综合采样和通信恢复."));
+            log_printf(INF, "UART: "GRN("综合采样盒通信恢复."));
         }
         bit_clr(task, S_MEASURE_COMM_DOWN);
         self->master->died = 0;
@@ -1386,11 +1388,23 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
         if ( (me + 1)->user_evt_handle ) {
             output_len += sprintf(&thiz->iobuff[output_len], ",");
         } else {
-            output_len += sprintf(&thiz->iobuff[output_len], "]}");
+            output_len += sprintf(&thiz->iobuff[output_len], "]");
         }
     }
 
+    // 充电机遥信，遥测量
+    output_len += sprintf(&thiz->iobuff[output_len], ", chargers:[");
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_sn\":\"%08X\",", task->chargers.charger_sn);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_status":\"%08X\",", task->chargers.charger_status);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_v_out":\"%08X\",", task->chargers.charger_max_v_out);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_min_v_out":\"%08X\",", task->chargers.charger_min_v_out);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_i_out":\"%08X\",", task->chargers.charger_max_i_out);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_v_out":\"%08X\",", task->chargers.charger_v_out);
+    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_i_out":\"%08X\"", task->chargers.charger_i_out);
+    output_len += sprintf(&thiz->iobuff[output_len], "]");
 
+    // 终结符
+    output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
     return ERR_OK;
 }
