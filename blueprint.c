@@ -1115,23 +1115,23 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[1#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_1_assit_power_hezha ) {
-            if ( !me->yx_gun_1_assit_power_hezha ) {
+            if ( !me_pre->yx_gun_1_assit_power_hezha ) {
                 log_printf(INF, "1#枪辅助电源合闸.");
             }
             len += sprintf(&infstr[len], "[1#枪辅助电源"GRN("合闸")"] ");
         } else {
-            if ( me->yx_gun_1_assit_power_hezha ) {
+            if ( me_pre->yx_gun_1_assit_power_hezha ) {
                 log_printf(INF, "1#枪辅助电源分闸.");
             }
             len += sprintf(&infstr[len], "[1#枪辅助电源"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_hezha_stat ) {
-            if ( !me->yx_gun_2_hezha_stat ) {
+            if ( !me_pre->yx_gun_2_hezha_stat ) {
                 log_printf(INF, "2#枪输出"GRN("合闸")"");
             }
             len += sprintf(&infstr[len], "[2#枪输出"GRN("合闸")"] ");
         } else {
-            if ( me->yx_gun_2_hezha_stat ) {
+            if ( me_pre->yx_gun_2_hezha_stat ) {
                 log_printf(INF, "2#枪输出"RED("分闸")"");
             }
             len += sprintf(&infstr[len], "[2#枪输出"RED("分闸")"] ");
@@ -1152,12 +1152,12 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[2#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
-            if ( !me->yx_gun_2_assit_power_hezha ) {
+            if ( !me_pre->yx_gun_2_assit_power_hezha ) {
                 log_printf(INF, "2#枪辅助电源"GRN("合闸"));
             }
             len += sprintf(&infstr[len], "[2#枪辅助电源"GRN("合闸")"] ");
         } else {
-            if ( me->yx_gun_2_assit_power_hezha ) {
+            if ( me_pre->yx_gun_2_assit_power_hezha ) {
                 log_printf(INF, "2#枪辅助电源"RED("分闸"));
             }
             len += sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
