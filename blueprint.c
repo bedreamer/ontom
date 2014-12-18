@@ -941,8 +941,10 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
 static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR, ccc, nr = 0, len;
+    int ret = ERR_ERR, ccc, nr = 0, len = 0, errnr = 0;
     char buff[32] = {0};
+    struct MDATA_ACK *me;
+    char errstr[1024] = {0};
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -973,6 +975,59 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->master->died = 0;
 
         memcpy(&task->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
+        // 故障判定
+        me = &task->measure;
+        if ( me->yx_mx_V_high ) {
+            len = sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
+        }
+        if ( me->yx_mx_V_low ) {
+            len = sprintf(&errstr[len], "[%d: 母线欠压] ", ++errnr);
+        }
+        if ( me->yx_mx_short_fault ) {
+            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        }
+
+        if ( me->yx_bat_V_high ) {
+            len = sprintf(&errstr[len], "[%d: 电池过压] ", ++errnr);
+        }
+        if ( me->yx_bat_V_low ) {
+            len = sprintf(&errstr[len], "[%d: 电池欠压] ", ++errnr);
+        }
+        if ( me->yx_bat_I_high ) {
+            len = sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
+        }
+        if ( me->yx_bat_short_fault ) {
+            len = sprintf(&errstr[len], "[%d: 电池链接短路] ", ++errnr);
+        }
+        if ( me->yx_bat_institude_fault ) {
+            len = sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
+        }
+
+        if ( me->yx_bat_revers_conn ) {
+            len = sprintf(&errstr[len], "[%d: 电池反接] ", ++errnr);
+        }
+        if ( me->yx_assit_power_stat ) {
+            len = sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
+        }
+        if ( me->yx_temprature ) {
+            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        }
+        if ( me->yx_wet_rate ) {
+            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        }
+        if ( me->yx_ac_input ) {
+            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        }
+        if ( me->yx_flq ) {
+            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        }
+        if ( me->yx_rdq ) {
+            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        }
+        if ( me->yx_rdq_1 ) {
+            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        }
+
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:

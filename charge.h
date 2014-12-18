@@ -111,58 +111,61 @@ struct MDATA_ACK {
     unsigned char yx_bat_V_high:1;
     // 电池电压过低
     unsigned char yx_bat_V_low:1;
-    // 电池电流过高
-    unsigned char yx_bat_I_high:1;
     // 电池链接短路
     unsigned char yx_bat_short_fault:1;
-    // 电池绝缘故障
-    unsigned char yx_bat_institude_fault:1;
-
     // 电池反接
     unsigned char yx_bat_revers_conn:1;
+    // 电池电流过高
+    unsigned char yx_bat_I_high:1;
+
+    // 电池绝缘故障
+    unsigned char yx_bat_institude_fault:1;
     // 辅助电源状态
     unsigned char yx_assit_power_stat:1;
-    // 温度状态，0: 正常，1： 过高
-    unsigned char yx_temprature:1;
-    // 湿度状态，0： 正常，1：过湿
-    unsigned char yx_wet_rate:1;
-    // 交流输入状态，0： 无故障，1： 输入故障
-    unsigned char yx_ac_input:1;
-    // 防雷器故障，0：无故障，1：防雷器故障
-    unsigned char yx_flq:1;
+    // 温度状态，00: 正常，01： 过高 10： 过低
+    unsigned char yx_temprature:2;
+    // 湿度状态，00： 正常，01：过湿, 10: 过干
+    unsigned char yx_wet_rate:2;
+    unsigned char yx_prtc2_rsv:2;
+
+    unsigned char yx_prtc3_rsv;
+
     // 总输出熔断器故障，0：无故障，1：熔断
     unsigned char yx_rdq:1;
-    // 一路输出熔断器状态，0： 无故障，1：熔断
-    unsigned char yx_rdq_1:1;
+    // 总直流输出跳闸, 0: 正常， 1： 跳闸
+    unsigned char yx_dc_output_tiaozha:1;
+    // 一路输出跳闸，0：正常，1：跳闸
+    unsigned char yx_dc_output_tiaozha1:1;
+    // 二路输出跳闸，0：正常，1：跳闸
+    unsigned char yx_dc_output_tiaozha2:1;
+    // 防雷器故障，0：无故障，1：防雷器故障
+    unsigned char yx_flq:1;
+    unsigned char yx_prtc4_rsv:3;
 
-    // 二路输出熔断器状态，0：无故障，1：熔断
-    unsigned char yx_rdq_2:1;
-    unsigned char yx_prtc3_rsv:7;
-
-    unsigned char yx_prtc4_rsv;
+    unsigned char yx_prtc5_rsv;
 
     // 交流输入合闸状态，0：分闸，1：合闸
     unsigned char yx_ac_hezha:1;
-    // 直流输入总开关合闸，0：分闸，1：合闸
-    unsigned char yx_dc_output_hz:1;
     // 加热状态，0：未加热，1：加热
     unsigned char yx_heater_stat:1;
     // 风扇状态，0：未启动，1：启动
     unsigned char yx_fan_stat:1;
-    // 1#充电枪连接状态，0：未连接，1：链接
-    unsigned char yx_gun_1_conn_stat:1;
+    // 直流输入总开关合闸，0：分闸，1：合闸
+    unsigned char yx_dc_output_hz:1;
     // 1#充电枪输出合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_1_hezha_stat:1;
+    // 1#充电枪连接状态，00：未连接，11：链接,10:连接保护，10：连接异常
+    unsigned char yx_gun_1_conn_stat:2;
     // 1#充电枪辅助电源合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_1_assit_power_hezha:1;
-    // 2#充电枪连接状态，0：未连接，1：链接
-    unsigned char yx_gun_2_conn_stat:1;
 
     // 2#充电枪输出合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_2_hezha_stat:1;
+    // 2#充电枪连接状态，00：未连接，11：链接,10:连接保护，10：连接异常
+    unsigned char yx_gun_2_conn_stat:2;
     // 2#充电枪辅助电源合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_2_assit_power_hezha:1;
-    unsigned char yx_run2_rsv:6;
+    unsigned char yx_run2_rsv:4;
 
     unsigned char yx_run3_rsv;
 
