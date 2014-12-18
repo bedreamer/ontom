@@ -1099,7 +1099,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_conn_stat == 0 ) {
-            if ( me_pre->yx_gun_1_hezha_stat != 0 ) {
+            if ( me_pre->yx_gun_1_conn_stat != 0 ) {
                 log_printf(INF, "1#枪断开连接");
             }
             len += sprintf(&infstr[len], "[1#枪未链接] ");
@@ -1108,7 +1108,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else if ( me->yx_gun_1_conn_stat == 2 ) {
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
         } else if ( me->yx_gun_1_conn_stat == 3 ) {
-            if ( me_pre->yx_gun_1_hezha_stat != 3 ) {
+            if ( me_pre->yx_gun_1_conn_stat != 3 ) {
                 log_printf(INF, "1#枪连接完成.");
             }
             len += sprintf(&infstr[len], "[1#枪链接"GRN("正常")"] ");
