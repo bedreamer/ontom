@@ -945,6 +945,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     char buff[32] = {0};
     struct MDATA_ACK *me;
     char errstr[1024] = {0};
+    char infstr[1024] = {0};
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1024,6 +1025,66 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "Fault: %s", errstr);
         }
         // 输入状态，遥信
+        len = 0;
+        if ( me->yx_ac_hezha ) {
+            len = sprintf(&infstr[len], "[交流"GRN("合")"闸] ");
+        } else {
+            len = sprintf(&infstr[len], "[交流"RED("分")"闸] ");
+        }
+        if ( me->yx_heater_stat ) {
+            len = sprintf(&infstr[len], "[加热] ");
+        } else {
+            len = sprintf(&infstr[len], "[未加热] ");
+        }
+        if ( me->yx_fan_stat ) {
+            len = sprintf(&infstr[len], "[通风] ");
+        } else {
+            len = sprintf(&infstr[len], "[未通风] ");
+        }
+        if ( me->yx_dc_output_hz ) {
+            len = sprintf(&infstr[len], "[总输出"GRN("合闸")"] ");
+        } else {
+            len = sprintf(&infstr[len], "[总输出"RED("分闸")"] ");
+        }
+        if ( me->yx_gun_1_hezha_stat ) {
+            len = sprintf(&infstr[len], "[1#枪输出"GRN("合闸")"] ");
+        } else {
+            len = sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
+        }
+        if ( me->yx_gun_1_conn_stat == 0 ) {
+            len = sprintf(&infstr[len], "[1#枪未链接] ");
+        } else if (me->yx_gun_1_conn_stat == 1 ) {
+            len = sprintf(&infstr[len], "[1#枪链接保护] ");
+        } else if ( me->yx_gun_1_conn_stat == 2 ) {
+            len = sprintf(&infstr[len], "[1#枪连接异常] ");
+        } else if ( me->yx_gun_1_conn_stat == 3 ) {
+            len = sprintf(&infstr[len], "[1#枪链接正常] ");
+        }
+        if ( me->yx_gun_1_assit_power_hezha ) {
+            len = sprintf(&infstr[len], "[1#枪辅助电源"GRN("合闸")"] ");
+        } else {
+            len = sprintf(&infstr[len], "[1#枪辅助电源"RED("分闸")"] ");
+        }
+        if ( me->yx_gun_2_hezha_stat ) {
+            len = sprintf(&infstr[len], "[2#枪输出"GRN("合闸")"] ");
+        } else {
+            len = sprintf(&infstr[len], "[2#枪输出"RED("分闸")"] ");
+        }
+        if ( me->yx_gun_2_conn_stat == 0 ) {
+            len = sprintf(&infstr[len], "[2#枪未链接] ");
+        } else if (me->yx_gun_2_conn_stat == 1 ) {
+            len = sprintf(&infstr[len], "[2#枪链接保护] ");
+        } else if ( me->yx_gun_2_conn_stat == 2 ) {
+            len = sprintf(&infstr[len], "[2#枪连接异常] ");
+        } else if ( me->yx_gun_2_conn_stat == 3 ) {
+            len = sprintf(&infstr[len], "[2#枪链接正常] ");
+        }
+        if ( me->yx_gun_2_assit_power_hezha ) {
+            len = sprintf(&infstr[len], "[2#枪辅助电源"GRN("合闸")"] ");
+        } else {
+            len = sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
+        }
+        log_printf(INF, "遥信: %s", infstr);
 
         break;
     // 串口发送数据请求
