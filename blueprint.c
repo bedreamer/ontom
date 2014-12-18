@@ -1693,7 +1693,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
         len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
         len += sprintf(&errstr[len], "[%d: 无故障] \"}", ++errnr);
     }
-    log_printf(INF, "%s", errstr);
+    log_printf(INF, "%s len=%d i=%d", errstr, len, i);
     output_len += sprintf(&thiz->iobuff[output_len], ",\"errors\":[%s]", errstr);
 
     // 输入状态，遥信
