@@ -1732,7 +1732,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     if ( self->yx_gun_2_conn_stat == 0 ) {
         len += sprintf(&infstr[len], "[2#枪未链接] \"},\"color\":\"yellow\"");
     } else if (self->yx_gun_2_conn_stat == 1 ) {
-        len += sprintf(&infstr[len], "[2#枪链接保护] \"},"\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[2#枪链接保护] \"},\"color\":\"yellow\"");
     } else if ( self->yx_gun_2_conn_stat == 2 ) {
         len += sprintf(&infstr[len], "[2#枪连接异常] \"},\"color\":\"red\"");
     } else if ( self->yx_gun_2_conn_stat == 3 ) {
