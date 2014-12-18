@@ -1016,7 +1016,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
         }
         if ( me->yx_wet_rate == 1 ) {
-            len += sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
+            len = sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
         } else if ( me->yx_wet_rate == 2 ) {
             len += sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
         }
@@ -1027,9 +1027,9 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         // 输入状态，遥信
         len = 0;
         if ( me->yx_ac_hezha ) {
-            len += sprintf(&infstr[len], "[交流合闸] ");
+            len += sprintf(&infstr[len], "[交流"GRN("合")"闸] ");
         } else {
-            len += sprintf(&infstr[len], "[交流分闸] ");
+            len += sprintf(&infstr[len], "[交流"RED("分")"闸] ");
         }
         if ( me->yx_heater_stat ) {
             len += sprintf(&infstr[len], "[加热] ");
@@ -1042,14 +1042,14 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[未通风] ");
         }
         if ( me->yx_dc_output_hz ) {
-            len += sprintf(&infstr[len], "[总输出合闸] ");
+            len += sprintf(&infstr[len], "[总输出"GRN("合闸")"] ");
         } else {
-            len += sprintf(&infstr[len], "[总输出分闸] ");
+            len += sprintf(&infstr[len], "[总输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_hezha_stat ) {
-            len += sprintf(&infstr[len], "[1#枪输出合闸] ");
+            len += sprintf(&infstr[len], "[1#枪输出"GRN("合闸")"] ");
         } else {
-            len += sprintf(&infstr[len], "[1#枪输出分闸] ");
+            len += sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_conn_stat == 0 ) {
             len += sprintf(&infstr[len], "[1#枪未链接] ");
@@ -1061,14 +1061,14 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[1#枪链接正常] ");
         }
         if ( me->yx_gun_1_assit_power_hezha ) {
-            len += sprintf(&infstr[len], "[1#枪辅助电源合闸] ");
+            len += sprintf(&infstr[len], "[1#枪辅助电源"GRN("合闸")"] ");
         } else {
-            len += sprintf(&infstr[len], "[1#枪辅助电源分闸] ");
+            len += sprintf(&infstr[len], "[1#枪辅助电源"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_hezha_stat ) {
-            len += sprintf(&infstr[len], "[2#枪输出合闸] ");
+            len += sprintf(&infstr[len], "[2#枪输出"GRN("合闸")"] ");
         } else {
-            len += sprintf(&infstr[len], "[2#枪输出分闸] ");
+            len += sprintf(&infstr[len], "[2#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_conn_stat == 0 ) {
             len += sprintf(&infstr[len], "[2#枪未链接] ");
@@ -1080,9 +1080,9 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[2#枪链接正常] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
-            len += sprintf(&infstr[len], "[2#枪辅助电源合闸] ");
+            len += sprintf(&infstr[len], "[2#枪辅助电源"GRN("合闸")"] ");
         } else {
-            len += sprintf(&infstr[len], "[2#枪辅助电源分闸] ");
+            len += sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
         }
         log_printf(INF, "遥信: %s", infstr);
 
