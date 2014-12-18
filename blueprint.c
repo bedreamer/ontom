@@ -1093,7 +1093,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             }
             len += sprintf(&infstr[len], "[1#枪输出"GRN("合闸")"] ");
         } else {
-            if ( ! me_pre->yx_gun_1_hezha_stat ) {
+            if ( me_pre->yx_gun_1_hezha_stat ) {
                 log_printf(INF, "1#枪输出"RED("分闸"));
             }
             len += sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
