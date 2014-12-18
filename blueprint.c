@@ -1671,7 +1671,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 
     // 输入状态，遥信
     len = 0;
-    len += sprintf(&infstr[len], ",\"yaoxin\":[{\"no\":%d,\"stat\"\":\"", ++i);
+    len += sprintf(&infstr[len], ",\"yaoxin\":[{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_ac_hezha ) {
         len += sprintf(&infstr[len], "[交流合闸] \"},");
     } else {
