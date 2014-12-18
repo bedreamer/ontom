@@ -1038,7 +1038,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
 
         if ( errnr ) {
-            log_printf(ERR, "Fault: %s", errstr);
+            log_printf(ERR, "Fault: "RED("%s"), errstr);
         }
         // 输入状态，遥信
         len = 0;
