@@ -1759,15 +1759,15 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_heater_stat ) {
-        len += sprintf(&infstr[len], "[加热] \"},");
+        len += sprintf(&infstr[len], "[加热] ,\"color\":\"yellow\"},");
     } else {
         len += sprintf(&infstr[len], "[未加热] \",\"color\":\"green\"},");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_fan_stat ) {
-        len += sprintf(&infstr[len], "[通风] \",\"color\":\"green\"},");
+        len += sprintf(&infstr[len], "[通风] \",\"color\":\"yellow\"},");
     } else {
-        len += sprintf(&infstr[len], "[未通风] \",\"color\":\"yellow\"},");
+        len += sprintf(&infstr[len], "[未通风] \",\"color\":\"green\"},");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_dc_output_hz ) {
