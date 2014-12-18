@@ -941,7 +941,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
 static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR;
+    int ret = ERR_ERR, ccc;
     volatile struct MDATA_QRY qry = {0};
 
     switch (evt) {
@@ -988,14 +988,16 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         qry.gun_1_assit_power_on = 1;
         qry.gun_1_output_hezha = 1;
         qry.cmd_copy = *(((char *)(&qry.len)) + 1);
-        qry.crc = load_crc(23, (char *)&qry);
+        ccc = load_crc(23, (char *)&qry);
+        qry.crc = ccc;
         //qry.crc = l2b(qry.crc);
         memcpy(param->buff.tx_buff, &qry, sizeof(qry));
         param->payload_size = sizeof(qry);
 
         self->rx_param.need_bytes = 32;
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent %d %04X:%04X:%04X", __FUNCTION__, sizeof(qry),
+        log_printf(INF, "UART: %s sent %d %04X:%04X:%04X:%04X", __FUNCTION__, sizeof(qry),
+                   ccc,
                    qry.crc,
                    load_crc(23, param->buff.tx_buff),
                    load_crc(23, (char *)&qry));
