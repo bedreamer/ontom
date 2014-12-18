@@ -1020,8 +1020,9 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len = sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
         }
 
-        log_printf(ERR, "Fault: %s", errstr);
-
+        if ( errnr ) {
+            log_printf(ERR, "Fault: %s", errstr);
+        }
         // 输入状态，遥信
 
         break;
