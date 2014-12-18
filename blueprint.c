@@ -1402,7 +1402,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                             thiz->rx_param.payload_size);
                 }
 #endif
-            } while (ret == ERR_FRAME_CHECK_DATA_TOO_SHORT );
+            } while ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT && thiz->rx_seed.remain );
             continue;
         }
 
