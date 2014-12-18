@@ -988,8 +988,8 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         buff[ nr ++ ] = buff[ nr - 1 ];
         nr += 14;
         len = nr;
-        buff[ nr ++ ] = load_crc(len, buff) >> 8;
         buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
