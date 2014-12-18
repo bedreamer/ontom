@@ -1100,7 +1100,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else {
             len += sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
         }
-        log_printf(INF, "遥信: %s", infstr);
+        log_printf(DBG_LV3, "遥信: %s", infstr);
 
         break;
     // 串口发送数据请求
