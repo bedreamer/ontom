@@ -197,6 +197,11 @@ struct MDATA_QRY {
 
     unsigned short crc;
 };
+#define DC_SWITCH_ON        0x01
+#define GUN1_ASSIT_PWN_ON   0x02
+#define GUN1_OUTPUT_ON      0x04
+#define GUN2_ASSIT_PWN_ON   0x08
+#define GUN2_OUTPUT_ON      0x10
 #pragma pack()
 
 // 充电扩展测量结果

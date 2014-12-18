@@ -941,8 +941,8 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
 static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR, ccc;
-    volatile struct MDATA_QRY qry = {0};
+    int ret = ERR_ERR, ccc, nr = 0, len;
+    char buff[32] = {0};
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -977,31 +977,26 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        qry.magic[0] = 0xF0;
-        qry.magic[1] = 0xE1;
-        qry.magic[2] = 0xD2;
-        qry.magic[3] = 0xC3;
-        qry.magic[4] = 0xB4;
-        qry.addr = 0x05;
-        qry.len = 16;
-        qry.dc_output_hezha = 1;
-        qry.gun_1_assit_power_on = 1;
-        qry.gun_1_output_hezha = 1;
-        qry.cmd_copy = *(((char *)(&qry.len)) + 1);
-        ccc = load_crc(23, (char *)&qry);
-        qry.crc = ccc;
-        //qry.crc = l2b(qry.crc);
-        memcpy(param->buff.tx_buff, &qry, sizeof(qry));
-        param->payload_size = sizeof(qry);
+        buff[ nr ++ ] = 0xF0;
+        buff[ nr ++ ] = 0xE1;
+        buff[ nr ++ ] = 0xD2;
+        buff[ nr ++ ] = 0xC3;
+        buff[ nr ++ ] = 0xB4;
+        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 16;
+        buff[ nr ++ ] = DC_SWITCH_ON | GUN1_ASSIT_PWN_ON | GUN1_OUTPUT_ON;
+        buff[ nr ++ ] = buff[ nr - 2 ];
+        nr += 14;
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+        buff[ nr ++ ] = load_crc(len, buff);
+
+        memcpy(param->buff.tx_buff, &qry, nr);
+        param->payload_size = nr;
 
         self->rx_param.need_bytes = 32;
         ret = ERR_OK;
-        log_printf(INF, "UART: %s sent %d %02X:%04X:%04X:%04X:%04X", __FUNCTION__, sizeof(qry),
-                   qry.rsvs[13],
-                   ccc,
-                   qry.crc,
-                   load_crc(23, param->buff.tx_buff),
-                   load_crc(23, (char *)&qry));
+        log_printf(INF, "UART: %s sent.", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
