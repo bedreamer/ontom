@@ -993,40 +993,36 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( me->yx_bat_V_low ) {
             len = sprintf(&errstr[len], "[%d: 电池欠压] ", ++errnr);
         }
-        if ( me->yx_bat_I_high ) {
-            len = sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
-        }
         if ( me->yx_bat_short_fault ) {
             len = sprintf(&errstr[len], "[%d: 电池链接短路] ", ++errnr);
         }
-        if ( me->yx_bat_institude_fault ) {
-            len = sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
-        }
-
         if ( me->yx_bat_revers_conn ) {
             len = sprintf(&errstr[len], "[%d: 电池反接] ", ++errnr);
+        }
+        if ( me->yx_bat_I_high ) {
+            len = sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
+        }
+
+        if ( me->yx_bat_institude_fault ) {
+            len = sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
         }
         if ( me->yx_assit_power_stat ) {
             len = sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
         }
-        if ( me->yx_temprature ) {
-            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        if ( me->yx_temprature == 1 ) {
+            len = sprintf(&errstr[len], "[%d: 温度过高] ", ++errnr);
+        } else if ( me->yx_temprature == 2 ) {
+            len = sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
         }
-        if ( me->yx_wet_rate ) {
-            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        if ( me->yx_wet_rate == 1 ) {
+            len = sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
+        } else if ( me->yx_wet_rate == 2 ) {
+            len = sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
         }
-        if ( me->yx_ac_input ) {
-            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
-        }
-        if ( me->yx_flq ) {
-            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
-        }
-        if ( me->yx_rdq ) {
-            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
-        }
-        if ( me->yx_rdq_1 ) {
-            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
-        }
+
+        log_printf(ERR, "Fault: %s", errstr);
+
+        // 输入状态，遥信
 
         break;
     // 串口发送数据请求
