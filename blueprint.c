@@ -946,6 +946,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     struct MDATA_ACK *me, *me_pre;
     char errstr[1024] = {0};
     char infstr[1024] = {0};
+    char cmd = 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1168,6 +1169,26 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
+
+        if ( task->measure.yx_gun_1_conn_stat == 3 ) {
+            cmd |= GUN1_ASSIT_PWN_ON;
+            cmd |= GUN1_OUTPUT_ON;
+            cmd |= DC_SWITCH_ON;
+        } else {
+            cmd &= ~GUN1_ASSIT_PWN_ON;
+            cmd &= ~GUN1_OUTPUT_ON;
+            cmd &= ~DC_SWITCH_ON;
+        }
+        if ( task->measure.yx_gun_2_conn_stat == 3 ) {
+            cmd |= GUN2_ASSIT_PWN_ON;
+            cmd |= GUN2_OUTPUT_ON;
+            cmd |= DC_SWITCH_ON;
+        } else {
+            cmd &= ~GUN2_ASSIT_PWN_ON;
+            cmd &= ~GUN2_OUTPUT_ON;
+            cmd &= ~DC_SWITCH_ON;
+        }
+
         buff[ nr ++ ] = 0xF0;
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
@@ -1175,7 +1196,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         buff[ nr ++ ] = 0xB4;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 16;
-        buff[ nr ++ ] = DC_SWITCH_ON /*| GUN1_ASSIT_PWN_ON | GUN1_OUTPUT_ON*/;
+        buff[ nr ++ ] = cmd /*| GUN1_ASSIT_PWN_ON | GUN1_OUTPUT_ON*/;
         buff[ nr ++ ] = buff[ nr - 1 ];
         nr += 14;
         len = nr;
