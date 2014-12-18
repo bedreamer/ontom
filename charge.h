@@ -439,6 +439,8 @@ struct charge_task {
 
     // 扩展测量值
     struct MDATA_ACK measure;
+    // 前一次测量拷贝值
+    struct MDATA_ACK measure_pre_copy;
     struct charge_ex_measure *ex_measure;
     // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
     time_t pre_stamp_ex_measure;

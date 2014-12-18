@@ -943,7 +943,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 {
     int ret = ERR_ERR, ccc, nr = 0, len = 0, errnr = 0;
     char buff[32] = {0};
-    struct MDATA_ACK *me;
+    struct MDATA_ACK *me, *me_pre;
     char errstr[1024] = {0};
     char infstr[1024] = {0};
 
@@ -978,6 +978,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         memcpy(&task->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
         // 故障判定
         me = &task->measure;
+        me_pre = &task->measure_pre_copy;
         if ( me->yx_mx_V_high ) {
             len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
         }
@@ -1043,42 +1044,84 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         // 输入状态，遥信
         len = 0;
         if ( me->yx_ac_hezha ) {
+            if ( ! me_pre->yx_ac_hezha ) {
+                log_printf(INF, "交流开关合闸.");
+            }
             len += sprintf(&infstr[len], "[交流"GRN("合闸")"] ");
         } else {
+            if ( me_pre->yx_ac_hezha ) {
+                log_printf(INF, "交流开关分闸.");
+            }
             len += sprintf(&infstr[len], "[交流"RED("分闸")"] ");
         }
         if ( me->yx_heater_stat ) {
+            if ( ! me_pre->yx_heater_stat ) {
+                log_printf(INF, "开始加热.");
+            }
             len += sprintf(&infstr[len], "[加热] ");
         } else {
+            if ( me_pre->yx_heater_stat ) {
+                log_printf(INF, "停止加热.");
+            }
             len += sprintf(&infstr[len], "[未加热] ");
         }
         if ( me->yx_fan_stat ) {
+            if ( ! me_pre->yx_fan_stat ) {
+                log_printf(INF, "开始通风.");
+            }
             len += sprintf(&infstr[len], "[通风] ");
         } else {
+            if ( me_pre->yx_fan_stat ) {
+                log_printf(INF, "停止通风.");
+            }
             len += sprintf(&infstr[len], "[未通风] ");
         }
         if ( me->yx_dc_output_hz ) {
+            if ( ! me_pre->yx_dc_output_hz ) {
+                log_printf(INF, "总输出"GRN("合闸"));
+            }
             len += sprintf(&infstr[len], "[总输出"GRN("合闸")"] ");
         } else {
+            if ( me_pre->yx_dc_output_hz ) {
+                log_printf(INF, "总输出"RED("分闸"));
+            }
             len += sprintf(&infstr[len], "[总输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_hezha_stat ) {
+            if ( ! me_pre->yx_gun_1_hezha_stat ) {
+                log_printf(INF, "1#枪输出"GRN("合闸")".");
+            }
             len += sprintf(&infstr[len], "[1#枪输出"GRN("合闸")"] ");
         } else {
+            if ( ! me_pre->yx_gun_1_hezha_stat ) {
+                log_printf(INF, "1#枪输出"RED("分闸"));
+            }
             len += sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_conn_stat == 0 ) {
+            if ( me_pre->yx_gun_1_hezha_stat != 0 ) {
+                log_printf(INF, "1#枪断开连接");
+            }
             len += sprintf(&infstr[len], "[1#枪未链接] ");
         } else if (me->yx_gun_1_conn_stat == 1 ) {
             len += sprintf(&infstr[len], "[1#枪链接保护] ");
         } else if ( me->yx_gun_1_conn_stat == 2 ) {
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
         } else if ( me->yx_gun_1_conn_stat == 3 ) {
+            if ( me_pre->yx_gun_1_hezha_stat != 3 ) {
+                log_printf(INF, "1#枪连接完成.");
+            }
             len += sprintf(&infstr[len], "[1#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_1_assit_power_hezha ) {
+            if ( !me->yx_gun_1_assit_power_hezha ) {
+                log_printf(INF, "1#枪辅助电源合闸.");
+            }
             len += sprintf(&infstr[len], "[1#枪辅助电源"GRN("合闸")"] ");
         } else {
+            if ( me->yx_gun_1_assit_power_hezha ) {
+                log_printf(INF, "1#枪辅助电源分闸.");
+            }
             len += sprintf(&infstr[len], "[1#枪辅助电源"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_hezha_stat ) {
