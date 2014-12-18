@@ -1113,7 +1113,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         buff[ nr ++ ] = 0xB4;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 16;
-        buff[ nr ++ ] = DC_SWITCH_ON | GUN1_ASSIT_PWN_ON | GUN1_OUTPUT_ON;
+        buff[ nr ++ ] = DC_SWITCH_ON /*| GUN1_ASSIT_PWN_ON | GUN1_OUTPUT_ON*/;
         buff[ nr ++ ] = buff[ nr - 1 ];
         nr += 14;
         len = nr;
@@ -1680,13 +1680,13 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     if ( self->yx_ac_hezha ) {
         len += sprintf(&infstr[len], "[交流合闸] \",\"color\":\"green\"},");
     } else {
-        len += sprintf(&infstr[len], "[交流分闸] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[交流分闸] \",\"color\":\"yellow\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_heater_stat ) {
         len += sprintf(&infstr[len], "[加热] \"},");
     } else {
-        len += sprintf(&infstr[len], "[未加热] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[未加热] \",\"color\":\"green\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_fan_stat ) {
