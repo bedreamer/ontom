@@ -979,46 +979,46 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         // 故障判定
         me = &task->measure;
         if ( me->yx_mx_V_high ) {
-            len = sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
         }
         if ( me->yx_mx_V_low ) {
-            len = sprintf(&errstr[len], "[%d: 母线欠压] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 母线欠压] ", ++errnr);
         }
         if ( me->yx_mx_short_fault ) {
-            len = sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
         }
 
         if ( me->yx_bat_V_high ) {
-            len = sprintf(&errstr[len], "[%d: 电池过压] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 电池过压] ", ++errnr);
         }
         if ( me->yx_bat_V_low ) {
-            len = sprintf(&errstr[len], "[%d: 电池欠压] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 电池欠压] ", ++errnr);
         }
         if ( me->yx_bat_short_fault ) {
-            len = sprintf(&errstr[len], "[%d: 电池链接短路] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 电池链接短路] ", ++errnr);
         }
         if ( me->yx_bat_revers_conn ) {
-            len = sprintf(&errstr[len], "[%d: 电池反接] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 电池反接] ", ++errnr);
         }
         if ( me->yx_bat_I_high ) {
-            len = sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
         }
 
         if ( me->yx_bat_institude_fault ) {
-            len = sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
         }
         if ( me->yx_assit_power_stat ) {
-            len = sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
         }
         if ( me->yx_temprature == 1 ) {
-            len = sprintf(&errstr[len], "[%d: 温度过高] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 温度过高] ", ++errnr);
         } else if ( me->yx_temprature == 2 ) {
-            len = sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
         }
         if ( me->yx_wet_rate == 1 ) {
-            len = sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
         } else if ( me->yx_wet_rate == 2 ) {
-            len = sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
+            len += sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
         }
 
         if ( errnr ) {
@@ -1027,62 +1027,62 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         // 输入状态，遥信
         len = 0;
         if ( me->yx_ac_hezha ) {
-            len = sprintf(&infstr[len], "[交流合闸] ");
+            len += sprintf(&infstr[len], "[交流合闸] ");
         } else {
-            len = sprintf(&infstr[len], "[交流分闸] ");
+            len += sprintf(&infstr[len], "[交流分闸] ");
         }
         if ( me->yx_heater_stat ) {
-            len = sprintf(&infstr[len], "[加热] ");
+            len += sprintf(&infstr[len], "[加热] ");
         } else {
-            len = sprintf(&infstr[len], "[未加热] ");
+            len += sprintf(&infstr[len], "[未加热] ");
         }
         if ( me->yx_fan_stat ) {
-            len = sprintf(&infstr[len], "[通风] ");
+            len += sprintf(&infstr[len], "[通风] ");
         } else {
-            len = sprintf(&infstr[len], "[未通风] ");
+            len += sprintf(&infstr[len], "[未通风] ");
         }
         if ( me->yx_dc_output_hz ) {
-            len = sprintf(&infstr[len], "[总输出合闸] ");
+            len += sprintf(&infstr[len], "[总输出合闸] ");
         } else {
-            len = sprintf(&infstr[len], "[总输出分闸] ");
+            len += sprintf(&infstr[len], "[总输出分闸] ");
         }
         if ( me->yx_gun_1_hezha_stat ) {
-            len = sprintf(&infstr[len], "[1#枪输出合闸] ");
+            len += sprintf(&infstr[len], "[1#枪输出合闸] ");
         } else {
-            len = sprintf(&infstr[len], "[1#枪输出分闸] ");
+            len += sprintf(&infstr[len], "[1#枪输出分闸] ");
         }
         if ( me->yx_gun_1_conn_stat == 0 ) {
-            len = sprintf(&infstr[len], "[1#枪未链接] ");
+            len += sprintf(&infstr[len], "[1#枪未链接] ");
         } else if (me->yx_gun_1_conn_stat == 1 ) {
-            len = sprintf(&infstr[len], "[1#枪链接保护] ");
+            len += sprintf(&infstr[len], "[1#枪链接保护] ");
         } else if ( me->yx_gun_1_conn_stat == 2 ) {
-            len = sprintf(&infstr[len], "[1#枪连接异常] ");
+            len += sprintf(&infstr[len], "[1#枪连接异常] ");
         } else if ( me->yx_gun_1_conn_stat == 3 ) {
-            len = sprintf(&infstr[len], "[1#枪链接正常] ");
+            len += sprintf(&infstr[len], "[1#枪链接正常] ");
         }
         if ( me->yx_gun_1_assit_power_hezha ) {
-            len = sprintf(&infstr[len], "[1#枪辅助电源合闸] ");
+            len += sprintf(&infstr[len], "[1#枪辅助电源合闸] ");
         } else {
-            len = sprintf(&infstr[len], "[1#枪辅助电源分闸] ");
+            len += sprintf(&infstr[len], "[1#枪辅助电源分闸] ");
         }
         if ( me->yx_gun_2_hezha_stat ) {
-            len = sprintf(&infstr[len], "[2#枪输出合闸] ");
+            len += sprintf(&infstr[len], "[2#枪输出合闸] ");
         } else {
-            len = sprintf(&infstr[len], "[2#枪输出分闸] ");
+            len += sprintf(&infstr[len], "[2#枪输出分闸] ");
         }
         if ( me->yx_gun_2_conn_stat == 0 ) {
-            len = sprintf(&infstr[len], "[2#枪未链接] ");
+            len += sprintf(&infstr[len], "[2#枪未链接] ");
         } else if (me->yx_gun_2_conn_stat == 1 ) {
-            len = sprintf(&infstr[len], "[2#枪链接保护] ");
+            len += sprintf(&infstr[len], "[2#枪链接保护] ");
         } else if ( me->yx_gun_2_conn_stat == 2 ) {
-            len = sprintf(&infstr[len], "[2#枪连接异常] ");
+            len += sprintf(&infstr[len], "[2#枪连接异常] ");
         } else if ( me->yx_gun_2_conn_stat == 3 ) {
-            len = sprintf(&infstr[len], "[2#枪链接正常] ");
+            len += sprintf(&infstr[len], "[2#枪链接正常] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
-            len = sprintf(&infstr[len], "[2#枪辅助电源合闸] ");
+            len += sprintf(&infstr[len], "[2#枪辅助电源合闸] ");
         } else {
-            len = sprintf(&infstr[len], "[2#枪辅助电源分闸] ");
+            len += sprintf(&infstr[len], "[2#枪辅助电源分闸] ");
         }
         log_printf(INF, "遥信: %s", infstr);
 
