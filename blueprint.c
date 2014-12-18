@@ -1172,21 +1172,13 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         if ( task->measure.yx_gun_1_conn_stat == 3 ) {
             cmd |= GUN1_ASSIT_PWN_ON;
-            cmd |= GUN1_OUTPUT_ON;
-            cmd |= DC_SWITCH_ON;
         } else {
             cmd &= ~GUN1_ASSIT_PWN_ON;
-            cmd &= ~GUN1_OUTPUT_ON;
-            cmd &= ~DC_SWITCH_ON;
         }
         if ( task->measure.yx_gun_2_conn_stat == 3 ) {
             cmd |= GUN2_ASSIT_PWN_ON;
-            cmd |= GUN2_OUTPUT_ON;
-            cmd |= DC_SWITCH_ON;
         } else {
             cmd &= ~GUN2_ASSIT_PWN_ON;
-            cmd &= ~GUN2_OUTPUT_ON;
-            cmd &= ~DC_SWITCH_ON;
         }
 
         buff[ nr ++ ] = 0xF0;
