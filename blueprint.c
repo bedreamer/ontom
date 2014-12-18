@@ -1125,22 +1125,40 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[1#枪辅助电源"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_hezha_stat ) {
+            if ( !me->yx_gun_2_hezha_stat ) {
+                log_printf(INF, "2#枪输出"GRN("合闸")"");
+            }
             len += sprintf(&infstr[len], "[2#枪输出"GRN("合闸")"] ");
         } else {
+            if ( me->yx_gun_2_hezha_stat ) {
+                log_printf(INF, "2#枪输出"RED("分闸")"");
+            }
             len += sprintf(&infstr[len], "[2#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_conn_stat == 0 ) {
+            if ( me_pre->yx_gun_2_conn_stat != 0 ) {
+                log_printf(INF, "2#枪断开连接");
+            }
             len += sprintf(&infstr[len], "[2#枪未链接] ");
         } else if (me->yx_gun_2_conn_stat == 1 ) {
             len += sprintf(&infstr[len], "[2#枪链接保护] ");
         } else if ( me->yx_gun_2_conn_stat == 2 ) {
             len += sprintf(&infstr[len], "[2#枪连接异常] ");
         } else if ( me->yx_gun_2_conn_stat == 3 ) {
+            if ( me_pre->yx_gun_2_conn_stat != 3 ) {
+                log_printf(INF, "2#枪连接完成.");
+            }
             len += sprintf(&infstr[len], "[2#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
+            if ( !me->yx_gun_2_assit_power_hezha ) {
+                log_printf(INF, "2#枪辅助电源"GRN("合闸"));
+            }
             len += sprintf(&infstr[len], "[2#枪辅助电源"GRN("合闸")"] ");
         } else {
+            if ( me->yx_gun_2_assit_power_hezha ) {
+                log_printf(INF, "2#枪辅助电源"RED("分闸"));
+            }
             len += sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
         }
         log_printf(DBG_LV3, "遥信: %s", infstr);
