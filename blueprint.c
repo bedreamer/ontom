@@ -1058,7 +1058,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else if ( me->yx_gun_1_conn_stat == 2 ) {
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
         } else if ( me->yx_gun_1_conn_stat == 3 ) {
-            len += sprintf(&infstr[len], "[1#枪链接正常] ");
+            len += sprintf(&infstr[len], "[1#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_1_assit_power_hezha ) {
             len += sprintf(&infstr[len], "[1#枪辅助电源"GRN("合闸")"] ");
@@ -1077,7 +1077,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else if ( me->yx_gun_2_conn_stat == 2 ) {
             len += sprintf(&infstr[len], "[2#枪连接异常] ");
         } else if ( me->yx_gun_2_conn_stat == 3 ) {
-            len += sprintf(&infstr[len], "[2#枪链接正常] ");
+            len += sprintf(&infstr[len], "[2#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
             len += sprintf(&infstr[len], "[2#枪辅助电源"GRN("合闸")"] ");
