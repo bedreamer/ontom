@@ -1339,9 +1339,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
-            errno = 0;
-            cursor = thiz->rx_param.cursor;
             do {
+                errno = 0;
+                cursor = thiz->rx_param.cursor;
                 rd = read(thiz->dev_handle,
                           &thiz->rx_param.buff.rx_buff[cursor], 32);
                 if ( rd > 0 ) {
