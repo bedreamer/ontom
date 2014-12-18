@@ -690,7 +690,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
 {
     int ret = ERR_ERR;
     unsigned int val;
-    char buff[32], nr = 0, s;
+    unsigned char buff[32], nr = 0, s;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -790,7 +790,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    char buff[8];
+    unsigned char buff[8];
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
