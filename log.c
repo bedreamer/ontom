@@ -9,7 +9,7 @@
 
 int log_printf(unsigned int level, const char *fmt, ...)
 {
-	char buff[256]={0};
+    char buff[512]={0};
 	va_list ap;
     //char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
     const char *cfg;
