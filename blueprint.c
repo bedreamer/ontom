@@ -1690,53 +1690,53 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_fan_stat ) {
-        len += sprintf(&infstr[len], "[通风] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[通风] \",\"color\":\"green\"}");
     } else {
-        len += sprintf(&infstr[len], "[未通风] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[未通风] \",\"color\":\"yellow\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_dc_output_hz ) {
-        len += sprintf(&infstr[len], "[总输出合闸] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[总输出合闸] \",\"color\":\"green\"}");
     } else {
-        len += sprintf(&infstr[len], "[总输出分闸] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[总输出分闸] \",\"color\":\"yellow\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_1_hezha_stat ) {
-        len += sprintf(&infstr[len], "[1#枪输出合闸] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[1#枪输出合闸] \",\"color\":\"green\"}");
     } else {
-        len += sprintf(&infstr[len], "[1#枪输出分闸] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[1#枪输出分闸] \",\"color\":\"yellow\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_1_conn_stat == 0 ) {
-        len += sprintf(&infstr[len], "[1#枪未链接] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[1#枪未链接] \",\"color\":\"yellow\"}");
     } else if (self->yx_gun_1_conn_stat == 1 ) {
-        len += sprintf(&infstr[len], "[1#枪链接保护] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[1#枪链接保护] \",\"color\":\"yellow\"}");
     } else if ( self->yx_gun_1_conn_stat == 2 ) {
-        len += sprintf(&infstr[len], "[1#枪连接异常] \"},\"color\":\"red\"");
+        len += sprintf(&infstr[len], "[1#枪连接异常] \",\"color\":\"red\"}");
     } else if ( self->yx_gun_1_conn_stat == 3 ) {
-        len += sprintf(&infstr[len], "[1#枪链接正常] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[1#枪链接正常] \",\"color\":\"green\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_1_assit_power_hezha ) {
-        len += sprintf(&infstr[len], "[1#枪辅助电源合闸] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[1#枪辅助电源合闸] \",\"color\":\"green\"}");
     } else {
-        len += sprintf(&infstr[len], "[1#枪辅助电源分闸] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[1#枪辅助电源分闸] \",\"color\":\"yellow\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_2_hezha_stat ) {
-        len += sprintf(&infstr[len], "[2#枪输出合闸] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[2#枪输出合闸] \",\"color\":\"green\"}");
     } else {
-        len += sprintf(&infstr[len], "[2#枪输出分闸] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[2#枪输出分闸] \",\"color\":\"yellow\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_2_conn_stat == 0 ) {
-        len += sprintf(&infstr[len], "[2#枪未链接] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[2#枪未链接] \",\"color\":\"yellow\"}");
     } else if (self->yx_gun_2_conn_stat == 1 ) {
-        len += sprintf(&infstr[len], "[2#枪链接保护] \"},\"color\":\"yellow\"");
+        len += sprintf(&infstr[len], "[2#枪链接保护] \",\"color\":\"yellow\"}");
     } else if ( self->yx_gun_2_conn_stat == 2 ) {
-        len += sprintf(&infstr[len], "[2#枪连接异常] \"},\"color\":\"red\"");
+        len += sprintf(&infstr[len], "[2#枪连接异常] \",\"color\":\"red\"}");
     } else if ( self->yx_gun_2_conn_stat == 3 ) {
-        len += sprintf(&infstr[len], "[2#枪链接正常] \"},\"color\":\"green\"");
+        len += sprintf(&infstr[len], "[2#枪链接正常] \",\"color\":\"green\"}");
     }
     len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_2_assit_power_hezha ) {
