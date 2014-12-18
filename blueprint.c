@@ -1021,15 +1021,31 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
         }
 
+        if ( me->yx_rdq ) {
+            len += sprintf(&errstr[len], "[%d: 总输出熔断器熔断] ", ++errnr);
+        }
+        if ( me->yx_dc_output_tiaozha ) {
+            len += sprintf(&errstr[len], "[%d: 总输出跳闸] ", ++errnr);
+        }
+        if ( me->yx_dc_output_tiaozha1 ) {
+            len += sprintf(&errstr[len], "[%d: 一路输出跳闸] ", ++errnr);
+        }
+        if ( me->yx_dc_output_tiaozha2 ) {
+            len += sprintf(&errstr[len], "[%d: 二路输出跳闸] ", ++errnr);
+        }
+        if ( me->yx_flq ) {
+            len += sprintf(&errstr[len], "[%d: 防雷器故障] ", ++errnr);
+        }
+
         if ( errnr ) {
             log_printf(ERR, "Fault: %s", errstr);
         }
         // 输入状态，遥信
         len = 0;
         if ( me->yx_ac_hezha ) {
-            len += sprintf(&infstr[len], "[交流"GRN("合")"闸] ");
+            len += sprintf(&infstr[len], "[交流"GRN("合闸")"] ");
         } else {
-            len += sprintf(&infstr[len], "[交流"RED("分")"闸] ");
+            len += sprintf(&infstr[len], "[交流"RED("分闸")"] ");
         }
         if ( me->yx_heater_stat ) {
             len += sprintf(&infstr[len], "[加热] ");
