@@ -1610,64 +1610,90 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "}");
 
     self = &task->measure;
+    len = 0;
+    i = 0;
     if ( self->yx_mx_V_high ) {
-        len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 母线过压] \"},", ++errnr);
     }
     if ( self->yx_mx_V_low ) {
-        len += sprintf(&errstr[len], "[%d: 母线欠压] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 母线欠压] \"},", ++errnr);
     }
     if ( self->yx_mx_short_fault ) {
-        len += sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 母线短路] \"},", ++errnr);
     }
 
     if ( self->yx_bat_V_high ) {
-        len += sprintf(&errstr[len], "[%d: 电池过压] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 电池过压] \"},", ++errnr);
     }
     if ( self->yx_bat_V_low ) {
-        len += sprintf(&errstr[len], "[%d: 电池欠压] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 电池欠压] \"},", ++errnr);
     }
     if ( self->yx_bat_short_fault ) {
-        len += sprintf(&errstr[len], "[%d: 电池链接短路] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 电池链接短路] \"},", ++errnr);
     }
     if ( self->yx_bat_revers_conn ) {
-        len += sprintf(&errstr[len], "[%d: 电池反接] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 电池反接] \"},", ++errnr);
     }
     if ( self->yx_bat_I_high ) {
-        len += sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 电池过流] \"},", ++errnr);
     }
 
     if ( self->yx_bat_institude_fault ) {
-        len += sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 电池绝缘接地] \"},", ++errnr);
     }
     if ( self->yx_assit_power_stat ) {
-        len += sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 辅助电源故障] \"},", ++errnr);
     }
     if ( self->yx_temprature == 1 ) {
-        len += sprintf(&errstr[len], "[%d: 温度过高] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 温度过高] \"},", ++errnr);
     } else if ( self->yx_temprature == 2 ) {
-        len += sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
+        len += sprintf(&errstr[len], "[%d: 温度过低] \"},", ++errnr);
     }
     if ( self->yx_wet_rate == 1 ) {
-        len = sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len = sprintf(&errstr[len], "[%d: 湿度过高] \"},", ++errnr);
     } else if ( self->yx_wet_rate == 2 ) {
-        len += sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
+        len += sprintf(&errstr[len], "[%d: 湿度过低] \"},", ++errnr);
     }
 
     if ( self->yx_rdq ) {
-        len += sprintf(&errstr[len], "[%d: 总输出熔断器熔断] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 总输出熔断器熔断] \"},", ++errnr);
     }
     if ( self->yx_dc_output_tiaozha ) {
-        len += sprintf(&errstr[len], "[%d: 总输出跳闸] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 总输出跳闸] \"},", ++errnr);
     }
     if ( self->yx_dc_output_tiaozha1 ) {
-        len += sprintf(&errstr[len], "[%d: 一路输出跳闸] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 一路输出跳闸] \"},", ++errnr);
     }
     if ( self->yx_dc_output_tiaozha2 ) {
-        len += sprintf(&errstr[len], "[%d: 二路输出跳闸] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 二路输出跳闸] \"},", ++errnr);
     }
     if ( self->yx_flq ) {
-        len += sprintf(&errstr[len], "[%d: 防雷器故障] ", ++errnr);
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 防雷器故障] \"},", ++errnr);
     }
+    if ( i > 0 ) {
+        errstr[len --] = '\0';
+    } else {
+        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
+        len += sprintf(&errstr[len], "[%d: 无故障] \"},", ++errnr);
+    }
+    output_len += sprintf(&thiz->iobuff[output_len], ",\"error\":[%s]", errstr);
 
     // 输入状态，遥信
     len = 0;
