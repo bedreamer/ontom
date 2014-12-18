@@ -1671,37 +1671,37 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 
     // 输入状态，遥信
     len = 0;
-    len += sprintf(&infstr[len], "\"yaoxin\":[{no:%d,\"stat\"\":\"", ++i);
+    len += sprintf(&infstr[len], ",\"yaoxin\":[{\"no\":%d,\"stat\"\":\"", ++i);
     if ( self->yx_ac_hezha ) {
         len += sprintf(&infstr[len], "[交流合闸] \"},");
     } else {
         len += sprintf(&infstr[len], "[交流分闸] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_heater_stat ) {
         len += sprintf(&infstr[len], "[加热] \"},");
     } else {
         len += sprintf(&infstr[len], "[未加热] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_fan_stat ) {
         len += sprintf(&infstr[len], "[通风] \"},");
     } else {
         len += sprintf(&infstr[len], "[未通风] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_dc_output_hz ) {
         len += sprintf(&infstr[len], "[总输出合闸] \"},");
     } else {
         len += sprintf(&infstr[len], "[总输出分闸] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_1_hezha_stat ) {
         len += sprintf(&infstr[len], "[1#枪输出合闸] \"},");
     } else {
         len += sprintf(&infstr[len], "[1#枪输出分闸] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_1_conn_stat == 0 ) {
         len += sprintf(&infstr[len], "[1#枪未链接] \"},");
     } else if (self->yx_gun_1_conn_stat == 1 ) {
@@ -1711,19 +1711,19 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     } else if ( self->yx_gun_1_conn_stat == 3 ) {
         len += sprintf(&infstr[len], "[1#枪链接正常] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_1_assit_power_hezha ) {
         len += sprintf(&infstr[len], "[1#枪辅助电源合闸] \"},");
     } else {
         len += sprintf(&infstr[len], "[1#枪辅助电源分闸] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_2_hezha_stat ) {
         len += sprintf(&infstr[len], "[2#枪输出合闸] \"},");
     } else {
         len += sprintf(&infstr[len], "[2#枪输出分闸] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_2_conn_stat == 0 ) {
         len += sprintf(&infstr[len], "[2#枪未链接] \"},");
     } else if (self->yx_gun_2_conn_stat == 1 ) {
@@ -1733,7 +1733,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     } else if ( self->yx_gun_2_conn_stat == 3 ) {
         len += sprintf(&infstr[len], "[2#枪链接正常] \"},");
     }
-    len += sprintf(&infstr[len], "{no:%d,\"stat\":\"", ++i);
+    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
     if ( self->yx_gun_2_assit_power_hezha ) {
         len += sprintf(&infstr[len], "[2#枪辅助电源合闸] \"}");
     } else {
