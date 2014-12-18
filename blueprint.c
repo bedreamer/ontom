@@ -985,7 +985,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 16;
         buff[ nr ++ ] = DC_SWITCH_ON | GUN1_ASSIT_PWN_ON | GUN1_OUTPUT_ON;
-        buff[ nr ++ ] = buff[ nr - 2 ];
+        buff[ nr ++ ] = buff[ nr - 1 ];
         nr += 14;
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
