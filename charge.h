@@ -521,6 +521,13 @@ typedef enum {
     // 接收电池充电总状态报文超时
     F_PCK_BAT_STATUS_TIMEOUT,
 
+    // 触发充电刷卡完成
+    F_CARDING_TRIGER,
+    // 确认充电刷卡完成
+    F_CARDING_CONFIRM,
+    // 充电结束刷卡完成
+    F_CARDING_SETTLE,
+
     // 系统人为条件可以充电
     F_MANUAL_CHARGE_ALLOW, // 人为禁止充电
     // 系统硬件条件可以充电
@@ -699,18 +706,13 @@ static inline unsigned short load_crc(unsigned short cnt, char *dat)
     return crc;
 }
 
-// 大端转小段
-static inline unsigned short b2l(unsigned short b)
+// 大小端转换
+static inline unsigned short swap_hi_lo_bytes(unsigned short b)
 {
     unsigned char h = b >> 8, l = b & 0xFF;
     return (l << 8 | h);
 }
-
-// 小端转大端
-static inline unsigned short l2b(unsigned short t)
-{
-    unsigned char h = t >> 8, l = t & 0xFF;
-    return (l << 8 | h);
-}
+#define b2l swap_hi_lo_bytes
+#define l2b swap_hi_lo_bytes
 
 #endif /*_CHARGE_INCLUDED_H_*/

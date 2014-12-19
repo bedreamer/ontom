@@ -1263,8 +1263,8 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         buff[ nr ++ ] = 0xB4;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 16;
-        buff[ nr ++ ] = cmd /*| GUN1_ASSIT_PWN_ON | GUN1_OUTPUT_ON*/;
-        buff[ nr ++ ] = buff[ nr - 1 ];
+        buff[ nr ++ ] = cmd;
+        buff[ nr ++ ] = cmd;
         nr += 14;
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);

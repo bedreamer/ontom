@@ -43,6 +43,7 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
 
     if ( done == NULL ) done = &mydone;
     log_printf(INF, "%s running...", __FUNCTION__);
+____reinit:
     icdev = dc_init(100, 9600);//初始化串口1，波特率9600
 
     if ( icdev > 0 ) {
@@ -57,10 +58,13 @@ void *thread_measure_service(void *arg) ___THREAD_ENTRY___
 
         sleep(2);
 
-        if ( 0 == initok ) continue;
-
+        if ( 0 == initok ) {
+            goto ____reinit;
+            continue;
+        }
         ret = dc_card(icdev, 0, &_Snr);
         if ( ret != 0 ) {
+            goto ____reinit;
             continue;
        }
         log_printf(INF, "GET CARD: %08X", _Snr);
