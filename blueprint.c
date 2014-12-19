@@ -721,7 +721,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         buff[nr ++] = 0x01;
         buff[nr ++] = 0x10;
         buff[nr ++] = 0x00;
-        buff[nr ++] = 0x13;
+        buff[nr ++] = 0x12;
         buff[nr ++] = 0x00;
         buff[nr ++] = 0x04;
         buff[nr ++] = 0x08;
