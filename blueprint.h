@@ -146,6 +146,9 @@ struct bp_user {
     unsigned int check_err_total;
     // 已经接收帧数
     unsigned int rcv_ok_cnt;
+    // 发送数据帧所需时间
+    // 为了适配不同数据真发送时接受发送模式切换时间长度问题
+    unsigned int time_to_send;
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：
