@@ -255,16 +255,16 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
     if ( self == p ) {
         Hachiko_pause(&thiz->rx_seed);
         if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
-            log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d")"gave crc: %02X%02X need: %04X",
+            log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d")",
+                       thiz->rx_param.need_bytes,
+                        thiz->rx_param.payload_size);
+        } else {
+            log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")gave crc: %02X%02X need: %04X",
                        thiz->rx_param.need_bytes,
                         thiz->rx_param.payload_size,
                        thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
                     thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
                     load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff));
-        } else {
-            log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d"),
-                       thiz->rx_param.need_bytes,
-                        thiz->rx_param.payload_size);
             log_printf(DBG_LV1,
                        "UART: RD:<"
                        "%02X %02X %02X %02X %02X %02X %02X %02X "
