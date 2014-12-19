@@ -1565,6 +1565,8 @@ continue_to_send:
                 thiz->tx_seed.ttl = thiz->tx_param.payload_size /*+
                         (thiz->tx_param.payload_size % 10 ? 1 : 0)*/;
                 Hachiko_resume( & thiz->tx_seed );
+                // 睡眠20ms 引起内核线程切换
+                usleep(20);
                 log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
