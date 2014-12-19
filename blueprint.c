@@ -1283,7 +1283,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         param->payload_size = nr;
 
         self->rx_param.need_bytes = 32;
-        self->master->time_to_send = param->payload_size;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
