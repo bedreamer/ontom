@@ -982,61 +982,116 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         me_pre = &task->measure_pre_copy;
         if ( me->yx_mx_V_high ) {
             len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
+            bit_set(task, S_BUS_V_HI);
+        } else {
+            bit_clr(task, S_BUS_V_HI);
         }
         if ( me->yx_mx_V_low ) {
             len += sprintf(&errstr[len], "[%d: 母线欠压] ", ++errnr);
+            bit_set(task, S_BUS_V_LO);
+        } else {
+            bit_clr(task, S_BUS_V_LO);
         }
         if ( me->yx_mx_short_fault ) {
             len += sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
+            bit_set(task, S_BUS_SHORTED);
+        } else {
+            bit_clr(task, S_BUS_SHORTED);
         }
 
         if ( me->yx_bat_V_high ) {
             len += sprintf(&errstr[len], "[%d: 电池过压] ", ++errnr);
+            bit_set(task, S_BAT_V_HI);
+        } else {
+            bit_clr(task, S_BAT_V_HI);
         }
         if ( me->yx_bat_V_low ) {
             len += sprintf(&errstr[len], "[%d: 电池欠压] ", ++errnr);
+            bit_set(task, S_BAT_V_LO);
+        } else {
+            bit_clr(task, S_BAT_V_LO);
         }
         if ( me->yx_bat_short_fault ) {
             len += sprintf(&errstr[len], "[%d: 电池链接短路] ", ++errnr);
+            bit_set(task, S_BAT_SHORTED);
+        } else {
+            bit_clr(task, S_BAT_SHORTED);
         }
         if ( me->yx_bat_revers_conn ) {
             len += sprintf(&errstr[len], "[%d: 电池反接] ", ++errnr);
+            bit_set(task, S_BAT_REVERT_CONN);
+        } else {
+            bit_clr(task, S_BAT_REVERT_CONN);
         }
         if ( me->yx_bat_I_high ) {
             len += sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
+            bit_set(task, S_BAT_I_HI);
+        } else {
+            bit_clr(task, S_BAT_I_HI);
         }
 
         if ( me->yx_bat_institude_fault ) {
             len += sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
+            bit_set(task, S_INSTITUDE_ERR);
+        } else {
+            bit_clr(task, S_INSTITUDE_ERR);
         }
         if ( me->yx_assit_power_stat ) {
             len += sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
+            bit_set(task, S_ASSIT_POWER_DOWN);
+        } else {
+            bit_clr(task, S_ASSIT_POWER_DOWN);
         }
         if ( me->yx_temprature == 1 ) {
             len += sprintf(&errstr[len], "[%d: 温度过高] ", ++errnr);
+            bit_set(task, S_CHARGE_BOX_TEMP_HI);
         } else if ( me->yx_temprature == 2 ) {
             len += sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
+            bit_set(task, S_CHARGE_BOX_TEMP_LO);
+        } else {
+            bit_clr(task, S_CHARGE_BOX_TEMP_HI);
+            bit_clr(task, S_CHARGE_BOX_TEMP_LO);
         }
         if ( me->yx_wet_rate == 1 ) {
             len = sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
+            bit_set(task, S_CHARGE_BOX_WET_HI);
         } else if ( me->yx_wet_rate == 2 ) {
             len += sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
+            bit_set(task, S_CHARGE_BOX_WET_LO);
+        } else {
+            bit_clr(task, S_CHARGE_BOX_WET_HI);
+            bit_clr(task, S_CHARGE_BOX_WET_LO);
         }
 
         if ( me->yx_rdq ) {
             len += sprintf(&errstr[len], "[%d: 总输出熔断器熔断] ", ++errnr);
+            bit_set(task, S_DC_RDQ_BREAK);
+        } else {
+            bit_clr(task, S_DC_RDQ_BREAK);
         }
         if ( me->yx_dc_output_tiaozha ) {
             len += sprintf(&errstr[len], "[%d: 总输出跳闸] ", ++errnr);
+            bit_set(task, S_DC_SW_BREAK);
+        } else {
+            bit_clr(task, S_DC_SW_BREAK);
         }
         if ( me->yx_dc_output_tiaozha1 ) {
             len += sprintf(&errstr[len], "[%d: 一路输出跳闸] ", ++errnr);
+            bit_set(task, S_GUN_1_SW_BREAK);
+        } else {
+            bit_clr(task, S_GUN_1_SW_BREAK);
         }
         if ( me->yx_dc_output_tiaozha2 ) {
             len += sprintf(&errstr[len], "[%d: 二路输出跳闸] ", ++errnr);
+            bit_set(task, S_GUN_2_SW_BREAK);
+        } else {
+            bit_clr(task, S_GUN_2_SW_BREAK);
         }
         if ( me->yx_flq ) {
             len += sprintf(&errstr[len], "[%d: 防雷器故障] ", ++errnr);
+            bit_set(task, S_FANGLEIQI_BREAK);
+        } else {
+            bit_clr(task, S_FANGLEIQI_BREAK);
         }
 
         if ( errnr ) {
@@ -1048,11 +1103,13 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             if ( ! me_pre->yx_ac_hezha ) {
                 log_printf(INF, "交流开关合闸.");
             }
+            bit_set(task, S_AC_INPUT_DOWN);
             len += sprintf(&infstr[len], "[交流"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_ac_hezha ) {
                 log_printf(INF, "交流开关分闸.");
             }
+            bit_clr(task, S_AC_INPUT_DOWN);
             len += sprintf(&infstr[len], "[交流"RED("分闸")"] ");
         }
         if ( me->yx_heater_stat ) {
@@ -1081,85 +1138,103 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             if ( ! me_pre->yx_dc_output_hz ) {
                 log_printf(INF, "总输出"GRN("合闸"));
             }
+            bit_set(task, F_DC_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[总输出"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_dc_output_hz ) {
                 log_printf(INF, "总输出"RED("分闸"));
             }
+            bit_clr(task, F_DC_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[总输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_hezha_stat ) {
             if ( ! me_pre->yx_gun_1_hezha_stat ) {
                 log_printf(INF, "1#枪输出"GRN("合闸")".");
             }
+            bit_set(task, F_GUN_1_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪输出"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_1_hezha_stat ) {
                 log_printf(INF, "1#枪输出"RED("分闸"));
             }
+            bit_clr(task, F_GUN_1_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_conn_stat == 0 ) {
             if ( me_pre->yx_gun_1_conn_stat != 0 ) {
                 log_printf(INF, "1#枪断开连接");
             }
+            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪未链接] ");
         } else if (me->yx_gun_1_conn_stat == 1 ) {
+            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪链接保护] ");
         } else if ( me->yx_gun_1_conn_stat == 2 ) {
+            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
         } else if ( me->yx_gun_1_conn_stat == 3 ) {
             if ( me_pre->yx_gun_1_conn_stat != 3 ) {
                 log_printf(INF, "1#枪连接完成.");
             }
+            bit_set(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_1_assit_power_hezha ) {
             if ( !me_pre->yx_gun_1_assit_power_hezha ) {
                 log_printf(INF, "1#枪辅助电源合闸.");
             }
+            bit_set(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪辅助电源"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_1_assit_power_hezha ) {
                 log_printf(INF, "1#枪辅助电源分闸.");
             }
+            bit_clr(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪辅助电源"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_hezha_stat ) {
             if ( !me_pre->yx_gun_2_hezha_stat ) {
                 log_printf(INF, "2#枪输出"GRN("合闸")"");
             }
+            bit_set(task, F_GUN_2_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪输出"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_2_hezha_stat ) {
                 log_printf(INF, "2#枪输出"RED("分闸")"");
             }
+            bit_clr(task, F_GUN_2_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_conn_stat == 0 ) {
             if ( me_pre->yx_gun_2_conn_stat != 0 ) {
                 log_printf(INF, "2#枪断开连接");
             }
+            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪未链接] ");
         } else if (me->yx_gun_2_conn_stat == 1 ) {
+            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接保护] ");
         } else if ( me->yx_gun_2_conn_stat == 2 ) {
+            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪连接异常] ");
         } else if ( me->yx_gun_2_conn_stat == 3 ) {
             if ( me_pre->yx_gun_2_conn_stat != 3 ) {
                 log_printf(INF, "2#枪连接完成.");
             }
+            bit_set(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
             if ( !me_pre->yx_gun_2_assit_power_hezha ) {
                 log_printf(INF, "2#枪辅助电源"GRN("合闸"));
             }
+            bit_set(task, F_GUN_2_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪辅助电源"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_2_assit_power_hezha ) {
                 log_printf(INF, "2#枪辅助电源"RED("分闸"));
             }
+            bit_clr(task, F_GUN_2_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
         }
         log_printf(DBG_LV3, "遥信: %s", infstr);

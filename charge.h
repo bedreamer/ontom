@@ -505,6 +505,7 @@ typedef enum {
     // 扩展测量值刷新标记
     F_MEASURE_DATA_NEW,
 
+    //{{{ 状态标记
     // BMS 已经识别
     F_BMS_RECOGNIZED,
     // 已经发送车辆已经识别数据包
@@ -520,19 +521,93 @@ typedef enum {
     // 接收电池充电总状态报文超时
     F_PCK_BAT_STATUS_TIMEOUT,
 
+    // 系统人为条件可以充电
+    F_MANUAL_CHARGE_ALLOW, // 人为禁止充电
+    // 系统硬件条件可以充电
+    F_SYSTEM_CHARGE_ALLOW, // 系统无故障
+    // 直流输出总开关闭合状态
+    F_DC_OUTPUT_SWITCH_STATUS,
+    // 1#枪物理连接完成状态
+    F_GUN_1_PHY_CONN_STATUS,
+    // 1#枪输出开关状态
+    F_GUN_1_OUTPUT_SWITCH_STATUS,
+    // 1#枪辅助电源开关状态
+    F_GUN_1_ASSIT_PWN_SWITCH_STATUS,
+    // 2#枪物理连接完成状态
+    F_GUN_2_PHY_CONN_STATUS,
+    // 2#枪输出开关状态
+    F_GUN_2_OUTPUT_SWITCH_STATUS,
+    // 2#枪辅助电源开关状态
+    F_GUN_2_ASSIT_PWN_SWITCH_STATUS,
+    // }}}
 
+    // {{ 输出控制命令状态
+    // 直流输出总开关打开
+    CMD_DC_OUTPUT_SWITCH_ON  = 0x0080,
+    // 1#枪辅助电源打开
+    CMD_GUN_1_ASSIT_PWN_ON,
+    // 1#枪输出开关打开
+    CMD_GUN_1_OUTPUT_ON,
+    // 2#枪辅助电源打开
+    CMD_GUN_2_ASSIT_PWN_ON,
+    // 2#枪输出开关打开
+    CMD_GUN_2_OUTPUT_ON,
+    // }}
+
+    // {{{ 故障标记
     // 系统遥信量
-    S_ERROR             = 0x0080,
+    S_ERROR             = 0x0100,
+    // 交流输入停电故障
+    S_AC_INPUT_DOWN,
     // 辅助电源故障
     S_ASSIT_POWER_DOWN,
     // 充电屏监控通信中断
     S_CHARGER_COMM_DOWN,
     // 采样单元通信中断
     S_MEASURE_COMM_DOWN,
+    // BMS通信故障
+    S_BMS_COMM_DOWN,
     // 1# 充电枪物理连接故障
     S_GUN_1_PYH_CONN_DOWN,
     // 2# 充电枪物理连接故障
     S_GUN_2_PYH_CONN_DOWN,
+    // 绝缘故障
+    S_INSTITUDE_ERR,
+    // 母线过压
+    S_BUS_V_HI,
+    // 母线欠压
+    S_BUS_V_LO,
+    // 母线短路
+    S_BUS_SHORTED,
+    // 电池过压
+    S_BAT_V_HI,
+    // 电池欠压
+    S_BAT_V_LO,
+    // 电池短路
+    S_BAT_SHORTED,
+    // 电池反接故障
+    S_BAT_REVERT_CONN,
+    // 电池过流
+    S_BAT_I_HI,
+    // 充电桩温度过高
+    S_CHARGE_BOX_TEMP_HI,
+    // 充电桩温度过低
+    S_CHARGE_BOX_TEMP_LO,
+    // 充电桩湿度过高
+    S_CHARGE_BOX_WET_HI,
+    // 充电桩湿度过低
+    S_CHARGE_BOX_WET_LO,
+    // 总输出熔断器熔断
+    S_DC_RDQ_BREAK,
+    // 总输出开关跳闸
+    S_DC_SW_BREAK,
+    // 1#枪输出开关跳闸
+    S_GUN_1_SW_BREAK,
+    // 2#枪输出开关跳闸
+    S_GUN_2_SW_BREAK,
+    // 防雷器故障
+    S_FANGLEIQI_BREAK,
+
     // 输出电压过高
     S_V_OUT_HIGH,
     // 输出电压过低
@@ -541,6 +616,7 @@ typedef enum {
     S_I_OUT_HIGH,
     // 输出电流过低
     S_I_OUT_LOW
+    // }}}
 }ONTOM_FLAG_SINGLE;
 
 // 创建充电任务
