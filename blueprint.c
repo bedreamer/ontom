@@ -758,7 +758,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         ret = ERR_OK;
 
         self->rx_param.need_bytes = 8;
-        self->master->time_to_send = param->payload_size - 2;
+        self->master->time_to_send = param->payload_size - 1;
 
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
