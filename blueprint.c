@@ -193,30 +193,24 @@ Return:				0
 int set_gpio_output(int pin, int value)
 {
     char file[40], direction[5];
-    static FILE *dir = NULL, *val = NULL;
 
     sprintf(file, "/sys/class/gpio/gpio%d/direction", pin);
-    if ( dir == NULL ) {
-         dir = fopen(file, "w");
-    }
+    FILE *fp = fopen(file, "w");
+
     sprintf(direction,"out");
 
-    rewind(dir);
-    if (fprintf(dir, "%s",direction) < 0) {
+    rewind(fp);
+    if (fprintf(fp, "%s",direction) < 0)
         return -2;
-    }
-#if 0
+
     fclose(fp);
-#endif
+
     sprintf(file, "/sys/class/gpio/gpio%d/value", pin);
-    if ( val == NULL ) {
-        val = fopen(file, "w");
-    }
-    rewind(val);
-    fprintf(val, "%d\n", value);
-#if 0
+    fp = fopen(file, "w");
+    rewind(fp);
+    fprintf(fp, "%d\n", value);
     fclose(fp);
-#endif
+
     return ERR_OK;
 }
 
