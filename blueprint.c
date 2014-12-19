@@ -655,7 +655,7 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         param->payload_size = sizeof(buff);
         self->rx_param.need_bytes = 205;
-        self->master->time_to_send = param->payload_size * 960 / 1000;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
 
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
@@ -758,7 +758,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         ret = ERR_OK;
 
         self->rx_param.need_bytes = 8;
-        self->master->time_to_send = param->payload_size * 960 / 1000;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
 
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
@@ -836,7 +836,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, BP_UART_EVENT e
 
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
-        self->master->time_to_send = param->payload_size * 960 / 1000;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
@@ -913,7 +913,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
 
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
-        self->master->time_to_send = param->payload_size * 960 / 1000;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
