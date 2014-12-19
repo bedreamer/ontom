@@ -64,7 +64,6 @@ ____reinit:
         }
         ret = dc_card(icdev, 0, &_Snr);
         if ( ret != 0 ) {
-            goto ____reinit;
             continue;
        }
         log_printf(INF, "GET CARD: %08X", _Snr);
