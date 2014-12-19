@@ -1562,10 +1562,10 @@ continue_to_send:
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
-                thiz->tx_seed.ttl = thiz->tx_param.payload_size /*+
-                        (thiz->tx_param.payload_size % 10 ? 1 : 0)*/;
+                thiz->tx_seed.ttl = thiz->tx_param.payload_size +
+                        (thiz->tx_param.payload_size % 10 ? 2 : 1);
                 Hachiko_resume( & thiz->tx_seed );
-                // 睡眠20ms 引起内核线程切换
+                // 睡眠20ms 引起内核线程切换, 快速切换至Hachiko线程
                 usleep(20);
                 log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
