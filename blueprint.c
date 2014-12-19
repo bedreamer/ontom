@@ -1256,7 +1256,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             cmd &= ~GUN2_ASSIT_PWN_ON;
         }
 
-        if ( bit_read(task, ))
+       // if ( bit_read(task, ))
 
         buff[ nr ++ ] = 0xF0;
         buff[ nr ++ ] = 0xE1;
