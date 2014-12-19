@@ -193,7 +193,7 @@ Return:				0
 int set_gpio_output(int pin, int value)
 {
     char file[40], direction[5];
-    static FILE *dir = NULL, val = NULL;
+    static FILE *dir = NULL, *val = NULL;
 
     sprintf(file, "/sys/class/gpio/gpio%d/direction", pin);
     if ( dir == NULL ) {
