@@ -117,8 +117,10 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
+    int charging = 1, len = 0;
+    char errstr[1024] = {0};
     if ( done == NULL ) done = &mydone;
-    log_printf(INF, "%s running...sizeof(struct charge_task)=%d",
+    log_printf(INF, "ZUES: %s running...sizeof(struct charge_task)=%d",
                __FUNCTION__,
                sizeof(struct charge_task));
 
@@ -131,7 +133,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         switch ( task->charge_task_stat) {
         // 无效任务状态
         case CHARGE_STAT_INVALID:
-            log_printf(INF, "charge task status RESET.");
+            log_printf(INF, "ZUES: charge task status RESET.");
             config_write("triger_card_sn", "N/A");
             config_write("confirm_card_sn", "N/A");
             config_write("settle_card_sn", "N/A");
@@ -145,9 +147,49 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             break;
         // BMS 连接等待, 已经确认充电
         case CHARGE_STAT_WAIT_BMS:
+            if ( bit_read(task, F_BMS_RECOGNIZED) ) {
+                task->charge_task_stat = CHARGE_STAT_READY;
+            }
             break;
         // BMS 已经连接，进行充电参数配置
         case CHARGE_STAT_READY:
+            if ( bit_read(task, F_MANUAL_CHARGE_ALLOW) ) {
+                // 系统人为的允许充电
+            } else {
+                log_printf(INF, "ZEUS: 系统禁止充电(人工).");
+                break;
+            }
+
+            if ( bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
+                // 系统总的硬件条件允许充电
+            } else {
+                memset(errstr, 0, sizeof(errstr));
+                len = 0;
+                if ( bit_read(task, S_AC_INPUT_DOWN)) {
+                    len += sprintf(errstr, "系统交流停电 ");
+                }
+                if ( bit_read(task, S_ASSIT_POWER_DOWN )) {
+                    len += sprintf(errstr, "辅助电源故障 ");
+                }
+                if ( bit_read(task, S_INSTITUDE_ERR )) {
+                    len += sprintf(errstr, "系统绝缘故障 ");
+                }
+                if ( bit_read(task, S_BMS_COMM_DOWN )) {
+                    len += sprintf(errstr, "BMS通信故障");
+                }
+                if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
+                    len += sprintf(errstr, "综合采样盒通讯故障 ");
+                }
+                if ( bit_read(task, S_CHARGER_COMM_DOWN) ) {
+                    len += sprintf(errstr, "充电机组通讯故障 ");
+                }
+                if ( bit_read(task, S_ERROR) ) {
+                    len += sprintf(errstr, "系统总故障 ");
+                } else {
+                    len += sprintf(errstr, "未确定故障 ");
+                }
+                log_printf(INF, "ZEUS: 系统无法充电(故障), [%s]", errstr);
+            }
             break;
         // 充电阶段
         case CHARGE_STAT_CHARGING:
