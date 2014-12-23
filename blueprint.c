@@ -641,6 +641,10 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( self->master->died >= self->master->died_line ) {
+            bit_set(task, S_CHARGER_YX_1_COMM_DOWN);
+            log_printf(ERR, "UART: 充电机监控通讯(次要0-49)"GRN("恢复"));
+        }
         memcpy(&task->chargers, &param->buff.rx_buff[3], 100);
         break;
     // 串口发送数据请求
@@ -675,6 +679,10 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
+        if ( self->master->died >= self->master->died_line ) {
+            bit_set(task, S_CHARGER_YX_1_COMM_DOWN);
+            log_printf(ERR, "UART: 充电机监控通讯(次要0-49)"RED("中断"));
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -718,6 +726,10 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( self->master->died >= self->master->died_line ) {
+            bit_set(task, S_CHARGER_YX_2_COMM_DOWN);
+            log_printf(ERR, "UART: 充电机监控通讯(次要50-100)"GRN("恢复"));
+        }
         memcpy(&task->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
         break;
     // 串口发送数据请求
@@ -753,6 +765,10 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
+        if ( self->master->died >= self->master->died_line ) {
+            bit_set(task, S_CHARGER_YX_2_COMM_DOWN);
+            log_printf(ERR, "UART: 充电机监控通讯(次要50-100)"RED("中断"));
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -798,6 +814,10 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_CHARGER_COMM_DOWN) ) {
+            bit_clr(task, S_CHARGER_COMM_DOWN);
+            log_printf(INF, "UART: 充电桩监控通信(主要)"GRN("恢复"));
+        }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -855,6 +875,10 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
+        if ( self->master->died >= self->master->died_line ) {
+            bit_set(task, S_CHARGER_COMM_DOWN);
+            log_printf(ERR, "UART: 充电机监控通讯(主要)"RED("中断"));
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误

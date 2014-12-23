@@ -570,6 +570,10 @@ typedef enum {
     S_ASSIT_POWER_DOWN,
     // 充电屏监控通信中断
     S_CHARGER_COMM_DOWN,
+    // 充电屏监控次要要信1通信中断
+    S_CHARGER_YX_1_COMM_DOWN,
+    // 充电屏监控次要要信2通信终端
+    S_CHARGER_YX_2_COMM_DOEN,
     // 采样单元通信中断
     S_MEASURE_COMM_DOWN,
     // BMS通信故障

@@ -20,7 +20,7 @@ LINK          = arm-arago-linux-gnueabi-gcc -lts -lrt
 LFLAGS        = -Wl,-O1
 LIBS          = $(SUBLIBS)  -L/home/tom/workspace/qt-4.8.2-arm/lib  \
 		-L/home/tom/workspace/tslib/lib -L/home/tom/workspace/qt-4.8.2-arm/lib \
-		-L. -lD8U -lD8usb -lpthread
+		-L. -lD8U -lD8usb -ltcc -lpthread
 AR            = arm-arago-linux-ar cqs
 RANLIB        = 
 QMAKE         = /home/tom/workspace/qt-4.8.2-arm/bin/qmake
