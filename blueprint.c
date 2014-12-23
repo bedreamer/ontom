@@ -1212,68 +1212,68 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         len = 0;
         if ( me->yx_ac_hezha ) {
             if ( ! me_pre->yx_ac_hezha ) {
-                log_printf(INF, "交流开关合闸.");
+                log_printf(INF, "采样盒: 交流开关合闸.");
             }
             bit_set(task, S_AC_INPUT_DOWN);
             len += sprintf(&infstr[len], "[交流"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_ac_hezha ) {
-                log_printf(INF, "交流开关分闸.");
+                log_printf(INF, "采样盒: 交流开关分闸.");
             }
             bit_clr(task, S_AC_INPUT_DOWN);
             len += sprintf(&infstr[len], "[交流"RED("分闸")"] ");
         }
         if ( me->yx_heater_stat ) {
             if ( ! me_pre->yx_heater_stat ) {
-                log_printf(INF, "开始加热.");
+                log_printf(INF, "采样盒: 开始加热.");
             }
             len += sprintf(&infstr[len], "[加热] ");
         } else {
             if ( me_pre->yx_heater_stat ) {
-                log_printf(INF, "停止加热.");
+                log_printf(INF, "采样盒: 停止加热.");
             }
             len += sprintf(&infstr[len], "[未加热] ");
         }
         if ( me->yx_fan_stat ) {
             if ( ! me_pre->yx_fan_stat ) {
-                log_printf(INF, "开始通风.");
+                log_printf(INF, "采样盒: 开始通风.");
             }
             len += sprintf(&infstr[len], "[通风] ");
         } else {
             if ( me_pre->yx_fan_stat ) {
-                log_printf(INF, "停止通风.");
+                log_printf(INF, "采样盒: 停止通风.");
             }
             len += sprintf(&infstr[len], "[未通风] ");
         }
         if ( me->yx_dc_output_hz ) {
             if ( ! me_pre->yx_dc_output_hz ) {
-                log_printf(INF, "总输出"GRN("合闸"));
+                log_printf(INF, "采样盒: 总输出"GRN("合闸"));
             }
             bit_set(task, F_DC_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[总输出"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_dc_output_hz ) {
-                log_printf(INF, "总输出"RED("分闸"));
+                log_printf(INF, "采样盒: 总输出"RED("分闸"));
             }
             bit_clr(task, F_DC_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[总输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_hezha_stat ) {
             if ( ! me_pre->yx_gun_1_hezha_stat ) {
-                log_printf(INF, "1#枪输出"GRN("合闸")".");
+                log_printf(INF, "采样盒: 1#枪输出"GRN("合闸")".");
             }
             bit_set(task, F_GUN_1_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪输出"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_1_hezha_stat ) {
-                log_printf(INF, "1#枪输出"RED("分闸"));
+                log_printf(INF, "采样盒: 1#枪输出"RED("分闸"));
             }
             bit_clr(task, F_GUN_1_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_1_conn_stat == 0 ) {
             if ( me_pre->yx_gun_1_conn_stat != 0 ) {
-                log_printf(INF, "1#枪断开连接");
+                log_printf(INF, "采样盒: 1#枪断开连接");
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪未链接] ");
@@ -1285,40 +1285,40 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
         } else if ( me->yx_gun_1_conn_stat == 3 ) {
             if ( me_pre->yx_gun_1_conn_stat != 3 ) {
-                log_printf(INF, "1#枪连接完成.");
+                log_printf(INF, "采样盒: 1#枪连接完成.");
             }
             bit_set(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_1_assit_power_hezha ) {
             if ( !me_pre->yx_gun_1_assit_power_hezha ) {
-                log_printf(INF, "1#枪辅助电源合闸.");
+                log_printf(INF, "采样盒: 1#枪辅助电源合闸.");
             }
             bit_set(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪辅助电源"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_1_assit_power_hezha ) {
-                log_printf(INF, "1#枪辅助电源分闸.");
+                log_printf(INF, "采样盒: 1#枪辅助电源分闸.");
             }
             bit_clr(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪辅助电源"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_hezha_stat ) {
             if ( !me_pre->yx_gun_2_hezha_stat ) {
-                log_printf(INF, "2#枪输出"GRN("合闸")"");
+                log_printf(INF, "采样盒: 2#枪输出"GRN("合闸")"");
             }
             bit_set(task, F_GUN_2_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪输出"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_2_hezha_stat ) {
-                log_printf(INF, "2#枪输出"RED("分闸")"");
+                log_printf(INF, "采样盒: 2#枪输出"RED("分闸")"");
             }
             bit_clr(task, F_GUN_2_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪输出"RED("分闸")"] ");
         }
         if ( me->yx_gun_2_conn_stat == 0 ) {
             if ( me_pre->yx_gun_2_conn_stat != 0 ) {
-                log_printf(INF, "2#枪断开连接");
+                log_printf(INF, "采样盒: 2#枪断开连接");
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪未链接] ");
@@ -1330,25 +1330,25 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             len += sprintf(&infstr[len], "[2#枪连接异常] ");
         } else if ( me->yx_gun_2_conn_stat == 3 ) {
             if ( me_pre->yx_gun_2_conn_stat != 3 ) {
-                log_printf(INF, "2#枪连接完成.");
+                log_printf(INF, "采样盒: 2#枪连接完成.");
             }
             bit_set(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
             if ( !me_pre->yx_gun_2_assit_power_hezha ) {
-                log_printf(INF, "2#枪辅助电源"GRN("合闸"));
+                log_printf(INF, "采样盒: 2#枪辅助电源"GRN("合闸"));
             }
             bit_set(task, F_GUN_2_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪辅助电源"GRN("合闸")"] ");
         } else {
             if ( me_pre->yx_gun_2_assit_power_hezha ) {
-                log_printf(INF, "2#枪辅助电源"RED("分闸"));
+                log_printf(INF, "采样盒: 2#枪辅助电源"RED("分闸"));
             }
             bit_clr(task, F_GUN_2_ASSIT_PWN_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
         }
-        log_printf(DBG_LV3, "遥信: %s", infstr);
+        log_printf(DBG_LV3, "采样盒: 遥信: %s", infstr);
         memcpy(me_pre, me, sizeof(struct MDATA_ACK));
 
         break;
