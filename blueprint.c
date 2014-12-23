@@ -719,7 +719,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
-        memcpy(&task->chargers.charge_module_t, &param->buff.rx_buff[3], 100);
+        memcpy(&task->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
