@@ -766,7 +766,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
-            bit_set(task, S_CHARGER_YX_2_COMM_DOWN);
+            bit_set(task, S_CHARGER_YX_2_COMM_DOEN);
             log_printf(ERR, "UART: 充电机监控通讯(次要50-100)"RED("中断"));
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
