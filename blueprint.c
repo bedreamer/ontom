@@ -643,7 +643,7 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
     case BP_EVT_RX_FRAME:
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_YX_1_COMM_DOWN);
-            log_printf(ERR, "UART: 充电机监控通讯(次要0-49)"GRN("恢复"));
+            log_printf(ERR, "UART: "GRN("充电机监控通讯(次要0-49)恢复"));
         }
         memcpy(&task->chargers, &param->buff.rx_buff[3], 100);
         break;
@@ -681,7 +681,7 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_YX_1_COMM_DOWN);
-            log_printf(ERR, "UART: 充电机监控通讯(次要0-49)"RED("中断"));
+            log_printf(ERR, "UART: "RED("充电机监控通讯(次要0-49)中断"));
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
@@ -728,7 +728,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
     case BP_EVT_RX_FRAME:
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_YX_2_COMM_DOEN);
-            log_printf(ERR, "UART: 充电机监控通讯(次要50-100)"GRN("恢复"));
+            log_printf(ERR, "UART: "GRN("充电机监控通讯(次要50-100)恢复"));
         }
         memcpy(&task->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
         break;
@@ -767,7 +767,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_YX_2_COMM_DOEN);
-            log_printf(ERR, "UART: 充电机监控通讯(次要50-100)"RED("中断"));
+            log_printf(ERR, "UART: "RED("充电机监控通讯(次要50-100)中断"));
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
