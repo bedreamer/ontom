@@ -153,16 +153,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             break;
         // BMS 已经连接，进行充电参数配置
         case CHARGE_STAT_READY:
-            if ( bit_read(task, F_MANUAL_CHARGE_ALLOW) ) {
-                // 系统人为的允许充电
-            } else {
+            if ( ! bit_read(task, F_MANUAL_CHARGE_ALLOW) ) {
                 log_printf(INF, "ZEUS: 系统禁止充电(人工).");
                 break;
             }
 
-            if ( bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
-                // 系统总的硬件条件允许充电
-            } else {
+            if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
                 memset(errstr, 0, sizeof(errstr));
                 len = 0;
                 if ( bit_read(task, S_AC_INPUT_DOWN)) {
@@ -189,6 +185,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     len += sprintf(errstr, "未确定故障 ");
                 }
                 log_printf(INF, "ZEUS: 系统无法充电(故障), [%s]", errstr);
+                break;
             }
             break;
         // 充电阶段

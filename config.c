@@ -104,6 +104,9 @@ CONFIG_DOMAIN_BEGIN
 {"socket_config_passwd", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"charge_pile_serial",          C_STRING,  yes,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"price",                       C_FLOAT,   yes,     C_INVALID,  .cuv.f=0.0f,    {"0.0"}},
+
+// 配置故障时是否可以进行充电
+{"enablebits1",                 C_STRING,  no,      C_VALID,    .cuv.i=0,       {"000000000000000000000000"}},
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 

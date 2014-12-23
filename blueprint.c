@@ -19,7 +19,9 @@
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
-static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+static int uart4_charger_yaoce_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
@@ -40,7 +42,8 @@ struct bp_user down_user[] = {
 #if 1
     {50 * 100, 2000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
     {50 * 100, 3000, 2, 0, 0, 0, 0, 0, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
-    {50 * 100, 4000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_evt_handle},        // 盒充电机运行寄存器，只读
+    {50 * 100, 4000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_yaoce_handle},      // 盒充电机运行寄存器，只读
+    {50 * 100, 4000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_yaoce_50_100_handle},// 盒充电机运行寄存器，只读
 #endif
     {0,  0, 0, 0, 0, 0, 0, 0, 0, 0, NULL}
 };
@@ -610,7 +613,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 }
 
 // 只读数据段
-static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+static int uart4_charger_yaoce_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
@@ -648,13 +651,91 @@ static int uart4_charger_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         buff[1] = 0x04;
         buff[2] = buff[3] = 0x00;
         buff[4] = 0x00;
-        buff[5] = 0x64;
-        buff[6] = 0xF1;
-        buff[7] = 0xE1;
+        buff[5] = 0x32;
+        buff[6] = 0x71;
+        buff[7] = 0xDF;
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
 
         param->payload_size = sizeof(buff);
-        self->rx_param.need_bytes = 205;
+        self->rx_param.need_bytes = 105;
+        self->master->time_to_send = param->payload_size * 1000 / 960 + 2;
+
+        ret = ERR_OK;
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    char buff[8];
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        memcpy(&task->chargers.charge_module_t, &param->buff.rx_buff[3], 100);
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        buff[0] = 0x01;
+        buff[1] = 0x04;
+        buff[2] = 0x00;
+        buff[3] = 0x32;
+        buff[4] = 0x00;
+        buff[5] = 0x32;
+        buff[6] = 0xD0;
+        buff[7] = 0x10;
+        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+
+        param->payload_size = sizeof(buff);
+        self->rx_param.need_bytes = 105;
         self->master->time_to_send = param->payload_size * 1000 / 960 + 2;
 
         ret = ERR_OK;
@@ -1696,7 +1777,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控配置\",");
          } else if (me->user_evt_handle == uart4_charger_date_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"日期配置\",");
-         } else if (me->user_evt_handle == uart4_charger_evt_handle) {
+         } else if (me->user_evt_handle == uart4_charger_yaoce_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信\",");
          } else if ( me->user_evt_handle == uart4_simple_box_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"综合采样\",");
@@ -1706,7 +1787,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
                        uart4_charger_module_evt_handle,
                        uart4_charger_config_evt_handle,
                        uart4_charger_date_evt_handle,
-                       uart4_charger_evt_handle);
+                       uart4_charger_yaoce_handle);
             return ERR_ERR;
          }
         output_len += sprintf(&thiz->iobuff[output_len], "\"freq\":%d,", me->frame_freq);
