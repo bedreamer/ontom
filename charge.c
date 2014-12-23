@@ -151,7 +151,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 task->charge_task_stat = CHARGE_STAT_READY;
             }
             break;
-        // BMS 已经连接，进行充电参数配置
+        // BMS 已经连接，进行充电参数配置, 连接条件等待
         case CHARGE_STAT_READY:
             if ( ! bit_read(task, F_MANUAL_CHARGE_ALLOW) ) {
                 log_printf(INF, "ZEUS: 系统禁止充电(人工).");
