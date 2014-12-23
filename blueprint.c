@@ -816,7 +816,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
     case BP_EVT_RX_FRAME:
         if ( bit_read(task, S_CHARGER_COMM_DOWN) ) {
             bit_clr(task, S_CHARGER_COMM_DOWN);
-            log_printf(INF, "UART: 充电桩监控通信(主要)"GRN("恢复"));
+            log_printf(INF, "UART: "GRN("充电桩监控通信(主要)恢复"));
         }
         break;
     // 串口发送数据请求
@@ -877,7 +877,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_COMM_DOWN);
-            log_printf(ERR, "UART: 充电机监控通讯(主要)"RED("中断"));
+            log_printf(ERR, "UART: "RED("充电机监控通讯(主要)中断"));
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
