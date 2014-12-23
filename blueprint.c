@@ -19,7 +19,7 @@
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
-static int uart4_charger_yaoce_handle(struct bp_uart *self, BP_UART_EVENT evt,
+static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
@@ -42,7 +42,7 @@ struct bp_user down_user[] = {
 #if 1
     {50 * 100, 2000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
     {50 * 100, 3000, 2, 0, 0, 0, 0, 0, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
-    {50 * 100, 4000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_yaoce_handle},      // 盒充电机运行寄存器，只读
+    {50 * 100, 4000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_yaoce_0_49_handle},      // 盒充电机运行寄存器，只读
     {50 * 100, 4000, 5, 0, 0, 0, 0, 0, 0, 0, uart4_charger_yaoce_50_100_handle},// 盒充电机运行寄存器，只读
 #endif
     {0,  0, 0, 0, 0, 0, 0, 0, 0, 0, NULL}
@@ -613,7 +613,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 }
 
 // 只读数据段
-static int uart4_charger_yaoce_handle(struct bp_uart *self, BP_UART_EVENT evt,
+static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
@@ -1777,9 +1777,11 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控配置\",");
          } else if (me->user_evt_handle == uart4_charger_date_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"日期配置\",");
-         } else if (me->user_evt_handle == uart4_charger_yaoce_handle) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信\",");
-         } else if ( me->user_evt_handle == uart4_simple_box_evt_handle) {
+         } else if (me->user_evt_handle == uart4_charger_yaoce_0_49_handle) {
+            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信0\",");
+        } else if ( me->user_evt_handle == uart4_charger_yaoce_0_49_handle) {
+            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信1\",");
+        } else if ( me->user_evt_handle == uart4_simple_box_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"综合采样\",");
          } else {
             log_printf(ERR, "AJAX: bad request abort UART debug page. %p:(%p:%p:%p:%p)",
@@ -1787,7 +1789,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
                        uart4_charger_module_evt_handle,
                        uart4_charger_config_evt_handle,
                        uart4_charger_date_evt_handle,
-                       uart4_charger_yaoce_handle);
+                       uart4_charger_yaoce_0_49_handle);
             return ERR_ERR;
          }
         output_len += sprintf(&thiz->iobuff[output_len], "\"freq\":%d,", me->frame_freq);
