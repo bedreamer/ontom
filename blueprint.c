@@ -1779,7 +1779,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"日期配置\",");
          } else if (me->user_evt_handle == uart4_charger_yaoce_0_49_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信0\",");
-        } else if ( me->user_evt_handle == uart4_charger_yaoce_0_49_handle) {
+        } else if ( me->user_evt_handle == uart4_charger_yaoce_50_100_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信1\",");
         } else if ( me->user_evt_handle == uart4_simple_box_evt_handle) {
             output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"综合采样\",");
