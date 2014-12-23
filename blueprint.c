@@ -727,7 +727,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
         if ( self->master->died >= self->master->died_line ) {
-            bit_set(task, S_CHARGER_YX_2_COMM_DOWN);
+            bit_set(task, S_CHARGER_YX_2_COMM_DOEN);
             log_printf(ERR, "UART: 充电机监控通讯(次要50-100)"GRN("恢复"));
         }
         memcpy(&task->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
