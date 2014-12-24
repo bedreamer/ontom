@@ -1654,6 +1654,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                         } else {
                             thiz->continues_nr = 0;
                         }
+                        log_printf(INF, "UART: 需要立即发送回应帧: %d", thiz->continues_nr);
                     } else {
                         thiz->continues_nr = 0;
                     }
