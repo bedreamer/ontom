@@ -172,6 +172,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             fault = 0;
             warn = 0;
             omit = 0;
+            memset(errstr, 0, sizeof(errstr));
             for ( i = 1; i < S_ERR_END - S_ERROR; i ++ ) {
                 if ( bit_read(task, i + S_ERROR) ) {
                     switch ( i + S_ERROR ) {
@@ -211,9 +212,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 }
             }
 
-            if ( fault + warn + omit ) {
+            //if ( fault + warn + omit ) {
                 log_printf(WRN, "故障代码： %s", errstr);
-            }
+            //}
 
             if ( fault + warn ) {
                 bit_set(task, S_ERROR);
@@ -246,30 +247,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
             }
 
-            if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
-                memset(errstr, 0, sizeof(errstr));
-                len = 0;
-                if ( bit_read(task, S_AC_INPUT_DOWN)) {
-                    len += sprintf(errstr, "系统交流停电 ");
-                }
-                if ( bit_read(task, S_ASSIT_POWER_DOWN )) {
-                    len += sprintf(errstr, "辅助电源故障 ");
-                }
-                if ( bit_read(task, S_INSTITUDE_ERR )) {
-                    len += sprintf(errstr, "系统绝缘故障 ");
-                }
-                if ( bit_read(task, S_BMS_COMM_DOWN )) {
-                    len += sprintf(errstr, "BMS通信故障");
-                }
-                if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
-                    len += sprintf(errstr, "综合采样盒通讯故障 ");
-                }
-                if ( bit_read(task, S_CHARGER_COMM_DOWN) ) {
-                    len += sprintf(errstr, "充电机组通讯故障 ");
-                }
-                log_printf(WRN, "ZEUS: 系统无法充电(故障), [%s]", errstr);
-                break;
-            }
             break;
         // 充电阶段
         case CHARGE_STAT_CHARGING:
