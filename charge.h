@@ -154,14 +154,16 @@ struct MDATA_ACK {
     unsigned char yx_dc_output_hz:1;
     // 1#充电枪输出合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_1_hezha_stat:1;
-    // 1#充电枪连接状态，00：未连接，11：链接,10:连接保护，10：连接异常
+    // 1#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
+    // @ GUN_CONN_STAT
     unsigned char yx_gun_1_conn_stat:2;
     // 1#充电枪辅助电源合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_1_assit_power_hezha:1;
 
     // 2#充电枪输出合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_2_hezha_stat:1;
-    // 2#充电枪连接状态，00：未连接，11：链接,10:连接保护，10：连接异常
+    // 2#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
+    // @ GUN_CONN_STAT
     unsigned char yx_gun_2_conn_stat:2;
     // 2#充电枪辅助电源合闸状态，0：未合闸，1：合闸
     unsigned char yx_gun_2_assit_power_hezha:1;
@@ -171,6 +173,16 @@ struct MDATA_ACK {
 
     unsigned short crc;
 };
+typedef enum {
+    // 分离的，未连接
+    GUN_CONN_DETACHED = 0,
+    // 连接保护
+    GUN_CONN_PROTECTED = 1,
+    // 连接异常
+    GUN_CONN_EXCEPTION = 2,
+    // 已连接
+    GUN_CONN_CONNECTIVE=3
+}GUN_CONN_STAT;
 
 // 下发数据包
 struct MDATA_QRY {

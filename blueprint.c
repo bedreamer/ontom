@@ -1282,14 +1282,14 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪未链接] ");
-        } else if (me->yx_gun_1_conn_stat == 1 ) {
+        } else if (me->yx_gun_1_conn_stat == GUN_CONN_PROTECTED ) {
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪链接保护] ");
-        } else if ( me->yx_gun_1_conn_stat == 2 ) {
+        } else if ( me->yx_gun_1_conn_stat == GUN_CONN_EXCEPTION ) {
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
-        } else if ( me->yx_gun_1_conn_stat == 3 ) {
-            if ( me_pre->yx_gun_1_conn_stat != 3 ) {
+        } else if ( me->yx_gun_1_conn_stat == GUN_CONN_CONNECTIVE ) {
+            if ( me_pre->yx_gun_1_conn_stat != GUN_CONN_CONNECTIVE ) {
                 log_printf(INF, "采样盒: 1#枪连接完成.");
                 need_echo ++;
             }
@@ -1329,14 +1329,14 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪未链接] ");
-        } else if (me->yx_gun_2_conn_stat == 1 ) {
+        } else if (me->yx_gun_2_conn_stat == GUN_CONN_PROTECTED ) {
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接保护] ");
-        } else if ( me->yx_gun_2_conn_stat == 2 ) {
+        } else if ( me->yx_gun_2_conn_stat == GUN_CONN_EXCEPTION ) {
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪连接异常] ");
-        } else if ( me->yx_gun_2_conn_stat == 3 ) {
-            if ( me_pre->yx_gun_2_conn_stat != 3 ) {
+        } else if ( me->yx_gun_2_conn_stat == GUN_CONN_CONNECTIVE ) {
+            if ( me_pre->yx_gun_2_conn_stat != GUN_CONN_CONNECTIVE ) {
                 log_printf(INF, "采样盒: 2#枪连接完成.");
                 need_echo ++;
             }
@@ -1368,12 +1368,12 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
 
-        if ( task->measure.yx_gun_1_conn_stat == 3 ) {
+        if ( task->measure.yx_gun_1_conn_stat == GUN_CONN_CONNECTIVE ) {
             cmd |= GUN1_ASSIT_PWN_ON;
         } else {
             cmd &= ~GUN1_ASSIT_PWN_ON;
         }
-        if ( task->measure.yx_gun_2_conn_stat == 3 ) {
+        if ( task->measure.yx_gun_2_conn_stat == GUN_CONN_CONNECTIVE ) {
             cmd |= GUN2_ASSIT_PWN_ON;
         } else {
             cmd &= ~GUN2_ASSIT_PWN_ON;
