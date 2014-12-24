@@ -136,6 +136,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->charge_task_stat = CHARGE_STAT_INVALID;
     memset((char *)task->single, 0, sizeof(task->single));
     memset((char *)&task->measure, 0, sizeof(task->measure));
+    bit_set(task, F_MANUAL_CHARGE_ALLOW);
 
     while ( ! *done ) {
         switch ( task->charge_task_stat) {
