@@ -13,8 +13,8 @@ CXX           = arm-arago-linux-gnueabi-gcc -lts
 #DEFINES      = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED
 VER           = `svn info | grep 'Revision' | awk '{print $2}'`
 DEFINES       =
-CFLAGS        = -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT $(DEFINES)
-CXXFLAGS      = -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT $(DEFINES)
+CFLAGS        = -g -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT $(DEFINES)
+CXXFLAGS      = -g -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT $(DEFINES)
 INCPATH       = -I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 LINK          = arm-arago-linux-gnueabi-gcc -lts -lrt
 LFLAGS        = -Wl,-O1
@@ -114,7 +114,7 @@ $(TARGET):  $(OBJECTS)
 	@echo "        ARM-LD                   $@"
 	@$(LINK) $(LFLAGS) -Map=ontom.map -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 	@echo "        ARM-STIP                 $@"
-	@$(STRIP) $@
+#	@$(STRIP) $@
 
 Makefile: ontom.pro  ../qt-4.8.2-arm/mkspecs/qws/linux-arm-g++/qmake.conf ../qt-4.8.2-arm/mkspecs/common/unix.conf \
 		../qt-4.8.2-arm/mkspecs/common/linux.conf \
