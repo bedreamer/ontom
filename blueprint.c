@@ -479,7 +479,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->master->rcv_ok_cnt ++;
         self->master->check_err_cnt = 0;
         self->master->died = 0;
-        break;
+        break ;
 
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
