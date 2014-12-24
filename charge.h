@@ -586,10 +586,14 @@ typedef enum {
     S_CHARGER_YX_1_COMM_DOWN,
     // 充电屏监控次要要信2通信终端
     S_CHARGER_YX_2_COMM_DOEN,
+    // 充电模块通信故障
+    S_CHARGE_MODULE_COMM_DOWN,
     // 采样单元通信中断
     S_MEASURE_COMM_DOWN,
     // BMS通信故障
     S_BMS_COMM_DOWN,
+    // 充电模块故障
+    S_CHARGE_MODULE_DOWN,
     // 1# 充电枪物理连接故障
     S_GUN_1_PYH_CONN_DOWN,
     // 2# 充电枪物理连接故障
@@ -630,6 +634,8 @@ typedef enum {
     S_GUN_2_SW_BREAK,
     // 防雷器故障
     S_FANGLEIQI_BREAK,
+    // 故障截至标记
+    S_ERR_END,
 
     // 输出电压过高
     S_V_OUT_HIGH,

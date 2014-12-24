@@ -105,8 +105,8 @@ CONFIG_DOMAIN_BEGIN
 {"charge_pile_serial",          C_STRING,  yes,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"price",                       C_FLOAT,   yes,     C_INVALID,  .cuv.f=0.0f,    {"0.0"}},
 
-// 配置故障时是否可以进行充电
-{"enablebits1",                 C_STRING,  no,      C_VALID,    .cuv.i=0,       {"000000000000000000000000"}},
+// 关键故障标记, 标识是否可进行充电, 参考文档 充电桩相关信息.xlsx 充电桩故障对照表
+{"keyfault",                    C_STRING,  no,      C_VALID,    .cuv.i=0,       {"X11100111111100100110000011111"}},
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 

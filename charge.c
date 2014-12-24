@@ -117,8 +117,14 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
-    int charging = 1, len = 0;
+    int charging = 0, len = 0;
     char errstr[1024] = {0};
+    char *keyerr = config_read("keyfault");
+    if ( keyerr == NULL ) {
+        // 参考文档 充电桩相关信息.xlsx 充电桩故障对照表
+        // 0 标识非关键故障， 1 关键故障, X 其他
+        keyerr = "X11100111111100100110000011111";
+    }
     if ( done == NULL ) done = &mydone;
     log_printf(INF, "ZUES: %s running...sizeof(struct charge_task)=%d",
                __FUNCTION__,
@@ -155,7 +161,22 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         case CHARGE_STAT_READY:
             if ( ! bit_read(task, F_MANUAL_CHARGE_ALLOW) ) {
                 log_printf(INF, "ZEUS: 系统禁止充电(人工).");
-                break;
+                charging --;
+            }
+
+            // 因故障无法充电原因参考文档 充电桩相关信息.xlsx 充电桩故障对照表
+            if ( bit_read(task, S_ERROR) ) {
+                log_printf(WRN, "ZEUS: 系统禁止充电(故障).");
+                charging --;
+            }
+
+            if ( !bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
+                log_printf(WRN, "ZEUS: 系统禁止充电(条件).");
+                charging --;
+            }
+
+            if ( charging >= 0 ) {
+
             }
 
             if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
@@ -179,12 +200,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 if ( bit_read(task, S_CHARGER_COMM_DOWN) ) {
                     len += sprintf(errstr, "充电机组通讯故障 ");
                 }
-                if ( bit_read(task, S_ERROR) ) {
-                    len += sprintf(errstr, "系统总故障 ");
-                } else {
-                    len += sprintf(errstr, "未确定故障 ");
-                }
-                log_printf(INF, "ZEUS: 系统无法充电(故障), [%s]", errstr);
+                log_printf(WRN, "ZEUS: 系统无法充电(故障), [%s]", errstr);
                 break;
             }
             break;
