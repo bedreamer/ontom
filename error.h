@@ -24,6 +24,6 @@
 #define ERR_UART_CONFIG_FAILE (ERR_ERR|0x00000008)
 
 // 数据帧需要立即回应
-#define ERR_NEED_ECHO   (ERR_ERR|0x80000000)
+#define ERR_NEED_ECHO   (ERR_ERR|0x01000000)
 
 #endif /*_ERROR_H_*/
