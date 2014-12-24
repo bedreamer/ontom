@@ -1647,7 +1647,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
                     ret = thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
                                                           &thiz->rx_param);
-                    if ( ret == ERR_NEED_ECHO ) {
+                    if ( (unsigned)ret == ERR_NEED_ECHO ) {
                         thiz->continues_nr ++;
                         if ( thiz->continues_nr < 5 ) {
                             thiz->sequce --;
@@ -1692,7 +1692,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 }
 #endif
             } while ( thiz->status == BP_UART_STAT_RD &&
-                      ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
+                      (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
             continue;
         }
