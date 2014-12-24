@@ -364,7 +364,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->users = &down_user[0];
         self->master =NULL;// &self->users[0];
-        self->sequce = 0;
+        self->sequce = 10;
+        self->continues_nr = 0;
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
                      2000, HACHIKO_PAUSE, (void*)self);
