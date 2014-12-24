@@ -301,6 +301,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
      *  void uarts_async_sigio(int param)
      */
 #else
+    #if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
     p = & thiz->tx_seed;
     if ( self == p ) {
         Hachiko_pause(p);
@@ -321,6 +322,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
         }
         return;
     }
+    #endif
 #endif
 }
 
@@ -369,7 +371,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart reciever's timer faile.");
         }
-
+#if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
         self->tx_seed.private = (void*)self;
         self->tx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
         self->tx_param.payload_size = 0;
@@ -381,7 +383,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart transfer's timer faile.");
         }
-
+#endif
         self->tx_speed.private = (void*)self;
         self->tx_speed.Hachiko_notify_proc = uart4_Hachiko_speed_proc;
         ret = _Hachiko_new(&self->tx_speed, HACHIKO_AUTO_FEED,
@@ -1757,12 +1759,26 @@ continue_to_send:
 #else
                 thiz->tx_seed.ttl = thiz->master->time_to_send;
 #endif
+
+#if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
                 Hachiko_resume( & thiz->tx_seed );
                 // 睡眠20us 引起内核线程切换, 快速切换至Hachiko线程
                 usleep(20);
                 log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
+#else
+                usleep(1000 * thiz->master->time_to_send);
+                thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
+                thiz->tx_param.payload_size = 0;
+                log_printf(DBG_LV0, "UART: packet send done.");
+                memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
+                thiz->status = BP_UART_STAT_RD;
+                if ( thiz->role == BP_UART_MASTER ) {
+                    // 主动设备，需要进行接收超时判定
+                    Hachiko_resume(&thiz->rx_seed);
+                }
+#endif
             } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送了一部分
                 thiz->tx_param.cursor = retval;

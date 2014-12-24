@@ -21,7 +21,8 @@
 #define CONFIG_SUPPORT_FRAME_BALANCE   1
 // 支持的充电模块个数
 #define CONFIG_SUPPORT_CHARGE_MODULE   14
-
+// 采用异步发送超时
+#define CONFIG_SUPPORT_ASYNC_UART_TX   0
 //}}}}}}}}}}}}}
 
 #ifndef bool
