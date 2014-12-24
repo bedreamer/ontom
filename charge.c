@@ -157,6 +157,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         case CHARGE_STAT_WAIT_BMS:
             if ( bit_read(task, F_BMS_RECOGNIZED) ) {
                 task->charge_task_stat = CHARGE_STAT_READY;
+                log_printf(INF, "ZEUS: BMS 已经识别..");
+            } else {
+                bit_set(task, F_BMS_RECOGNIZED);
             }
             break;
         // BMS 已经连接，进行充电参数配置, 连接条件等待
