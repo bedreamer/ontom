@@ -349,7 +349,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 {
     int ret = ERR_OK;
     int i, nr;
-    struct bp_user *u, *hit;
+    struct bp_user *hit;
 
     switch ( evt ) {
     // 串口数据结构初始化
@@ -1055,7 +1055,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, BP_UART_EVENT evt
 static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR, ccc, nr = 0, len = 0, errnr = 0;
+    int ret = ERR_ERR, nr = 0, len = 0, errnr = 0;
     char buff[32] = {0};
     struct MDATA_ACK *me, *me_pre;
     char errstr[1024] = {0};
