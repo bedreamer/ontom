@@ -508,7 +508,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         //self->master = NULL;
         nr = (sizeof(down_user) - sizeof(struct bp_user)) / sizeof(struct bp_user);
         i = self->sequce % nr;
-        log_printf(DBG_LV0, "下一个发送序列为: %d", i);
+        log_printf(DBG_LV0, "下一个发送序列为: %d:%d", self->sequce, i);
         hit = &down_user[ i ];
         /*
         for ( u = self->users, hit = self->users; u->user_evt_handle; u ++ ) {
