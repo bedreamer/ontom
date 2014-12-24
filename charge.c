@@ -106,6 +106,8 @@ void deal_with_charge_logic(struct charge_task *thiz)
 
 }
 
+#define true_express(i) (keyerr[i] == '1' || keyerr[i] == 't' || keyerr[i] =='T'|| keyerr[i] == 'y' || keyerr[i] == 'Y')
+#define false_express(i) (keyerr[i] == '0' || keyerr[i] == 'f' || keyerr[i] =='F'|| keyerr[i] == 'n' || keyerr[i] == 'N')
 /* 充电任务服务线程
  * 充电状态的转换触发条件都由UI转发过来，这样做的目的是为了保证触发唯一和触发条件的同步。
  *
@@ -116,13 +118,13 @@ void deal_with_charge_logic(struct charge_task *thiz)
 void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
-    int mydone = 0;
-    int charging = 0, len = 0;
+    int mydone = 0, i;
+    int charging = 0, len = 0, fault, warn, omit;
     char errstr[1024] = {0};
-    char *keyerr = config_read("keyfault");
+    const char *keyerr = config_read("keyfault");
     if ( keyerr == NULL ) {
         // 参考文档 充电桩相关信息.xlsx 充电桩故障对照表
-        // 0 标识非关键故障， 1 关键故障, X 其他
+        // [0nNfF]:标识非关键故障， [1yYtT]:关键故障, [^0nNfF1yYtT]:其他
         keyerr = "X11100111111100100110000011111";
     }
     if ( done == NULL ) done = &mydone;
@@ -164,8 +166,60 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 charging --;
             }
 
+            fault = 0;
+            warn = 0;
+            omit = 0;
+            for ( i = 1; i < S_ERR_END - S_ERROR; i ++ ) {
+                if ( bit_read(task, i + S_ERROR) ) {
+                    switch ( i + S_ERROR ) {
+                    case S_GUN_1_PYH_CONN_DOWN:
+                    case S_GUN_1_SW_BREAK:
+                        if ( task->can_charge_gun_sn == GUN_SN0 && true_express(i) ) {
+                            fault ++;
+                            len += sprintf(errstr, "[E: 0x%04X] ", i + S_ERROR);
+                        } else {
+                            omit ++;
+                            len += sprintf(errstr, "[O: 0x%04X] ", i + S_ERROR);
+                        }
+                        break;
+                    case S_GUN_2_PYH_CONN_DOWN:
+                    case S_GUN_2_SW_BREAK:
+                        if ( task->can_charge_gun_sn == GUN_SN1 && true_express(i) ) {
+                            fault ++;
+                            len += sprintf(errstr, "[E: 0x%04X] ", i + S_ERROR);
+                        } else {
+                            omit ++;
+                            len += sprintf(errstr, "[O: 0x%04X] ", i + S_ERROR);
+                        }
+                        break;
+                    default:
+                        if ( false_express(i) ) { // 非关键
+                            warn ++;
+                            len += sprintf(errstr, "[W: 0x%04X] ", i + S_ERROR);
+                        } else if ( true_express(i) ) { // 关键
+                            fault ++;
+                            len += sprintf(errstr, "[E: 0x%04X] ", i + S_ERROR);
+                        } else { // 可忽略
+                            omit ++;
+                            len += sprintf(errstr, "[O: 0x%04X] ", i + S_ERROR);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if ( fault + warn + omit ) {
+                log_printf(WRN, "故障代码： %s", errstr);
+            }
+
+            if ( fault + warn ) {
+                bit_set(task, S_ERROR);
+            } else {
+                bit_clr(task, S_ERROR);
+            }
+
             // 因故障无法充电原因参考文档 充电桩相关信息.xlsx 充电桩故障对照表
-            if ( bit_read(task, S_ERROR) ) {
+            if ( bit_read(task, S_ERROR) && fault ) {
                 log_printf(WRN, "ZEUS: 系统禁止充电(故障).");
                 charging --;
             }
@@ -173,6 +227,16 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             if ( !bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
                 log_printf(WRN, "ZEUS: 系统禁止充电(条件).");
                 charging --;
+            }
+
+            if ( bit_read(task, S_ASSIT_POWER_DOWN) ) {
+                bit_clr(task, CMD_GUN_1_ASSIT_PWN_ON);
+                bit_clr(task, CMD_GUN_2_ASSIT_PWN_ON);
+            } else {
+                if ( task->can_charge_gun_sn == GUN_SN0 ) {
+                }
+                if ( task->can_charge_gun_sn == GUN_SN1 ) {
+                }
             }
 
             if ( charging >= 0 ) {

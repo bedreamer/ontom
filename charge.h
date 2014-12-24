@@ -32,8 +32,10 @@ typedef enum {
     GUN_SN0 = 0,
     // 1# 充电枪
     GUN_SN1 = 1,
-    // 默认充电强编号
-    GUN_DEFAULT = 0
+    // 默认充电枪
+    GUN_DEFAULT = 0,
+    // 未指定充电枪
+    GUN_UNDEFINE = 177
 }CHARGE_GUN_SN;
 
 /* 卡信息
@@ -585,7 +587,7 @@ typedef enum {
     // 充电屏监控次要要信1通信中断
     S_CHARGER_YX_1_COMM_DOWN,
     // 充电屏监控次要要信2通信终端
-    S_CHARGER_YX_2_COMM_DOEN,
+    S_CHARGER_YX_2_COMM_DOWN,
     // 充电模块通信故障
     S_CHARGE_MODULE_COMM_DOWN,
     // 采样单元通信中断
