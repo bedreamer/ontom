@@ -211,6 +211,8 @@ struct bp_uart {
 
     // 发送序列
     unsigned int sequce;
+    // 连续发送次数
+    unsigned int continues_nr;
     // 使用者信息
     struct bp_user *users;
     // 当前使用者

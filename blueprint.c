@@ -1060,6 +1060,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     char errstr[1024] = {0};
     char infstr[1024] = {0};
     char cmd = 0;
+    int need_echo = 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1276,6 +1277,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( me->yx_gun_1_conn_stat == 0 ) {
             if ( me_pre->yx_gun_1_conn_stat != 0 ) {
                 log_printf(INF, "采样盒: 1#枪断开连接");
+                need_echo ++;
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪未链接] ");
@@ -1288,6 +1290,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else if ( me->yx_gun_1_conn_stat == 3 ) {
             if ( me_pre->yx_gun_1_conn_stat != 3 ) {
                 log_printf(INF, "采样盒: 1#枪连接完成.");
+                need_echo ++;
             }
             bit_set(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪链接"GRN("正常")"] ");
@@ -1321,6 +1324,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( me->yx_gun_2_conn_stat == 0 ) {
             if ( me_pre->yx_gun_2_conn_stat != 0 ) {
                 log_printf(INF, "采样盒: 2#枪断开连接");
+                need_echo ++;
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪未链接] ");
@@ -1333,6 +1337,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else if ( me->yx_gun_2_conn_stat == 3 ) {
             if ( me_pre->yx_gun_2_conn_stat != 3 ) {
                 log_printf(INF, "采样盒: 2#枪连接完成.");
+                need_echo ++;
             }
             bit_set(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接"GRN("正常")"] ");
@@ -1352,7 +1357,11 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
         log_printf(DBG_LV3, "采样盒: 遥信: %s", infstr);
         memcpy(me_pre, me, sizeof(struct MDATA_ACK));
-
+        if ( need_echo ) {
+            ret = ERR_NEED_ECHO;
+        } else {
+            ret = ERR_OK;
+        }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -1635,8 +1644,18 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
                     log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
-                    thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
+                    ret = thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
                                                           &thiz->rx_param);
+                    if ( ret == ERR_NEED_ECHO ) {
+                        thiz->continues_nr ++;
+                        if ( thiz->continues_nr < 5 ) {
+                            thiz->sequce --;
+                        } else {
+                            thiz->continues_nr = 0;
+                        }
+                    } else {
+                        thiz->continues_nr = 0;
+                    }
                     //thiz->master->rcv_ok_cnt ++;
                     break;
                 // 数据接收完成，但校验失败, 停止接收

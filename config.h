@@ -21,7 +21,10 @@
 #define CONFIG_SUPPORT_FRAME_BALANCE   1
 // 支持的充电模块个数
 #define CONFIG_SUPPORT_CHARGE_MODULE   14
-// 采用异步发送超时
+/* 采用异步发送超时, 若采用定时器来进行发送完成超时计算
+ *可能会出现丢帧情况，且该情况较为严重，丢帧率可达到1%-2%
+ *采用同步等待发送方式发送数据后，现象得到改善。
+ */
 #define CONFIG_SUPPORT_ASYNC_UART_TX   0
 //}}}}}}}}}}}}}
 
