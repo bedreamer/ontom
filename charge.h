@@ -270,7 +270,9 @@ struct charger_config_10h {
     // 充电机模块状态
     unsigned short charge_module_status[CONFIG_SUPPORT_CHARGE_MODULE/2];
     // 充电机模块机身编号
-    unsigned short charge_module_sn[CONFIG_SUPPORT_CHARGE_MODULE/2][3];
+    unsigned short charge_module_sn[CONFIG_SUPPORT_CHARGE_MODULE][3];
+    unsigned short charge_kaichu;
+    unsigned short charge_kairu;
     // }}
 };
 
