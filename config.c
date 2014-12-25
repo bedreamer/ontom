@@ -729,19 +729,19 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
     for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
         if ( C_STRING == head->config_type ) {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "{\"name\":\"%s\",\"type\":\"%s\",\"val\":\"%s\"},",
+                                  "{\"n\":\"%s\",\"t\":\"%s\",\"v\":\"%s\"},",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                                   head->config_value);
         } else if ( C_BOOL == head->config_type ) {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "{\"name\":\"%s\",\"type\":\"%s\",\"val\":%s},",
+                                  "{\"n\":\"%s\",\"type\":\"%s\",\"v\":%s},",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                     (head->config_value[0] == 't' || head->config_value[0] == 'T') ?"true":"false");
         } else {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "{\"name\":\"%s\",\"type\":\"%s\",\"val\":%s},",
+                                  "{\"n\":\"%s\",\"t\":\"%s\",\"v\":%s},",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                     head->config_value[0]=='N'?"0":head->config_value);
