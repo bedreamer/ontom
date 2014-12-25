@@ -725,24 +725,24 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
     }
 
     thiz->ct = "application/json";
-    output_len += sprintf(&thiz->iobuff[output_len], "\"configs\":{");
+    output_len += sprintf(&thiz->iobuff[output_len], "\"configs\":[");
     for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
         if ( C_STRING == head->config_type ) {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "[\"name\":\"%s\",\"type\":\"%s\",\"val\":\"%s\"]",
+                                  "{\"name\":\"%s\",\"type\":\"%s\",\"val\":\"%s\"}",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                                   head->config_value);
         } else {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "[\"name\":\"%s\",\"type\":\"%s\",\"val\":%s],",
+                                  "{\"name\":\"%s\",\"type\":\"%s\",\"val\":%s},",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                                   head->config_value);
         }
     }
     thiz->iobuff[output_len] = '\0';
-    output_len += sprintf(&thiz->iobuff[output_len], "}");
+    output_len += sprintf(&thiz->iobuff[output_len], "]");
     thiz->xml_len = output_len;
 
     return ERR_OK;
