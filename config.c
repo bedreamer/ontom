@@ -741,7 +741,7 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
                                   head->config_value);
         }
     }
-    thiz->iobuff[output_len--] = '\0';
+    thiz->iobuff[output_len] = '\0';
     output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
 
