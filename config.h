@@ -26,6 +26,8 @@
  *采用同步等待发送方式发送数据后，现象得到改善。
  */
 #define CONFIG_SUPPORT_ASYNC_UART_TX   0
+// 充电管理中可添加的最多的充电作业个数
+#define CONFIG_SUPPORT_CHARGE_JOBS     8
 //}}}}}}}}}}}}}
 
 #ifndef bool

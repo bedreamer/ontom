@@ -403,6 +403,32 @@ struct can_pack_generator {
     const char *mnemonic;
 };
 
+// 充电作业状态
+typedef enum {
+    // 作业状态为空
+    JOB_IDLE = 0x00,
+    // 作业状态正在设置
+    JOB_SETTING,
+    // 作业就绪等待
+    JOB_STANDBY,
+    // 作业正在执行
+    JOB_WORKING,
+    // 作业完成，正在进行清理工作
+    JOB_DONE
+}JOBSTATUS;
+
+/*
+ * 充电作业描述，充电管理的最小单位
+ */
+struct charge_job {
+    //  作业状态
+    JOBSTATUS job_status;
+    // 作业序号
+    unsigned int job_sn;
+    // 作业充电枪
+    CHARGE_GUN_SN job_gun_sn;
+};
+
 /*
  * 充电任务描述
  */
