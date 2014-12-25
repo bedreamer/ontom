@@ -670,7 +670,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
             config_write(tag, val);
         }
     }
-#if 0
+
     thiz->ct = "text/html";
     output_len = sprintf(&thiz->iobuff[output_len],
                             "<html><title>直流充电桩内部调试接口</title>"
@@ -702,27 +702,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
 
     output_len += sprintf(&thiz->iobuff[output_len], "</table></body></html>");
     thiz->xml_len = output_len;
-#else
-    thiz->ct = "application/json";
-    output_len += sprintf(&thiz->iobuff[output_len], "\"configs\":{");
-    for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
-        if ( C_STRING == head->config_type ) {
-            output_len += sprintf(&thiz->iobuff[output_len],
-                                  "[\"name\":%s,\"type\":\"%s\",\"val\":\"%s\"]",
-                                  head->config_name,
-                                  value_type[(unsigned int)(head->config_type)],
-                                  head->config_value);
-        } else {
-            output_len += sprintf(&thiz->iobuff[output_len],
-                                  "[\"name\":%s,\"type\":\"%s\",\"val\":%s],",
-                                  head->config_name,
-                                  value_type[(unsigned int)(head->config_type)],
-                                  head->config_value);
-        }
-    }
-    thiz->iobuff[output_len--] = '\0';
-    output_len += sprintf(&thiz->iobuff[output_len], "}");
-#endif
+
     return ERR_OK;
 }
 
