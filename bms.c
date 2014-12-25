@@ -828,6 +828,8 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             log_printf(WRN, "BMS: CAN_TP_WRITE not implement.");
             continue;
         } else if ( task->can_bms_status == CAN_INVALID ) {
+            log_printf(WRN, "BMS: invalid can_bms_status: %d.",
+                       task->can_bms_status);
             continue;
         } else {
             log_printf(WRN, "BMS: invalid can_bms_status: %d.",
