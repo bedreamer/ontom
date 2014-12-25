@@ -965,7 +965,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         memset(&frame, 0, sizeof(frame));
         nbytes = read(s, &frame, sizeof(struct can_frame));
         if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
-            #if 1
+            #if 0
             log_printf(DBG_LV0, "BMS: id not accept %x", frame.can_id);
             #endif
             continue;
@@ -1085,10 +1085,9 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     task->can_tp_bomb.Hachiko_notify_proc =
                             Hachiko_CAN_TP_notify_proc;
                     // 根据SAE J1939-21中关于CAN总线数据传输链接的说明，中间传输
-                    // 过程最大不超过1250ms，而根据系统中定时器的默认分辨率（10ms）
-                    // 计算得来125
+                    // 过程最大不超过1250ms
                     int ret = Hachiko_new( & task->can_tp_bomb,
-                                           HACHIKO_ONECE, 125,
+                                           HACHIKO_ONECE, 1250,
                                            &task->can_tp_private);
                     if ( ret == (int)ERR_WRONG_PARAM ) {
                         log_printf(ERR,
