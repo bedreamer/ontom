@@ -670,7 +670,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
             config_write(tag, val);
         }
     }
-
+#if 0
     thiz->ct = "text/html";
     output_len = sprintf(&thiz->iobuff[output_len],
                             "<html><title>直流充电桩内部调试接口</title>"
@@ -702,6 +702,67 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
 
     output_len += sprintf(&thiz->iobuff[output_len], "</table></body></html>");
     thiz->xml_len = output_len;
+#else
+    thiz->ct = "application/json";
+    output_len += sprintf(&thiz->iobuff[output_len], "\"configs\":{");
+    for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
+        if ( C_STRING == head->config_type ) {
+            output_len += sprintf(&thiz->iobuff[output_len],
+                                  "[\"name\":%s,\"type\":\"%s\",\"val\":\"%s\"]",
+                                  head->config_name,
+                                  value_type[(unsigned int)(head->config_type)],
+                                  head->config_value);
+        } else {
+            output_len += sprintf(&thiz->iobuff[output_len],
+                                  "[\"name\":%s,\"type\":\"%s\",\"val\":%s],",
+                                  head->config_name,
+                                  value_type[(unsigned int)(head->config_type)],
+                                  head->config_value);
+        }
+    }
+    thiz->iobuff[output_len--] = '\0';
+    output_len += sprintf(&thiz->iobuff[output_len], "}");
+#endif
+    return ERR_OK;
+}
+
+// 生成动态设置页面
+int ajax_debug_json_list(struct ajax_xml_struct *thiz)
+{
+    struct config_struct *head = configs;
+    int nr = 0, output_len = 0;
+    char tag[128] = {0}, val[128] ={0}, de_val[128]={0};
+
+    mg_get_var(thiz->xml_conn, "t", tag, 128);
+    mg_get_var(thiz->xml_conn, "v", val, 128);
+
+    if ( tag[0] && val[0] ) {
+        mg_url_decode(val, 128, de_val, 128, 0);
+        log_printf(DBG_LV1, "WEB SET %s: %s", tag, de_val);
+        if ( de_val[0] ) {
+            config_write(tag, val);
+        }
+    }
+
+    thiz->ct = "application/json";
+    output_len += sprintf(&thiz->iobuff[output_len], "\"configs\":{");
+    for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
+        if ( C_STRING == head->config_type ) {
+            output_len += sprintf(&thiz->iobuff[output_len],
+                                  "[\"name\":%s,\"type\":\"%s\",\"val\":\"%s\"]",
+                                  head->config_name,
+                                  value_type[(unsigned int)(head->config_type)],
+                                  head->config_value);
+        } else {
+            output_len += sprintf(&thiz->iobuff[output_len],
+                                  "[\"name\":%s,\"type\":\"%s\",\"val\":%s],",
+                                  head->config_name,
+                                  value_type[(unsigned int)(head->config_type)],
+                                  head->config_value);
+        }
+    }
+    thiz->iobuff[output_len--] = '\0';
+    output_len += sprintf(&thiz->iobuff[output_len], "}");
     return ERR_OK;
 }
 
