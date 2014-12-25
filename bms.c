@@ -775,7 +775,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
-    strcpy(ifr.ifr_name, "can0" );
+    strcpy(ifr.ifr_name, "can1" );
     ioctl(s, SIOCGIFINDEX, &ifr);
 
     addr.can_family = PF_CAN;
