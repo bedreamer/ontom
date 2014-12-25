@@ -223,7 +223,7 @@ struct bms_statistics statistics[] = {
     }
 };
 
-// 数据包超时心跳包, 定时器自动复位, 10ms(一个单位时间)一次
+// 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
 void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
@@ -277,7 +277,7 @@ static int can_packet_callback(
         thiz->can_bms_status = CAN_NORMAL;
         thiz->can_heart_beat.Hachiko_notify_proc=
                 Hachiko_packet_heart_beart_notify_proc;
-        Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 1, NULL);
+        Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 20, NULL);
         thiz->charge_stage = CHARGE_STAGE_HANDSHACKING;
         //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
         break;
