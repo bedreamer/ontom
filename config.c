@@ -744,7 +744,7 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
                                   "{\"name\":\"%s\",\"type\":\"%s\",\"val\":%s},",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
-                                  head->config_value);
+                    head->config_value[0]=='N'?"0":head->config_value);
         }
     }
     thiz->iobuff[output_len] = '\0';
