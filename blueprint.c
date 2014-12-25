@@ -1631,11 +1631,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                                "%02X %02X %02X %02X %02X %02X %02X %02X "
                                "%02X %02X %02X %02X>",
                                rd, nr, cursor,
-                               buff[0], buff[1], buff[2], buff[3],
-                               buff[4], buff[5], buff[6], buff[7],
-                               buff[0+8], buff[1+8], buff[2+8], buff[3+8],
-                               buff[4+8], buff[5+8], buff[6+8], buff[7+8],
-                               buff[8+8], buff[9+8], buff[10+8], buff[11+8]);
+                               buff[0 + cursor], buff[1 + cursor], buff[2 + cursor], buff[3 + cursor],
+                               buff[4 + cursor], buff[5 + cursor], buff[6 + cursor], buff[7 + cursor],
+                               buff[0+8 + cursor], buff[1+8 + cursor], buff[2+8 + cursor], buff[3+8 + cursor],
+                               buff[4+8 + cursor], buff[5+8 + cursor], buff[6+8 + cursor], buff[7+8 + cursor],
+                               buff[8+8 + cursor], buff[9+8 + cursor], buff[10+8 + cursor], buff[11+8 + cursor]);
                 }
                 ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
                                           &thiz->rx_param);

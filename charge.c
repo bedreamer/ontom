@@ -213,9 +213,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 }
             }
 
-            //if ( fault + warn + omit ) {
+            if ( fault + warn + omit ) {
                 log_printf(WRN, "故障代码： %s", errstr);
-            //}
+            }
 
             if ( fault + warn ) {
                 bit_set(task, S_ERROR);
