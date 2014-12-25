@@ -735,7 +735,7 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
                                   head->config_value);
         } else {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "[\"name\":%s,\"type\":\"%s\",\"val\":%s],",
+                                  "[\"name\":\"%s\",\"type\":\"%s\",\"val\":%s],",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                                   head->config_value);
