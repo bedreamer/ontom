@@ -277,7 +277,7 @@ static int can_packet_callback(
         thiz->can_bms_status = CAN_NORMAL;
         thiz->can_heart_beat.Hachiko_notify_proc=
                 Hachiko_packet_heart_beart_notify_proc;
-        Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 1, NULL);
+        Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 200, NULL);
         thiz->charge_stage = CHARGE_STAGE_HANDSHACKING;
         //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
         break;
