@@ -729,7 +729,7 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
     for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
         if ( C_STRING == head->config_type ) {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "{\"name\":\"%s\",\"type\":\"%s\",\"val\":\"%s\"}",
+                                  "{\"name\":\"%s\",\"type\":\"%s\",\"val\":\"%s\"},",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                                   head->config_value);
