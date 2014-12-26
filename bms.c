@@ -261,23 +261,39 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                 switch (task->charge_stage) {
                 case CHARGE_STAGE_HANDSHACKING:
                     if (me->can_pgn != PGN_BRM) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
-                    log_printf(WRN, "BMS: 握手阶段BMS通信故障.");
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
+                        if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
+                            bit_set(task, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
+                        }
+                    }
                     break;
                 case CHARGE_STAGE_CONFIGURE:
                     if (me->can_pgn != PGN_BCP) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
-                    log_printf(WRN, "BMS: 配置阶段BMS通信故障.");
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
+                        if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
+                            bit_set(task, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障"));
+                        }
+                    }
                     break;
                 case CHARGE_STAGE_CHARGING:
                     if (me->can_pgn != PGN_BCL) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
-                    log_printf(WRN, "BMS: 充电阶段BMS通信故障.");
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
+                        if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
+                            bit_set(task, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障"));
+                        }
+                    }
                     break;
                 case CHARGE_STAGE_DONE:
                     if (me->can_pgn != PGN_BSD) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
-                    log_printf(WRN, "BMS: 充电完成阶段BMS通信故障.");
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
+                        if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
+                            bit_set(task, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障"));
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -522,6 +538,10 @@ int about_packet_reciev_done(struct charge_task *thiz,
     case PGN_BRM :// 0x000200, BMS 车辆辨识报文
         statistics[I_BRM].can_counter ++;
         statistics[I_BRM].can_silence = 0;
+        if ( bit_read(task, S_BMS_COMM_DOWN) ) {
+            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
+        }
+        bit_clr(task, S_BMS_COMM_DOWN);
 
         if ( param->buff_payload == 8 ) {
             memcpy(&thiz->vehicle_info, param->buff.rx_buff, 8);
@@ -574,6 +594,10 @@ int about_packet_reciev_done(struct charge_task *thiz,
     case PGN_BCP :// 0x000600, BMS 配置报文
         statistics[I_BCP].can_counter ++;
         statistics[I_BCP].can_silence = 0;
+        if ( bit_read(task, S_BMS_COMM_DOWN) ) {
+            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
+        }
+        bit_clr(task, S_BMS_COMM_DOWN);
 
         if ( param->buff_payload != 13 ) {
             log_printf(WRN, "BMS: BCP packet size crash, need 13 gave %d",
@@ -649,6 +673,10 @@ int about_packet_reciev_done(struct charge_task *thiz,
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
         statistics[I_BCL].can_counter ++;
         statistics[I_BCL].can_silence = 0;
+        if ( bit_read(task, S_BMS_COMM_DOWN) ) {
+            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
+        }
+        bit_clr(task, S_BMS_COMM_DOWN);
 
         memcpy(&thiz->bms_charge_need_now,
                param->buff.rx_buff, sizeof(struct pgn4096_BCL));
@@ -780,6 +808,10 @@ int about_packet_reciev_done(struct charge_task *thiz,
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
         statistics[I_BSD].can_counter ++;
         statistics[I_BSD].can_silence = 0;
+        if ( bit_read(task, S_BMS_COMM_DOWN) ) {
+            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
+        }
+        bit_clr(task, S_BMS_COMM_DOWN);
 
         log_printf(INF, "BMS: PGN_BSD fetched.");
         break;
