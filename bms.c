@@ -261,18 +261,22 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                 switch (task->charge_stage) {
                 case CHARGE_STAGE_HANDSHACKING:
                     if (me->can_pgn != PGN_BRM) break;
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
                     log_printf(WRN, "BMS: 握手阶段BMS通信故障.");
                     break;
                 case CHARGE_STAGE_CONFIGURE:
                     if (me->can_pgn != PGN_BCP) break;
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
                     log_printf(WRN, "BMS: 配置阶段BMS通信故障.");
                     break;
                 case CHARGE_STAGE_CHARGING:
                     if (me->can_pgn != PGN_BCL) break;
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
                     log_printf(WRN, "BMS: 充电阶段BMS通信故障.");
                     break;
                 case CHARGE_STAGE_DONE:
                     if (me->can_pgn != PGN_BSD) break;
+                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS))
                     log_printf(WRN, "BMS: 充电完成阶段BMS通信故障.");
                     break;
                 default:
