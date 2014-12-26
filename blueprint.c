@@ -664,7 +664,7 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
 
         param->payload_size = sizeof(buff);
         self->rx_param.need_bytes = 105;
-        self->master->time_to_send = param->payload_size * 1000 / 960 + 2;
+        self->master->time_to_send = param->payload_size * 1000 / 960 + 1;
 
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
@@ -750,7 +750,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
 
         param->payload_size = sizeof(buff);
         self->rx_param.need_bytes = 105;
-        self->master->time_to_send = param->payload_size * 1000 / 960 + 2;
+        self->master->time_to_send = param->payload_size * 1000 / 960 + 1;
 
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);

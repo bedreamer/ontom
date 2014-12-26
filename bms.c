@@ -257,6 +257,24 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
               (unsigned int)i < (sizeof(statistics) / sizeof(struct bms_statistics) ) - 2; i++ ) {
             me = &statistics[i];
             me->can_silence ++;
+            if ( me->can_tolerate_silence < me->can_silence ) {
+                switch (task->charge_stage) {
+                case CHARGE_STAGE_HANDSHACKING:
+                    if (me->can_pgn != PGN_BRM) break;
+                    break;
+                case CHARGE_STAGE_CONFIGURE:
+                    if (me->can_pgn != PGN_BCP) break;
+                    break;
+                case CHARGE_STAGE_CHARGING:
+                    if (me->can_pgn != PGN_BCL) break;
+                    break;
+                case CHARGE_STAGE_DONE:
+                    if (me->can_pgn != PGN_BSD) break;
+                    break;
+                default:
+                    break;
+                }
+            }
         }
     }
 }
