@@ -261,15 +261,19 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                 switch (task->charge_stage) {
                 case CHARGE_STAGE_HANDSHACKING:
                     if (me->can_pgn != PGN_BRM) break;
+                    log_printf(WRN, "BMS: 握手阶段BMS通信故障.");
                     break;
                 case CHARGE_STAGE_CONFIGURE:
                     if (me->can_pgn != PGN_BCP) break;
+                    log_printf(WRN, "BMS: 配置阶段BMS通信故障.");
                     break;
                 case CHARGE_STAGE_CHARGING:
                     if (me->can_pgn != PGN_BCL) break;
+                    log_printf(WRN, "BMS: 充电阶段BMS通信故障.");
                     break;
                 case CHARGE_STAGE_DONE:
                     if (me->can_pgn != PGN_BSD) break;
+                    log_printf(WRN, "BMS: 充电完成阶段BMS通信故障.");
                     break;
                 default:
                     break;
@@ -296,6 +300,7 @@ static int can_packet_callback(
         thiz->can_heart_beat.Hachiko_notify_proc=
                 Hachiko_packet_heart_beart_notify_proc;
         Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 4, NULL);
+        log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_HANDSHACKING"));
         thiz->charge_stage = CHARGE_STAGE_HANDSHACKING;
         //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
         break;
