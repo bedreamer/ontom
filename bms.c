@@ -521,6 +521,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     case PGN_BRM :// 0x000200, BMS 车辆辨识报文
         statistics[I_BRM].can_counter ++;
+        statistics[I_BRM].can_silence = 0;
 
         if ( param->buff_payload == 8 ) {
             memcpy(&thiz->vehicle_info, param->buff.rx_buff, 8);
@@ -572,6 +573,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     case PGN_BCP :// 0x000600, BMS 配置报文
         statistics[I_BCP].can_counter ++;
+        statistics[I_BCP].can_silence = 0;
 
         if ( param->buff_payload != 13 ) {
             log_printf(WRN, "BMS: BCP packet size crash, need 13 gave %d",
@@ -627,6 +629,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
         statistics[I_BRO].can_counter ++;
+        statistics[I_BRO].can_silence = 0;
 
         log_printf(INF, "BMS is %s for charge.",
                    param->buff.rx_buff[0] == 0x00 ?
@@ -645,6 +648,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
         statistics[I_BCL].can_counter ++;
+        statistics[I_BCL].can_silence = 0;
 
         memcpy(&thiz->bms_charge_need_now,
                param->buff.rx_buff, sizeof(struct pgn4096_BCL));
@@ -667,6 +671,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     case PGN_BCS :// 0x001100, BMS 电池充电总状态报文
         statistics[I_BCS].can_counter ++;
+        statistics[I_BCS].can_silence = 0;
 
         log_printf(INF, "PGN_BCS fetched.");
         memcpy(&thiz->bms_all_battery_status, param->buff.rx_buff,
@@ -690,6 +695,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     case PGN_BSM :// 0x001300, 动力蓄电池状态信息报文
         statistics[I_BSM].can_counter ++;
+        statistics[I_BSM].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BSM fetched.");
         memcpy(&thiz->bms_battery_status, param->buff.rx_buff,
@@ -749,31 +755,37 @@ int about_packet_reciev_done(struct charge_task *thiz,
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
         statistics[I_BMV].can_counter ++;
+        statistics[I_BMV].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
         statistics[I_BMT].can_counter ++;
+        statistics[I_BMT].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BMT fetched.");
         break;
     case PGN_BSP :// 0x001700, 动力蓄电池预留报文
         statistics[I_BSP].can_counter ++;
+        statistics[I_BSP].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BSP fetched.");
         break;
     case PGN_BST :// 0x001900, BMS 中止充电报文
         statistics[I_BST].can_counter ++;
+        statistics[I_BST].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
         statistics[I_BSD].can_counter ++;
+        statistics[I_BSD].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BSD fetched.");
         break;
     case PGN_BEM :// 0x001E00, BMS 错误报文
         statistics[I_BEM].can_counter ++;
+        statistics[I_BEM].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BEM fetched.");
         break;
