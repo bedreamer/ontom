@@ -265,6 +265,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
+                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     }
                     break;
@@ -274,6 +275,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障"));
+                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     }
                     break;
@@ -283,6 +285,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障"));
+                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     }
                     break;
@@ -292,6 +295,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障"));
+                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     }
                     break;
