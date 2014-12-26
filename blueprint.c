@@ -1327,20 +1327,20 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                 log_printf(INF, "采样盒: 2#枪断开连接");
                 need_echo ++;
             }
-            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
+            bit_clr(task, F_GUN_2_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪未链接] ");
         } else if (me->yx_gun_2_conn_stat == GUN_CONN_PROTECTED ) {
-            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
+            bit_clr(task, F_GUN_2_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接保护] ");
         } else if ( me->yx_gun_2_conn_stat == GUN_CONN_EXCEPTION ) {
-            bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
+            bit_clr(task, F_GUN_2_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪连接异常] ");
         } else if ( me->yx_gun_2_conn_stat == GUN_CONN_CONNECTIVE ) {
             if ( me_pre->yx_gun_2_conn_stat != GUN_CONN_CONNECTIVE ) {
                 log_printf(INF, "采样盒: 2#枪连接完成.");
                 need_echo ++;
             }
-            bit_set(task, F_GUN_1_PHY_CONN_STATUS);
+            bit_set(task, F_GUN_2_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接"GRN("正常")"] ");
         }
         if ( me->yx_gun_2_assit_power_hezha ) {
