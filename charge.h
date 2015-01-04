@@ -478,6 +478,12 @@ struct charge_task {
      * 第三次： 终止充电任务并计费
      */
     struct user_card card;
+    // 充电工作列表
+    struct charge_job jobs[CONFIG_SUPPORT_CHARGE_JOBS];
+    // 工作列表中的工作个数
+    unsigned int nr_jobs;
+    // 当前进行的充电工作
+    struct charge_job *this_job;
 
     // 扩展测量值
     struct MDATA_ACK measure;

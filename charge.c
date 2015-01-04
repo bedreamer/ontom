@@ -136,6 +136,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->charge_task_stat = CHARGE_STAT_INVALID;
     memset((char *)task->single, 0, sizeof(task->single));
     memset((char *)&task->measure, 0, sizeof(task->measure));
+    memset((char *)task->jobs, 0, sizeof(task->jobs));
+    task->nr_jobs = 0;
+    task->this_job = NULL;
     bit_set(task, F_MANUAL_CHARGE_ALLOW);
 
     while ( ! *done ) {
@@ -151,7 +154,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         // 空闲等待,界面停止于充电模式选择界面
         case CHARGE_STAT_TRIGER_PEDDING:
             break;
-        // 充电确认, 刷卡完成，进行充电确认等待
+        // 充电确认, 刷卡完成， 进行充电确认等待
         case CHARGE_STAT_CONFIRM_PEDDING:
             break;
         // BMS 连接等待, 已经确认充电
