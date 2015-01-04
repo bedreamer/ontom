@@ -1426,6 +1426,8 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             bit_set(task, S_MEASURE_COMM_DOWN);
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+
+        ret = ERR_NEED_ECHO;
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
