@@ -3,7 +3,7 @@ OBJS=$(patsubst %.c,%.o,$(SRCS))
 y-deps+=$(OBJS)
 EX-OBJS+=libontom.a
 
-libontom.a:$(OBJS)
+build-in.a:$(OBJS)
 	$(Q)echo "  **AR**        `pwd`/$<"
 	$(Q)$(AR) -cqs $@ $^
 

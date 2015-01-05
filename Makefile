@@ -92,7 +92,7 @@ modules:
      done
 PHONY+=modules
 
-zeus:ontom/libontom.a
+zeus:ontom/build-in.a
 	$(Q)echo "  **LD**        "`pwd`/$@
 	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@
 
