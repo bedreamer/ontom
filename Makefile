@@ -10,6 +10,7 @@ ZEUS=zeus
 # RELEASE=0 release
 # RELEASE=1 debug
 # RELEASE=2 demon
+VER= $(shell svn info | grep 'Revision'|grep -o '[0-9]\+')
 PREFIX=arm-arago-linux-gnueabi-
 RELEASE=2
 CC=$(PREFIX)gcc
@@ -25,9 +26,9 @@ OMIT=-
 PWD=pwd
 WORKDIR=$(shell pwd)
 IMGFILE=$(WORKDIR)/floppy.img
-#Q=@
-Q=
-CFLAGS=-c -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
+Q=@
+#Q=
+CFLAGS=-c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
 CPFLAGS=-I./thirdpart/D8 -Wl,-O1
@@ -55,7 +56,6 @@ LAST-DIR=
 SUB-DIRS=
 EX-OBJS=
 PHONY+=EX-OBJS
-VER= $(shell svn info | grep 'Revision'|grep -o '[0-9]\+')
 
 all: _all $(ZEUS)
 	$(Q)mv $(ZEUS) "$(ZEUS)_r$(VER)"
