@@ -86,6 +86,9 @@ modules:
 	   $(MAKE) $(MAKEPARAM) -C $$d modules;\
      done
 PHONY+=modules
+ontom:
+    $(Q)$(MAKE) $(MAKEPARAM) -C ontom all 2>/dev/null
+PHONY+=ontom
 clean:list-clean
 	$(Q)$(OMIT)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
 PHONY+=clean
