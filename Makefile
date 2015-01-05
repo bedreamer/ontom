@@ -30,7 +30,7 @@ Q=
 CFLAGS=-c -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
-CPFLAGS=-I./thirdpart/D8
+CPFLAGS=-I./thirdpart/D8 -Wl,-O1
 LDFLAGS=-L. -L/home/tom/workspace/qt-4.8.2-arm/lib \
 	-L/home/tom/workspace/tslib/lib -L$(WORKDIR)/thirdpart/D8
 LDEXFLAGS=-lrt -lts -lD8U -lD8usb -lpthread
