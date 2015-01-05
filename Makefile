@@ -26,8 +26,8 @@ OMIT=-
 PWD=pwd
 WORKDIR=$(shell pwd)
 IMGFILE=$(WORKDIR)/floppy.img
-#Q=@
-Q=
+Q=@
+#Q=
 CFLAGS=-c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
