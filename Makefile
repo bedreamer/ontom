@@ -30,7 +30,9 @@ Q=@
 CFLAGS=-c -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
-CPFLAGS=
+CPFLAGS=-I./thirdpart/D8
+LDFLAGS=-L. -L/home/tom/workspace/qt-4.8.2-arm/lib -L/home/tom/workspace/tslib/lib
+LDEXFLAGS=-lrt -lts -lD8U -lD8usb -lpthread
 # build-in objects.
 y-objs=
 yobjs-list:=$(WORKDIR)/.yobjs
