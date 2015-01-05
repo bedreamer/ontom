@@ -13,7 +13,8 @@ struct charge_task tom;
 
 // 充电任务结构
 struct charge_task *task = &tom;
-
+void deal_with_system_protection(struct charge_task *thiz);
+void deal_with_job_business(struct charge_task *thiz);
 // 创建充电任务
 struct charge_task * charge_task_create(void)
 {
@@ -56,16 +57,6 @@ void charge_task_destroy(struct charge_task *thiz)
 // 重新初始化充电任务
 void charge_task_reset(struct charge_task *thiz)
 {
-}
-
-// 等待首次刷卡，触发创建充电任务事件
-static inline void wait_for_triger_charge_task(struct charge_task *thiz)
-{
-    while ( thiz->card.triger_timestamp == INVALID_TIMESTAMP ||
-            thiz->card.triger_synced_timestamp == INVALID_TIMESTAMP ) {
-        // 休眠 500 微秒
-        usleep(500);
-    }
 }
 
 /*
@@ -142,6 +133,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     bit_set(task, F_MANUAL_CHARGE_ALLOW);
 
     while ( ! *done ) {
+#if 0
         switch ( task->charge_task_stat) {
         // 无效任务状态
         case CHARGE_STAT_INVALID:
@@ -281,8 +273,41 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         deal_with_BMS_logic(task);
         // 充电动作逻辑处理
         deal_with_charge_logic(task);
+#endif
+        deal_with_system_protection(task);
+        if ( task && task->this_job ) {
+            deal_with_job_business(task);
+        }
+
         usleep(5000);
     }
 
     return NULL;
+}
+
+static inline int __is_gun_phy_conn_ok(struct charge_task *thiz)
+{
+    if ( ! thiz->this_job ) return GUN_INVALID;
+    if ( thiz->this_job->job_gun_sn == GUN_SN0 ) {
+        if ( bit_read(thiz, F_GUN_1_PHY_CONN_STATUS) ) {
+            return GUN_SN0;
+        } else return GUN_INVALID;
+    } else if ( thiz->this_job->job_gun_sn == GUN_SN1 ) {
+        if ( bit_read(thiz, F_GUN_2_PHY_CONN_STATUS) ) {
+            return GUN_SN1;
+        } else return GUN_INVALID;
+    } else if ( thiz->this_job->job_gun_sn == GUN_UNDEFINE ) {
+        return GUN_UNDEFINE;
+    } else {
+        return GUN_INVALID;
+    }
+}
+
+void deal_with_system_protection(struct charge_task *thiz)
+{
+}
+
+void deal_with_job_business(struct charge_task *thiz)
+{
+
 }

@@ -34,6 +34,8 @@ typedef enum {
     GUN_SN1 = 1,
     // 默认充电枪
     GUN_DEFAULT = 0,
+    // 无效枪
+    GUN_INVALID = 344,
     // 未指定充电枪
     GUN_UNDEFINE = 177
 }CHARGE_GUN_SN;
@@ -429,6 +431,9 @@ struct charge_job {
     unsigned int job_sn;
     // 作业充电枪
     CHARGE_GUN_SN job_gun_sn;
+
+    // 刷卡状态
+    struct user_card card;
 };
 
 /*
@@ -470,6 +475,7 @@ struct charge_task {
         }option;
     }charge_billing;
 
+#if 0
     /* 刷卡信息
      * 该结构主要包含若干卡信息，最基本的信息是卡号
      * 正常充电需要刷卡三次，
@@ -478,6 +484,7 @@ struct charge_task {
      * 第三次： 终止充电任务并计费
      */
     struct user_card card;
+#endif
     // 充电工作列表
     struct charge_job jobs[CONFIG_SUPPORT_CHARGE_JOBS];
     // 工作列表中的工作个数

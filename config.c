@@ -69,9 +69,9 @@ CONFIG_DOMAIN_BEGIN
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
    // 充电模块个数
 {"charge_module_nr",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"14"}},
-{"初始电压",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
-{"需求电压",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
-{"需求电流",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"300"}},
+{"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
+{"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
+{"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"300"}},
 
 // 系统参数不应该出现在配置文件中, 仅供程序内部使用, 不公开
 {"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
@@ -107,6 +107,37 @@ CONFIG_DOMAIN_BEGIN
 
 // 关键故障标记, 标识是否可进行充电, 参考文档 充电桩相关信息.xlsx 充电桩故障对照表
 {"keyfault",                    C_STRING,  no,      C_VALID,    .cuv.i=0,       {"X11100111111100100110000011111"}},
+// 故障号对应字符串
+{"E0100",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"**系统总故障**"}},
+{"E0101",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"交流输入停电故障"}},
+{"E0102",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"辅助电源故障"}},
+{"E0103",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电屏监控通信中断"}},
+{"E0104",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电屏监控次要要信1通信中断"}},
+{"E0105",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电屏监控次要要信2通信终端"}},
+{"E0106",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电模块通信故障"}},
+{"E0107",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"采样单元通信中断"}},
+{"E0108",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"BMS通信故障"}},
+{"E0109",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电模块故障"}},
+{"E010A",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"1# 充电枪物理连接断开故障"}},
+{"E010B",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"2# 充电枪物理连接断开故障"}},
+{"E010C",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"绝缘故障"}},
+{"E010D",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"母线过压"}},
+{"E010E",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"母线欠压"}},
+{"E010F",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"母线短路"}},
+{"E0110",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"电池过压"}},
+{"E0111",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"电池欠压"}},
+{"E0112",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"电池短路"}},
+{"E0113",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"电池反接故障"}},
+{"E0114",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"电池过流"}},
+{"E0115",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电桩温度过高"}},
+{"E0116",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电桩温度过低"}},
+{"E0117",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电桩湿度过高"}},
+{"E0118",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"充电桩湿度过低"}},
+{"E0119",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"总输出熔断器熔断"}},
+{"E011A",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"总输出开关跳闸"}},
+{"E011B",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"1#枪输出开关跳闸"}},
+{"E011C",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"2#枪输出开关跳闸"}},
+{"E011D",                       C_STRING,  no,      C_VALID,    .cuv.i=0,       {"防雷器故障"}},
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
@@ -680,7 +711,7 @@ int ajax_debug_list(struct ajax_xml_struct *thiz)
                             "+document.getElementById(e).value;"
                             "}</script>"
                             "<body><table border=\"1px\" align=\"center\">");
-    for ( ; head && head->config_name != NULL && head->config_name[0]; head ++, nr ++ ) {
+    for ( ; head && head->config_name != NULL && head->config_name[0] && nr < 37; head ++, nr ++ ) {
         log_printf(DBG_LV1, "get configure list from WEB. %d:%p:%d", nr, head, output_len);
         output_len += sprintf(&thiz->iobuff[output_len], "<tr><td id=\"t%d\">%s</td>",
                               nr,
