@@ -55,7 +55,7 @@ LAST-DIR=
 SUB-DIRS=
 EX-OBJS=
 PHONY+=EX-OBJS
-VER= `svn info | grep 'Revision' | awk '{print $2}'`
+VER= $(shell svn info | grep 'Revision' | awk '{print $2}')
 
 all: _all $(ZEUS)
 	$(Q)mv $(ZEUS) "$(ZEUS)"_build_r"$(VER)"
