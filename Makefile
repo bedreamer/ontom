@@ -16,7 +16,7 @@ CC=$(PREFIX)gcc
 CXX=$(PREFIX)g++
 AS=nasm
 LD=$(PREFIX)ld
-AR=ar
+AR=$(PREFIX)ar
 RM=rm
 MAKE=make
 MAKEPARAM=--no-print-directory
@@ -28,8 +28,7 @@ IMGFILE=$(WORKDIR)/floppy.img
 Q=@
 #Q=
 CFLAGS=-c -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
-CCFLAGS+=-D_ARCH_$(ARCH)_
-CBUILDIN=-D_BUILDIN_ $(CFLAGS)
+CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
 CPFLAGS=
 # build-in objects.
@@ -46,8 +45,7 @@ b-objs=
 PHONY+=y-objs m-objs s-objs b-objs
 EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	PWD ARCH WORKDIR IMGFILE Q CFLAGS CCFLAGS CMODULE \
-	CBUILDIN ASFLAGS BINASFLAGS CPFLAGS yobjs-list mobjs-list\
-	 sobjs-list
+	BINASFLAGS CPFLAGS yobjs-list mobjs-list sobjs-list
 SEP-DIRS=ontom
 # must be the last one.
 LAST-DIR=
