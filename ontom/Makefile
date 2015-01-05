@@ -1,7 +1,7 @@
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
 y-deps+=$(OBJS)
-EX-OBJS+=libontom.a
+EX-OBJS+=build-in.a
 
 build-in.a:$(OBJS)
 	$(Q)echo "  **AR**        `pwd`/$<"
