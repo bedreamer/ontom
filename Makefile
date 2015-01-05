@@ -27,9 +27,9 @@ IMGFILE=$(WORKDIR)/floppy.img
 Q=@
 #Q=
 CFLAGS=-D_KERNEL_ -D_VERSION_=$(RELEASE) -I$(WORKDIR)/$(ARCH)\
-	-I$(WORKDIR)/include -Wall -ffreestanding \
-       -fno-builtin -fno-builtin-function -fno-stack-protector\
-	 -z nodefaultlib -I$(WORKDIR)/include/drivers -c
+	-I$(WORKDIR)/include -Wall -ffreestanding -fno-builtin \
+	-fno-builtin-function -fno-stack-protector -z nodefaultlib \
+	-I$(WORKDIR)/include/drivers -c
 CCFLAGS+=-D_ARCH_$(ARCH)_
 CBUILDIN=-D_BUILDIN_ $(CFLAGS)
 # used for some directory.
@@ -54,8 +54,8 @@ EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	 sobjs-list
 SEP-DIRS=ontom
 # must be the last one.
-LAST-DIR=boot
-SUB-DIRS=drivers
+LAST-DIR=
+SUB-DIRS=
 BOOT_LOADER:=boot/old/boot.bin boot/old/loader.bin
 
 all: _all
@@ -115,12 +115,6 @@ PHONY+=kernel-clean
 fs-clean:
 	$(Q)$(MAKE) $(MAKEPARAM) -C fs clean 2>/dev/null
 PHONY+=fs-clean
-image:
-	$(Q)$(MAKE) $(MAKEPARAM) -C boot boot-img
-PHONY+=image
-arch-clean:
-	$(Q)$(MAKE) $(MAKEPARAM) -C $(ARCH) boot-img
-PHONY+=arch-clean
 
 DOEXPORTS=$(EXPORTS)
 

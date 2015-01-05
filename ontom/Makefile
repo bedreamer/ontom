@@ -1,4 +1,4 @@
 SRCS=$(wildcard *.c)
-OBJS=$(patsubst %.c,%.o,$SRCS)
-y-deps+=printk.o kmain.o exec.o kmodel.o schedu.o signal.o time.o
+OBJS=$(patsubst %.c,%.o,$(SRCS))
+y-deps+=$(OBJS)
 include $(WORKDIR)/Rule.make
