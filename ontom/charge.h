@@ -718,14 +718,14 @@ static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE sin
     byte += single / 8;
     * byte |= (1 << (single % 8 ));
 }
-#define bit_set(tsk, single) __bit_set(tsk->single, single)
+#define bit_set(tsk, bits) __bit_set(tsk->single, bits)
 // 位清除
 static inline void __bit_clr(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
     byte += single / 8;
     * byte &= (~(1 << (single % 8 )));
 }
-#define bit_clr(tsk, single) __bit_clr(tsk->single, single)
+#define bit_clr(tsk, bits) __bit_clr(tsk->single, bits)
 // 位读取
 static inline int __bit_read(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
@@ -733,7 +733,7 @@ static inline int __bit_read(volatile unsigned char *byte, ONTOM_FLAG_SINGLE sin
 
     return (* byte & (1 << (single % 8 ))) ? 1 : 0;
 }
-#define bit_read(tsk, single) __bit_read(tsk->single, single)
+#define bit_read(tsk, bits) __bit_read(tsk->single, bits)
 
 //1字节crc16计算
 static inline void calc_crc16(unsigned short *crc, unsigned short  crcbuf)
