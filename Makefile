@@ -97,7 +97,10 @@ zeus:ontom/build-in.a
 	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@
 ontom/build-in.a:
 	$(Q)echo "  **LD**      "`pwd`/$@
-	$(Q)$(MAKE) $(MAKEPARAM) -C ontom build-in.a;\
+	$(Q)$(MAKE) $(MAKEPARAM) -C ontom build-in.a;
+
+browser:
+	$(Q)$(MAKE) $(MAKEPARAM) -C browser all;
 
 clean:list-clean
 	$(Q)$(OMIT)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
