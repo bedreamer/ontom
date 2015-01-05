@@ -126,6 +126,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     //task = charge_task_create();
     task->charge_task_stat = CHARGE_STAT_INVALID;
     memset((char *)task->single, 0, sizeof(task->single));
+    memset((char *)task->pre_single, 0, sizeof(task->pre_single));
     memset((char *)&task->measure, 0, sizeof(task->measure));
     memset((char *)task->jobs, 0, sizeof(task->jobs));
     task->nr_jobs = 0;

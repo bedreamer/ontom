@@ -460,6 +460,8 @@ struct charge_task {
     // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
     // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
     volatile unsigned char single[64];
+    // 系统前一次信号状态，用来做状态跳变比较
+    volatile unsigned char pre_single[64];
 
     // 充电计费
     struct {
@@ -710,37 +712,28 @@ void deal_with_BMS_logic(struct charge_task *);
 // 充电动作逻辑处理
 void deal_with_charge_logic(struct charge_task *);
 
-/* 遥信定义
- * 系统共计支持512个遥信量
- * remote_single[0:511]
- */
-// 遥信位,遥测偏移定义
-#include "rsrvdefine.h"
 // 位设置
-static inline void bit_set(struct charge_task *tsk, ONTOM_FLAG_SINGLE single)
+static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
-    volatile unsigned char *byte = tsk->single;
-
     byte += single / 8;
     * byte |= (1 << (single % 8 ));
 }
+#define bit_set(tsk, single) __bit_set(tsk->single, single)
 // 位清除
-static inline void bit_clr(struct charge_task *tsk, ONTOM_FLAG_SINGLE single)
+static inline void __bit_clr(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
-    volatile unsigned char *byte = tsk->single;
-
     byte += single / 8;
     * byte &= (~(1 << (single % 8 )));
 }
+#define bit_clr(tsk, single) __bit_clr(tsk->single, single)
 // 位读取
-static inline int bit_read(struct charge_task *tsk, ONTOM_FLAG_SINGLE single)
+static inline int __bit_read(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
-    volatile unsigned char *byte = tsk->single;
-
     byte += single / 8;
 
     return (* byte & (1 << (single % 8 ))) ? 1 : 0;
 }
+#define bit_read(tsk, single) __bit_read(tsk->single, single)
 
 //1字节crc16计算
 static inline void calc_crc16(unsigned short *crc, unsigned short  crcbuf)
