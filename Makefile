@@ -6,7 +6,7 @@ include .config
 # define exported values.
 include .exports
 
-KERNELFILE=KFOOL
+ZEUS=zeus
 # RELEASE=0 release
 # RELEASE=1 debug
 # RELEASE=2 demon
@@ -55,9 +55,10 @@ LAST-DIR=
 SUB-DIRS=
 EX-OBJS=
 PHONY+=EX-OBJS
+VER= `svn info | grep 'Revision' | awk '{print $2}'`
 
-all: _all
-
+all: _all $(ZEUS)
+	$(Q)mv $(ZEUS) "$(ZEUS)"_build_r"$(VER)"
 PHONY+=all _all
 
 config:
