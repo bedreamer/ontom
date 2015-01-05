@@ -10,11 +10,12 @@ KERNELFILE=KFOOL
 # RELEASE=0 release
 # RELEASE=1 debug
 # RELEASE=2 demon
+PREFIX=arm-arago-linux-gnueabi-
 RELEASE=2
-CC=gcc
-CXX=g++
+CC=$(PREFIX)gcc
+CXX=$(PREFIX)g++
 AS=nasm
-LD=ld
+LD=$(PREFIX)ld
 AR=ar
 RM=rm
 MAKE=make
@@ -26,16 +27,11 @@ WORKDIR=$(shell pwd)
 IMGFILE=$(WORKDIR)/floppy.img
 Q=@
 #Q=
-CFLAGS=-D_KERNEL_ -D_VERSION_=$(RELEASE) -I$(WORKDIR)/$(ARCH)\
-	-I$(WORKDIR)/include -Wall -ffreestanding -fno-builtin \
-	-fno-builtin-function -fno-stack-protector -z nodefaultlib \
-	-I$(WORKDIR)/include/drivers -c
+CFLAGS=-c -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
 CCFLAGS+=-D_ARCH_$(ARCH)_
 CBUILDIN=-D_BUILDIN_ $(CFLAGS)
 # used for some directory.
 CPFLAGS=
-ASFLAGS+=-I $(WORKDIR)/include/ -I $(WORKDIR)/$(ARCH) -f elf
-BINASFLAGS=
 # build-in objects.
 y-objs=
 yobjs-list:=$(WORKDIR)/.yobjs
@@ -56,7 +52,6 @@ SEP-DIRS=ontom
 # must be the last one.
 LAST-DIR=
 SUB-DIRS=
-BOOT_LOADER:=boot/old/boot.bin boot/old/loader.bin
 
 all: _all
 
