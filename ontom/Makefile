@@ -4,6 +4,6 @@ y-deps+=$(OBJS)
 EX-OBJS+=libontom.a
 
 libontom.a:$(OBJS)
-	$(Q)$(AR) cqs  $^ -o $@
+	$(Q)$(AR) -cqs $@ $^
 
 include $(WORKDIR)/Rule.make
