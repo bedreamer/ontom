@@ -25,8 +25,8 @@ OMIT=-
 PWD=pwd
 WORKDIR=$(shell pwd)
 IMGFILE=$(WORKDIR)/floppy.img
-Q=@
-#Q=
+#Q=@
+Q=
 CFLAGS=-c -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
@@ -93,7 +93,7 @@ modules:
 PHONY+=modules
 
 zeus:ontom/libontom.a
-	$(Q)echo "    LD        "`pwd`/$@
+	$(Q)echo "  **LD**        "`pwd`/$@
 	$(Q)$(LD) $(LDFLAGS) $(LDEXFLAGS) $^ -o $@
 
 clean:list-clean
