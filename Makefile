@@ -95,6 +95,9 @@ PHONY+=modules
 zeus:ontom/build-in.a
 	$(Q)echo "  **LD**        "`pwd`/$@
 	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@
+ontom/build-in.a:
+	$(Q)echo "  **LD**        "`pwd`/$@
+	$(Q)$(MAKE) $(MAKEPARAM) -C ontom build-in.a;\
 
 clean:list-clean
 	$(Q)$(OMIT)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
