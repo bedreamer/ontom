@@ -87,7 +87,8 @@ modules:
      done
 PHONY+=modules
 ontom:ontom/libontom.a
-	$(Q)echo "done.."
+	$(Q)echo "    LD        "`pwd`/$@
+	$(Q)$(LD) $(LDFLAGS) $(LDEXFLAGS) $^ -o $@
 PHONY+=ontom
 ontom/libontom.a:
 	$(Q)$(MAKE) $(MAKEPARAM) -C ontom all 2>/dev/null
