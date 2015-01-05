@@ -49,7 +49,7 @@ PHONY+=y-objs m-objs s-objs b-objs
 EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	PWD ARCH WORKDIR IMGFILE Q CFLAGS CCFLAGS CMODULE \
 	BINASFLAGS CPFLAGS yobjs-list mobjs-list sobjs-list
-SEP-DIRS=zeus
+SEP-DIRS=ontom
 # must be the last one.
 LAST-DIR=
 SUB-DIRS=
@@ -95,8 +95,6 @@ PHONY+=modules
 zeus:ontom/libontom.a
 	$(Q)echo "    LD        "`pwd`/$@
 	$(Q)$(LD) $(LDFLAGS) $(LDEXFLAGS) $^ -o $@
-ontom/libontom.a:
-	$(Q)$(MAKE) $(MAKEPARAM) -C ontom all 2>/dev/null
 
 clean:list-clean
 	$(Q)$(OMIT)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
