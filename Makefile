@@ -15,7 +15,7 @@ RELEASE=2
 CC=$(PREFIX)gcc
 CXX=$(PREFIX)g++
 AS=nasm
-LD=arm-arago-linux-gnueabi-gcc
+LD=$(PREFIX)ld
 AR=$(PREFIX)ar
 RM=rm
 MAKE=make
@@ -94,7 +94,7 @@ PHONY+=modules
 
 zeus:ontom/libontom.a
 	$(Q)echo "  **LD**        "`pwd`/$@
-	$(Q)$(LD) $(LDFLAGS) $(LDEXFLAGS) $^ -o $@
+	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@
 
 clean:list-clean
 	$(Q)$(OMIT)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
