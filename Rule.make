@@ -32,7 +32,7 @@ endif
 # for module complire.
 $(m-objs) : $(m-deps)
 
-all : $(b-objs) $(s-deps) $(y-deps) $(m-objs) $(suball) $(nothing)
+all : $(b-objs) $(s-deps) $(y-deps) $(m-objs) $(suball) $(EX-OBJS) $(nothing)
 	$(Q)$(OMIT)for o in $(y-deps); do PWD=`pwd`; echo $$PWD/$$o >> $(yobjs-list); done;
 	$(Q)$(OMIT)for o in $(s-deps); do PWD=`pwd`; echo $$PWD/$$o >> $(sobjs-list); done
 PHONY+=all

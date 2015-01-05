@@ -50,6 +50,8 @@ SEP-DIRS=ontom
 # must be the last one.
 LAST-DIR=
 SUB-DIRS=
+EX-OBJS=
+PHONY+=EX-OBJS
 
 all: _all
 
