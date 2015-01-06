@@ -868,6 +868,10 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
         usleep(5000);
 
+        if ( ! task->this_job ) {
+            continue;
+        }
+
         /*
          * 写线程同时负责写数据和进行连接管理时的控制数据写出，这里需要对当前CAN的
          * 状态进行判定，当CAN处于CAN_NORMAL时进行普通的写操作，当CAN处于CAN_TP_RD
@@ -1032,6 +1036,10 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     param.buff_payload = 0;
     while ( ! *done ) {
         usleep(5000);
+
+        if ( ! task->this_job ) {
+            continue;
+        }
 
         if ( task->this_job->can_bms_status  == CAN_INVALID ) {
             continue;
