@@ -65,9 +65,6 @@ void charge_task_reset(struct charge_task *thiz)
  */
 void deal_with_measure_data(struct charge_task *thiz)
 {
-    if ( 0 == bit_read(thiz, F_MEASURE_DATA_NEW) ) {
-        return;
-    }
 }
 
 /*
@@ -266,8 +263,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             break;
         }
 
-        // 扩展测量数据刷新
-        deal_with_measure_data(task);
         // 后台控制逻辑处理
         deal_with_master_contrl_logic(task);
         // BMS 控制逻辑处理
@@ -275,6 +270,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         // 充电动作逻辑处理
         deal_with_charge_logic(task);
 #endif
+        // 扩展测量数据刷新
+        deal_with_measure_data(task);
+
         deal_with_system_protection(task);
         if ( task && task->this_job ) {
             deal_with_job_business(task);

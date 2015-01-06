@@ -69,6 +69,7 @@ CONFIG_DOMAIN_BEGIN
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
    // 充电模块个数
 {"charge_module_nr",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"14"}},
+{"charger_comm_methord",        C_STRING,   yes,    C_VALID,    .cuv.i=0,       {"CAN"}},
 {"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
 {"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
 {"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"300"}},

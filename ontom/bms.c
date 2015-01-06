@@ -320,7 +320,7 @@ static int can_packet_callback(
     switch ( ev ) {
     case EVENT_CAN_INIT:
         // 事件循环函数初始化
-        thiz->can_bms_status = CAN_NORMAL;
+        thiz->thiz_job->can_bms_status = CAN_NORMAL;
         thiz->can_heart_beat.Hachiko_notify_proc=
                 Hachiko_packet_heart_beart_notify_proc;
         Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 4, NULL);
@@ -876,10 +876,10 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         param.buff.tx_buff = txbuff;
         param.buff_size = sizeof(txbuff);
         param.evt_param = EVT_RET_INVALID;
-        if ( task->can_bms_status & CAN_NORMAL ) {
+        if ( task->thiz_job->can_bms_status & CAN_NORMAL ) {
             can_packet_callback(task, EVENT_TX_REQUEST, &param);
-        } else if ( task->can_bms_status & CAN_TP_RD ) {
-            switch ( task->can_bms_status & 0xF0 ) {
+        } else if ( task->thiz_job->can_bms_status & CAN_TP_RD ) {
+            switch ( task->thiz_job->can_bms_status & 0xF0 ) {
             case CAN_TP_CTS:
                 can_packet_callback(task, EVENT_TX_TP_CTS, &param);
                 break;
@@ -893,22 +893,22 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                 can_packet_callback(task, EVENT_TX_TP_ABRT, &param);
                 break;
             default:
-                log_printf(WRN, "BMS: can_bms_status crashed(%d).",
-                           task->can_bms_status);
+                log_printf(WRN, "BMS: thiz_job->can_bms_status crashed(%d).",
+                           task->thiz_job->can_bms_status);
                 continue;
                 break;
             }
-        } else if ( task->can_bms_status & CAN_TP_WR ) {
+        } else if ( task->thiz_job->can_bms_status & CAN_TP_WR ) {
             // 当前协议没有用到
             log_printf(WRN, "BMS: CAN_TP_WRITE not implement.");
             continue;
-        } else if ( task->can_bms_status == CAN_INVALID ) {
-            log_printf(DBG_LV0, "BMS: invalid can_bms_status: %d.",
-                       task->can_bms_status);
+        } else if ( task->thiz_job->can_bms_status == CAN_INVALID ) {
+            log_printf(DBG_LV0, "BMS: invalid thiz_job->can_bms_status: %d.",
+                       task->thiz_job->can_bms_status);
             continue;
         } else {
-            log_printf(DBG_LV0, "BMS: invalid can_bms_status: %d.",
-                       task->can_bms_status);
+            log_printf(DBG_LV0, "BMS: invalid thiz_job->can_bms_status: %d.",
+                       task->thiz_job->can_bms_status);
             continue;
         }
 
@@ -918,7 +918,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
         param.evt_param = EVT_RET_INVALID;
         // 链接模式下的数据包发送不需要确认, 并且也不能被中止
-        if ( task->can_bms_status == CAN_NORMAL ) {
+        if ( task->thiz_job->can_bms_status == CAN_NORMAL ) {
             can_packet_callback(task, EVENT_TX_PRE, &param);
             if ( EVT_RET_TX_ABORT == param.evt_param ) {
                 // packet sent abort.
@@ -959,18 +959,18 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         param.buff_payload = 0;
 
         // 准备接收完成
-        if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_CTS) ) {
-            task->can_bms_status = (CAN_TP_RD | CAN_TP_RX);
+        if ( task->thiz_job->can_bms_status == (CAN_TP_RD | CAN_TP_CTS) ) {
+            task->thiz_job->can_bms_status = (CAN_TP_RD | CAN_TP_RX);
             log_printf(DBG_LV3, "BMS: ready for data transfer.");
         }
         // 应答结束
-        if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ACK) ) {
-            task->can_bms_status = CAN_NORMAL;
+        if ( task->thiz_job->can_bms_status == (CAN_TP_RD | CAN_TP_ACK) ) {
+            task->thiz_job->can_bms_status = CAN_NORMAL;
             log_printf(DBG_LV0, "BMS: connection closed normally.");
         }
         // 传输终止
-        if ( task->can_bms_status == (CAN_TP_RD | CAN_TP_ABRT) ) {
-            task->can_bms_status = CAN_NORMAL;
+        if ( task->thiz_job->can_bms_status == (CAN_TP_RD | CAN_TP_ABRT) ) {
+            task->thiz_job->can_bms_status = CAN_NORMAL;
             log_printf(DBG_LV2, "BMS: connection aborted.");
         }
     }
@@ -983,7 +983,7 @@ void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
 {
     if ( evt == HACHIKO_TIMEOUT ) {
         log_printf(WRN, "BMS: CAN data transfer terminal due to time out.");
-        task->can_bms_status = CAN_NORMAL;
+        task->thiz_job->can_bms_status = CAN_NORMAL;
     } else if ( evt == HACHIKO_DIE ) {
 
     }
@@ -1033,7 +1033,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     while ( ! *done ) {
         usleep(5000);
 
-        if ( task->can_bms_status  == CAN_INVALID ) {
+        if ( task->thiz_job->can_bms_status  == CAN_INVALID ) {
             continue;
         }
 
@@ -1085,8 +1085,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
              * byte[1]: 数据包编号
              * byte[2:8]: 数据
              */
-            if ( (task->can_bms_status & CAN_TP_RD) != CAN_TP_RD ) {
-                task->can_bms_status = CAN_NORMAL;
+            if ( (task->thiz_job->can_bms_status & CAN_TP_RD) != CAN_TP_RD ) {
+                task->thiz_job->can_bms_status = CAN_NORMAL;
                 log_printf(WRN, "BMS: timing crashed.");
                 continue;
             }
@@ -1108,7 +1108,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                            task->can_tp_param.tp_pgn);
                 can_packet_callback(task, EVENT_RX_DONE, &param);
                 // 数据链接接受完成
-                task->can_bms_status = CAN_TP_RD | CAN_TP_ACK;
+                task->thiz_job->can_bms_status = CAN_TP_RD | CAN_TP_ACK;
             }
         } else if ( ((frame.can_id & 0x00FF0000) >> 16 ) == 0xEC ) {
             // Connection managment
@@ -1183,7 +1183,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 task->can_tp_param.tp_pgn = tp_packet_PGN;
                 task->can_tp_param.tp_rcv_bytes = 0;
                 task->can_tp_param.tp_rcv_pack_nr = 0;
-                task->can_bms_status = CAN_TP_RD | CAN_TP_CTS;
+                task->thiz_job->can_bms_status = CAN_TP_RD | CAN_TP_CTS;
                 log_printf(DBG_LV2,
                            "BMS: data connection accepted, rolling..."
                            "PGN: %X, total: %d packets, %d bytes",
@@ -1210,8 +1210,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             log_printf(DBG_LV0, "BMS: read a frame done. %08X", frame.can_id);
         }
 
-        if ( task->can_bms_status == CAN_NORMAL ) {
-        } else if ( task->can_bms_status == CAN_TP_RD ) {
+        if ( task->thiz_job->can_bms_status == CAN_NORMAL ) {
+        } else if ( task->thiz_job->can_bms_status == CAN_TP_RD ) {
             // CAN通信处于连接管理模式
         }
     }

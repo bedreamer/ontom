@@ -431,17 +431,6 @@ struct charge_job {
     unsigned int job_sn;
     // 作业充电枪
     CHARGE_GUN_SN job_gun_sn;
-
-    // 刷卡状态
-    struct user_card card;
-};
-
-/*
- * 充电任务描述
- */
-struct charge_task {
-    // 充电任务编号，唯一，创建充电任务的那一刻
-    time_t charge_sn;
     // 充电起始时戳， 闭合充电开关的那一刻
     time_t charge_begin_timestamp;
     // 充电结束时戳， 断开充电开关的那一刻
@@ -451,6 +440,16 @@ struct charge_task {
     // BMS握手成功的时戳, 接收到第一次BRM的时刻
     time_t charge_bms_establish_timestamp;
 
+    // 刷卡状态
+    struct user_card card;
+    // CAN BMS 通信所处状态
+    CAN_BMS_STATUS can_bms_status;
+};
+
+/*
+ * 充电任务描述
+ */
+struct charge_task {
     // 任务状态
     CHARGE_TASK_STAT charge_task_stat;
     // 充电任务所处阶段
@@ -477,16 +476,6 @@ struct charge_task {
         }option;
     }charge_billing;
 
-#if 0
-    /* 刷卡信息
-     * 该结构主要包含若干卡信息，最基本的信息是卡号
-     * 正常充电需要刷卡三次，
-     * 第一次： 触发系统开始一个新的充电任务
-     * 第二次： 确认实施充电任务
-     * 第三次： 终止充电任务并计费
-     */
-    struct user_card card;
-#endif
     // 充电工作列表
     struct charge_job jobs[CONFIG_SUPPORT_CHARGE_JOBS];
     // 工作列表中的工作个数
@@ -504,12 +493,6 @@ struct charge_task {
     // 充电屏信息
     struct charger_config_10h chargers;
 
-    /* 当前正在使用的充电枪编号
-     * 由于目前系统配置为只能一把枪独占式充电，因此必须指明枪的编号
-     */
-    CHARGE_GUN_SN can_charge_gun_sn;
-    // CAN BMS 通信所处状态
-    CAN_BMS_STATUS can_bms_status;
     // CAN 通信输入缓冲区
     unsigned char can_buff_in[CAN_BUFF_SIZE];
     volatile unsigned int can_buff_in_nr;
@@ -550,15 +533,6 @@ struct charge_task {
  * 前 128个信号为系统标记
  */
 typedef enum {
-    // CAN 数据包发送标记, 当需要发送对应的PGN数据包时，该位被置1，发送完成后清零
-    F_TX_PGN256         = 0x0000,
-    F_TX_PGN1792,
-    F_TX_PGN2048,
-    F_TX_PGN2560,
-    F_TX_PGM4608,
-    F_TX_PGN6656,
-    F_TX_PGN7424,
-    F_TX_PGN7936,
     // 扩展测量值刷新标记
     F_MEASURE_DATA_NEW,
 
@@ -681,16 +655,8 @@ typedef enum {
     S_FANGLEIQI_BREAK,
     // 故障截至标记
     S_ERR_END,
-
-    // 输出电压过高
-    S_V_OUT_HIGH,
-    // 输出电压过低
-    S_V_OUT_LOW,
-    // 输出电流过高
-    S_I_OUT_HIGH,
-    // 输出电流过低
-    S_I_OUT_LOW
     // }}}
+    FLAG_END
 }ONTOM_FLAG_SINGLE;
 
 // 创建充电任务
@@ -719,6 +685,7 @@ static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE sin
     * byte |= (1 << (single % 8 ));
 }
 #define bit_set(tsk, bits) __bit_set(tsk->single, bits)
+#define bit_set_pre(tsk, bits) __bit_set(tsk->pre_single, bits)
 // 位清除
 static inline void __bit_clr(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
@@ -726,6 +693,7 @@ static inline void __bit_clr(volatile unsigned char *byte, ONTOM_FLAG_SINGLE sin
     * byte &= (~(1 << (single % 8 )));
 }
 #define bit_clr(tsk, bits) __bit_clr(tsk->single, bits)
+#define bit_clr_pre(tsk, bits) __bit_clr(tsk->pre_single, bits)
 // 位读取
 static inline int __bit_read(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
@@ -734,6 +702,7 @@ static inline int __bit_read(volatile unsigned char *byte, ONTOM_FLAG_SINGLE sin
     return (* byte & (1 << (single % 8 ))) ? 1 : 0;
 }
 #define bit_read(tsk, bits) __bit_read(tsk->single, bits)
+#define bit_read_pre(tsk, bits) __bit_read(tsk->pre_single, bits)
 
 //1字节crc16计算
 static inline void calc_crc16(unsigned short *crc, unsigned short  crcbuf)
