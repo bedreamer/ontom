@@ -440,6 +440,8 @@ struct charge_job {
     // BMS握手成功的时戳, 接收到第一次BRM的时刻
     time_t charge_bms_establish_timestamp;
 
+    // BMS初始化完成
+    int bms_init_ok;
     // 刷卡状态
     struct user_card card;
     // CAN BMS 通信所处状态

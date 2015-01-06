@@ -862,14 +862,16 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     param.buff_payload = 0;
     param.evt_param = EVT_RET_INVALID;
 
-    // 进行数据结构的初始化操作
-    can_packet_callback(task, EVENT_CAN_INIT, &param);
 
     while ( ! *done ) {
         usleep(5000);
 
         if ( ! task->this_job ) {
             continue;
+        } else if ( 0x7F != task->this_job->bms_init_ok ) {
+            // 进行数据结构的初始化操作
+            can_packet_callback(task, EVENT_CAN_INIT, &param);
+            task->this_job->bms_init_ok = 0x7f;
         }
 
         /*
