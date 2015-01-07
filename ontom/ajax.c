@@ -778,7 +778,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
-int ajax_job_man_pause_json_proc(struct ajax_xml_struct *thiz)
+int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     thiz->ct = "application/json";
@@ -788,7 +788,7 @@ int ajax_job_man_pause_json_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
-int ajax_job_man_resumt_json_proc(struct ajax_xml_struct *thiz)
+int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     thiz->ct = "application/json";
