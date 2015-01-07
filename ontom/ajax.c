@@ -732,6 +732,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         ret = ERR_OK;
         thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"jobs\":{\"nr\":1}");
+        task->this_job->job_gun_sn = GUN_SN0;
     }
     return ret;
 }
