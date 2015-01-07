@@ -311,7 +311,7 @@ void deal_with_job_business(struct charge_task *thiz)
     int ret = GUN_SN0;
     static int fl  = 0;
     if ( thiz->this_job == NULL ) return;
-    thiz->this_job->job_gun_sn = JOB_STANDBY;
+    thiz->this_job->job_status = JOB_STANDBY;
 
     switch ( thiz->this_job->job_status ) {
     case JOB_IDLE:
