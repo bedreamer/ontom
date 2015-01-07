@@ -812,7 +812,7 @@ int ajax_debug_bit_read(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     index = atoi(var);
     if ( index >=0 && index < FLAG_END ) {
-         thiz->xml_len = sprintf(thiz->iobuff[thiz->xml_len],
+         thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
             "%d", bit_read(task, index));
     } else {
         ret = ERR_ERR;
@@ -841,7 +841,7 @@ int ajax_debug_bit_write(struct ajax_xml_struct *thiz)
         ret =  ERR_ERR;
     }
 
-    thiz->xml_len = sprintf(thiz->iobuff[thiz->xml_len],
+    thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
             "%d", bit_read(task, index));
     return ret;
 }
