@@ -413,6 +413,8 @@ typedef enum {
     JOB_IDLE = 0x00,
     // 作业状态正在设置
     JOB_SETTING,
+    // 正在等待前驱作业完成
+    JOB_WAITTING,
     // 作业就绪等待
     JOB_STANDBY,
 
@@ -620,6 +622,12 @@ typedef enum {
     CMD_GUN_2_ASSIT_PWN_ON,
     // 2#枪输出开关打开
     CMD_GUN_2_OUTPUT_ON,
+    // }}
+    // {{ 充电作业操作命令
+    // 中止当前充电作业
+    CMD_JOB_ABORT,
+    // 暂停当前充电作业
+    CMD_JOB_MAN_PAUSE,
     // }}
 
     // {{{ 故障标记

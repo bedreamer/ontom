@@ -308,5 +308,47 @@ void deal_with_system_protection(struct charge_task *thiz)
 
 void deal_with_job_business(struct charge_task *thiz)
 {
+    int ret;
+    if ( thiz->this_job == NULL ) return;
 
+    switch ( thiz->this_job->job_status ) {
+    case JOB_IDLE:
+    case JOB_SETTING:
+    case JOB_WAITTING:
+        break;
+    case JOB_STANDBY:
+        ret = __is_gun_phy_conn_ok(thiz);
+        if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
+            break;
+        }
+
+        if ( ret == GUN_SN0 ) {
+            if ( ! bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
+                if ( !bit_read(task, S_ASSIT_POWER_DOWN) ) {
+                    bit_set(task, CMD_GUN_1_ASSIT_PWN_ON);
+                }
+            }
+            if ( ! bit_read(task, F_BMS_RECOGNIZED) ) {
+                break;
+            }
+        } else {
+            if ( ! bit_read(task, F_GUN_2_ASSIT_PWN_SWITCH_STATUS) ) {
+            }
+        }
+        break;
+    case JOB_WORKING:
+        break;
+    case JOB_ERR_PAUSE:
+        break;
+    case JOB_MAN_PAUSE:
+        break;
+    case JOB_ABORTING:
+        break;
+    case JOB_DONE:
+        break;
+    case JOB_EXITTING:
+        break;
+    case JOB_DETACHING:
+        break;
+    }
 }
