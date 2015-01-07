@@ -415,10 +415,22 @@ typedef enum {
     JOB_SETTING,
     // 作业就绪等待
     JOB_STANDBY,
+
     // 作业正在执行
     JOB_WORKING,
-    // 作业完成，正在进行清理工作
-    JOB_DONE
+    // 作业因故暂停
+    JOB_ERR_PAUSE,
+    // 人工暂停作业
+    JOB_MAN_PAUSE,
+    // 作业中止
+    JOB_ABORTING,
+    // 作业完成
+    JOB_DONE,
+    // 作业退出，正在进行清理工作
+    JOB_EXITTING,
+
+    // 作业销毁，等待其他线程引用退出
+    JOB_DETACHING
 }JOBSTATUS;
 
 /*

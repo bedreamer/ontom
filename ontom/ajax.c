@@ -17,11 +17,18 @@ int ajax_alarm_xml_proc(struct ajax_xml_struct *);
 int ajax_version_xml_proc(struct ajax_xml_struct *);
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
 int ajax_query_xml_proc(struct ajax_xml_struct *thiz);
+int ajax_query_json_proc(struct ajax_xml_struct *thiz);
 int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_debug_list(struct ajax_xml_struct *thiz);
 int ajax_debug_json_list(struct ajax_xml_struct *thiz);
 int ajax_debug_commit(struct ajax_xml_struct *thiz);
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz);
+
+// 充电任务操作接口
+int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_query_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz);
 
 struct xml_generator {
 	// xml 文件名
@@ -29,7 +36,8 @@ struct xml_generator {
 	// xml 生成过程地址
     int (*xml_gen_proc)(struct ajax_xml_struct *);
 }xmls[]={
-    {"/query.xml",                  ajax_query_xml_proc},
+    {"/query.json",             ajax_query_json_proc},
+    {"/query.xml",              ajax_query_xml_proc},
     {"/deal.xml",               ajax_deal_xml_proc},
     {"/chargestatus.xml",       ajax_charge_status_xml_proc},
     {"/battrystatus.xml",       ajax_battery_status_xml_proc},
@@ -37,6 +45,12 @@ struct xml_generator {
     {"/version.xml",            ajax_version_xml_proc},
     {"/autheticate.xml",        ajax_autheticate_xml_proc},
     {"/confirm.xml",            ajax_confirm_charge_xml_proc},
+
+    // 充电作业调用接口
+    {"/job/create.json",        ajax_job_create_json_proc},
+    {"/job/delete.json",        ajax_job_delete_json_proc},
+    {"/job/query.json",         ajax_job_query_json_proc},
+    {"/job/edit.json",          ajax_job_edit_json_proc},
 
     // 调试接口
     {"/debug/list.html",        ajax_debug_list},
@@ -620,6 +634,7 @@ int ajax_alarm_xml_proc(struct ajax_xml_struct  *thiz)
 // 返回版本信息 version.xml
 int ajax_version_xml_proc(struct ajax_xml_struct *thiz)
 {
+    thiz->ct = "text/xml";
     thiz->xml_len = sprintf(thiz->iobuff,
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
         "<VERSION>"
@@ -674,6 +689,7 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
     }
     log_printf(DBG, "%s<===>%s", passwd, passwd_const);
 
+    thiz->ct = "text/xml";
     thiz->xml_len = sprintf(thiz->iobuff,
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
         "<start>\r\n"
@@ -688,6 +704,46 @@ int ajax_autheticate_xml_proc(struct ajax_xml_struct *thiz)
                reason, auth_ok && param_check_ok ? "permit" : "reject");
 
     return ERR_OK;
+}
+
+/*
+ * 通过URL传参参数长度限制为2048字节，为了调试方便当前选用URL方式传参
+ * JSON 返回数据包含的内容有： 故障，刷卡鉴权，状态，任务信息
+ */
+int ajax_query_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_ERR;
+    thiz->ct = "application/json";
+    return ret;
+}
+
+// 充电任务操作接口
+int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_ERR;
+    thiz->ct = "application/json";
+    return ret;
+}
+
+int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_ERR;
+    thiz->ct = "application/json";
+    return ret;
+}
+
+int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_ERR;
+    thiz->ct = "application/json";
+    return ret;
+}
+
+int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_ERR;
+    thiz->ct = "application/json";
+    return ret;
 }
 
 static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
