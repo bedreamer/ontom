@@ -308,7 +308,7 @@ void deal_with_system_protection(struct charge_task *thiz)
 
 void deal_with_job_business(struct charge_task *thiz)
 {
-    int ret;
+    int ret = GUN_SN0;
     if ( thiz->this_job == NULL ) return;
 
     switch ( thiz->this_job->job_status ) {
@@ -317,10 +317,10 @@ void deal_with_job_business(struct charge_task *thiz)
     case JOB_WAITTING:
         break;
     case JOB_STANDBY:
-        ret = __is_gun_phy_conn_ok(thiz);
-        if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
-            break;
-        }
+        //ret = __is_gun_phy_conn_ok(thiz);
+        //if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
+        //    break;
+        //}
 
         if ( ret == GUN_SN0 ) {
             if ( ! bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
