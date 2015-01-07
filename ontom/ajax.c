@@ -726,6 +726,13 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_ERR;
     thiz->ct = "application/json";
+    if ( task->this_job == NULL ) {
+        task->this_job = & task->jobs[0];
+        task->this_job->can_bms_status = JOB_STANDBY;
+        ret = ERR_OK;
+        thiz->xml_len = sprintf(thiz->iobuff[thiz->xml_len],
+                "\"jobs\":{\"nr\":1}");
+    }
     return ret;
 }
 
