@@ -317,10 +317,10 @@ void deal_with_job_business(struct charge_task *thiz)
     case JOB_WAITTING:
         break;
     case JOB_STANDBY:
-        //ret = __is_gun_phy_conn_ok(thiz);
-        //if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
-        //    break;
-        //}
+        ret = __is_gun_phy_conn_ok(thiz);
+        if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
+            break;
+        }
 
         if ( ret == GUN_SN0 ) {
             if ( ! bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
