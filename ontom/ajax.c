@@ -53,8 +53,8 @@ struct xml_generator {
     {"/job/delete.json",        ajax_job_delete_json_proc},
     {"/job/query.json",         ajax_job_query_json_proc},
     {"/job/edit.json",          ajax_job_edit_json_proc},
-    {"/job/abort.json",         ajax_job_abort_json_proc},
-    {"/job/manpause.json",      ajax_job_manpause_json_proc},
+    //{"/job/abort.json",         ajax_job_abort_json_proc},
+    //{"/job/manpause.json",      ajax_job_manpause_json_proc},
 
     // 调试接口
     {"/debug/list.html",        ajax_debug_list},
