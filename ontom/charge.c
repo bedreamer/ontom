@@ -309,8 +309,15 @@ void deal_with_system_protection(struct charge_task *thiz)
 void deal_with_job_business(struct charge_task *thiz)
 {
     int ret = GUN_SN0;
+    static int fl  = 0;
     if ( thiz->this_job == NULL ) return;
     thiz->this_job->job_gun_sn = JOB_STANDBY;
+
+
+    if ( ! fl ) {
+        log_printf(INF, "ZEUS: 还活着");
+        fl = 1;
+    }
 
     switch ( thiz->this_job->job_status ) {
     case JOB_IDLE:
