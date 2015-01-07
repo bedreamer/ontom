@@ -414,7 +414,7 @@ void deal_with_job_business(struct charge_task *thiz)
                 break;
             }
             task->this_job->job_status = JOB_RESUMING;
-            log_printf(INF, "ZEUS: 人工恢复作业(%X)",
+            log_printf(INF, "ZEUS: 人工恢复作业(%X), 正在恢复",
                        task->this_job->status_befor_fault);
         }
         break;
@@ -438,4 +438,6 @@ void deal_with_job_business(struct charge_task *thiz)
         thiz->this_job = NULL;
         break;
     }
+
+    bit_clr(task, CMD_JOB_ABORT);
 }

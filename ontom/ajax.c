@@ -31,6 +31,7 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_man_pause_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_man_resumt_json_proc(struct ajax_xml_struct *thiz);
 
 struct xml_generator {
 	// xml 文件名
@@ -53,8 +54,9 @@ struct xml_generator {
     {"/job/delete.json",        ajax_job_delete_json_proc},
     {"/job/query.json",         ajax_job_query_json_proc},
     {"/job/edit.json",          ajax_job_edit_json_proc},
-    //{"/job/abort.json",         ajax_job_abort_json_proc},
-    //{"/job/manpause.json",      ajax_job_manpause_json_proc},
+    {"/job/abort.json",         ajax_job_abort_json_proc},
+    {"/job/manpause.json",      ajax_job_manpause_json_proc},
+    {"/job/resume.json",        ajax_job_resume_json_proc},
 
     // 调试接口
     {"/debug/list.html",        ajax_debug_list},
@@ -765,6 +767,38 @@ int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     return ret;
 }
+
+int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    thiz->ct = "application/json";
+    thiz->xml_len = 1;
+    thiz->iobuff[0] = 'A';
+    bit_set(task, CMD_JOB_ABORT);
+    return ret;
+}
+
+int ajax_job_man_pause_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    thiz->ct = "application/json";
+    thiz->xml_len = 1;
+    thiz->iobuff[0] = 'P';
+    bit_set(task, CMD_JOB_MAN_PAUSE);
+    return ret;
+}
+
+int ajax_job_man_resumt_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    thiz->ct = "application/json";
+    thiz->xml_len = 1;
+    thiz->iobuff[0] = 'R';
+    bit_clr(task, CMD_JOB_MAN_PAUSE);
+    return ret;
+}
+
+
 
 static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
     int result = MG_FALSE, err;

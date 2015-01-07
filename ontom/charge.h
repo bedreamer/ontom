@@ -438,18 +438,6 @@ typedef enum {
 }JOBSTATUS;
 
 /*
- * 作业暂停原因
- */
-typedef enum {
-    // 未知原因
-    JOB_PAUSE_REASON_UNKONW,
-    // 人工暂停
-    JOB_PAUSE_REASON_MANUAL,
-    // 因故障自动暂停
-    JOB_PAUSE_REASON_FAULT
-}JOBPAUSE_REASON;
-
-/*
  * 充电作业描述，充电管理的最小单位
  */
 struct charge_job {
@@ -457,8 +445,6 @@ struct charge_job {
     JOBSTATUS job_status;
     // 产生故障时的状
     JOBSTATUS status_befor_fault;
-    // 暂停原因
-    JOBPAUSE_REASON pause_reason;
     // 作业序号
     unsigned int job_sn;
     // 作业充电枪
@@ -612,7 +598,7 @@ typedef enum {
     // 系统人为条件可以充电
     F_MANUAL_CHARGE_ALLOW, // 人为禁止充电
     // 系统硬件条件可以充电
-    F_SYSTEM_CHARGE_ALLOW, // 系统无故障
+    F_SYSTEM_CHARGE_ALLOW, // 系统无故障, 关键故障
     // 直流输出总开关闭合状态
     F_DC_OUTPUT_SWITCH_STATUS,
     // 1#枪物理连接完成状态
