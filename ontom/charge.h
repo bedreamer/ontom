@@ -452,6 +452,20 @@ struct charge_job {
     // BMS握手成功的时戳, 接收到第一次BRM的时刻
     time_t charge_bms_establish_timestamp;
 
+    // 充电计费方式
+    struct {
+        // 计费方式
+        BILLING_MODE mode;
+        union {
+            // 设定充电金额, 0 - 9999
+            double set_money;
+            // 设定充电时长, 0 - 600
+            unsigned int set_time;
+            // 设定充电目标容量, 0 - 100
+            unsigned int set_cap;
+        }option;
+    }charge_billing;
+
     // BMS初始化完成
     int bms_init_ok;
     // 刷卡状态
@@ -492,6 +506,8 @@ struct charge_task {
 
     // 充电工作列表
     struct charge_job jobs[CONFIG_SUPPORT_CHARGE_JOBS];
+    // 作业执行列顺序列表
+    struct charge_job *job_list[CONFIG_SUPPORT_CHARGE_JOBS];
     // 工作列表中的工作个数
     unsigned int nr_jobs;
     // 当前进行的充电工作
