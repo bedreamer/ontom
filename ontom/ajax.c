@@ -727,7 +727,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     int ret = ERR_ERR, i = S_ERROR;
     char buff[32] = "";
     thiz->ct = "application/json";
-    if ( task->this_job == NULL ) {
+    //if ( task->this_job == NULL ) {
         task->this_job = & task->jobs[0];
         task->this_job->can_bms_status = JOB_STANDBY;
         ret = ERR_OK;
@@ -741,7 +741,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
             }
         }
         task->this_job->job_gun_sn = GUN_SN0;
-    }
+   // }
     return ret;
 }
 
