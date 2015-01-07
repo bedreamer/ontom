@@ -313,17 +313,17 @@ void deal_with_job_business(struct charge_task *thiz)
     if ( thiz->this_job == NULL ) return;
     thiz->this_job->job_gun_sn = JOB_STANDBY;
 
+    ret = __is_gun_phy_conn_ok(thiz);
+    if ( ! fl ) {
+        log_printf(INF, "ZEUS: 还活着 %d", ret);
+        fl = 1;
+    }
     switch ( thiz->this_job->job_status ) {
     case JOB_IDLE:
     case JOB_SETTING:
     case JOB_WAITTING:
         break;
     case JOB_STANDBY:
-        ret = __is_gun_phy_conn_ok(thiz);
-        if ( ! fl ) {
-            log_printf(INF, "ZEUS: 还活着 %d", ret);
-            fl = 1;
-        }
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
         }
