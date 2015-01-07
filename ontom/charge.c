@@ -313,12 +313,6 @@ void deal_with_job_business(struct charge_task *thiz)
     if ( thiz->this_job == NULL ) return;
     thiz->this_job->job_gun_sn = JOB_STANDBY;
 
-
-    if ( ! fl ) {
-        log_printf(INF, "ZEUS: 还活着");
-        fl = 1;
-    }
-
     switch ( thiz->this_job->job_status ) {
     case JOB_IDLE:
     case JOB_SETTING:
@@ -329,7 +323,10 @@ void deal_with_job_business(struct charge_task *thiz)
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
         }
-
+        if ( ! fl ) {
+            log_printf(INF, "ZEUS: 还活着");
+            fl = 1;
+        }
         if ( ret == GUN_SN0 ) {
             if ( ! bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
                 if ( !bit_read(task, S_ASSIT_POWER_DOWN) ) {
