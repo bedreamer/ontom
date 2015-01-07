@@ -326,19 +326,19 @@ void deal_with_job_business(struct charge_task *thiz)
             ret = __is_gun_phy_conn_ok(thiz);
             if ( ! bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
                 if ( !bit_read(task, S_ASSIT_POWER_DOWN) ) {
-                    bit_set(task, CMD_GUN_1_ASSIT_PWN_ON);
                     if ( ! bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
                         log_printf(INF, "ZEUS: 1# 充电枪辅助电源开始供电");
                     }
+                    bit_set(task, CMD_GUN_1_ASSIT_PWN_ON);
                 }
             }
         } else {
             if ( ! bit_read(task, F_GUN_2_ASSIT_PWN_SWITCH_STATUS) ) {
                 if ( !bit_read(task, S_ASSIT_POWER_DOWN) ) {
-                    bit_set(task, CMD_GUN_2_ASSIT_PWN_ON);
                     if ( ! bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
                         log_printf(INF, "ZEUS: 2# 充电枪辅助电源开始供电");
                     }
+                    bit_set(task, CMD_GUN_2_ASSIT_PWN_ON);
                 }
             }
 
