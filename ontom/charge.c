@@ -308,7 +308,7 @@ void deal_with_system_protection(struct charge_task *thiz)
 
 void deal_with_job_business(struct charge_task *thiz)
 {
-    CHARGE_GUN_SN ret = GUN_SN0;
+    int ret = GUN_SN0;
     static int fl  = 0;
     if ( thiz->this_job == NULL ) return;
     thiz->this_job->job_gun_sn = JOB_STANDBY;
@@ -321,7 +321,7 @@ void deal_with_job_business(struct charge_task *thiz)
     case JOB_STANDBY:
         ret = __is_gun_phy_conn_ok(thiz);
         if ( ! fl ) {
-            log_printf(INF, "ZEUS: 还活着");
+            log_printf(INF, "ZEUS: 还活着 %d", ret);
             fl = 1;
         }
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
