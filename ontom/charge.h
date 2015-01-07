@@ -424,6 +424,8 @@ typedef enum {
     JOB_ERR_PAUSE,
     // 人工暂停作业
     JOB_MAN_PAUSE,
+    // 作业从暂停状态恢复
+    JOB_RESUMING,
     // 作业中止
     JOB_ABORTING,
     // 作业完成
@@ -436,11 +438,27 @@ typedef enum {
 }JOBSTATUS;
 
 /*
+ * 作业暂停原因
+ */
+typedef enum {
+    // 未知原因
+    JOB_PAUSE_REASON_UNKONW,
+    // 人工暂停
+    JOB_PAUSE_REASON_MANUAL,
+    // 因故障自动暂停
+    JOB_PAUSE_REASON_FAULT
+}JOBPAUSE_REASON;
+
+/*
  * 充电作业描述，充电管理的最小单位
  */
 struct charge_job {
     //  作业状态
     JOBSTATUS job_status;
+    // 产生故障时的状
+    JOBSTATUS status_befor_fault;
+    // 暂停原因
+    JOBPAUSE_REASON pause_reason;
     // 作业序号
     unsigned int job_sn;
     // 作业充电枪
@@ -779,5 +797,23 @@ static inline unsigned short swap_hi_lo_bytes(unsigned short b)
 }
 #define b2l swap_hi_lo_bytes
 #define l2b swap_hi_lo_bytes
+
+static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_task *thiz)
+{
+    if ( ! thiz->this_job ) return GUN_INVALID;
+    if ( thiz->this_job->job_gun_sn == GUN_SN0 ) {
+        if ( bit_read(thiz, F_GUN_1_PHY_CONN_STATUS) ) {
+            return GUN_SN0;
+        } else return GUN_INVALID;
+    } else if ( thiz->this_job->job_gun_sn == GUN_SN1 ) {
+        if ( bit_read(thiz, F_GUN_2_PHY_CONN_STATUS) ) {
+            return GUN_SN1;
+        } else return GUN_INVALID;
+    } else if ( thiz->this_job->job_gun_sn == GUN_UNDEFINE ) {
+        return GUN_UNDEFINE;
+    } else {
+        return GUN_INVALID;
+    }
+}
 
 #endif /*_CHARGE_INCLUDED_H_*/

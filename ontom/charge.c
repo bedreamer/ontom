@@ -284,32 +284,14 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     return NULL;
 }
 
-static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_task *thiz)
-{
-    if ( ! thiz->this_job ) return GUN_INVALID;
-    if ( thiz->this_job->job_gun_sn == GUN_SN0 ) {
-        if ( bit_read(thiz, F_GUN_1_PHY_CONN_STATUS) ) {
-            return GUN_SN0;
-        } else return GUN_INVALID;
-    } else if ( thiz->this_job->job_gun_sn == GUN_SN1 ) {
-        if ( bit_read(thiz, F_GUN_2_PHY_CONN_STATUS) ) {
-            return GUN_SN1;
-        } else return GUN_INVALID;
-    } else if ( thiz->this_job->job_gun_sn == GUN_UNDEFINE ) {
-        return GUN_UNDEFINE;
-    } else {
-        return GUN_INVALID;
-    }
-}
-
 void deal_with_system_protection(struct charge_task *thiz)
 {
 }
 
 void deal_with_job_business(struct charge_task *thiz)
 {
-    int ret = GUN_SN0;
-    static int fl  = 0;
+    int ret;
+
     if ( thiz->this_job == NULL ) return;
     thiz->this_job->job_status = JOB_STANDBY;
 
@@ -317,8 +299,14 @@ void deal_with_job_business(struct charge_task *thiz)
     case JOB_IDLE:
     case JOB_SETTING:
     case JOB_WAITTING:
+        bit_clr(task, CMD_DC_OUTPUT_SWITCH_ON);
+        bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+        bit_clr(task, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_STANDBY:
+        bit_clr(task, CMD_DC_OUTPUT_SWITCH_ON);
+        bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+        bit_clr(task, CMD_GUN_2_OUTPUT_ON);
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
         }
@@ -341,25 +329,113 @@ void deal_with_job_business(struct charge_task *thiz)
                     bit_set(task, CMD_GUN_2_ASSIT_PWN_ON);
                 }
             }
-
         }
         if ( ! bit_read(task, F_BMS_RECOGNIZED) ) {
             break;
         }
+        if ( bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
+            task->this_job->job_status = thiz->this_job->job_status;
+            task->this_job->job_status = JOB_ERR_PAUSE;
+            log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(%X)",
+                       task->this_job->job_status);
+            break;
+        }
+        if ( ! bit_read(task, F_CARDING_TRIGER) ) {
+            break;
+        }
+        if ( ! bit_read(task, F_CARDING_CONFIRM) ) {
+            break;
+        }
+        task->this_job->job_status = JOB_WORKING;
+        log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
     case JOB_WORKING:
+        if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
+            bit_clr(task, CMD_DC_OUTPUT_SWITCH_ON);
+            bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+            bit_clr(task, CMD_GUN_2_OUTPUT_ON);
+            task->this_job->status_befor_fault = JOB_WORKING;
+            task->this_job->job_status = JOB_ERR_PAUSE;
+            log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(JOB_WORKING)");
+            break;
+        } else {
+            bit_set(task, CMD_DC_OUTPUT_SWITCH_ON);
+            ret = __is_gun_phy_conn_ok(thiz);
+            if ( ret  == GUN_SN0 ) {
+                bit_clr(task, CMD_GUN_2_OUTPUT_ON);
+                bit_set(task, CMD_GUN_1_OUTPUT_ON);
+            }
+            if ( ret  == GUN_SN1 ) {
+                bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+                bit_set(task, CMD_GUN_2_OUTPUT_ON);
+            }
+            //{{ 在这做是否充完判定
+            //}}
+            if ( bit_read(task, CMD_JOB_ABORT) ) {
+                task->this_job->status_befor_fault = JOB_WORKING;
+                task->this_job->job_status = JOB_ABORTING;
+                log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
+                break;
+            }
+            if ( bit_read(task, CMD_JOB_MAN_PAUSE) ) {
+                task->this_job->status_befor_fault = JOB_WORKING;
+                task->this_job->job_status = JOB_MAN_PAUSE;
+                log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
+                break;
+            }
+        }
         break;
     case JOB_ERR_PAUSE:
+        bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+        bit_clr(task, CMD_GUN_2_OUTPUT_ON);
+        if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
+            if ( bit_read(task, CMD_JOB_ABORT) ) {
+                log_printf(INF, "ZEUS: 充电任务中止(%X)",
+                           task->this_job->status_befor_fault);
+                task->this_job->job_status = JOB_ABORTING;
+            }
+        } else {
+            task->this_job->job_status = JOB_RESUMING;
+            log_printf(INF, "ZEUS: 故障消除, 充电作业继续进行(%X)",
+                       task->this_job->status_befor_fault);
+        }
         break;
     case JOB_MAN_PAUSE:
+        bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+        bit_clr(task, CMD_GUN_2_OUTPUT_ON);
+        if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
+            if ( bit_read(task, CMD_JOB_ABORT) ) {
+                log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
+                           task->this_job->status_befor_fault);
+                task->this_job->job_status = JOB_ABORTING;
+            }
+        } else {
+            if ( bit_read(task, CMD_JOB_MAN_PAUSE) ) {
+                break;
+            }
+            task->this_job->job_status = JOB_RESUMING;
+            log_printf(INF, "ZEUS: 人工恢复作业(%X)",
+                       task->this_job->status_befor_fault);
+        }
+        break;
+    case JOB_RESUMING:
         break;
     case JOB_ABORTING:
+        bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+        bit_clr(task, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_DONE:
         break;
     case JOB_EXITTING:
+        bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+        bit_clr(task, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_DETACHING:
+        bit_clr(task, CMD_DC_OUTPUT_SWITCH_ON);
+        bit_clr(task, CMD_GUN_1_OUTPUT_ON);
+        bit_clr(task, CMD_GUN_2_OUTPUT_ON);
+        thiz->this_job->job_status = JOB_IDLE;
+        thiz->this_job = NULL;
         break;
     }
 }
