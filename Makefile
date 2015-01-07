@@ -94,8 +94,8 @@ modules:
 PHONY+=modules
 
 zeus:ontom/build-in.a
-	$(Q)echo "  **LD**      "`pwd`/$@
-	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@
+	$(Q)echo "  **LD**      "`pwd`/$@-$(VER)
+	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@$(VER)
 ontom/build-in.a:
 	$(Q)echo "  **LD**      "`pwd`/$@
 	$(Q)$(MAKE) $(MAKEPARAM) -C ontom build-in.a;
