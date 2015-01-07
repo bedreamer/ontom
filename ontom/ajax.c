@@ -31,7 +31,7 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz);
-int ajax_job_resumt_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz);
 
 struct xml_generator {
 	// xml 文件名
