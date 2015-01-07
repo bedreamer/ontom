@@ -827,7 +827,7 @@ int ajax_debug_bit_write(struct ajax_xml_struct *thiz)
     int ret = ERR_OK;
 
     mg_get_var(thiz->xml_conn, "var", var, 32);
-    mg_get_var(thiz->xml_conn, "val", cal, 32);
+    mg_get_var(thiz->xml_conn, "val", val, 32);
     thiz->ct = "application/json";
 
     index = atoi(var);
