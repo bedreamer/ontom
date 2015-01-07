@@ -58,7 +58,6 @@ EX-OBJS=
 PHONY+=EX-OBJS
 
 all: _all $(ZEUS)
-	$(Q)mv $(ZEUS) "$(ZEUS)_r$(VER)"
 PHONY+=all _all
 
 config:
@@ -94,8 +93,8 @@ modules:
 PHONY+=modules
 
 zeus:ontom/build-in.a
-	$(Q)echo "  **LD**      "`pwd`/$@-$(VER)
-	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@$(VER)
+	$(Q)echo "  **LD**      "`pwd`/$@_r$(VER)
+	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@_r$(VER)
 ontom/build-in.a:
 	$(Q)echo "  **LD**      "`pwd`/$@
 	$(Q)$(MAKE) $(MAKEPARAM) -C ontom build-in.a;
