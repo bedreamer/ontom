@@ -805,15 +805,16 @@ int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
 int ajax_debug_bit_read(struct ajax_xml_struct *thiz)
 {
     char var[32]={0};
-    int index = 0;
+    int index = 0, i;
     int ret = ERR_OK;
 
     mg_get_var(thiz->xml_conn, "var", var, 32);
     thiz->ct = "application/json";
     index = atoi(var);
     if ( index >=0 && index < FLAG_END ) {
-         thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
-            "%d", bit_read(task, index));
+        for (i=0;i<512;i++)
+         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "%d", bit_read(task, i));
     } else {
         ret = ERR_ERR;
     }
