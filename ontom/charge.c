@@ -328,12 +328,16 @@ void deal_with_job_business(struct charge_task *thiz)
                     bit_set(task, CMD_GUN_1_ASSIT_PWN_ON);
                 }
             }
-            if ( ! bit_read(task, F_BMS_RECOGNIZED) ) {
-                break;
-            }
         } else {
             if ( ! bit_read(task, F_GUN_2_ASSIT_PWN_SWITCH_STATUS) ) {
+                if ( !bit_read(task, S_ASSIT_POWER_DOWN) ) {
+                    bit_set(task, CMD_GUN_2_ASSIT_PWN_ON);
+                }
             }
+
+        }
+        if ( ! bit_read(task, F_BMS_RECOGNIZED) ) {
+            break;
         }
         break;
     case JOB_WORKING:

@@ -724,7 +724,8 @@ int ajax_query_json_proc(struct ajax_xml_struct *thiz)
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 {
-    int ret = ERR_ERR;
+    int ret = ERR_ERR, i = S_ERROR;
+    char buff[32] = "";
     thiz->ct = "application/json";
     if ( task->this_job == NULL ) {
         task->this_job = & task->jobs[0];
@@ -732,6 +733,13 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         ret = ERR_OK;
         thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"jobs\":{\"nr\":1}");
+        for (; i < S_ERR_END; i ++) {
+            if ( bit_read(task, i) ) {
+                sprintf(buff, "E%04X", i);
+                thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                        "%s ", config_read(buff));
+            }
+        }
         task->this_job->job_gun_sn = GUN_SN0;
     }
     return ret;
