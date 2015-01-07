@@ -284,7 +284,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     return NULL;
 }
 
-static inline int __is_gun_phy_conn_ok(struct charge_task *thiz)
+static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_task *thiz)
 {
     if ( ! thiz->this_job ) return GUN_INVALID;
     if ( thiz->this_job->job_gun_sn == GUN_SN0 ) {
@@ -308,7 +308,7 @@ void deal_with_system_protection(struct charge_task *thiz)
 
 void deal_with_job_business(struct charge_task *thiz)
 {
-    int ret = GUN_SN0;
+    CHARGE_GUN_SN ret = GUN_SN0;
     static int fl  = 0;
     if ( thiz->this_job == NULL ) return;
     thiz->this_job->job_gun_sn = JOB_STANDBY;
@@ -320,12 +320,12 @@ void deal_with_job_business(struct charge_task *thiz)
         break;
     case JOB_STANDBY:
         ret = __is_gun_phy_conn_ok(thiz);
-        if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
-            break;
-        }
         if ( ! fl ) {
             log_printf(INF, "ZEUS: 还活着");
             fl = 1;
+        }
+        if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
+            break;
         }
         if ( ret == GUN_SN0 ) {
             if ( ! bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
