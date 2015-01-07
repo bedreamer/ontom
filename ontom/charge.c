@@ -372,6 +372,7 @@ void deal_with_job_business(struct charge_task *thiz)
             //{{ 在这做是否充完判定
             //}}
             if ( bit_read(task, CMD_JOB_ABORT) ) {
+                bit_clr(task, CMD_JOB_ABORT);
                 task->this_job->status_befor_fault = JOB_WORKING;
                 task->this_job->job_status = JOB_ABORTING;
                 log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
@@ -390,6 +391,7 @@ void deal_with_job_business(struct charge_task *thiz)
         bit_clr(task, CMD_GUN_2_OUTPUT_ON);
         if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
             if ( bit_read(task, CMD_JOB_ABORT) ) {
+                bit_clr(task, CMD_JOB_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X)",
                            task->this_job->status_befor_fault);
                 task->this_job->job_status = JOB_ABORTING;
@@ -405,6 +407,7 @@ void deal_with_job_business(struct charge_task *thiz)
         bit_clr(task, CMD_GUN_2_OUTPUT_ON);
         if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
             if ( bit_read(task, CMD_JOB_ABORT) ) {
+                bit_clr(task, CMD_JOB_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
                            task->this_job->status_befor_fault);
                 task->this_job->job_status = JOB_ABORTING;
@@ -438,6 +441,4 @@ void deal_with_job_business(struct charge_task *thiz)
         thiz->this_job = NULL;
         break;
     }
-
-    bit_clr(task, CMD_JOB_ABORT);
 }

@@ -23,6 +23,8 @@ int ajax_debug_list(struct ajax_xml_struct *thiz);
 int ajax_debug_json_list(struct ajax_xml_struct *thiz);
 int ajax_debug_commit(struct ajax_xml_struct *thiz);
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz);
+int ajax_debug_bit_read(struct ajax_xml_struct *thiz);
+int ajax_debug_bit_write(struct ajax_xml_struct *thiz);
 
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
@@ -62,6 +64,8 @@ struct xml_generator {
     {"/debug/list.html",        ajax_debug_list},
     {"/debug/list.json",        ajax_debug_json_list},
     {"/debug/commit.html",      ajax_debug_commit},
+    {"/debug/singlebit/read.json",    ajax_debug_bit_read},
+    {"/debug/singlebit/write.json",   ajax_debug_bit_write},
     // 生成串口通信统计页面
     {"/debug/uart.json",        ajax_uart_debug_page},
     {"", NULL}
@@ -798,7 +802,49 @@ int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
+int ajax_debug_bit_read(struct ajax_xml_struct *thiz)
+{
+    char var[32]={0};
+    int index = 0;
+    int ret = ERR_OK;
 
+    mg_get_var(thiz->xml_conn, "var", var, 32);
+    thiz->ct = "application/json";
+    index = atoi(var);
+    if ( index >=0 && index < FLAG_END ) {
+         thiz->xml_len = sprintf(thiz->iobuff[thiz->xml_len],
+            "%d", bit_read(task, index));
+    } else {
+        ret = ERR_ERR;
+    }
+    return ret;
+}
+
+int ajax_debug_bit_write(struct ajax_xml_struct *thiz)
+{
+    char var[32]={0}, val[32] = {0};
+    int index = 0;
+    int ret = ERR_OK;
+
+    mg_get_var(thiz->xml_conn, "var", var, 32);
+    mg_get_var(thiz->xml_conn, "val", cal, 32);
+    thiz->ct = "application/json";
+
+    index = atoi(var);
+    if ( index >=0 && index < FLAG_END ) {
+        if ( val[0] == '0' ) {
+            bit_clr(task, index);
+        } else if ( val[0] == '1') {
+            bit_set(task, index);
+        }
+    } else {
+        ret =  ERR_ERR;
+    }
+
+    thiz->xml_len = sprintf(thiz->iobuff[thiz->xml_len],
+            "%d", bit_read(task, index));
+    return ret;
+}
 
 static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
     int result = MG_FALSE, err;
