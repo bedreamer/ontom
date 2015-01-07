@@ -569,6 +569,7 @@ struct charge_task {
  * 前 128个信号为系统标记
  */
 typedef enum {
+    FLAG_BEGIN,
     // 扩展测量值刷新标记
     F_MEASURE_DATA_NEW,
 
