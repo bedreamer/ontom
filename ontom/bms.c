@@ -256,48 +256,46 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
         for ( i = 0;
               (unsigned int)i < (sizeof(statistics) / sizeof(struct bms_statistics) ) - 2; i++ ) {
             me = &statistics[i];
-            me->can_silence ++;
+            if ((bit_read(task, F_GUN_1_PHY_CONN_STATUS)&&
+                 bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))
+                    ||
+                (bit_read(task, F_GUN_2_PHY_CONN_STATUS)&&
+                 bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))){
+                me->can_silence ++;
+            } else continue;
             if ( me->can_tolerate_silence < me->can_silence ) {
                 switch (task->charge_stage) {
                 case CHARGE_STAGE_HANDSHACKING:
                     if (me->can_pgn != PGN_BRM) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
                             task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
-                    }
                     break;
                 case CHARGE_STAGE_CONFIGURE:
                     if (me->can_pgn != PGN_BCP) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障"));
                             task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
-                    }
                     break;
                 case CHARGE_STAGE_CHARGING:
                     if (me->can_pgn != PGN_BCL) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障"));
                             task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
-                    }
                     break;
                 case CHARGE_STAGE_DONE:
                     if (me->can_pgn != PGN_BSD) break;
-                    if (bit_read(task, F_GUN_1_PHY_CONN_STATUS)) {
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障"));
                             task->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
-                    }
                     break;
                 default:
                     break;
@@ -868,10 +866,15 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
         if ( ! task->this_job ) {
             continue;
-        } else if ( 0x7F != task->this_job->bms_init_ok ) {
+        } else if ( 0x7F != task->this_job->bms_write_init_ok ) {
             // 进行数据结构的初始化操作
             can_packet_callback(task, EVENT_CAN_INIT, &param);
-            task->this_job->bms_init_ok = 0x7f;
+            task->this_job->bms_write_init_ok = 0x7f;
+            task->this_job->ref_nr ++;
+        } else if ( task->this_job->job_status == JOB_DETACHING ) {
+            task->this_job->ref_nr --;
+            task->this_job->bms_write_init_ok = 0;
+            continue;
         }
 
         /*
@@ -1026,6 +1029,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    fcntl(s, F_SETFL, FASYNC);
     strcpy(ifr.ifr_name, "can1" );
     ioctl(s, SIOCGIFINDEX, &ifr);
     addr.can_family = PF_CAN;
@@ -1047,6 +1051,11 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
+        if ( task->this_job->bms_read_init_ok != 0x7f ) {
+            task->this_job->bms_read_init_ok = 0x7F;
+            task->this_job->ref_nr ++;
+        }
+
         memset(&frame, 0, sizeof(frame));
         nbytes = read(s, &frame, sizeof(struct can_frame));
         if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
@@ -1057,6 +1066,14 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         }
 
         dbg_packets ++;
+        /*
+         * 非阻塞方式读
+         */
+        if ( task->this_job && task->this_job->job_status == JOB_DETACHING ) {
+            task->this_job->bms_read_init_ok = 0;
+            task->this_job->ref_nr --;
+            continue;
+        }
 
         if ( nbytes != sizeof(struct can_frame) ) {
             param.evt_param = EVT_RET_ERR;

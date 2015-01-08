@@ -472,12 +472,17 @@ struct charge_job {
         }option;
     }charge_billing;
 
-    // BMS初始化完成
-    int bms_init_ok;
     // 刷卡状态
     struct user_card card;
     // CAN BMS 通信所处状态
     CAN_BMS_STATUS can_bms_status;
+
+    // BMS写初始化完成
+    int bms_write_init_ok;
+    // BMS读初始化完成
+    int bms_read_init_ok;
+    // 结构体引用计数
+    unsigned int ref_nr;
 };
 
 /*
