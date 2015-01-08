@@ -559,7 +559,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
 
         } else {
             log_printf(WRN,
-                  "BMS not recognized due to invalid BMS VERSION(SPN2565).");
+                  "BMS: BMS not recognized due to invalid BMS VERSION(SPN2565).");
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
@@ -568,25 +568,25 @@ int about_packet_reciev_done(struct charge_task *thiz,
              (thiz->vehicle_info.spn2566_battery_type > 0x08 &&
               thiz->vehicle_info.spn2566_battery_type < 0xFF) ) {
             log_printf(WRN,
-                   "BMS not recognized due to invalid BATTERY TYPE(SPN2566)");
+                   "BMS: BMS not recognized due to invalid BATTERY TYPE(SPN2566)");
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
 
         if ( thiz->vehicle_info.spn2567_capacity / 10.0f > 1000.0f ) {
             log_printf(WRN,
-                   "BMS not recognized due to invalid CAP INFO(SPN2567)");
+                   "BMS: BMS not recognized due to invalid CAP INFO(SPN2567)");
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
 
         if ( thiz->vehicle_info.spn2568_volatage / 10.0f > 750.0f ) {
             log_printf(WRN,
-                  "BMS not recognized due to invalid VOLTAGE INFO(SPN2568)");
+                  "BMS: BMS not recognized due to invalid VOLTAGE INFO(SPN2568)");
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
-        log_printf(INF, "BMS recognized....CAP: %d A.H, VOL: %d V",
+        log_printf(INF, "BMS: BMS recognized....CAP: %d A.H, VOL: %d V",
                    thiz->vehicle_info.spn2567_capacity,
                    thiz->vehicle_info.spn2568_volatage);
         if ( ! bit_read(thiz, F_BMS_RECOGNIZED ) ) {
@@ -704,7 +704,7 @@ int about_packet_reciev_done(struct charge_task *thiz,
         statistics[I_BCS].can_counter ++;
         statistics[I_BCS].can_silence = 0;
 
-        log_printf(INF, "PGN_BCS fetched.");
+        log_printf(INF, "BMS: PGN_BCS fetched.");
         memcpy(&thiz->bms_all_battery_status, param->buff.rx_buff,
                sizeof(struct pgn4352_BCS));
         if (thiz->bms_all_battery_status.spn3075_charge_voltage/10.0 > 750.0f) {
@@ -1120,7 +1120,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             }
             Hachiko_feed(&task->can_tp_bomb);
             memcpy(&tp_buff[ (frame.data[0] - 1) * 7 ], &frame.data[1], 7);
-            log_printf(DBG_LV1, "BM data tansfer fetch the %dst packet.",
+            log_printf(DBG_LV1, "BMS: BM data tansfer fetch the %dst packet.",
                        frame.data[0]);
             task->can_tp_param.tp_rcv_pack_nr ++;
             if ( task->can_tp_param.tp_rcv_pack_nr >=
