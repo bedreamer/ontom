@@ -441,6 +441,8 @@ typedef enum {
  * 充电作业描述，充电管理的最小单位
  */
 struct charge_job {
+    // 充电作业所处阶段,BMS 链接阶段
+    CHARGE_STAGE charge_stage;
     //  作业状态
     JOBSTATUS job_status;
     // 产生故障时的状
@@ -491,8 +493,6 @@ struct charge_job {
 struct charge_task {
     // 任务状态
     CHARGE_TASK_STAT charge_task_stat;
-    // 充电任务所处阶段
-    CHARGE_STAGE charge_stage;
 
     // 系统信号, 最多支持64 * 8 种信号标记
     // 前面 16 * 8 = 128 个信号是系统内部使用信号标记

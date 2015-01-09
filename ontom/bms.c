@@ -324,7 +324,7 @@ static int can_packet_callback(
                 Hachiko_packet_heart_beart_notify_proc;
         Hachiko_new(&thiz->can_heart_beat, HACHIKO_AUTO_FEED, 4, NULL);
         log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_HANDSHACKING"));
-        thiz->charge_stage = CHARGE_STAGE_HANDSHACKING;
+        thiz->this_job->charge_stage = CHARGE_STAGE_HANDSHACKING;
         //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
         break;
     case EVENT_CAN_RESET:
@@ -351,15 +351,15 @@ static int can_packet_callback(
         if ( (param->can_id & 0x00FF0000) == (PGN_CRM << 8) &&
              bit_read(thiz, F_BMS_RECOGNIZED ) &&
              bit_read(thiz, F_VEHICLE_RECOGNIZED ) &&
-             thiz->charge_stage == CHARGE_STAGE_HANDSHACKING) {
-            thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
+             thiz->this_job->charge_stage == CHARGE_STAGE_HANDSHACKING) {
+            thiz->this_job->charge_stage = CHARGE_STAGE_CONFIGURE;
             log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CONFIGURE"));
         }
         if ( (param->can_id & 0x00FF0000) == (PGN_CRO << 8) &&
              bit_read(thiz, F_CHARGER_READY) &&
              bit_read(thiz, F_BMS_READY ) &&
-             thiz->charge_stage == CHARGE_STAGE_CONFIGURE ) {
-            thiz->charge_stage = CHARGE_STAGE_CHARGING;
+             thiz->this_job->charge_stage == CHARGE_STAGE_CONFIGURE ) {
+            thiz->this_job->charge_stage = CHARGE_STAGE_CHARGING;
             log_printf(INF,
               "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CHARGING"));
         }
@@ -402,7 +402,7 @@ static int can_packet_callback(
          * } else ;
          * 在若干个循环控制周期内，数据包都能按照既定的周期发送完成.
          */
-        switch ( thiz->charge_stage ) {
+        switch ( thiz->this_job->charge_stage ) {
         case CHARGE_STAGE_INVALID:
             param->evt_param = EVT_RET_ERR;
             break;
