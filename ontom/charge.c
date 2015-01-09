@@ -333,7 +333,7 @@ void deal_with_job_business(struct charge_task *thiz)
         if ( ! bit_read(task, F_BMS_RECOGNIZED) ) {
             break;
         }
-        if ( bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
+        if ( ! bit_read(task, F_SYSTEM_CHARGE_ALLOW) ) {
             task->this_job->job_status = thiz->this_job->job_status;
             task->this_job->job_status = JOB_ERR_PAUSE;
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(%X)",
