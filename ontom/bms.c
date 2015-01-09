@@ -343,6 +343,7 @@ static int can_packet_callback(
         break;
     case EVENT_TX_FAILS:
         // 数据包发送失败了
+        log_printf(ERR, "BMS: packet send faile.");
         break;
     case EVENT_TX_DONE:
         // 数据包发送完成了
