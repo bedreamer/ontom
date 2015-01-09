@@ -235,7 +235,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
         for ( i = 0;
               (unsigned int)i < sizeof(generator) / sizeof(struct can_pack_generator); i++ ) {
             thiz = &generator[i];
-            if ( thiz->stage == task->charge_stage ) {
+            if ( task->this_job && thiz->stage == task->this_job->charge_stage ) {
                 if ( thiz->heartbeat < thiz->period ) {
                     //thiz->heartbeat += 10;
                     thiz->heartbeat += 1;
@@ -264,14 +264,14 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                  bit_read(task, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))){
                 me->can_silence ++;
             } else continue;
-            if ( me->can_tolerate_silence < me->can_silence ) {
-                switch (task->charge_stage) {
+            if ( task->this_job && me->can_tolerate_silence < me->can_silence ) {
+                switch (task->this_job->charge_stage) {
                 case CHARGE_STAGE_HANDSHACKING:
                     if (me->can_pgn != PGN_BRM) break;
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
-                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
+                            task->this_job->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     break;
                 case CHARGE_STAGE_CONFIGURE:
@@ -279,7 +279,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障"));
-                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
+                            task->this_job->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     break;
                 case CHARGE_STAGE_CHARGING:
@@ -287,7 +287,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障"));
-                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
+                            task->this_job->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     break;
                 case CHARGE_STAGE_DONE:
@@ -295,7 +295,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                         if ( !bit_read(task, S_BMS_COMM_DOWN) ) {
                             bit_set(task, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障"));
-                            task->charge_stage = CHARGE_STAGE_HANDSHACKING;
+                            task->this_job->charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     break;
                 default:
