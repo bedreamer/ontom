@@ -286,6 +286,42 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
 void deal_with_system_protection(struct charge_task *thiz)
 {
+    int fault_nr = 0; // 系统关键故障
+    int err_nr = 0;   // 系统故障数
+
+    if ( bit_read(thiz, S_AC_INPUT_DOWN) ) {
+        fault_nr ++;
+    }
+    if ( bit_read(thiz, S_AC_INPUT_DOWN) ) {
+        fault_nr ++;
+    }
+    if ( bit_read(thiz, S_CHARGER_COMM_DOWN) ) {
+        fault_nr ++;
+    }
+    if ( bit_read(thiz, S_CHARGER_YX_1_COMM_DOWN) ) {
+        err_nr ++;
+    }
+    if ( bit_read(thiz, S_CHARGER_YX_2_COMM_DOWN) ) {
+        err_nr ++;
+    }
+    if ( bit_read(thiz, S_MEASURE_COMM_DOWN) ) {
+        fault_nr ++;
+    }
+    if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
+        fault_nr ++;
+    }
+
+    if ( fault_nr ) {
+        bit_set(thiz, F_SYSTEM_CHARGE_ALLOW);
+    } else {
+        bit_clr(thiz, F_SYSTEM_CHARGE_ALLOW);
+    }
+
+    if ( fault_nr + err_nr ) {
+        bit_set(thiz, S_ERROR);
+    } else {
+        bit_clr(thiz, S_ERROR);
+    }
 }
 
 void deal_with_job_business(struct charge_task *thiz)
