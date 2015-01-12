@@ -50,10 +50,10 @@ PHONY+=y-objs m-objs s-objs b-objs
 EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	PWD ARCH WORKDIR IMGFILE Q CFLAGS CCFLAGS CMODULE \
 	BINASFLAGS CPFLAGS yobjs-list mobjs-list sobjs-list
-SEP-DIRS=ontom
+SEP-DIRS=thirdpart/mongoose
 # must be the last one.
 LAST-DIR=
-SUB-DIRS=thirdpart/mongoose
+SUB-DIRS=ontom
 EX-OBJS=
 PHONY+=EX-OBJS
 
@@ -85,7 +85,6 @@ modules:
 PHONY+=modules
 
 zeus:
-	$(Q)echo "  Last step for link >>>>"
 	$(Q)echo "  **LD**      "`pwd`/$@_r$(VER)
 	$(Q)$(LD) $(shell cat $(yobjs-list)) $(LDFLAGS) $(LDEXFLAGS) -o $@_r$(VER)
 
