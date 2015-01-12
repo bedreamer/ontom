@@ -50,10 +50,10 @@ PHONY+=y-objs m-objs s-objs b-objs
 EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	PWD ARCH WORKDIR IMGFILE Q CFLAGS CCFLAGS CMODULE \
 	BINASFLAGS CPFLAGS yobjs-list mobjs-list sobjs-list
-SEP-DIRS=ontom thirdpart/mongoose
+SEP-DIRS=ontom
 # must be the last one.
 LAST-DIR=
-SUB-DIRS=
+SUB-DIRS=thirdpart/mongoose
 EX-OBJS=
 PHONY+=EX-OBJS
 
@@ -76,15 +76,7 @@ _all:
 	   $(MAKE) $(MAKEPARAM) -C $$d all;\
      done
 PHONY+=all
-drivers:
-	$(Q)$(MAKE) $(MAKEPARAM) -C drivers all 2>/dev/null
-PHONY+=drivers
-fs:
-	$(Q)$(MAKE) $(MAKEPARAM) -C fs all 2>/dev/null
-PHONY+=fs
-kernel:
-	$(Q)$(MAKE) $(MAKEPARAM) -C kernel all 2>/dev/null
-PHONY+=kernel
+
 modules:
 	$(Q)echo ''> $(mobjs-list);
 	$(Q)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR); do\
@@ -92,15 +84,9 @@ modules:
      done
 PHONY+=modules
 
-zeus:ontom/build-in.a thirdpart/mongoose/build-in.a
+zeus:
 	$(Q)echo "  **LD**      "`pwd`/$@_r$(VER)
-	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@_r$(VER)
-ontom/build-in.a:
-	$(Q)echo "  **LD**      "`pwd`/$@
-	$(Q)$(MAKE) $(MAKEPARAM) -C ontom build-in.a;
-thirdpart/mongoose/build-in.a:
-	$(Q)echo "  **LD**      "`pwd`/$@
-	$(Q)$(MAKE) $(MAKEPARAM) -C thirdpart/mongoose build-in.a;
+	$(Q)$(LD) `cat $(yobjs-list)` $(LDFLAGS) $(LDEXFLAGS) -o $@_r$(VER)
 
 browser:
 	$(Q)$(MAKE) $(MAKEPARAM) -C browser all;
@@ -113,20 +99,6 @@ list-clean:
 	$(Q)$(OMIT)$(RM) $(yobjs-list) $(mobjs-list) $(sobjs-list) 2>/dev/null;
 	$(Q)true
 PHONY+=list-clean
-modules-clean:
-	$(Q)echo ''> $(mobjs-list);
-	$(Q)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR); do\
-	   $(MAKE) $(MAKEPARAM) -C $$d modules-clean;\
-     done
-drivers-clean:
-	$(Q)$(MAKE) $(MAKEPARAM) -C drivers clean 2>/dev/null
-PHONY+=drivers-clean
-kernel-clean:
-	$(Q)$(MAKE) $(MAKEPARAM) -C kernel clean 2>/dev/null
-PHONY+=kernel-clean
-fs-clean:
-	$(Q)$(MAKE) $(MAKEPARAM) -C fs clean 2>/dev/null
-PHONY+=fs-clean
 
 DOEXPORTS=$(EXPORTS)
 
