@@ -92,12 +92,15 @@ modules:
      done
 PHONY+=modules
 
-zeus:ontom/build-in.a
+zeus:ontom/build-in.a thirdpart/mongoose/build-in.a
 	$(Q)echo "  **LD**      "`pwd`/$@_r$(VER)
 	$(Q)$(LD) $^ $(LDFLAGS) $(LDEXFLAGS) -o $@_r$(VER)
 ontom/build-in.a:
 	$(Q)echo "  **LD**      "`pwd`/$@
 	$(Q)$(MAKE) $(MAKEPARAM) -C ontom build-in.a;
+thirdpart/mongoose/build-in.a:
+	$(Q)echo "  **LD**      "`pwd`/$@
+	$(Q)$(MAKE) $(MAKEPARAM) -C thirdpart/mongoose build-in.a;
 
 browser:
 	$(Q)$(MAKE) $(MAKEPARAM) -C browser all;
