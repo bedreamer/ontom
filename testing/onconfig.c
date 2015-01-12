@@ -7,7 +7,7 @@
 #include <sys/socket.h> /* socket specific definitions */
 #include <netinet/in.h> /* INET constants and stuff */
 #include <arpa/inet.h>  /* IP address conversion stuff */
-#include "../config.h"
+#include "../ontom/config.h"
 
 int noecho  = 0;
 
