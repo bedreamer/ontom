@@ -148,7 +148,6 @@ static inline int xml_gen_settle_card(char *buff)
 static inline int xml_gen_system_error(char *buff)
 {
     int err_cnt = 0;
-    static int magic = 0;
     char errbuff[2048];
 #define MAX_ERR  16
 #if 0
