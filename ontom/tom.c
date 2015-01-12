@@ -15,13 +15,13 @@
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
-#include "mongoose.h"
+#include "../thirdpart/mongoose/mongoose.h"
+#include "../thirdpart/D8/librf.h"
 #include "ajax.h"
 #include "config.h"
 #include "error.h"
 #include "log.h"
 #include "Hachiko.h"
-#include "../thirdpart/D8/librf.h"
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_read_service(void *) ___THREAD_ENTRY___;
