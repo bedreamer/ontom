@@ -25,7 +25,6 @@ MAKEPARAM=--no-print-directory
 OMIT=-
 PWD=pwd
 WORKDIR=$(shell pwd)
-IMGFILE=$(WORKDIR)/floppy.img
 Q=@
 #Q=
 CFLAGS=-c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT

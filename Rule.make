@@ -40,12 +40,12 @@ modules: $(m-objs) $(submodules)
 	$(Q)true;
 PHONY+=modules
 clean: $(subclean)
-	$(Q)$(OMIT)echo "    RM        `pwd`/*.(o|ko)"
+	$(Q)$(OMIT)echo "    RM        `pwd`/*.(o|{ko}|{build-in.a})"
 	$(Q)$(OMIT)$(RM) build-in.a $(b-objs) $(m-objs) $(m-deps) $(y-deps) $(s-deps) 2>/dev/null;
 PHONY+=clean
 ifdef m-objs
 modules-clean:$(submodules-clean)
-	$(Q)$(OMIT)$(RM) "    RM        `pwd`/*.ko"
+	$(Q)$(OMIT)$(RM) "    RM        `pwd`/*.|{ko}|"
 	$(Q)$(OMIT)$(RM) build-in.a $(m-objs) $(m-deps) 2>/dev/null;
 PHONY+=modules-clean
 else
