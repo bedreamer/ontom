@@ -87,9 +87,9 @@ PHONY+=modules
 zeus:
 	$(Q)echo "------------------------------------------"
 	$(Q)echo "  **LD**      "`pwd`/$@_r$(VER)
-	$(Q)printf "%32s" `date`
-	$(Q)echo "------------------------------------------"
 	$(Q)$(LD) $(shell cat $(yobjs-list)) $(LDFLAGS) $(LDEXFLAGS) -o $@_r$(VER)
+	$(Q)echo "         "`date`
+	$(Q)echo "------------------------------------------"
 
 browser:
 	$(Q)$(MAKE) $(MAKEPARAM) -C browser all;
