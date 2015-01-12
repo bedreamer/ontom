@@ -70,7 +70,6 @@ PHONY+=reconfig
 
 # FIXME: maybe there is a better way to refresh objects-list files.
 _all:
-	$(Q)echo ''> $(yobjs-list);echo ''> $(mobjs-list);echo ''> $(sobjs-list);
 	$(Q)dd if=/dev/null of=$(yobjs-list) bs=1 count=0 2>/dev/null
 	$(Q)dd if=/dev/null of=$(mobjs-list) bs=1 count=0 2>/dev/null
 	$(Q)dd if=/dev/null of=$(sobjs-list) bs=1 count=0 2>/dev/null
