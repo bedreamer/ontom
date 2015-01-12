@@ -23,6 +23,7 @@ void printf_ack(struct socket_config_ack *head)
         printf("request faile, error code: %d\n", head->config_result);
         return;
     }
+    if ( ! head->config_name[0] ) return;
 
     i = (head->config_type >=0 && head->config_type <= 3)? head->config_type : 4;
     j = (head->config_user == 0 || head->config_user == 1) ? head->config_user : 2;
