@@ -3,7 +3,7 @@
 
 #define XML_IO_SIZE   8*1024  // 4K
 
-#include "../thirdpart/mongoose/ongoose.h"
+#include "../thirdpart/mongoose/mongoose.h"
 
 struct ajax_xml_struct {
     // 动态生成的XML文件长度， 最长为31字节
