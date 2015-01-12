@@ -71,6 +71,9 @@ PHONY+=reconfig
 # FIXME: maybe there is a better way to refresh objects-list files.
 _all:
 	$(Q)echo ''> $(yobjs-list);echo ''> $(mobjs-list);echo ''> $(sobjs-list);
+	$(Q)dd if=/dev/null of=$(yobjs-list) bs=1 count=0
+	$(Q)dd if=/dev/null of=$(mobjs-list) bs=1 count=0
+	$(Q)dd if=/dev/null of=$(sobjs-list) bs=1 count=0
 	$(Q)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR); do\
 	   $(MAKE) $(MAKEPARAM) -C $$d all;\
      done
