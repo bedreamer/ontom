@@ -502,6 +502,8 @@ struct charge_task {
     // 系统前一次信号状态，用来做状态跳变比较
     volatile unsigned char pre_single[64];
 
+    sqlite3 *database;
+
     // 充电计费
     struct {
         // 计费方式

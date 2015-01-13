@@ -23,6 +23,8 @@
 #include "error.h"
 #include "log.h"
 #include "Hachiko.h"
+#include "charge.h"
+
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_read_service(void *) ___THREAD_ENTRY___;
@@ -129,7 +131,10 @@ void *thread_backgroud_service(void *arg) ___THREAD_ENTRY___
 // 捕捉中止信号，保存重要数据
 void sig_interrupt(int signo)
 {
-    log_printf(WRN, "TOM: 捕捉到键盘CTRL+C信号, 进程即将中止, 开始保存重要数据...");
+    if ( task && task->database ) {
+        log_printf(WRN, "TOM: 捕捉到键盘CTRL+C信号, 进程即将中止, 开始保存重要数据...");
+        sqlite3_close(task->database);
+    }
     exit(0);
 }
 
@@ -142,7 +147,6 @@ int main()
     int thread_done[ 8 ] = {0};
     char buff[32];
     int errcode = 0, ret;
-    sqlite3 *database = NULL;
 
     signal(SIGINT, sig_interrupt);
 
