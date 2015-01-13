@@ -125,6 +125,13 @@ void *thread_backgroud_service(void *arg) ___THREAD_ENTRY___
     return NULL;
 }
 
+// 捕捉中止信号，保存重要数据
+void sig_interrupt(int signo)
+{
+    log_printf(WRN, "TOM: 捕捉到键盘CTRL+C信号, 进程即将中止, 开始保存重要数据...");
+    exit(0);
+}
+
 int main()
 {
     const char *user_cfg = NULL;
@@ -298,7 +305,7 @@ int main()
 #endif
     // 主循环中放置看门狗代码
     for ( ;; ) {
-        sleep(1);
+        sleep(3);
     }
     return 0;
 die:
