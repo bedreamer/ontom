@@ -17,8 +17,8 @@
 #include <linux/can/raw.h>
 #include "../thirdpart/mongoose/mongoose.h"
 #include "../thirdpart/D8/librf.h"
-#include "../thirdpart/sqlite/sqlite3.h"
 #include "../thirdpart/sqlite/sqlite3ext.h"
+#include "../thirdpart/sqlite/sqlite3.h"
 #include "ajax.h"
 #include "config.h"
 #include "error.h"
