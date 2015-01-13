@@ -16,8 +16,6 @@ struct MDATA_ACK;
 #include "config.h"
 
 #include "../thirdpart/sqlite/sqlite3.h"
-#include "../thirdpart/sqlite/sqlite3ext.h"
-
 // 无效时戳，初始化时默认赋值， 用于time_t默认值
 #define INVALID_TIMESTAMP  0x00000000
 // BMS 通信时的缓冲区
