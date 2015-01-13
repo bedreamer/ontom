@@ -17,6 +17,8 @@
 #include <linux/can/raw.h>
 #include "../thirdpart/mongoose/mongoose.h"
 #include "../thirdpart/D8/librf.h"
+#include "../thirdpart/sqlite/sqlite3.h"
+#include "../thirdpart/sqlite/sqlite3ext.h"
 #include "ajax.h"
 #include "config.h"
 #include "error.h"
@@ -141,8 +143,14 @@ int main()
     int thread_done[ 8 ] = {0};
     char buff[32];
     int errcode = 0, ret;
+    sqlite3 *database = NULL;
 
     signal(SIGINT, sig_interrupt);
+
+    ret = sqlite3_open(DEFAULT_DB, &database);
+    if ( ret == SQLITE_OK ) {
+        log_printf(ERR, "TOM: 打开数据库失败..");
+    }
 
     printf(
             "           ___        _       ____\n"

@@ -30,6 +30,9 @@
 #define CONFIG_SUPPORT_CHARGE_JOBS     8
 //}}}}}}}}}}}}}
 
+// 默认数据库文件
+#define DEFAULT_DB  "ontom.db"
+
 #ifndef bool
 	#define bool unsigned char
 #endif
