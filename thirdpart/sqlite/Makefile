@@ -1,5 +1,6 @@
 y-deps+=sqlite3.o
 EX-OBJS+=build-in.a
+EXFLAGS=-DSQLITE_THREADSAFE
 
 build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"

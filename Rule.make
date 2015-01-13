@@ -55,7 +55,7 @@ PHONY+=modules-clean
 endif
 %.o : %.c Makefile
 	$(Q)echo "    CC        `pwd`/$<"
-	$(Q)$(CC) $(CFLAGS) $(CCFLAGS) $(CPFLAGS) -o $@ $<
+	$(Q)$(CC) $(CFLAGS) $(CCFLAGS) $(CPFLAGS) $(EXFLAGS) -o $@ $<
 
 %.o : %.s Makefile
 	$(Q)echo "    AS        `pwd`/$<"
