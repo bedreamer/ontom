@@ -49,7 +49,7 @@ PHONY+=y-objs m-objs s-objs b-objs
 EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	PWD ARCH WORKDIR IMGFILE Q CFLAGS CCFLAGS CMODULE \
 	BINASFLAGS CPFLAGS yobjs-list mobjs-list sobjs-list
-SEP-DIRS=thirdpart/mongoose
+SEP-DIRS=thirdpart/mongoose thirdpart/sqlite
 # must be the last one.
 LAST-DIR=
 SUB-DIRS=ontom
