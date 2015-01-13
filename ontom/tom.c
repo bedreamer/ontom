@@ -142,6 +142,8 @@ int main()
     char buff[32];
     int errcode = 0, ret;
 
+    signal(SIGINT, sig_interrupt);
+
     printf(
             "           ___        _       ____\n"
             "          / _ \\ _ __ | |_   _|  _ \\ _____      _____ _ __\n"
