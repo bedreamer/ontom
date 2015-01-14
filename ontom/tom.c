@@ -53,6 +53,7 @@ ____reinit:
     if ( icdev > 0 ) {
         log_printf(INF, "open D8 reader OK...");
         dc_beep(icdev, 100);
+        initok = 1;
     } else {
         initok = 0;
         log_printf(ERR, "open D8 reader ERROR: %d", icdev);
