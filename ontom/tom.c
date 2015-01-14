@@ -208,6 +208,9 @@ int main()
 
         sprintf(sql, "select MAX(error_seq_id)+1 from errors");
         sqlite3_exec(task->database, sql, sql_result, NULL, NULL);
+
+        sprintf(sql, "update errors set recover_reason='DISCARD' where recover_reason='ERROR'");
+        sqlite3_exec(task->database, sql, sql_result, NULL, NULL);
     }
 
     task->err_head = NULL;
