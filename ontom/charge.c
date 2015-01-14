@@ -695,6 +695,8 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
             config_read(errname));
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     log_printf(INF, "ZEUS: %s:%d", sql, ret);
+
+    /*
     head = task->err_head;
     do {
         thiz = list_load(struct error_history, error_me, head);
@@ -707,6 +709,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
         head = head->next;
     } while (head != task->err_head);
     printf("    ==== ADD\n");
+    */
 out:
     pthread_mutex_unlock (&task->err_list_lck);
 
@@ -755,6 +758,7 @@ del:
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     log_printf(INF, "ZEUS: %s:%d", sql, ret);
 
+    /*
     head = task->err_head;
     if ( head ) {
         do {
@@ -769,6 +773,7 @@ del:
         } while (head != task->err_head);
     }
     printf("    ===  DEL\n");
+    */
 out:
     pthread_mutex_unlock (&task->err_list_lck);
 }
