@@ -561,7 +561,6 @@ void error_history_recover(unsigned int error_id)
 {
     struct error_history *thiz;
     struct list_head *head;
-    char sql[128];
     char sql[128], errname[32], timestamp[20];
     time_t timep;
     struct tm *p;
