@@ -134,6 +134,21 @@ void sig_interrupt(int signo)
 {
     if ( task && task->database ) {
         log_printf(WRN, "TOM: 捕捉到键盘CTRL+C信号, 进程即将中止, 开始保存重要数据...");
+        char sql[128] = {0};
+        time_t timep;
+        struct tm *p;
+        time(&timep);
+        p =localtime(&timep);
+
+        sprintf(sql,
+                "insert into log values('%04d-%02d-%02d %02d:%02d:%02d', '系统中止')",
+                p->tm_year + 1990,
+                p->tm_mon,
+                p->tm_mday,
+                p->tm_hour,
+                p->tm_min,
+                p->tm_sec);
+        sqlite3_exec(task->database, sql, NULL, NULL, NULL);
         sqlite3_close(task->database);
     }
     exit(0);
@@ -155,6 +170,22 @@ int main()
     if ( ret == SQLITE_OK ) {
         log_printf(ERR, "TOM: 打开数据库失败..");
         exit(1);
+    } else {
+        char sql[128] = {0};
+        time_t timep;
+        struct tm *p;
+        time(&timep);
+        p =localtime(&timep);
+
+        sprintf(sql,
+                "insert into log values('%04d-%02d-%02d %02d:%02d:%02d', '系统启动')",
+                p->tm_year + 1990,
+                p->tm_mon,
+                p->tm_mday,
+                p->tm_hour,
+                p->tm_min,
+                p->tm_sec);
+        sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     }
 
     task->err_head = NULL;

@@ -555,6 +555,9 @@ void error_history_recover(unsigned int error_id)
     } while ( head->next != task->err_head );
     goto out;
 del:
+    if ( task->err_head == & thiz->error_me ) {
+        task->err_head = thiz->error_me.next;
+    }
     list_remove(&thiz->error_me);
     task->err_nr --;
     if ( task->err_nr == 0 ) {
