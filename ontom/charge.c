@@ -534,6 +534,9 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
     strncpy(thiz->error_string, error_string, 32);
     strcpy(thiz->error_recover, "0000-00-00 00:00:00");
 
+    log_printf(INF, "ZEUS: 故障总数为: %d", task->err_nr);
+
+    timep = time(NULL);
     p =localtime(&timep);
     sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
             p->tm_year + 1990,
@@ -587,6 +590,7 @@ del:
     if ( task->err_nr == 0 ) {
         task->err_head = NULL;
     }
+    timep = time(NULL);
     p =localtime(&timep);
     sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
             p->tm_year + 1990,
