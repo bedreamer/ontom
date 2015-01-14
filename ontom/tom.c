@@ -167,7 +167,7 @@ int main()
     signal(SIGINT, sig_interrupt);
 
     ret = sqlite3_open(DEFAULT_DB, &task->database);
-    if ( ret == SQLITE_OK ) {
+    if ( ret != SQLITE_OK ) {
         log_printf(ERR, "TOM: 打开数据库失败..");
         exit(1);
     } else {
