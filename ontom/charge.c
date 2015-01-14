@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "charge.h"
 #include "bms.h"
 #include "config.h"
