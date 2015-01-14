@@ -1,4 +1,4 @@
-﻿CREATE TABLE log(
+CREATE TABLE log(
 	timestamp string,
 	logstring string
 	);
