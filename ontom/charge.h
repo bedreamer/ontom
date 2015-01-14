@@ -862,4 +862,6 @@ static inline void __get_timestamp(char *outstring)
             p->tm_sec);
 }
 
+
+
 #endif /*_CHARGE_INCLUDED_H_*/

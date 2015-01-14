@@ -557,7 +557,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
 
         head = head->next;
     } while (head->next != task->err_head);
-
+    printf("    ==== ADD\n");
 out:
     pthread_mutex_unlock (&task->err_list_lck);
 
@@ -617,7 +617,7 @@ del:
             head = head->next;
         } while (head->next != task->err_head);
     }
-
+    printf("    ===  DEL\n");
 out:
     pthread_mutex_unlock (&task->err_list_lck);
 }
