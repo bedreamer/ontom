@@ -90,8 +90,8 @@ zeus:
 	$(Q)echo "------------------------------------------"
 	$(Q)echo "  **LD**      "`pwd`/$@_r$(VER)
 	$(Q)$(LD) $(shell cat $(yobjs-list)) $(LDFLAGS) $(LDEXFLAGS) -o $@_r$(VER)
-	$(Q)$(OMIT)$(RM) zeus
-	$(Q)ln -s $@_r$(VER) zeus
+	$(Q)$(OMIT)$(RM) zeus 2>/dev/null
+	$(Q)ln -s $@_r$(VER) zeus 2>/dev/null
 	$(Q)echo "         "`date`
 	$(Q)echo "------------------------------------------"
 
