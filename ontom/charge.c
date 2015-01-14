@@ -532,7 +532,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
     thiz->error_seqid = task->err_seq_id_next ++;
     thiz->error_id = error_id;
     strncpy(thiz->error_string, error_string, 32);
-    thiz->error_recover = 0;
+    strcpy(thiz->error_recover, "0000-00-00 00:00:00");
 
     p =localtime(&timep);
     sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
@@ -544,9 +544,10 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
             p->tm_sec);
     strcpy(thiz->error_begin, timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
-    sprintf(sql, "insert into errors values('%04X','%s','0000-00-00 00:00:00','ERROR','%s')",
+    sprintf(sql, "insert into errors values('%04X','%s','%s','ERROR','%s')",
             thiz->error_id,
-            timestamp,
+            thiz->error_begin,
+            thiz->error_recover,
             config_read(errname));
     sqlite3_exec(task->database, sql, NULL, NULL, NULL);
 
