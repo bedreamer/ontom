@@ -536,15 +536,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
 
     log_printf(INF, "ZEUS: 故障总数为: %d", task->err_nr);
 
-    timep = time(NULL);
-    p =localtime(&timep);
-    sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
-            p->tm_year + 1990,
-            p->tm_mon,
-            p->tm_mday,
-            p->tm_hour,
-            p->tm_min,
-            p->tm_sec);
+    __get_timestamp(timestamp);
     strcpy(thiz->error_begin, timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
     sprintf(sql, "insert into errors values('%04X','%s','%s','ERROR','%s')",
@@ -553,6 +545,18 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
             thiz->error_recover,
             config_read(errname));
     sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+
+    head = task->err_head;
+    do {
+        thiz = list_load(struct error_history, error_me, head);
+
+        printf("%p<-- %p -->%p   ",
+               thiz->error_me.pre,
+               &thiz->error_me,
+               thiz->error_me.next);
+
+        head = head->next;
+    } while (head->next != task->err_head);
 
 out:
     pthread_mutex_unlock (&task->err_list_lck);
@@ -590,15 +594,7 @@ del:
     if ( task->err_nr == 0 ) {
         task->err_head = NULL;
     }
-    timep = time(NULL);
-    p =localtime(&timep);
-    sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
-            p->tm_year + 1990,
-            p->tm_mon,
-            p->tm_mday,
-            p->tm_hour,
-            p->tm_min,
-            p->tm_sec);
+    __get_timestamp(timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
     sprintf(sql,
             "update errors set "
@@ -607,6 +603,21 @@ del:
             timestamp, thiz->error_id,
             thiz->error_begin);
     sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+
+    head = task->err_head;
+    if ( head ) {
+        do {
+            thiz = list_load(struct error_history, error_me, head);
+
+            printf("%p<-- %p -->%p   ",
+                   thiz->error_me.pre,
+                   &thiz->error_me,
+                   thiz->error_me.next);
+
+            head = head->next;
+        } while (head->next != task->err_head);
+    }
+
 out:
     pthread_mutex_unlock (&task->err_list_lck);
 }
