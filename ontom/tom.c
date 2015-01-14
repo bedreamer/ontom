@@ -164,6 +164,7 @@ int sql_result(void *param, int nr, char **text, char **name)
         for ( ; text && name && *text && &name ; text ++ ) {
             printf("   %16s -- %16s\n", *text, *name);
         }
+        task->err_seq_id_next = atoi(*text);
     } else {
         task->err_seq_id_next = 1;
     }
