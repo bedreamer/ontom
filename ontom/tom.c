@@ -54,7 +54,7 @@ ____reinit:
         log_printf(INF, "open D8 reader OK...");
         dc_beep(icdev, 100);
         initok = 1;
-    } else {
+    } else if ( icdev < 0 ) {
         initok = 0;
         log_printf(ERR, "open D8 reader ERROR: %d", icdev);
     }
@@ -68,9 +68,12 @@ ____reinit:
             continue;
         }
         ret = dc_card(icdev, 0, &_Snr);
-        if ( ret != 0 ) {
+        if ( ret > 0 ) {
             continue;
-       }
+        } else {
+            initok = 0;
+            continue;
+        }
         log_printf(INF, "GET CARD: %08X", _Snr);
         dc_beep(icdev, 50);
         usleep(100000);
