@@ -507,7 +507,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
 
     pthread_mutex_lock(&task->err_list_lck);
     if ( task->err_head != NULL ) {
-        head = &task->err_head;
+        head = task->err_head;
         do {
             thiz = list_load(struct error_history, error_me, head);
             if ( thiz->error_id == error_id ) {
