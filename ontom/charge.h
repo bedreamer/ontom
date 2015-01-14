@@ -852,6 +852,7 @@ static inline void __get_timestamp(char *outstring)
 {
     time_t timep;
     struct tm *p;
+    timep = time(NULL);
     p =localtime(&timep);
     sprintf(outstring, "%04d-%02d-%02d %02d:%02d:%02d",
             p->tm_year + 1900,
