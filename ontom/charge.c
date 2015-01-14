@@ -504,7 +504,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
     struct error_history *thiz;
     struct list_head *head;
 
-    pthread_mutext_lock(task->err_list_lck);
+    pthread_mutext_lock(&task->err_list_lck);
     if ( task->err_head != NULL ) {
         head = &task->err_head;
         do {
@@ -528,10 +528,10 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
     thiz->error_seqid = task->err_seq_id_next ++;
     thiz->error_id = error_id;
     strncpy(thiz->error_string, error_string, 32);
-    thiz->error_begin = time();
+    thiz->error_begin = time(NULL);
     thiz->error_recover = 0;
 out:
-    pthread_mutex_unlock (task->err_list_lck);
+    pthread_mutex_unlock (&task->err_list_lck);
 
     return error_id;
 }
@@ -541,7 +541,7 @@ void error_history_recover(unsigned int error_id)
     struct error_history *thiz;
     struct list_head *head;
 
-    pthread_mutext_lock(task->err_list_lck);
+    pthread_mutext_lock(&task->err_list_lck);
 
     if ( task->err_head == NULL ) goto out;
 
@@ -561,5 +561,5 @@ del:
         task->err_head = NULL;
     }
 out:
-    pthread_mutex_unlock (task->err_list_lck);
+    pthread_mutex_unlock (&task->err_list_lck);
 }
