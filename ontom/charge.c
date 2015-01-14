@@ -545,7 +545,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
             thiz->error_recover,
             config_read(errname));
     sqlite3_exec(task->database, sql, NULL, NULL, NULL);
-
+    log_printf(INF, "ZEUS: %s", sql);
     head = task->err_head;
     do {
         thiz = list_load(struct error_history, error_me, head);
@@ -602,6 +602,7 @@ del:
             "where error_id='%04X' AND error_begin='%s'",
             timestamp, thiz->error_id,
             thiz->error_begin);
+    log_printf(INF, "ZEUS: %s", sql);
     sqlite3_exec(task->database, sql, NULL, NULL, NULL);
 
     head = task->err_head;
