@@ -686,7 +686,8 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
     __get_timestamp(timestamp);
     strcpy(thiz->error_begin, timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
-    sprintf(sql, "insert into errors values('E%04X','%s','%s','%s','ERROR')",
+    sprintf(sql, "insert into errors values('%d',E%04X','%s','%s','%s','ERROR')",
+            thiz->error_seqid,
             thiz->error_id,
             thiz->error_begin,
             thiz->error_recover,
