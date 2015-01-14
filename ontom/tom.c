@@ -18,6 +18,7 @@
 #include "../thirdpart/mongoose/mongoose.h"
 #include "../thirdpart/D8/librf.h"
 #include "../thirdpart/sqlite/sqlite3.h"
+#include "list.h"
 #include "ajax.h"
 #include "config.h"
 #include "error.h"
@@ -153,6 +154,14 @@ int main()
     ret = sqlite3_open(DEFAULT_DB, &task->database);
     if ( ret == SQLITE_OK ) {
         log_printf(ERR, "TOM: 打开数据库失败..");
+        exit(1);
+    }
+
+    task->err_head = NULL;
+    task->err_nr = 0;
+    ret = pthread_mutex_create(&task->err_list_lck, NULL);
+    if ( ret == -1 ) {
+        log_printf(ERR, "TOM: 互斥锁初始化失败.");
         exit(1);
     }
 

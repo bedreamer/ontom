@@ -11,6 +11,8 @@
 
 struct charge_task;
 struct MDATA_ACK;
+#include <pthread.h>
+#include "list.h"
 #include "Hachiko.h"
 #include "bms.h"
 #include "config.h"
@@ -488,6 +490,35 @@ struct charge_job {
     unsigned int ref_nr;
 };
 
+// 故障恢复原因
+typedef  enum {
+    // 故障消除后恢复
+    REASON_NORMAL,
+    // 系统做初始化时恢复前一次运行时的故障
+    REASON_MANAUL
+}ERR_RECOVER_REASON;
+
+// 历史故障定义
+struct error_history {
+    // 故障唯一ID
+    unsigned int error_seqid;
+    // 故障代码编号
+    unsigned int error_id;
+    // 故障起始日期, 时间
+    time_t error_begin;
+    // 故障恢复日期，时间
+    time_t error_recover;
+    // 故障参数
+    char error_string[32];
+    // 故障恢复原因
+    ERR_RECOVER_REASON error_recover_reason;
+
+    struct list_head error_me;
+};
+
+unsigned int error_history_begin(unsigned int error_id, char *error_string);
+void error_history_recover(unsigned int error_id);
+
 /*
  * 充电任务描述
  */
@@ -571,6 +602,12 @@ struct charge_task {
     struct pgn4352_BCS bms_all_battery_status;
     // BMS 动力蓄电池状态信息
     struct pgn4864_BSM bms_battery_status;
+
+    // 当前故障列表
+    pthread_mutex_t err_list_lck;
+    unsigned int err_seq_id_next;
+    unsigned int err_nr;
+    struct list_head *err_head;
 };
 
 /* 系统信号定义

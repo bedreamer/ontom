@@ -291,24 +291,45 @@ void deal_with_system_protection(struct charge_task *thiz)
 
     if ( bit_read(thiz, S_AC_INPUT_DOWN) ) {
         fault_nr ++;
+        error_history_begin(S_AC_INPUT_DOWN, "N/A");
+    } else {
+        error_history_recover(S_AC_INPUT_DOWN);
     }
-    if ( bit_read(thiz, S_AC_INPUT_DOWN) ) {
+    if ( bit_read(thiz, S_ASSIT_POWER_DOWN) ) {
         fault_nr ++;
+        error_history_begin(S_ASSIT_POWER_DOWN, "N/A");
+    } else {
+        error_history_recover(S_ASSIT_POWER_DOWN);
     }
     if ( bit_read(thiz, S_CHARGER_COMM_DOWN) ) {
         fault_nr ++;
+        error_history_begin(S_CHARGER_COMM_DOWN, "N/A");
+    } else {
+        error_history_recover(S_CHARGER_COMM_DOWN);
     }
     if ( bit_read(thiz, S_CHARGER_YX_1_COMM_DOWN) ) {
         err_nr ++;
+        error_history_begin(S_CHARGER_YX_1_COMM_DOWN, "N/A");
+    } else {
+        error_history_recover(S_CHARGER_YX_1_COMM_DOWN);
     }
     if ( bit_read(thiz, S_CHARGER_YX_2_COMM_DOWN) ) {
         err_nr ++;
+        error_history_begin(S_CHARGER_YX_2_COMM_DOWN, "N/A");
+    } else {
+        error_history_recover(S_CHARGER_YX_2_COMM_DOWN);
     }
     if ( bit_read(thiz, S_MEASURE_COMM_DOWN) ) {
         fault_nr ++;
+        error_history_begin(S_MEASURE_COMM_DOWN, "N/A");
+    } else {
+        error_history_recover(S_MEASURE_COMM_DOWN);
     }
     if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
         fault_nr ++;
+        error_history_begin(S_BMS_COMM_DOWN, "N/A");
+    } else {
+        error_history_recover(S_BMS_COMM_DOWN);
     }
 
     if ( fault_nr ) {
@@ -476,4 +497,69 @@ void deal_with_job_business(struct charge_task *thiz)
         thiz->this_job = NULL;
         break;
     }
+}
+
+unsigned int error_history_begin(unsigned int error_id, char *error_string)
+{
+    struct error_history *thiz;
+    struct list_head *head;
+
+    pthread_mutext_lock(task->err_list_lck);
+    if ( task->err_head != NULL ) {
+        head = &task->err_head;
+        do {
+            thiz = list_load(struct error_history, error_me, head);
+            if ( thiz->error_id == error_id ) {
+                goto out;
+            }
+            head = head->next;
+        } while ( head->next != task->err_head );
+    }
+
+    thiz = (struct error_history*)malloc(sizeof(struct error_history));
+    if ( thiz == NULL ) goto out;
+    list_ini(thiz->error_me);
+    if ( task->err_head == NULL ) {
+        task->err_head = & thiz->error_me;
+    } else {
+        list_inserttail(task->err_head, &thiz->error_me);
+    }
+    task->err_nr ++;
+    thiz->error_seqid = task->err_seq_id_next ++;
+    thiz->error_id = error_id;
+    strncpy(thiz->error_string, error_string, 32);
+    thiz->error_begin = time();
+    thiz->error_recover = 0;
+out:
+    pthread_mutex_unlock (task->err_list_lck);
+
+    return error_id;
+}
+
+void error_history_recover(unsigned int error_id)
+{
+    struct error_history *thiz;
+    struct list_head *head;
+
+    pthread_mutext_lock(task->err_list_lck);
+
+    if ( task->err_head == NULL ) goto out;
+
+    head = task->err_head;
+    do {
+        thiz = list_load(struct error_history, error_me, head);
+        if ( thiz->error_id == error_id ) {
+            goto del;
+        }
+        head = head->next;
+    } while ( head->next != task->err_head );
+    goto out;
+del:
+    list_remove(&thiz->error_me);
+    task->err_nr --;
+    if ( task->err_nr == 0 ) {
+        task->err_head = NULL;
+    }
+out:
+    pthread_mutex_unlock (task->err_list_lck);
 }
