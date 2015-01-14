@@ -517,7 +517,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
                 goto out;
             }
             head = head->next;
-        } while ( head->next != task->err_head );
+        } while ( head != task->err_head );
     }
 
     thiz = (struct error_history*)malloc(sizeof(struct error_history));
@@ -556,7 +556,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
                thiz->error_me.next);
 
         head = head->next;
-    } while (head->next != task->err_head);
+    } while (head != task->err_head);
     printf("    ==== ADD\n");
 out:
     pthread_mutex_unlock (&task->err_list_lck);
@@ -583,7 +583,7 @@ void error_history_recover(unsigned int error_id)
             goto del;
         }
         head = head->next;
-    } while ( head->next != task->err_head );
+    } while ( head != task->err_head );
     goto out;
 del:
     if ( task->err_head == & thiz->error_me ) {
@@ -615,7 +615,7 @@ del:
                    thiz->error_me.next);
 
             head = head->next;
-        } while (head->next != task->err_head);
+        } while (head != task->err_head);
     }
     printf("    ===  DEL\n");
 out:
