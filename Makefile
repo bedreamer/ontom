@@ -34,7 +34,7 @@ CPFLAGS=-I./thirdpart/D8 -I./thirdpart/mongoose -I./thirdpart/sqlite -Wl,-O1
 EXFLAGS=
 LDFLAGS=-L. -L/home/tom/workspace/qt-4.8.2-arm/lib \
 	-L/home/tom/workspace/tslib/lib -L$(WORKDIR)/thirdpart/D8
-LDEXFLAGS=-lrt -lts -lD8U -lD8usb -lpthread
+LDEXFLAGS=-lrt -lpthread -lts -lD8U -lD8usb
 # build-in objects.
 y-objs=
 yobjs-list:=$(WORKDIR)/.yobjs
