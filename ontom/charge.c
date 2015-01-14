@@ -599,7 +599,7 @@ del:
     sprintf(sql,
             "update errors set "
             "error_recover='%s',recover_reason='NORMAL' "
-            "where error_id='%04X' AND error_begind='%s'",
+            "where error_id='%04X' AND error_begin='%s'",
             timestamp, thiz->error_id,
             thiz->error_begin);
     sqlite3_exec(task->database, sql, NULL, NULL, NULL);
