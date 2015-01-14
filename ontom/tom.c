@@ -158,6 +158,18 @@ void sig_interrupt(int signo)
     exit(0);
 }
 
+int sql_result(void *param, int nr, char **text, char **name)
+{
+    if ( nr > 0 ) {
+        for ( ; text && name && *text && &name ; text ++ ) {
+            printf("   %16s -- %16s\n", *text, *name);
+        }
+    } else {
+        task->err_seq_id_next = 1;
+    }
+    return 0;
+}
+
 int main()
 {
     const char *user_cfg = NULL;
@@ -190,6 +202,9 @@ int main()
                 p->tm_min,
                 p->tm_sec);
         sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+
+        sprintf(sql, "select MAX(error_seq_id)+1 from errors");
+        sqlite3_exec(task->database, sql, sql_result, NULL, NULL);
     }
 
     task->err_head = NULL;
