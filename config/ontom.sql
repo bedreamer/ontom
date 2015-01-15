@@ -191,3 +191,41 @@ INSERT INTO configs VALUES
 	'采样盒通信时间调整',
 	'解决485收发时间切换问题'
     );
+INSERT INTO configs VALUES
+    (
+	'core',
+	'core_charger_yaoce_0_49',
+	'INT',
+	'0',
+	'N/A',
+	'1000',
+	'0',
+	'0',
+	'0',
+	'false',
+	'false',
+	'0000-00-00 00:00:00',
+	'充电屏监控遥信1通信收发转换时间修正',
+	'false',
+	'充电屏监控遥信1通信时间调整',
+	'解决485收发时间切换问题'
+    );
+INSERT INTO configs VALUES
+    (
+	'core',
+	'core_charger_yaoce_50_100',
+	'INT',
+	'0',
+	'N/A',
+	'1000',
+	'0',
+	'0',
+	'0',
+	'false',
+	'false',
+	'0000-00-00 00:00:00',
+	'充电屏监控遥信2通信收发转换时间修正',
+	'false',
+	'充电屏监控遥信2通信时间调整',
+	'解决485收发时间切换问题'
+    );
