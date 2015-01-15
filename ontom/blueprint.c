@@ -1793,6 +1793,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                             thiz->rx_param.payload_size);
                 }
 #endif
+                usleep(1000);
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
