@@ -533,21 +533,8 @@ struct charge_task {
     // 系统前一次信号状态，用来做状态跳变比较
     volatile unsigned char pre_single[64];
 
+    // 已经编译为多线程安全模式，所以不用加锁
     sqlite3 *database;
-
-    // 充电计费
-    struct {
-        // 计费方式
-        BILLING_MODE mode;
-        union {
-            // 设定充电金额, 0 - 9999
-            double set_money;
-            // 设定充电时长, 0 - 600
-            unsigned int set_time;
-            // 设定充电目标容量, 0 - 100
-            unsigned int set_cap;
-        }option;
-    }charge_billing;
 
     // 充电工作列表
     struct charge_job jobs[CONFIG_SUPPORT_CHARGE_JOBS];

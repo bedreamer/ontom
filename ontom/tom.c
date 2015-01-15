@@ -161,11 +161,11 @@ void sig_interrupt(int signo)
 int sql_result(void *param, int nr, char **text, char **name)
 {
     if ( nr > 0 ) {
-        printf("[%s]\n", *text);
+        //printf("[%s]\n", *text);
         task->err_seq_id_next = atoi(*text);
-        for ( ; text && name && *text && &name ; text ++ ) {
+        /*for ( ; text && name && *text && &name ; text ++ ) {
             printf("   %16s -- %16s\n", *text, *name);
-        }
+        }*/
 
     } else {
         task->err_seq_id_next = 1;

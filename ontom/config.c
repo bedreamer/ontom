@@ -105,7 +105,8 @@ CONFIG_DOMAIN_BEGIN
 {"socket_config_passwd", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"charge_pile_serial",          C_STRING,  yes,     C_INVALID,  .cuv.n=0,       {"N/A"}},
 {"price",                       C_FLOAT,   yes,     C_INVALID,  .cuv.f=0.0f,    {"0.0"}},
-
+    // 系统通讯模型
+{"comm_methord_module",         C_STRING,  yes,     C_VALID,    .cuv.i=0,       {"M-01"}},
 // 关键故障标记, 标识是否可进行充电, 参考文档 充电桩相关信息.xlsx 充电桩故障对照表
 {"keyfault",                    C_STRING,  no,      C_VALID,    .cuv.i=0,       {"X11100111111100100110000011111"}},
 // 故障号对应字符串

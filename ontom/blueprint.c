@@ -16,6 +16,7 @@
 #include "blueprint.h"
 #include "charge.h"
 #include "ajax.h"
+#include "../thirdpart/sqlite/sqlite3.h"
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
@@ -37,15 +38,35 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 struct bp_uart uarts[2];
 // 串口4 使用者为充电机和采样盒
 struct bp_user down_user[] = {
-    {50 * 100,    0, 1, 0, 0, 0, 0, 0, 0, 0, uart4_simple_box_evt_handle},     // 采样
-    {50 * 100, 1000, 1, 0, 0, 0, 0, 0, 0, 0, uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
+    {50 * 100,    0, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, "core_simple_box_swap_time",
+        uart4_simple_box_evt_handle},     // 采样
+    {50 * 100, 1000, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, "core_charger_module_time",
+        uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
 #if 1
-    {50 * 100, 2000, 1, 0, 0, 0, 0, 0, 0, 0, uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
-    {50 * 100, 3000, 1, 0, 0, 0, 0, 0, 0, 0, uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
-    {50 * 100, 4000, 1, 0, 0, 0, 0, 0, 0, 0, uart4_charger_yaoce_0_49_handle},      // 盒充电机运行寄存器，只读
-    {50 * 100, 4000, 1, 0, 0, 0, 0, 0, 0, 0, uart4_charger_yaoce_50_100_handle},// 盒充电机运行寄存器，只读
+    {50 * 100, 2000, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, "core_charger_config",
+        uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
+    {50 * 100, 3000, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, "core_charger_date",
+        uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
+    {50 * 100, 4000, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, "core_charger_yaoce_0_49",
+        uart4_charger_yaoce_0_49_handle},      // 盒充电机运行寄存器，只读
+    {50 * 100, 4000, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, "core_charger_yaoce_50_100",
+        uart4_charger_yaoce_50_100_handle},// 盒充电机运行寄存器，只读
 #endif
-    {0,  0, 0, 0, 0, 0, 0, 0, 0, 0, NULL}
+    {0, 0, 0, 0, 0, 0, 0,
+             0, "",
+     0, 0, 0, NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user up_user[] = {
@@ -664,7 +685,7 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
 
         param->payload_size = sizeof(buff);
         self->rx_param.need_bytes = 105;
-        self->master->time_to_send = param->payload_size * 1000 / 960;
+        self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
 
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
@@ -750,7 +771,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
 
         param->payload_size = sizeof(buff);
         self->rx_param.need_bytes = 105;
-        self->master->time_to_send = param->payload_size * 1000 / 960;
+        self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
 
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
@@ -1438,7 +1459,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         param->payload_size = nr;
 
         self->rx_param.need_bytes = 32;
-        self->master->time_to_send = param->payload_size * 1000 / 960;
+        self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
@@ -1521,11 +1542,32 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     return ret;
 }
 
+// 从数据库初始化
+int sql_init_uart_result(void *param, int nr, char **text, char **name)
+{
+    struct bp_user *self = (struct bp_user *)(param);
+
+    if (  nr <= ) {
+        return 0;
+    }
+    do {
+        int len = atoi(*text);
+        if ( len >= 0 ) {
+            log_printf(INF, "UART: database init %s = %d",
+                       self->swap_time_config_name,
+                       len);
+            self->swap_time_modify = len;
+        }
+    } while (0);
+}
+
+
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0, ret;
     struct bp_uart *thiz = &uarts[0];
+    struct bp_user *self = &down_user[0];
     int retval, max_handle = 0;
     size_t cursor;
 
@@ -1552,6 +1594,23 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                    "errno: %d", errno);
     }
 #endif
+
+    // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
+    if ( task->database != NULL ) {
+        for (;self && self->bp_evt_handle; self ++ ) {
+            char sql[128] = {0};
+            char *errmsg = NULL;
+            sprintf(sql,
+                    "SELECT config_value FROM config "
+                    "   WHERE config_name='%s' AND "
+                    "         config_attrib='core'",
+                    self->swap_time_config_name);
+            ret = sqlite3_exec(task->database, sql, sql_init_uart_result, self, &errmsg);
+            if ( ret ) {
+                log_printf(ERR, "UART: SQL error msg: %s", errmsg);
+            }
+        }
+    }
 
     while ( ! *done ) {
         usleep(1000);

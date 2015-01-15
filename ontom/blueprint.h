@@ -150,6 +150,11 @@ struct bp_user {
     // 为了适配不同数据真发送时接受发送模式切换时间长度问题
     unsigned int time_to_send;
 
+    // 转换为发送状态的时间修正
+    unsigned int swap_time_modify;
+    // 配置项名称
+    char * swap_time_config_name;
+
     // 使用者事件通知响应函数
     // 可接受的事件包括：
     // 串口接收到新数据
