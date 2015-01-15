@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include "log.h"
 #include "config.h"
+#include "charge.h"
 
 int log_printf(unsigned int level, const char *fmt, ...)
 {
