@@ -172,3 +172,22 @@ INSERT INTO configs VALUES
 	'监控工厂编号',
 	'由生产部设置该值'
     );
+INSERT INTO configs VALUES
+    (
+	'core',
+	'core_simple_box_swap_time',
+	'INT',
+	'0',
+	'N/A',
+	'1000',
+	'0',
+	'0',
+	'0',
+	'false',
+	'false',
+	'0000-00-00 00:00:00',
+	'采样盒485通信收发转换时间修正',
+	'false',
+	'采样盒通信时间调整',
+	'解决485收发时间切换问题'
+    );
