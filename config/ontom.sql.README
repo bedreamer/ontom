@@ -1,0 +1,154 @@
+ontom.sql 的注解文件
+
+// 创建日志记录表
+CREATE TABLE log(
+	timestamp string, // 日志记录时间
+	logstring string  // 日志内容
+	);
+// 创建系统故障记录表
+CREATE TABLE errors(
+	error_seq_id unsigned int,  // 故障序列号
+	error_id string,	    // 故障ID
+	error_begin string,	    // 故障生成时间
+	error_recover string,	    // 故障恢复时间
+	recover_reason string,	    // 故障恢复原因
+	error_string string	    // 故障注解
+	);
+// 创建系统通用查询记录表
+CREATE TABLE configs(
+	config_attrib string,	    // 配置项属性（工厂配置项|系统配置项|用户配置项|信息|标志）
+	config_name string,	    // 配置项名称
+	config_type string,	    // 配置项数据类型（字符串|数字|选项|布尔）
+	config_value string,	    // 配置项当前值
+	config_options string,	    // 选项列表,用‘|’作为选项分隔符（针对选项有效）
+	config_value_max string,    // 配置项最大值(针对数字有效)
+	config_value_min string,    // 配置项最小值(针对数字有效)
+	config_value_default string,// 配置项默认值
+	config_value_pre string,    // 配置项前一次的值
+	config_writeable bool,	    // 配置项是否用户可写
+	config_readable bool,	    // 配置项用户是否可读
+	config_last_update string,  // 最后一次修改时间
+	config_comment string,	    // 配置项解释说明
+	config_dis bool,	    // 是否在配置页面中显示
+	config_dis_name string,	    // 配置项的显示名(在配置页面生效)
+	config_dis_comment string,  // 配置项的显示说明文字(在配置页面生效)
+	);
+INSERT INTO configs VALUES
+    (
+	'flag',			    // 属性为标记
+	'ontom_configured',	    // 系统已经经过配置了
+	'BOOL',			    // 布尔型
+	'false',		    // 当前值为false, 说明系统还没有被配置过，或被恢复出厂设置
+	'N/A',			    // 无效
+	'true',			    // 布尔型的最大值为1
+	'false',		    // 布尔型的最小值为0
+	'false',		    // 该值的默认值为false
+	'false',		    // 原来的配置值为false
+	'false',		    // 用户配置项不可写
+	'false',		    // 用户配置项不可读
+	'0000-00-00 00:00:00',	    // 最后一次的更新时间
+	'系统初次启动配置项',	    // 配置项说明
+	'false',		    // 该配置项不出现在配置页面
+	'N/A',			    // 该配置项不出现在配置页面
+	'N/A'			    // 该配置项不出现在配置页面
+    );
+INSERT INTO configs VALUES
+    (
+	'user',			    // 属性为用户配置项
+	'comm_methord_module',	    // 系统通信模型
+	'OPTION',		    // 选项型
+	'S-01',	    		    // 系统通信模型选项(S-01|M-01)
+	'S-01|M-01',		    // 选项列表，'|'为分隔符
+	'N/A',			    // 最大值无效
+	'N/A',			    // 最大值无效
+	'S-01',			    // 默认值为分体式通信
+	'S-01',			    // 前一次为分体式通信
+	'true',			    // 用户配置项可写
+	'true',			    // 用户配置项可读
+	'0000-00-00 00:00:00',	    // 最后一次的更新时间
+	'系统通信模型选择',	    // 配置项说明
+	'true',			    // 该项出现在配置页面
+	'系统通信模型',		    // 显示名
+	'一体式充电桩使用U-01(充电机[485], 后台[CAN]),'
+	'分体式充电桩选择S-01(充电机[485], 后台[集中器485])'
+				    // 显示说明
+    );
+INSERT INTO configs VALUES
+    (
+	'system',		    // 属性为系统配置项
+	'charge_module_nr',	    // 充电模块个数
+	'INT',			    // 数字型
+	'14',	    		    // 当前配置值
+	'N/A',			    // 选项列表无效
+	'14',			    // 最大值为14
+	'N/A',			    // 最小值为0
+	'14',			    // 默认值为14
+	'14',			    // 前一次为14
+	'true',			    // 用户配置项可写
+	'true',			    // 用户配置项可读
+	'0000-00-00 00:00:00',	    // 最后一次的更新时间
+	'充电模块个数',   	    // 配置项说明
+	'true',			    // 该项出现在配置页面
+	'充电模块个数',		    // 显示名
+	'用于配置单体充电机的个数，根据系统实际配置进行设置'
+				    // 显示说明
+    );
+INSERT INTO configs VALUES
+    (
+	'user',			    // 属性为用户配置项
+	'charge_pipe_sn',	    // 充电桩编号
+	'STRING',		    // 字符串型
+	'unset',	    	    // 当前配置值
+	'N/A',			    // 选项列表无效
+	'N/A',			    // 最大值无效
+	'N/A',			    // 最小值无效
+	'unset',		    // 默认值为unset
+	'unset',		    // 前一次为unset
+	'false',		    // 用户配置项不可写
+	'true',			    // 用户配置项可读
+	'0000-00-00 00:00:00',	    // 最后一次的更新时间
+	'用户配置充电桩编号',   	    // 配置项说明
+	'true',			    // 该项出现在配置页面
+	'充电桩编号',		    // 显示名
+	'用户配置根据自己的需求配置充电桩编号'
+				    // 显示说明
+    );
+INSERT INTO configs VALUES
+    (
+	'user',			    // 属性为用户配置项
+	'monitor_comm_addr',	    // 充电桩通信地址
+	'INT',			    // 数字型
+	'1',			    // 当前配置值
+	'N/A',			    // 选项列表无效
+	'65535',		    // 最大值65535
+	'1',			    // 最小值1
+	'1',			    // 默认值为1
+	'1',			    // 前一次为1
+	'true',			    // 用户配置项可写
+	'true',			    // 用户配置项可读
+	'0000-00-00 00:00:00',	    // 最后一次的更新时间
+	'充电桩通信地址',   	    // 配置项说明
+	'true',			    // 该项出现在配置页面
+	'监控通信地址',		    // 显示名
+	'用户配置根据自己的需求配置充电桩的通信地址'
+				    // 显示说明
+    );
+INSERT INTO configs VALUES
+    (
+	'factory',		    // 属性为工厂配置项
+	'pipe_hw_sn',		    // 充电桩出厂编号
+	'STRING',		    // 数字型
+	'unset',		    // 当前配置值
+	'N/A',			    // 选项列表无效
+	'N/A',			    // 最大值无效
+	'1',			    // 最小值无效
+	'unset',		    // 默认值为unset
+	'unset',		    // 前一次为unset
+	'false',		    // 用户配置项不可写
+	'true',			    // 用户配置项可读
+	'0000-00-00 00:00:00',	    // 最后一次的更新时间
+	'充电桩工厂序列号',   	    // 配置项说明
+	'true',			    // 该项出现在配置页面
+	'监控工厂编号',   	    // 显示名
+	'由生产部设置该值'	    // 显示说明
+    );
