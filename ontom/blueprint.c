@@ -1597,7 +1597,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
     // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
     if ( task->database != NULL ) {
-        for (;self && self->bp_evt_handle; self ++ ) {
+        for (;self && self->user_evt_handle; self ++ ) {
             char sql[128] = {0};
             char *errmsg = NULL;
             sprintf(sql,
