@@ -139,19 +139,10 @@ void sig_interrupt(int signo)
     if ( task && task->database ) {
         log_printf(WRN, "TOM: 捕捉到键盘CTRL+C信号, 进程即将中止, 开始保存重要数据...");
         char sql[128] = {0};
-        time_t timep;
-        struct tm *p;
-        time(&timep);
-        p =localtime(&timep);
+        char buff[32] = {0};
 
-        sprintf(sql,
-                "insert into log values('%04d-%02d-%02d %02d:%02d:%02d', '系统中止')",
-                p->tm_year + 1990,
-                p->tm_mon,
-                p->tm_mday,
-                p->tm_hour,
-                p->tm_min,
-                p->tm_sec);
+        __get_timestamp(buff);
+        sprintf(sql, "INSERT INTO log VALUES('%s', '系统中止')", buff);
         sqlite3_exec(task->database, sql, NULL, NULL, NULL);
         sqlite3_close(task->database);
     }
@@ -163,7 +154,7 @@ int sql_result(void *param, int nr, char **text, char **name)
     if ( nr > 0 && text ) {
         printf("[%s: %p:%p]\n", *text, text, name);
         task->err_seq_id_next = atoi(*text);
-        for ( ; text && name && *text && &name ; text ++ ) {
+        for ( ; text && name && *text && *name ; text ++ ) {
             printf("   %16s -- %16s\n", *text, *name);
         }
     } else {
@@ -191,31 +182,21 @@ int main()
         exit(1);
     } else {
         char sql[128] = {0};
-        time_t timep;
-        struct tm *p;
-        time(&timep);
-        p =localtime(&timep);
 
-        sprintf(sql,
-                "insert into log values('%04d-%02d-%02d %02d:%02d:%02d', '系统启动')",
-                p->tm_year + 1990,
-                p->tm_mon,
-                p->tm_mday,
-                p->tm_hour,
-                p->tm_min,
-                p->tm_sec);
+        __get_timestamp(buff);
+        sprintf(sql, "INSERT INTO log VALUES('%s', '系统启动')", buff);
         ret = sqlite3_exec(task->database, sql, NULL, NULL, &errmsg);
         if ( ret ) {
             log_printf(ERR, "TOM: SQL error: %s", errmsg);
         }
 
-        sprintf(sql, "select MAX(error_seq_id)+1 from errors");
+        sprintf(sql, "SELECT MAX(error_seq_id)+1 FROM errors");
         ret = sqlite3_exec(task->database, sql, sql_result, NULL, &errmsg);
         if ( ret ) {
             log_printf(ERR, "TOM: SQL error: %s", errmsg);
         }
 
-        sprintf(sql, "update errors set recover_reason='DISCARD' where recover_reason='ERROR'");
+        sprintf(sql, "UPDATE errors SET recover_reason='DISCARD' WHERE recover_reason='ERROR'");
         ret = sqlite3_exec(task->database, sql, NULL, NULL, &errmsg);
         if ( ret ) {
             log_printf(ERR, "TOM: SQL error: %s", errmsg);
