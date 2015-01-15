@@ -28,7 +28,7 @@ CREATE TABLE configs(
 	config_comment string,
 	config_dis bool,
 	config_dis_name string,
-	config_dis_comment string,
+	config_dis_comment string
 	);
 INSERT INTO configs VALUES
     (
