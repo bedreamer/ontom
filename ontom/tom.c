@@ -160,7 +160,7 @@ void sig_interrupt(int signo)
 
 int sql_result(void *param, int nr, char **text, char **name)
 {
-    if ( nr > 0 ) {
+    if ( nr > 0 && text ) {
         printf("[%s]\n", *text);
         task->err_seq_id_next = atoi(*text);
         for ( ; text && name && *text && &name ; text ++ ) {
@@ -182,6 +182,7 @@ int main()
     int thread_done[ 8 ] = {0};
     char buff[32];
     int errcode = 0, ret;
+    char *errmsg = NULL;
 
     signal(SIGINT, sig_interrupt);
 
@@ -204,13 +205,22 @@ int main()
                 p->tm_hour,
                 p->tm_min,
                 p->tm_sec);
-        sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+        ret = sqlite3_exec(task->database, sql, NULL, NULL, &errmsg);
+        if ( ret ) {
+            log_printf(ERR, "TOM: SQL error: %s", errmsg);
+        }
 
         sprintf(sql, "select MAX(error_seq_id)+1 from errors");
-        sqlite3_exec(task->database, sql, sql_result, NULL, NULL);
+        ret = sqlite3_exec(task->database, sql, sql_result, NULL, &errmsg);
+        if ( ret ) {
+            log_printf(ERR, "TOM: SQL error: %s", errmsg);
+        }
 
         sprintf(sql, "update errors set recover_reason='DISCARD' where recover_reason='ERROR'");
-        sqlite3_exec(task->database, sql, sql_result, NULL, NULL);
+        ret = sqlite3_exec(task->database, sql, NULL, NULL, &errmsg);
+        if ( ret ) {
+            log_printf(ERR, "TOM: SQL error: %s", errmsg);
+        }
     }
 
     task->err_head = NULL;
