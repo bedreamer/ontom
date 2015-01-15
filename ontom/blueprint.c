@@ -1601,7 +1601,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             char sql[128] = {0};
             char *errmsg = NULL;
             sprintf(sql,
-                    "SELECT config_value FROM config "
+                    "SELECT config_value FROM configs "
                     "   WHERE config_name='%s' AND "
                     "         config_attrib='core'",
                     self->swap_time_config_name);
