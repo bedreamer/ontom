@@ -1547,7 +1547,7 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
 {
     struct bp_user *self = (struct bp_user *)(param);
 
-    if (  nr <= ) {
+    if (  nr <= 0 ) {
         return 0;
     }
     do {
