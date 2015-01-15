@@ -1551,12 +1551,16 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
         return 0;
     }
     do {
-        int len = atoi(*text);
+        int len = atoi(text[0]);
         if ( len >= 0 ) {
             log_printf(INF, "UART: database init %s = %d",
                        self->swap_time_config_name,
                        len);
             self->swap_time_modify = len;
+        } else {
+            log_printf(WRN, "UART: dabase init exception %s = %d",
+                       self->swap_time_config_name,
+                       len);
         }
     } while (0);
 }
