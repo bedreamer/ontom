@@ -1,3 +1,28 @@
+CREATE TABLE user(
+	username string,
+	passwd string
+	);
+INSERT INTO user VALUES
+    (
+	'zeus',
+	'45c7c9ffa8c374942d62a80602cd2d07'
+    );
+INSERT INTO user VALUES
+    (
+	'manufacturer',
+	'415c92bb33c0496cf92dfc4a48b37bcd'
+    );
+INSERT INTO user VALUES
+    (
+	'system',
+	'ac7d6f1b636fafe1985f2be26d615189'
+    );
+INSERT INTO user VALUES
+    (
+	'user',
+	'9b1ce7dae449fe298abd224e2bab2888'
+    );
+
 CREATE TABLE log(
 	timestamp string,
 	logstring string
@@ -46,8 +71,8 @@ INSERT INTO configs VALUES
 	'0000-00-00 00:00:00',
 	'系统初次启动配置项',
 	'false',
-	'系统初始化标识',
-	'系统初始化完成后该值为true'
+	'N/A',
+	'N/A'
     );
 INSERT INTO configs VALUES
     (
@@ -55,7 +80,7 @@ INSERT INTO configs VALUES
 	'comm_methord_module',
 	'OPTION',
 	'S-01',
-	'S-01|M-01',
+	'S-01:M-01',
 	'N/A',
 	'N/A',
 	'S-01',
@@ -66,9 +91,7 @@ INSERT INTO configs VALUES
 	'系统通信模型选择',
 	'true',
 	'系统通信模型',
-	'一体式充电桩使用U-01(充电机[485], 后台[CAN]),
-	分体式充电桩选择S-01(充电机[485], 后台[集中器485])'
-
+	'一体式充电桩使用U-01(充电机[485], 后台[CAN]),分体式充电桩选择S-01(充电机[485], 后台[集中器485])'
     );
 INSERT INTO configs VALUES
     (

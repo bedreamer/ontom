@@ -1,5 +1,33 @@
-ontom.sql 的注解文件
-
+// ontom.sql 的注解文件
+// 创建操作用户
+CREATE TABLE user(
+	username string,	    // 用户(zeus|manufacturer|system|user)
+	passwd string		    // 用户密文
+	);
+INSERT INTO user VALUES
+    (
+	'zeus',				    // 超级用户名
+	'45c7c9ffa8c374942d62a80602cd2d07'  // 超级用户密文, 默认密码111111
+	// 密文加密方式：  md5 = md5( username + passwd )
+    );
+INSERT INTO user VALUES
+    (
+	'manufacturer',			    // 生产商用户名
+	'415c92bb33c0496cf92dfc4a48b37bcd'  // 生产商用户密文, 默认密码111111
+	// 密文加密方式：  md5 = md5( username + passwd )
+    );
+INSERT INTO user VALUES
+    (
+	'system',			    // 系统用户名
+	'ac7d6f1b636fafe1985f2be26d615189'  // 系统用户密文, 默认密码111111
+	// 密文加密方式：  md5 = md5( username + passwd )
+    );
+INSERT INTO user VALUES
+    (
+	'user',				    // 用户名
+	'9b1ce7dae449fe298abd224e2bab2888'  // 用户密文, 默认密码111111
+	// 密文加密方式：  md5 = md5( username + passwd )
+    );
 // 创建日志记录表
 CREATE TABLE log(
 	timestamp string, // 日志记录时间
@@ -16,11 +44,11 @@ CREATE TABLE errors(
 	);
 // 创建系统通用查询记录表
 CREATE TABLE configs(
-	config_attrib string,	    // 配置项属性（工厂配置项|系统配置项|用户配置项|信息|标志）
+	config_attrib string,	    // 配置项属性（工厂配置项|系统配置项|用户配置项|信息|标志|核心配置）
 	config_name string,	    // 配置项名称
 	config_type string,	    // 配置项数据类型（字符串|数字|选项|布尔）
 	config_value string,	    // 配置项当前值
-	config_options string,	    // 选项列表,用‘|’作为选项分隔符（针对选项有效）
+	config_options string,	    // 选项列表,用‘:’作为选项分隔符（针对选项有效）
 	config_value_max string,    // 配置项最大值(针对数字有效)
 	config_value_min string,    // 配置项最小值(针对数字有效)
 	config_value_default string,// 配置项默认值
@@ -31,7 +59,7 @@ CREATE TABLE configs(
 	config_comment string,	    // 配置项解释说明
 	config_dis bool,	    // 是否在配置页面中显示
 	config_dis_name string,	    // 配置项的显示名(在配置页面生效)
-	config_dis_comment string,  // 配置项的显示说明文字(在配置页面生效)
+	config_dis_comment string   // 配置项的显示说明文字(在配置页面生效)
 	);
 INSERT INTO configs VALUES
     (
@@ -57,8 +85,8 @@ INSERT INTO configs VALUES
 	'user',			    // 属性为用户配置项
 	'comm_methord_module',	    // 系统通信模型
 	'OPTION',		    // 选项型
-	'S-01',	    		    // 系统通信模型选项(S-01|M-01)
-	'S-01|M-01',		    // 选项列表，'|'为分隔符
+	'S-01',	    		    // 系统通信模型选项(S-01:M-01)
+	'S-01:M-01',		    // 选项列表，':'为分隔符
 	'N/A',			    // 最大值无效
 	'N/A',			    // 最大值无效
 	'S-01',			    // 默认值为分体式通信
@@ -69,8 +97,7 @@ INSERT INTO configs VALUES
 	'系统通信模型选择',	    // 配置项说明
 	'true',			    // 该项出现在配置页面
 	'系统通信模型',		    // 显示名
-	'一体式充电桩使用U-01(充电机[485], 后台[CAN]),'
-	'分体式充电桩选择S-01(充电机[485], 后台[集中器485])'
+	'一体式充电桩使用U-01(充电机[485], 后台[CAN]),分体式充电桩选择S-01(充电机[485], 后台[集中器485])'
 				    // 显示说明
     );
 INSERT INTO configs VALUES
