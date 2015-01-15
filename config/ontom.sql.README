@@ -35,7 +35,7 @@ CREATE TABLE log(
 	);
 // 创建系统故障记录表
 CREATE TABLE errors(
-	error_seq_id unsigned int,  // 故障序列号
+	error_seq_id string,	    // 故障序列号
 	error_id string,	    // 故障ID
 	error_begin string,	    // 故障生成时间
 	error_recover string,	    // 故障恢复时间
