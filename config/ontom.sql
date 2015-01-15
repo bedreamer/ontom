@@ -46,8 +46,8 @@ INSERT INTO configs VALUES
 	'0000-00-00 00:00:00',
 	'系统初次启动配置项',
 	'false',
-	'N/A',
-	'N/A'
+	'系统初始化标识',
+	'系统初始化完成后该值为true'
     );
 INSERT INTO configs VALUES
     (
