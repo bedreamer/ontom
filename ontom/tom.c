@@ -152,12 +152,12 @@ void sig_interrupt(int signo)
 int sql_result(void *param, int nr, char **text, char **name)
 {
     if ( nr > 0 && text ) {
-        printf("[%s: %p:%p]\n", *text, text, name);
-        task->err_seq_id_next = atoi(*text);
-/*        for ( ; text && name && *text && *name ; text ++ ) {
+        printf("[%d:%s: %p:%p]\n", nr, *text, text, name);
+        task->err_seq_id_next = atoi(text[0]);
+        for ( ; text && name && *text && *name ; text ++ ) {
             printf("   %16s -- %16s\n", *text, *name);
         }
-*/    } else {
+    } else {
         task->err_seq_id_next = 1;
     }
     return 0;
