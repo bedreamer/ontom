@@ -13,71 +13,41 @@ int log_printf(unsigned int level, const char *fmt, ...)
 	va_list ap;
     //char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
     const char *cfg;
-    time_t timep;
-    struct tm *p;
+    char timestamp[20] = {0};
 
 	va_start(ap, fmt);
+    __get_timestamp(timestamp);
 
     switch (level) {
     case INF:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
-        printf("\033[32m[INF@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[32m[INF@%u %s]\033[0m %s\n",
                (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                buff);
         break;
     case WRN:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
-        printf("\033[33m[WRN@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[33m[WRN@%u %s]\033[0m %s\n",
                (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                buff);
         break;
     case ERR:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
-        printf("\033[31m[ERR@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[31m[ERR@%u %s]\033[0m %s\n",
                (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                buff);
         break;
     case DBG:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
-        printf("\033[34m[DBG@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[34m[DBG@%u %s]\033[0m %s\n",
                (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                 buff);
         break;
     case DBG_LV0:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvA");
         if ( cfg == NULL ) return 1;
@@ -85,19 +55,12 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
         }
-        printf("\033[35m[DBG_LV0@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[35m[DBG_LV0@%u %s]\033[0m %s\n",
                (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                buff);
         break;
     case DBG_LV1:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvB");
         if ( cfg == NULL ) return 1;
@@ -105,19 +68,12 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
         }
-        printf("\033[35m[DBG_LV1@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[35m[DBG_LV1@%u %s]\033[0m %s\n",
                (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                buff);
         break;
     case DBG_LV2:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvC");
         if ( cfg == NULL ) return 1;
@@ -125,19 +81,12 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
         }
-        printf("\033[36m[DBG_LV2@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[36m[DBG_LV2@%u %s]\033[0m %s\n",
                (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                buff);
         break;
     case DBG_LV3:
-        time(&timep);
-        p =localtime(&timep);
         vsnprintf(buff, sizeof(buff), fmt, ap);
         cfg = config_read("debug_lvD");
         if ( cfg == NULL ) return 1;
@@ -145,14 +94,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
              strcmp(cfg, "FALSE") == 0 ) {
             return 1;
         }
-        printf("\033[36m[DBG_LV3@%u %04d-%02d-%02d %02d:%02d:%02d]\033[0m %s\n",
+        printf("\033[36m[DBG_LV3@%u %s]\033[0m %s\n",
               (unsigned int)pthread_self(),
-               p->tm_year + 1990,
-               p->tm_mon,
-               p->tm_mday,
-               p->tm_hour,
-               p->tm_min,
-               p->tm_sec,
+               timestamp,
                buff);
         break;
     default:

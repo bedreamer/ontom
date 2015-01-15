@@ -687,7 +687,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
     __get_timestamp(timestamp);
     strcpy(thiz->error_begin, timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
-    sprintf(sql, "insert into errors values('%d','E%04X','%s','%s','ERROR','%s')",
+    sprintf(sql, "INSERT INTO errors VALUES('%d','E%04X','%s','%s','ERROR','%s')",
             thiz->error_seqid,
             thiz->error_id,
             thiz->error_begin,
@@ -750,9 +750,9 @@ del:
     __get_timestamp(timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
     sprintf(sql,
-            "update errors set "
+            "UPDATE errors SET "
             "error_recover='%s',recover_reason='NORMAL' "
-            "where error_id='E%04X' AND error_begin='%s'",
+            "WHERE error_id='E%04X' AND error_begin='%s'",
             timestamp, thiz->error_id,
             thiz->error_begin);
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
