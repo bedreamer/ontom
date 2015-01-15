@@ -382,7 +382,7 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->charge_billing.mode = BILLING_MODE_AS_AUTO;
+        task->this_job->charge_billing.mode = BILLING_MODE_AS_AUTO;
         output_len += sprintf(&output[output_len], "</auto>\r\n");
     } else if ( 0 == strcmp("asmoney", mode) ) {
         output_len += sprintf(&output[output_len], "<asmoney>\r\n");
@@ -390,12 +390,12 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->charge_billing.mode = BILLING_MODE_AS_MONEY;
+        task->this_job->charge_billing.mode = BILLING_MODE_AS_MONEY;
         if ( mg_get_var(thiz->xml_conn, "money", themoney, 8) ) {
             double cash = atof(themoney);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( cash > 0.0f && cash < 999.99f ) {
-                task->charge_billing.option.set_money = cash;
+                task->this_job->charge_billing.option.set_money = cash;
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>yes</param_accept>\r\n");
             } else {
@@ -418,12 +418,12 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->charge_billing.mode = BILLING_MODE_AS_TIME;
+        task->this_job->charge_billing.mode = BILLING_MODE_AS_TIME;
         if ( mg_get_var(thiz->xml_conn, "time", thetime, 8) ) {
             unsigned int minits = atoi(thetime);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( minits > 0 && minits <= 600 ) {
-                task->charge_billing.option.set_time = minits;
+                task->this_job->charge_billing.option.set_time = minits;
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>yes</param_accept>\r\n");
             } else {
@@ -445,12 +445,12 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->charge_billing.mode = BILLING_MODE_AS_CAP;
+        task->this_job->charge_billing.mode = BILLING_MODE_AS_CAP;
         if ( mg_get_var(thiz->xml_conn, "cap", thecap, 8) ) {
             unsigned int caps = atoi(thecap);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( caps > 0 && caps <= 100 ) {
-                task->charge_billing.option.set_cap = caps;
+                task->this_job->charge_billing.option.set_cap = caps;
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>yes</param_accept>\r\n");
             } else {
