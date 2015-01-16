@@ -269,10 +269,10 @@ void uarts_async_sigio(int param)
 static inline void __dump_uart_hex(char *hex, int len, int lv)
 {
     char buff[512] = {0};
-    int i = 0 ,l = 0;
+    int i = 0 ,l = 0, j =0;
 
     while ( i < len) {
-        if ( i % 20 == 0 && i )
+        if ( j ++ < 21 )
             l += sprintf(&buff[l], "%02X\n", hex[i++]);
         else
             l += sprintf(&buff[l], "%02X ", hex[i++]);
