@@ -84,6 +84,8 @@ struct bp_user up_user[] = {
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options={0};
+    char dbg[256] = 0;
+    int l = 0;
 
     bzero(&options, sizeof(options));
     if (tcgetattr(fd, &options) != 0) {
@@ -98,23 +100,28 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
         default:
         case 7:
             options.c_cflag |= CS7;
+            l += sprintf(&dbg[l], "[数据位: 7 bits]");
             break;
         case 8:
             options.c_cflag |= CS8;
+            l += sprintf(&dbg[l], "[数据位: 8 bits]");
             break;
     }
     switch (stopbits) {
         default:
         case 1:
             options.c_cflag &= ~CSTOPB;
+            l += sprintf(&dbg[l], "[停止位: 1 bit]");
             break;
         case 2:
             options.c_cflag |= CSTOPB;
+            l += sprintf(&dbg[l], "[停止位: 2 bits]");
             break;
     }
     switch (parity) {
         case 'n':
         case 'N':
+            l += sprintf(&dbg[l], "[无校验]");
             options.c_cflag &= ~PARENB;   /* Clear parity enable */
             break;
         case 'o':
@@ -148,6 +155,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
         perror("SetupSerial 3");
         return ERR_UART_CONFIG_FAILE;
     }
+    log_printf(INF, "%s:{%d, %s}", dbg);
     return ERR_OK;
 }
 
