@@ -20,7 +20,9 @@ typedef enum {
     // 一次性的
     HACHIKO_ONECE     = 0x40,
     // 自动循环定时器
-    HACHIKO_AUTO_FEED = 0x80
+    HACHIKO_AUTO_FEED = 0x80,
+    // 自动保持定时器
+    HACHIKO_AUTO_HOLD = 0x20
 }Hachiko_Type;
 
 typedef enum {

@@ -487,7 +487,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->sequce = 10;
         self->continues_nr = 0;
 
-        ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
+        ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_HOLD,
                      500, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart reciever's timer faile.");

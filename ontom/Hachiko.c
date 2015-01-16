@@ -53,7 +53,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
             //continue;
         }
         if ( pool[i]->status == HACHIKO_PAUSE ) {
-            Hachiko_feed(pool[i]);
+            //Hachiko_feed(pool[i]);
             continue;
         }
 
@@ -74,6 +74,9 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
                 pool[i] = NULL;
                 refresh ++;
                 log_printf(DBG_LV3, "HACHIKO: watch dog die.");
+                continue;
+            }
+            if ( pool[i]->type == HACHIKO_AUTO_HOLD ) {
                 continue;
             }
         }
