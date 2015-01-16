@@ -84,7 +84,7 @@ struct bp_user up_user[] = {
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options={0};
-    char dbg[256] = 0;
+    char dbg[256] = {0};
     int l = 0;
 
     bzero(&options, sizeof(options));
