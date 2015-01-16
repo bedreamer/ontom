@@ -1558,11 +1558,14 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     struct bp_user *self = &down_user[0];
     int retval, max_handle = 0;
     size_t cursor;
+    fd_set rfds;
+    struct timeval tv ;
 
     if ( done == NULL ) done = &mydone;
-
+    tv.tv_sec = 2;
+    tv.tv_usec = 0;
     memset(uarts, 0, sizeof(uarts));
-
+    FD_ZERO(&rfds);
     uarts[0].bp_evt_handle = uart4_bp_evt_handle;
     uarts[0].dev_handle = -1;
     uarts[0].dev_name = "/dev/ttyO5";
@@ -1639,6 +1642,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
+            FD_SET(thiz->dev_handle, &rfds);
             if ( thiz->status != BP_UART_STAT_RD &&
                  thiz->status != BP_UART_STAT_WR ) {
                 // 默认采用被动方式
@@ -1707,6 +1711,12 @@ ___fast_switch_2_rx:
             do {
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
+                if ( !FD_ISSET(thiz->dev_handle, &rfds ) ) {
+                    usleep(2000);
+                    continue;
+                }
+                FD_ZERO(&rfds);
+                FD_SET(thiz->dev_handle, &rfds);
                 rd = read(thiz->dev_handle,
                           &thiz->rx_param.buff.rx_buff[cursor], 32);
                 if ( rd > 0 ) {
