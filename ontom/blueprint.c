@@ -412,27 +412,6 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
 
     if ( self == p ) {
         Hachiko_pause(&thiz->rx_seed);
-        if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
-            log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
-                       thiz->rx_param.need_bytes,
-                        thiz->rx_param.payload_size);
-        } else {
-            log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
-                       thiz->rx_param.need_bytes,
-                        thiz->rx_param.payload_size/*,
-                       thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
-                    thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
-                    load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
-            __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
-        }
-        if ( thiz->rx_param.payload_size == 0 ) {
-            thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
-        } else if ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
-            thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
-        } else {
-            // all thing is ok.
-        }
-        thiz->status = BP_UART_STAT_WR;
         return;
     }
 
@@ -899,7 +878,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
         self->rx_param.need_bytes = 105;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
 
-        ret = ERR_ERR;
+        ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
@@ -1005,7 +984,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         buff[nr ++] = load_crc(s, (char*)buff) >> 8;
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
-        ret = ERR_ERR;
+        ret = ERR_OK;
 
         self->rx_param.need_bytes = 8;
         self->master->time_to_send = param->payload_size * 1000 / 960;
@@ -1586,7 +1565,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->rx_param.need_bytes = 32;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
-        ret = ERR_ERR;
+        ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
     // 串口发送确认
@@ -1927,6 +1906,29 @@ ___fast_switch_2_rx:
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
+            if ( ! thiz->rx_seed.remain ) {
+                if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
+                    log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
+                               thiz->rx_param.need_bytes,
+                                thiz->rx_param.payload_size);
+                } else {
+                    log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
+                               thiz->rx_param.need_bytes,
+                                thiz->rx_param.payload_size/*,
+                               thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
+                            thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
+                            load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
+                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
+                }
+                if ( thiz->rx_param.payload_size == 0 ) {
+                    thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
+                } else if ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
+                    thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
+                } else {
+                    // all thing is ok.
+                }
+                thiz->status = BP_UART_STAT_WR;
+            }
             continue;
         }
 
