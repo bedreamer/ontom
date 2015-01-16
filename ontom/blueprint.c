@@ -1832,7 +1832,8 @@ ___fast_switch_2_rx:
             thiz->tx_param.payload_size = 0;
             thiz->tx_param.cursor = 0;
 
-            if ( thiz->rx_seed.remain ) {
+            if ( thiz->rx_param.payload_size >=
+                 thiz->rx_param.need_bytes ) {
                 // 前一次接收没有超时，减缓节奏
                 log_printf(INF, "UART: 前一次通信正常.");
                 usleep(600 * 1000);
