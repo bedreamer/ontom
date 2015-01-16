@@ -804,13 +804,13 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
         buff[2] = 0x00;
         buff[3] = 0x00;
         buff[4] = 0x00;
-        buff[5] = 0x16;
-        buff[6] = 0x71;
-        buff[7] = 0xC4;
+        buff[5] = 0x32;
+        buff[6] = load_crc(6, buff);
+        buff[7] = load_crc(6, buff) >>8;
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
 
         param->payload_size = sizeof(buff);
-        self->rx_param.need_bytes = 49;
+        self->rx_param.need_bytes = 105;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
 
         ret = ERR_OK;
@@ -890,13 +890,13 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
         buff[2] = 0x00;
         buff[3] = 0x32;
         buff[4] = 0x00;
-        buff[5] = 0x16;
-        buff[6] = 0xD0;
-        buff[7] = 0x0B;
+        buff[5] = 0x32;
+        buff[6] = load_crc(6, buff);
+        buff[7] = load_crc(6, buff) >>8;
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
 
         param->payload_size = sizeof(buff);
-        self->rx_param.need_bytes = 49;
+        self->rx_param.need_bytes = 105;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
 
         ret = ERR_ERR;
