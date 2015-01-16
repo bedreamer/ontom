@@ -1671,8 +1671,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 max_handle = thiz->dev_handle;
             }
 
-            log_printf(INF, "UART: open UART %d:%s correct.",
-                       thiz->dev_handle, thiz->dev_name);
+            log_printf(INF, "UART: open UART %d:%s correct(%X).",
+                       thiz->dev_handle, thiz->dev_name, thiz->status);
             continue;
         }
 
