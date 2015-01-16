@@ -1772,7 +1772,7 @@ ___fast_switch_2_rx:
                 }
 #endif
                 //一个帧接收4次
-                usleep((thiz->rx_param.need_bytes / 2) * 1000);
+                usleep(2000);
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
