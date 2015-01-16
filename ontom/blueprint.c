@@ -1809,12 +1809,8 @@ ___fast_switch_2_rx:
             thiz->tx_param.payload_size = 0;
             thiz->tx_param.cursor = 0;
 
-            if ( thiz->rx_param.payload_size >=
-                 thiz->rx_param.need_bytes ) {
-                // 前一次接收没有超时，减缓节奏
-                usleep(600 * 1000);
-            } else {
-            }
+            usleep(400 * 1000);
+
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
             if ( ret != ERR_OK || thiz->tx_param.payload_size <= 0 ||
