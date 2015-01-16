@@ -94,7 +94,6 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
     }
     cfsetispeed(&options, B19200);
     cfsetospeed(&options, B19200);
-    options.c_cflag |= (CLOCAL|CREAD);
 
     switch (databits) {
         default:
