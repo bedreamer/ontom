@@ -389,7 +389,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->continues_nr = 0;
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_FEED,
-                     2000, HACHIKO_PAUSE, (void*)self);
+                     500, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart reciever's timer faile.");
         }
@@ -1700,6 +1700,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
          * 超时计时器，反之需要设定超时计时器来确定能否在指定时间内收到完整
          * 的数据帧。
          */
+___fast_switch_2_rx:
         if ( thiz->status == BP_UART_STAT_RD ) {
             char *buff = thiz->rx_param.buff.rx_buff;
             int rd = 0;
@@ -1793,7 +1794,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                             thiz->rx_param.payload_size);
                 }
 #endif
-                usleep(1000);
+                usleep(2000);
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
@@ -1904,6 +1905,7 @@ continue_to_send:
                     // 主动设备，需要进行接收超时判定
                     Hachiko_resume(&thiz->rx_seed);
                 }
+                goto ___fast_switch_2_rx;
 #endif
             } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送了一部分
