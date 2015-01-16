@@ -155,7 +155,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
         perror("SetupSerial 3");
         return ERR_UART_CONFIG_FAILE;
     }
-    log_printf(INF, "%s:{%d, %s}", dbg);
+    log_printf(INF, "%d:{%d, %s}", fd, baud_rate, dbg);
     return ERR_OK;
 }
 
