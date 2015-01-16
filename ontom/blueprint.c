@@ -118,8 +118,8 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
             break;
     }
     switch (parity) {
-        case 'n':
-        case 'N':
+        case 's':
+        case 'S':
             l += sprintf(&dbg[l], "[无校验]");
             options.c_cflag &= ~PARENB;   /* Clear parity enable */
             break;
@@ -135,8 +135,8 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
             options.c_cflag &= ~PARODD;     /* 转换为偶效验*/
             break;
         default:
-        case 'S':
-        case 's':  /*as no parity*/
+        case 'n':
+        case 'N':  /*as no parity*/
         case 0:
             options.c_cflag &= ~PARENB;
             options.c_cflag &= ~CSTOPB;
@@ -149,13 +149,142 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
 
     options.c_cc[VTIME] = 0;
     options.c_cc[VMIN] = 0;
-    tcflush(fd,TCIFLUSH);
+    tcflush(fd,TCIOFLUSH);
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
         return ERR_UART_CONFIG_FAILE;
     }
     log_printf(INF, "%d:{%d, %s}", fd, baud_rate, dbg);
     return ERR_OK;
+}
+int set_speed(int fd, int speed)
+{
+    int   i;
+    int   status;
+    struct termios   Opt;
+
+    tcgetattr(fd, &Opt);
+
+    for ( i= 0;  i < sizeof(speed_arr) / sizeof(int);  i++)
+    {
+        if (speed == name_arr[i])
+        {
+            tcflush(fd, TCIOFLUSH);
+            cfsetispeed(&Opt, speed_arr[i]);
+            cfsetospeed(&Opt, speed_arr[i]);
+            status = tcsetattr(fd, TCSANOW, &Opt);
+            if  (status != 0)
+            {
+                perror("tcsetattr fd");
+                return -1;
+            }
+            tcflush(fd,TCIOFLUSH);
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int set_other_attribute(int fd, int databits, int stopbits, int parity)
+{
+    struct termios options;
+
+    if (tcgetattr(fd, &options) != 0)
+    {
+        perror("SetupSerial 1");
+        return -1;
+    }
+
+    options.c_cflag &= ~CSIZE;
+
+    switch (databits)
+    {
+        case 7:
+            options.c_cflag |= CS7;
+            break;
+
+        case 8:
+            options.c_cflag |= CS8;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported data size\n");
+            return -1;
+    }
+
+    switch (parity)
+    {
+        case 'n':
+        case 'N':
+            options.c_cflag &= ~PARENB;   /* Clear parity enable */
+            options.c_iflag &= ~INPCK;     /* Enable parity checking */
+            break;
+
+        case 'o':
+        case 'O':
+        case 1:
+            options.c_cflag |= (PARODD | PARENB);
+            options.c_iflag |= INPCK;             /* Disnable parity checking */
+            break;
+
+        case 'e':
+        case 'E':
+        case 2:
+            options.c_cflag |= PARENB;     /* Enable parity */
+            options.c_cflag &= ~PARODD;
+            options.c_iflag |= INPCK;      /* Disnable parity checking */
+            break;
+
+        case 'S':
+        case 's':  /*as no parity*/
+        case 0:
+            options.c_cflag &= ~PARENB;
+            options.c_cflag &= ~CSTOPB;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported parity\n");
+            return -1;
+    }
+
+    switch (stopbits)
+    {
+        case 1:
+            options.c_cflag &= ~CSTOPB;
+            break;
+
+        case 2:
+            options.c_cflag |= CSTOPB;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported stop bits\n");
+            return -1;
+    }
+
+    /* Set input parity option */
+    if (parity != 'n')
+        options.c_iflag |= INPCK;
+
+    //options.c_cflag   |= CRTSCTS;
+    options.c_iflag &=~(IXON | IXOFF | IXANY);
+    options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    //options.c_lflag |= ISIG;
+
+    tcflush(fd,TCIFLUSH);
+    options.c_oflag = 0;
+    //options.c_lflag = 0;
+    options.c_cc[VTIME] = 15; 						// delay 15 seconds
+    options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
+
+if (tcsetattr(fd,TCSANOW,&options) != 0)
+    {
+        perror("SetupSerial 3");
+        return -1;
+    }
+
+    return 0;
 }
 
 /********************************************************
@@ -417,11 +546,16 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                     "UART: set uart to async mode failed!!! errno: %d", errno);
         }
 #endif
+#if 0
         ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
         if ( ret == (int)ERR_UART_CONFIG_FAILE ) {
             log_printf(ERR, "UART: configure uart faile.");
             return ERR_UART_CONFIG_FAILE;
         }
+#else
+        set_speed(self->dev_handle, B9600);
+        set_other_attribute(self->dev_handle, 8, 1, 0);
+#endif
         self->status = BP_UART_STAT_WR;
         self->hw_status = BP_UART_STAT_INVALID;
 
