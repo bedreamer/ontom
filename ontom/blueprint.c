@@ -91,6 +91,9 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
         perror("SetupSerial 1");
         return ERR_UART_CONFIG_FAILE;
     }
+    cfsetispeed(&options, B9600);
+    cfsetospeed(&options, B9600);
+    options.c_cflag |= (CLOCAL|CREAD);
 
     switch (databits) {
         default:
@@ -134,17 +137,14 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
             options.c_cflag &= ~CSTOPB;
             break;
     }
-
-    options.c_cc[VTIME] =	0;
-    options.c_cc[VMIN] = 0;
-    options.c_cflag  |=   (CLOCAL|CREAD);
-    options.c_oflag  &=	~OPOST;
-    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
     options.c_cflag &= ~CSIZE;
-    cfsetispeed(&options, baud_rate);
-    cfsetospeed(&options, baud_rate);
+
+    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    options.c_oflag &= ~OPOST;
+
+    options.c_cc[VTIME] = 0;
+    options.c_cc[VMIN] = 0;
     tcflush(fd,TCIFLUSH);
-    tcflush(fd,TCOFLUSH);
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
         return ERR_UART_CONFIG_FAILE;
