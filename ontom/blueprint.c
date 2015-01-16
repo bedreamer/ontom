@@ -272,7 +272,7 @@ static inline void __dump_uart_hex(char *hex, int len, int lv)
     int i = 0 ,l = 0;
 
     while ( i < len) {
-        l += sprintf(buff[l], "%02X ", hex[i++]);
+        l += sprintf(&buff[l], "%02X ", hex[i++]);
     }
 
     log_printf(lv, "UART: %s", buff);
