@@ -266,6 +266,18 @@ void uarts_async_sigio(int param)
 #endif
 }
 
+static inline void __dump_uart_hex(char *buff, int len, int lv)
+{
+    char buff[1024] = {0};
+    int i = 0 ,l = 0;
+
+    while ( i < len) {
+        l += sprintf(buff[l], "%02X ", buff[i++]);
+    }
+
+    log_printf(lv, "UART: %s", buff);
+}
+
 // 串口4的超时响应
 void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
@@ -289,21 +301,7 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
                        thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
                     thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
                     load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
-            log_printf(DBG_LV1,
-                       "UART: RD:<"
-                       "%02X %02X %02X %02X %02X %02X %02X %02X "
-                       "%02X %02X %02X %02X %02X %02X %02X %02X "
-                       "%02X %02X %02X %02X>",
-                       thiz->rx_param.buff.rx_buff[0], thiz->rx_param.buff.rx_buff[1],
-                       thiz->rx_param.buff.rx_buff[2], thiz->rx_param.buff.rx_buff[3],
-                       thiz->rx_param.buff.rx_buff[4], thiz->rx_param.buff.rx_buff[5],
-                       thiz->rx_param.buff.rx_buff[6], thiz->rx_param.buff.rx_buff[7],
-                       thiz->rx_param.buff.rx_buff[0+8], thiz->rx_param.buff.rx_buff[1+8],
-                       thiz->rx_param.buff.rx_buff[2+8], thiz->rx_param.buff.rx_buff[3+8],
-                       thiz->rx_param.buff.rx_buff[4+8], thiz->rx_param.buff.rx_buff[5+8],
-                       thiz->rx_param.buff.rx_buff[6+8], thiz->rx_param.buff.rx_buff[7+8],
-                       thiz->rx_param.buff.rx_buff[8+8], thiz->rx_param.buff.rx_buff[9+8],
-                       thiz->rx_param.buff.rx_buff[10+8], thiz->rx_param.buff.rx_buff[11+8]);
+            __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
         }
         if ( thiz->rx_param.payload_size == 0 ) {
             thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
@@ -1565,7 +1563,6 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
     } while (0);
 }
 
-
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
@@ -1728,23 +1725,13 @@ ___fast_switch_2_rx:
                     thiz->rx_param.payload_size += rd;
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
-                    log_printf(DBG_LV1,
-                               "UART: RD:%d:%d:%d <"
-                               "%02X %02X %02X %02X %02X %02X %02X %02X "
-                               "%02X %02X %02X %02X %02X %02X %02X %02X "
-                               "%02X %02X %02X %02X>",
-                               rd, nr, cursor,
-                               buff[0 + cursor], buff[1 + cursor], buff[2 + cursor], buff[3 + cursor],
-                               buff[4 + cursor], buff[5 + cursor], buff[6 + cursor], buff[7 + cursor],
-                               buff[0+8 + cursor], buff[1+8 + cursor], buff[2+8 + cursor], buff[3+8 + cursor],
-                               buff[4+8 + cursor], buff[5+8 + cursor], buff[6+8 + cursor], buff[7+8 + cursor],
-                               buff[8+8 + cursor], buff[9+8 + cursor], buff[10+8 + cursor], buff[11+8 + cursor]);
                 }
                 ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
                                           &thiz->rx_param);
                 switch ( ret ) {
                 // 数据接收，校验完成, 完成数据接收过程，停止接收
                 case ERR_OK:
+                    __dump_uart_hex(buff, nr, INF);
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
                     log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
@@ -1767,6 +1754,7 @@ ___fast_switch_2_rx:
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
+                    __dump_uart_hex(buff, nr, WRN);
                     thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
                                                               &thiz->rx_param);
                     //thiz->master->check_err_cnt ++;
