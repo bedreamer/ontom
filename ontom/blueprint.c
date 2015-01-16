@@ -86,6 +86,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
     struct termios options={0};
     int   status;
 
+    bzero(&newtio, sizeof(newtio));
     if (tcgetattr(fd, &options) != 0) {
         perror("SetupSerial 1");
         return ERR_UART_CONFIG_FAILE;
@@ -100,7 +101,15 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
             options.c_cflag |= CS8;
             break;
     }
-
+    switch (stopbits) {
+        default:
+        case 1:
+            options.c_cflag &= ~CSTOPB;
+            break;
+        case 2:
+            options.c_cflag |= CSTOPB;
+            break;
+    }
     switch (parity) {
         case 'n':
         case 'N':
@@ -123,16 +132,6 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
         case 0:
             options.c_cflag &= ~PARENB;
             options.c_cflag &= ~CSTOPB;
-            break;
-    }
-
-    switch (stopbits) {
-        default:
-        case 1:
-            options.c_cflag &= ~CSTOPB;
-            break;
-        case 2:
-            options.c_cflag |= CSTOPB;
             break;
     }
 
