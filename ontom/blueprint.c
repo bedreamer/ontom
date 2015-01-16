@@ -268,7 +268,7 @@ void uarts_async_sigio(int param)
 
 static inline void __dump_uart_hex(char *hex, int len, int lv)
 {
-    char buff[1024] = {0};
+    char buff[512] = {0};
     int i = 0 ,l = 0;
 
     while ( i < len) {
