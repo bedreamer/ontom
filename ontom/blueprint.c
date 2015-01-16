@@ -1823,10 +1823,8 @@ ___fast_switch_2_rx:
             if ( thiz->rx_param.payload_size >=
                  thiz->rx_param.need_bytes ) {
                 // 前一次接收没有超时，减缓节奏
-                log_printf(INF, "UART: 前一次通信正常.");
                 usleep(600 * 1000);
             } else {
-                log_printf(WRN, "UART: "YEL("前一次通信超时."));
             }
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
