@@ -877,7 +877,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, BP_UART_EVENT e
         buff[nr ++] = load_crc(s, (char*)buff) >> 8;
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
-        ret = ERR_OK;
+        ret = ERR_ERR;
 
         self->rx_param.need_bytes = 8;
         self->master->time_to_send = param->payload_size * 1000 / 960;
@@ -1458,7 +1458,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         self->rx_param.need_bytes = 32;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
-        ret = ERR_OK;
+        ret = ERR_ERR;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
     // 串口发送确认
