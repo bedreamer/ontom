@@ -90,7 +90,6 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
         perror("SetupSerial 1");
         return ERR_UART_CONFIG_FAILE;
     }
-    options.c_cflag &= ~CSIZE;
 
     switch (databits) {
         default:
@@ -106,20 +105,17 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
         case 'n':
         case 'N':
             options.c_cflag &= ~PARENB;   /* Clear parity enable */
-            options.c_iflag &= ~INPCK;     /* Enable parity checking */
             break;
         case 'o':
         case 'O':
         case 1:
-            options.c_cflag |= (PARODD | PARENB);
-            options.c_iflag |= INPCK;             /* Disnable parity checking */
+            options.c_cflag |= (PARODD | PARENB);/* 设置为奇效验*/
             break;
         case 'e':
         case 'E':
         case 2:
             options.c_cflag |= PARENB;     /* Enable parity */
-            options.c_cflag &= ~PARODD;
-            options.c_iflag |= INPCK;      /* Disnable parity checking */
+            options.c_cflag &= ~PARODD;     /* 转换为偶效验*/
             break;
         default:
         case 'S':
@@ -144,7 +140,8 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
     options.c_cc[VMIN] = 0;
     options.c_cflag  |=   (CLOCAL|CREAD);
     options.c_oflag  &=	~OPOST;
-    options.c_iflag  &=~(IXON|IXOFF|IXANY);
+    newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    options.c_cflag &= ~CSIZE;
     cfsetispeed(&options, baud_rate);
     cfsetospeed(&options, baud_rate);
     tcflush(fd,TCIFLUSH);
