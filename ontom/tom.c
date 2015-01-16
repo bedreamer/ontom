@@ -142,7 +142,7 @@ void sig_interrupt(int signo)
         char buff[32] = {0};
 
         __get_timestamp(buff);
-        sprintf(sql, "INSERT INTO log VALUES('%s', '系统中止')", buff);
+        sprintf(sql, "INSERT INTO log VALUES('%s', '系统中止 CTRL+C')", buff);
         sqlite3_exec(task->database, sql, NULL, NULL, NULL);
         sqlite3_close(task->database);
     }
