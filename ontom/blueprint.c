@@ -84,7 +84,6 @@ struct bp_user up_user[] = {
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options={0};
-    int   status;
 
     bzero(&options, sizeof(options));
     if (tcgetattr(fd, &options) != 0) {
@@ -755,7 +754,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
         self->rx_param.need_bytes = 49;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
 
-        ret = ERR_OK;
+        ret = ERR_ERR;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
