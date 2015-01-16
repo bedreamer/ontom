@@ -664,7 +664,7 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
         buff[2] = 0x00;
         buff[3] = 0x00;
         buff[4] = 0x00;
-        buff[5] = 0x32;
+        buff[5] = 0x16;
         buff[6] = 0x71;
         buff[7] = 0xC4;
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
