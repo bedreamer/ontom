@@ -83,18 +83,8 @@ struct bp_user up_user[] = {
 
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
-    struct termios options;
+    struct termios options={0};
     int   status;
-
-    if (tcgetattr(fd, &options) != 0) {
-        perror("SetupSerial 1");
-        return ERR_UART_CONFIG_FAILE;
-    }
-
-    tcflush(fd, TCIOFLUSH);
-    cfsetispeed(&options, baud_rate);
-    cfsetospeed(&options, baud_rate);
-    status = tcsetattr(fd, TCSANOW, &options);
 
     if (tcgetattr(fd, &options) != 0) {
         perror("SetupSerial 1");
@@ -150,28 +140,19 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
             break;
     }
 
-    /* Set input parity option */
-    if (parity != 'n')
-        options.c_iflag |= INPCK;
-
-    //options.c_cflag   |= CRTSCTS;
-    options.c_iflag &=~(IXON | IXOFF | IXANY);
-    options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    //options.c_lflag |= ISIG;
-
+    options.c_cc[VTIME] =	0;
+    options.c_cc[VMIN] = 0;
+    options.c_cflag  |=   (CLOCAL|CREAD);
+    options.c_oflag  |=	OPOST;
+    options.c_iflag  &=~(IXON|IXOFF|IXANY);
+    cfsetispeed(&options, baud_rate);
+    cfsetospeed(&options, baud_rate);
     tcflush(fd,TCIFLUSH);
     tcflush(fd,TCOFLUSH);
-    options.c_oflag = 0;
-    //options.c_lflag = 0;
-    options.c_cc[VTIME] = 0; 						// delay 15 seconds
-    options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
-
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
         return ERR_UART_CONFIG_FAILE;
     }
-
     return ERR_OK;
 }
 
