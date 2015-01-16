@@ -266,13 +266,13 @@ void uarts_async_sigio(int param)
 #endif
 }
 
-static inline void __dump_uart_hex(char *buff, int len, int lv)
+static inline void __dump_uart_hex(char *hex, int len, int lv)
 {
     char buff[1024] = {0};
     int i = 0 ,l = 0;
 
     while ( i < len) {
-        l += sprintf(buff[l], "%02X ", buff[i++]);
+        l += sprintf(buff[l], "%02X ", hex[i++]);
     }
 
     log_printf(lv, "UART: %s", buff);
