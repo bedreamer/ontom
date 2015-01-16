@@ -86,7 +86,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
     struct termios options={0};
     int   status;
 
-    bzero(&newtio, sizeof(newtio));
+    bzero(&options, sizeof(options));
     if (tcgetattr(fd, &options) != 0) {
         perror("SetupSerial 1");
         return ERR_UART_CONFIG_FAILE;
