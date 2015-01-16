@@ -1710,13 +1710,13 @@ ___fast_switch_2_rx:
 
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 errno = 0;
+                tcflush(thiz->dev_handle, TCIFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
                 nr = 0;
                 memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
-                tcflush(thiz->dev_handle, TCIFLUSH);
                 log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
@@ -1800,9 +1800,9 @@ ___fast_switch_2_rx:
         if ( thiz->status == BP_UART_STAT_WR ) {
 
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 tcflush(thiz->dev_handle, TCOFLUSH);
                 tcflush(thiz->dev_handle, TCIFLUSH);
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
                 log_printf(DBG_LV0, "UART: switch to TX mode.");
