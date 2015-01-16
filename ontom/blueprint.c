@@ -1709,13 +1709,13 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     FD_ZERO(&rfds);
     uarts[0].bp_evt_handle = uart4_bp_evt_handle;
     uarts[0].dev_handle = -1;
-    uarts[0].dev_name = "/dev/ttyO5";
-    uarts[0].hw_port = SERIAL5_CTRL_PIN;
+    uarts[0].dev_name = "/dev/ttyO4";
+    uarts[0].hw_port = SERIAL4_CTRL_PIN;
 
     uarts[1].bp_evt_handle = NULL;
     uarts[1].dev_handle = -1;
-    uarts[1].dev_name = "/dev/ttyO4";
-    uarts[1].hw_port = SERIAL4_CTRL_PIN;
+    uarts[1].dev_name = "/dev/ttyO5";
+    uarts[1].hw_port = SERIAL5_CTRL_PIN;
 
     if ( thiz ) {
         // 出错误后尝试的次数
