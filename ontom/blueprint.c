@@ -257,7 +257,7 @@ static inline void __dump_uart_hex(char *hex, int len, int lv)
         }
     }
 
-    log_printf(lv, "UART: \n%s", buff);
+    log_printf(lv, "UART:%d \n%s", len, buff);
 }
 
 // 串口4的超时响应
