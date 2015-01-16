@@ -1838,7 +1838,7 @@ ___fast_switch_2_rx:
                 log_printf(INF, "UART: 前一次通信正常.");
                 usleep(600 * 1000);
             } else {
-                log_printf(WRN, "UART: 前一次通信超时.");
+                log_printf(WRN, "UART: "YEL("前一次通信超时."));
             }
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
