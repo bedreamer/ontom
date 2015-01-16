@@ -162,6 +162,10 @@ int set_speed(int fd, int speed)
     int   i;
     int   status;
     struct termios   Opt;
+    int speed_arr[] = {B230400, B115200, B57600, B38400, B19200, \
+                            B9600, B4800, B2400, B1800, B1200, B600, B300};
+    int name_arr[]  = {230400,  115200,  57600,  38400,  19200,  \
+                            9600,  4800,  2400,  1800,  1200,  600,  300};
 
     tcgetattr(fd, &Opt);
 
