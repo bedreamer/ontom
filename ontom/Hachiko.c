@@ -50,7 +50,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
         if ( pool[i]->status == HACHIKO_RESUME ) {
             Hachiko_feed(pool[i]);
             pool[i]->status = HACHIKO_NORMAL;
-            continue;
+            //continue;
         }
         if ( pool[i]->status == HACHIKO_PAUSE ) {
             Hachiko_feed(pool[i]);
