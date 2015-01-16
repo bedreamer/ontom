@@ -140,7 +140,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
     options.c_cc[VMIN] = 0;
     options.c_cflag  |=   (CLOCAL|CREAD);
     options.c_oflag  &=	~OPOST;
-    newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
     options.c_cflag &= ~CSIZE;
     cfsetispeed(&options, baud_rate);
     cfsetospeed(&options, baud_rate);
