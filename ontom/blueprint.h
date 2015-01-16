@@ -192,6 +192,8 @@ struct bp_uart {
     volatile BP_UART_STAT status;
     // 硬件状态,仅针对RS485有效
     volatile BP_UART_STAT hw_status;
+    // 作为485串口时的收发转换端口
+    unsigned int hw_port;
 
     // 初始化标识
     unsigned int init_magic;

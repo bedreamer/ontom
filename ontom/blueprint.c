@@ -419,7 +419,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 串口配置
     case BP_EVT_CONFIGURE:
-        gpio_export(SERIAL4_CTRL_PIN);
+        gpio_export(self->hw_port);
         self->dev_handle = open(self->dev_name,
                                 O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
         if ( self->dev_handle == -1 ) {
@@ -446,7 +446,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 关闭串口
     case BP_EVT_KILLED:
-        gpio_unexport(SERIAL4_CTRL_PIN);
+        gpio_unexport(self->hw_port);
         close(self->dev_handle);
         break;
     // 串口数据帧校验
@@ -458,7 +458,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
-        ret = set_gpio_output(SERIAL4_CTRL_PIN, TX_HIGH_LEVEL);
+        ret = set_gpio_output(self->hw_port, TX_HIGH_LEVEL);
         if ( self->master ) {
             //self->master->seed = 0;
         }
@@ -469,7 +469,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
-        ret = set_gpio_output(SERIAL4_CTRL_PIN, RX_LOW_LEVEL);
+        ret = set_gpio_output(self->hw_port, RX_LOW_LEVEL);
         if ( self->master ) {
             //self->master->seed = 0;
         }
@@ -1584,10 +1584,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     uarts[0].bp_evt_handle = uart4_bp_evt_handle;
     uarts[0].dev_handle = -1;
     uarts[0].dev_name = "/dev/ttyO4";
+    uarts[0].hw_port = SERIAL4_CTRL_PIN;
 
     uarts[1].bp_evt_handle = NULL;
     uarts[1].dev_handle = -1;
     uarts[1].dev_name = "/dev/ttyO5";
+    uarts[1].hw_port = SERIAL5_CTRL_PIN;
 
     if ( thiz ) {
         // 出错误后尝试的次数
