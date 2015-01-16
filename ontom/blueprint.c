@@ -161,6 +161,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
     //options.c_lflag |= ISIG;
 
     tcflush(fd,TCIFLUSH);
+    tcflush(fd,TCOFLUSH);
     options.c_oflag = 0;
     //options.c_lflag = 0;
     options.c_cc[VTIME] = 0; 						// delay 15 seconds
