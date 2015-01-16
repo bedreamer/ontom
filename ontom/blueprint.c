@@ -273,10 +273,10 @@ static inline void __dump_uart_hex(char *hex, int len, int lv)
 
     while ( i < len) {
         if ( j ++ < 21 )
-            l += sprintf(&buff[l], "%02X\n", hex[i++]);
-        else {
             l += sprintf(&buff[l], "%02X ", hex[i++]);
+        else {
             j = 0;
+            l += sprintf(&buff[l], "%02X\n", hex[i++]);
         }
     }
 
