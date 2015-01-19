@@ -139,6 +139,26 @@ struct socket_config_ack {
 /*套接字配置服务程序*/
 void *config_drive_service(void *arg);
 
+// 数据库配置结构
+struct db_config_struct {
+    char * config_attrib ;	    // 配置项属性（工厂配置项|系统配置项|用户配置项|信息|标志|核心配置）
+    char * config_name ;         // 配置项名称
+    char * config_type ;         // 配置项数据类型（字符串|数字|选项|布尔）
+    char * config_value ;	    // 配置项当前值
+    char * config_options ;	    // 选项列表,用‘:’作为选项分隔符（针对选项有效）
+    char * config_value_max ;    // 配置项最大值(针对数字有效)
+    char * config_value_min ;    // 配置项最小值(针对数字有效)
+    char * config_value_default ;// 配置项默认值
+    char * config_value_pre ;    // 配置项前一次的值
+    bool   config_writeable ;    // 配置项是否用户可写
+    bool   config_readable ;	    // 配置项用户是否可读
+    char * config_last_update ;  // 最后一次修改时间
+    char * config_comment ;	    // 配置项解释说明
+    bool   config_dis ;            // 是否在配置页面中显示
+    char * config_dis_name ;	    // 配置项的显示名(在配置页面生效)
+    char * config_dis_comment ;   // 配置项的显示说明文字(在配置页面生效)
+};
+
 #if CONFIG_DEBUG_CONFIG >= 1
 /*打印配置数据*/
 void config_print();

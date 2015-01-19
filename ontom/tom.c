@@ -166,6 +166,29 @@ int sql_result(void *param, int nr, char **text, char **name)
     return 0;
 }
 
+int sql_db_config_result(void *param, int nr, char **text, char **name)
+{
+    int i;
+    if ( nr > 0 && text ) {
+        if ( text[0] ) {
+            log_printf(INF, "TOM: SQL init err_seq=%s", text[0]);
+            task->err_seq_id_next = atoi(text[0]);
+
+            for ( i = 0; i < nr; i ++ ) {
+                printf("%s", text[i]);
+            }
+
+        } else {
+            printf("[%d==>%d:%s<=>%s: %p:%p]\n",
+                   nr, task->err_seq_id_next,
+                   text[0], name[0], text, name);
+        }
+    } else {
+        task->err_seq_id_next = 1;
+    }
+    return 0;
+}
+
 int main()
 {
     const char *user_cfg = NULL;
@@ -195,6 +218,12 @@ int main()
 
         sprintf(sql, "SELECT MAX(error_seq_id)+1 FROM errors");
         ret = sqlite3_exec(task->database, sql, sql_result, NULL, &errmsg);
+        if ( ret ) {
+            log_printf(ERR, "TOM: SQL error: %s", errmsg);
+        }
+
+        sprintf(sql, "SELECT * FROM configs");
+        ret = sqlite3_exec(task->database, sql, sql_db_config_result, NULL, &errmsg);
         if ( ret ) {
             log_printf(ERR, "TOM: SQL error: %s", errmsg);
         }
