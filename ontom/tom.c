@@ -310,7 +310,7 @@ int main()
         goto die;
     }
     log_printf(INF, "mongoose service start up.                         DONE.");
-
+#if 0
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & tid, &attr, thread_bms_write_service,
                           &thread_done[1]);
@@ -332,7 +332,7 @@ int main()
         goto die;
     }
     log_printf(INF, "CAN-BUS writer start up.                           DONE.");
-
+#endif
     // 串口服务线程，和读卡器，采样盒，电能表进行数据交换，测量
     ret = pthread_create( & tid, &attr, thread_measure_service, &thread_done[3]);
     if ( 0 != ret ) {

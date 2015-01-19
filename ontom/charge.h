@@ -440,12 +440,93 @@ typedef enum {
     JOB_DETACHING
 }JOBSTATUS;
 
+// 充电计费方式
+struct billing_methord {
+    // 计费方式
+    BILLING_MODE mode;
+    union {
+        // 设定充电金额, 0 - 9999
+        double set_money;
+        // 设定充电时长, 0 - 600
+        unsigned int set_time;
+        // 设定充电目标容量, 0 - 100
+        unsigned int set_cap;
+    }option;
+};
+
+// 通信管理单元状态
+typedef enum {
+    // 管理但愿正在初始化
+    COMM_M_INIT = 0,
+    // 管理单元正在执行
+    COMM_M_WORKING = 1,
+    // 管理单元正在停止
+    COMM_M_STOPPING = 2,
+    // 管理单元已经终止
+    COMM_M_DIED = 3
+}COMM_M_STRUCT_STATUS;
+
+// BMS 通讯管理描述结构，JOB的下属成员结构
+struct bms_struct {
+    COMM_M_STRUCT_STATUS status;
+    // 充电作业所处阶段,BMS 链接阶段
+    CHARGE_STAGE charge_stage;
+
+    // BMS通讯设备名, "can1|can2"
+    char *can_dev;
+    // BMS写初始化完成
+    int bms_write_init_ok;
+    // BMS读初始化完成
+    int bms_read_init_ok;
+    // CAN BMS 通信所处状态
+    CAN_BMS_STATUS can_bms_status;
+    // 连接管理的传输控制参数
+    struct can_tp_param can_tp_param;
+    // 连接管理超时控制器
+    struct Hachiko_food can_tp_bomb;
+    // 连接超时参数组状态
+    struct PRIVATE_STATUS can_tp_private_status;
+    // CAN数据包心跳时钟
+    struct Hachiko_food can_heart_beat;
+
+    // 车辆基本信息
+    struct pgn512_BRM  vehicle_info;
+    // BMS充电配置信息
+    struct pgn1536_BCP bms_config_info;
+    // BMS当前充电需求信息
+    struct pgn4096_BCL bms_charge_need_now;
+    // BMS 电池充电总状态信息
+    struct pgn4352_BCS bms_all_battery_status;
+    // BMS 动力蓄电池状态信息
+    struct pgn4864_BSM bms_battery_status;
+
+    struct can_pack_generator generator[8];
+    struct bms_statistics statistics[20];
+};
+
+// 采样盒 通讯管理描述结构，JOB的下属成员结构
+struct measure_struct {
+    COMM_M_STRUCT_STATUS status;
+    // 扩展测量值
+    struct MDATA_ACK measure;
+    // 前一次测量拷贝值
+    struct MDATA_ACK measure_pre_copy;
+    struct charge_ex_measure *ex_measure;
+    // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
+    time_t pre_stamp_ex_measure;
+};
+
+// 充电机 通讯管理描述结构，JOB的下属成员结构
+struct charger_struct {
+    COMM_M_STRUCT_STATUS status;
+    // 充电屏信息
+    struct charger_config_10h chargers;
+};
+
 /*
  * 充电作业描述，充电管理的最小单位
  */
 struct charge_job {
-    // 充电作业所处阶段,BMS 链接阶段
-    CHARGE_STAGE charge_stage;
     //  作业状态
     JOBSTATUS job_status;
     // 产生故障时的状
@@ -454,6 +535,8 @@ struct charge_job {
     unsigned int job_sn;
     // 作业充电枪
     CHARGE_GUN_SN job_gun_sn;
+    // 通信CAN名称
+    char job_can_dev_name[32];
     // 充电起始时戳， 闭合充电开关的那一刻
     time_t charge_begin_timestamp;
     // 充电结束时戳， 断开充电开关的那一刻
@@ -464,30 +547,20 @@ struct charge_job {
     time_t charge_bms_establish_timestamp;
 
     // 充电计费方式
-    struct {
-        // 计费方式
-        BILLING_MODE mode;
-        union {
-            // 设定充电金额, 0 - 9999
-            double set_money;
-            // 设定充电时长, 0 - 600
-            unsigned int set_time;
-            // 设定充电目标容量, 0 - 100
-            unsigned int set_cap;
-        }option;
-    }charge_billing;
+    struct billing_methord charge_billing;
 
     // 刷卡状态
     struct user_card card;
-    // CAN BMS 通信所处状态
-    CAN_BMS_STATUS can_bms_status;
 
-    // BMS写初始化完成
-    int bms_write_init_ok;
-    // BMS读初始化完成
-    int bms_read_init_ok;
     // 结构体引用计数
     unsigned int ref_nr;
+
+    // BMS 管理模块
+    struct bms_struct bms;
+    // 采样单元管理模块
+    struct measure_struct measure;
+    // 充电机管理模块
+    struct charger_struct charger;
 };
 
 // 故障恢复原因
@@ -520,7 +593,7 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string);
 void error_history_recover(unsigned int error_id);
 
 /*
- * 充电任务描述
+ * 充电任务描述, 详细描述了系统的配置参数
  */
 struct charge_task {
     // 任务状态
@@ -544,51 +617,6 @@ struct charge_task {
     unsigned int nr_jobs;
     // 当前进行的充电工作
     struct charge_job *this_job;
-
-    // 扩展测量值
-    struct MDATA_ACK measure;
-    // 前一次测量拷贝值
-    struct MDATA_ACK measure_pre_copy;
-    struct charge_ex_measure *ex_measure;
-    // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
-    time_t pre_stamp_ex_measure;
-    // 充电屏信息
-    struct charger_config_10h chargers;
-
-    // CAN 通信输入缓冲区
-    unsigned char can_buff_in[CAN_BUFF_SIZE];
-    volatile unsigned int can_buff_in_nr;
-    unsigned int can_packet_pgn;
-    // CAN 通信输出缓冲区
-    unsigned char can_buff_out[CAN_BUFF_SIZE];
-    volatile unsigned int can_buff_out_nr;
-    // 标识CAN写缓冲是否满，若缓冲区满，则CAN线程向外写出数据, 写完后置0
-    volatile unsigned int can_buff_out_magic;
-
-    // 连接管理时的输出数据包
-    unsigned char can_tp_buff_tx[8];
-    // 连接管理时的输出数据包大小
-    unsigned int can_tp_buff_nr;
-
-    // 连接管理的传输控制参数
-    struct can_tp_param can_tp_param;
-
-    // 连接管理超时控制器
-    struct Hachiko_food can_tp_bomb;
-    struct Hachiko_CNA_TP_private can_tp_private;
-    // CAN数据包心跳
-    struct Hachiko_food can_heart_beat;
-
-    // 车辆基本信息
-    struct pgn512_BRM  vehicle_info;
-    // BMS充电配置信息
-    struct pgn1536_BCP bms_config_info;
-    // BMS当前充电需求信息
-    struct pgn4096_BCL bms_charge_need_now;
-    // BMS 电池充电总状态信息
-    struct pgn4352_BCS bms_all_battery_status;
-    // BMS 动力蓄电池状态信息
-    struct pgn4864_BSM bms_battery_status;
 
     // 当前故障列表
     pthread_mutex_t err_list_lck;
