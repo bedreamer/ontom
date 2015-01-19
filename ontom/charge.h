@@ -494,7 +494,7 @@ struct bms_struct {
     // 连接管理超时控制器
     struct Hachiko_food can_tp_bomb;
     // 连接超时参数组状态
-    struct PRIVATE_STATUS can_tp_private_status;
+    PRIVATE_STATUS can_tp_private_status;
     // CAN数据包心跳时钟
     struct Hachiko_food can_heart_beat;
 
