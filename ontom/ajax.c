@@ -177,48 +177,6 @@ static inline int xml_gen_system_error(char *buff)
     } else return 0;
 #endif
 
-    // 优先级较高的故障必须放置在前面进行判断
-    // 绝缘故障
-    if ( err_cnt < MAX_ERR && task->measure.yx_bat_I_high ) {
-        sprintf(errbuff, "<e%d>电池绝缘故障</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-    // 电池反接故障
-    if ( err_cnt < MAX_ERR && task->measure.yx_bat_revers_conn ) {
-        sprintf(errbuff, "<e%d>电池反接故障</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-    // 电池连接短路
-    if ( err_cnt < MAX_ERR && task->measure.yx_bat_short_fault ) {
-        sprintf(errbuff, "<e%d>电池连接短路</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-    // 母线电压过高
-    if ( err_cnt < MAX_ERR && task->measure.yx_mx_V_high ) {
-        sprintf(errbuff, "<e%d>母线电压过高</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-    // 母线欠压故障
-    if ( err_cnt < MAX_ERR && task->measure.yx_mx_V_low ) {
-        sprintf(errbuff, "<e%d>母线欠压故障</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-    // 母线电流过高
-    if ( err_cnt < MAX_ERR && task->measure.yx_bat_I_high ) {
-        sprintf(errbuff, "<e%d>电池电流过高</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-    // 电池电压过高
-    if ( err_cnt < MAX_ERR && task->measure.yx_bat_V_high ) {
-        sprintf(errbuff, "<e%d>电池电流过高</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-    // 电池电压过低
-    if ( err_cnt < MAX_ERR && task->measure.yx_bat_V_low ) {
-        sprintf(errbuff, "<e%d>电池电流过高</e%d>\r\n", err_cnt, err_cnt);
-        err_cnt ++;
-    }
-
     if ( err_cnt ) {
     return sprintf(buff, "<error>\r\n"
                   "<total>"
