@@ -498,9 +498,9 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
                     config_read("triger_card_sn"),
                     config_read("confirm_card_sn"),
                     config_read("settle_card_sn"));
-     } else if (task->charge_task_stat== CHARGE_STAT_CHARGING) {
+     } else if (task->charge_task_stat == CHARGE_STAT_CHARGING) {
          // 正在充电，手动终止充电
-         task->charge_task_stat == CHARGE_STAT_ABORT;
+         task->charge_task_stat = CHARGE_STAT_ABORT;
          log_printf(INF, "AJAX: 手动中止充电.");
      } else if (task->charge_task_stat == CHARGE_STAT_DONE) {
          // 充电正常结束，刷卡完成付款
