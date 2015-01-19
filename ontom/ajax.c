@@ -7,6 +7,7 @@
 #include "error.h"
 #include "log.h"
 #include "charge.h"
+#include "Hachiko.h"
 #include "../thirdpart/mongoose/mongoose.h"
 
 // 生成xml文件，并返回文件大小，头部由调用者生成
