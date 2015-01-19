@@ -496,7 +496,7 @@ typedef enum {
 }CAN_PGN_STATISTICS;
 
 
-int about_packet_reciev_done(charge_job *thiz, struct event_struct *param);
+int about_packet_reciev_done(struct charge_job *thiz, struct event_struct *param);
 int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param);
 int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param);
 int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param);
