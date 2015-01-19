@@ -223,6 +223,15 @@ struct bms_statistics statistics[] = {
     .can_counter = 0
     }
 };
+int about_packet_reciev_done(struct charge_job *thiz, struct event_struct *param);
+int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN7936(struct charge_job * thiz, struct event_struct* param);
 
 // 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
 void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
