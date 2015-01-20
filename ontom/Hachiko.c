@@ -23,7 +23,7 @@ struct Hachiko_food *pool[NR_POOL] = {NULL};
  *
  * 按照设定的分辨率，定时进入该过程完成，相应条件的判定和处理
  */
-static void Hachiko_wangwang(int sig, int *si, void *uc)
+static void Hachiko_wangwang(int sig, siginfo_t *si, void *_uc)
 {
     unsigned int i, refresh = 0;
 
