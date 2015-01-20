@@ -554,22 +554,26 @@ struct charge_job {
     time_t charge_implemention_timestamp;
     // BMS握手成功的时戳, 接收到第一次BRM的时刻
     time_t charge_bms_establish_timestamp;
-
-    // 充电计费方式
-    struct billing_methord charge_billing;
-
-    // 刷卡状态
-    struct user_card card;
-
     // 结构体引用计数
     unsigned int ref_nr;
 
+    // 充电计费方式
+    struct billing_methord charge_billing;
+    // 刷卡状态
+    struct user_card card;
     // BMS 管理模块
     struct bms_struct bms;
     // 采样单元管理模块
     struct measure_struct measure;
     // 充电机管理模块
     struct charger_struct chargers;
+
+    // 系统信号, 最多支持64 * 8 种信号标记
+    // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
+    // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
+    volatile unsigned char single[64];
+    // 系统前一次信号状态，用来做状态跳变比较
+    volatile unsigned char pre_single[64];
 };
 
 // 故障恢复原因
@@ -607,14 +611,6 @@ void error_history_recover(unsigned int error_id);
 struct charge_task {
     // 任务状态
     CHARGE_TASK_STAT charge_task_stat;
-
-    // 系统信号, 最多支持64 * 8 种信号标记
-    // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
-    // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
-    volatile unsigned char single[64];
-    // 系统前一次信号状态，用来做状态跳变比较
-    volatile unsigned char pre_single[64];
-
     // 已经编译为多线程安全模式，所以不用加锁
     sqlite3 *database;
 
