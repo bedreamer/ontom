@@ -1212,7 +1212,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         memcpy(&self->job->measure.measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
         // 故障判定
         me = &self->job->measure.measure;
-        me_pre = &self->job->measur;
+        me_pre = &self->job->measure;
         if ( me->yx_mx_V_high ) {
             len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
             bit_set(task, S_BUS_V_HI);
