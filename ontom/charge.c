@@ -534,7 +534,7 @@ void deal_with_job_business(struct charge_task *thiz)
                 }
             }
         }
-        if ( ! bit_read(task, F_BMS_RECOGNIZED) ) {
+        if ( ! bit_read(thiz->this_job, F_BMS_RECOGNIZED) ) {
             break;
         }
         if ( ! bit_read(thiz->this_job, F_SYSTEM_CHARGE_ALLOW) ) {
