@@ -624,6 +624,8 @@ struct charge_task {
     unsigned int nr_jobs;
     // 当前进行的充电工作
     struct charge_job *this_job;
+    // 空闲作业
+    struct charge_job idle;
 
     // 共计两个串口
     struct bp_uart uarts[2];
@@ -857,16 +859,16 @@ static inline unsigned short swap_hi_lo_bytes(unsigned short b)
 
 static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_task *thiz)
 {
-    if ( ! thiz->this_job ) return GUN_INVALID;
-    if ( thiz->this_job->job_gun_sn == GUN_SN0 ) {
-        if ( bit_read(thiz->this_job, F_GUN_1_PHY_CONN_STATUS) ) {
+    if ( ! thiz->this_job[0] ) return GUN_INVALID;
+    if ( thiz->this_job[0]->job_gun_sn == GUN_SN0 ) {
+        if ( bit_read(thiz->this_job[0], F_GUN_1_PHY_CONN_STATUS) ) {
             return GUN_SN0;
         } else return GUN_INVALID;
-    } else if ( thiz->this_job->job_gun_sn == GUN_SN1 ) {
-        if ( bit_read(thiz->this_job, F_GUN_2_PHY_CONN_STATUS) ) {
+    } else if ( thiz->this_job[0]->job_gun_sn == GUN_SN1 ) {
+        if ( bit_read(thiz->this_job[0], F_GUN_2_PHY_CONN_STATUS) ) {
             return GUN_SN1;
         } else return GUN_INVALID;
-    } else if ( thiz->this_job->job_gun_sn == GUN_UNDEFINE ) {
+    } else if ( thiz->this_job[0]->job_gun_sn == GUN_UNDEFINE ) {
         return GUN_UNDEFINE;
     } else {
         return GUN_INVALID;

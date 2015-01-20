@@ -331,7 +331,7 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->this_job->charge_billing.mode = BILLING_MODE_AS_AUTO;
+        task->this_job[0]->charge_billing.mode = BILLING_MODE_AS_AUTO;
         output_len += sprintf(&output[output_len], "</auto>\r\n");
     } else if ( 0 == strcmp("asmoney", mode) ) {
         output_len += sprintf(&output[output_len], "<asmoney>\r\n");
@@ -339,12 +339,12 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->this_job->charge_billing.mode = BILLING_MODE_AS_MONEY;
+        task->this_job[0]->charge_billing.mode = BILLING_MODE_AS_MONEY;
         if ( mg_get_var(thiz->xml_conn, "money", themoney, 8) ) {
             double cash = atof(themoney);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( cash > 0.0f && cash < 999.99f ) {
-                task->this_job->charge_billing.option.set_money = cash;
+                task->this_job[0]->charge_billing.option.set_money = cash;
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>yes</param_accept>\r\n");
             } else {
@@ -367,12 +367,12 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->this_job->charge_billing.mode = BILLING_MODE_AS_TIME;
+        task->this_job[0]->charge_billing.mode = BILLING_MODE_AS_TIME;
         if ( mg_get_var(thiz->xml_conn, "time", thetime, 8) ) {
             unsigned int minits = atoi(thetime);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( minits > 0 && minits <= 600 ) {
-                task->this_job->charge_billing.option.set_time = minits;
+                task->this_job[0]->charge_billing.option.set_time = minits;
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>yes</param_accept>\r\n");
             } else {
@@ -394,12 +394,12 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
         output_len += xml_gen_confirm_card(&output[output_len]);
         output_len += xml_gen_settle_card(&output[output_len]);
 
-        task->this_job->charge_billing.mode = BILLING_MODE_AS_CAP;
+        task->this_job[0]->charge_billing.mode = BILLING_MODE_AS_CAP;
         if ( mg_get_var(thiz->xml_conn, "cap", thecap, 8) ) {
             unsigned int caps = atoi(thecap);
             // 已经刷过卡了，现在做参数检查，直到参数检查成功
             if ( caps > 0 && caps <= 100 ) {
-                task->this_job->charge_billing.option.set_cap = caps;
+                task->this_job[0]->charge_billing.option.set_cap = caps;
                 output_len += sprintf(&output[output_len],
                                       "<param_accept>yes</param_accept>\r\n");
             } else {
@@ -681,20 +681,20 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     int ret = ERR_ERR, i = S_ERROR;
     char buff[32] = "";
     thiz->ct = "application/json";
-    //if ( task->this_job == NULL ) {
-    task->this_job = & task->jobs[0];
-    task->this_job->job_status = JOB_STANDBY;
+    //if ( task->this_job[0] == NULL ) {
+    task->this_job[0] = & task->jobs[0];
+    task->this_job[0]->job_status = JOB_STANDBY;
     ret = ERR_OK;
     thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
             "\"jobs\":{\"nr\":1}");
     for (; i < S_ERR_END; i ++) {
-        if ( bit_read(task->this_job, i) ) {
+        if ( bit_read(task->this_job[0], i) ) {
             sprintf(buff, "E%04X", i);
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "%s ", config_read(buff));
         }
     }
-    task->this_job->job_gun_sn = GUN_SN0;
+    task->this_job[0]->job_gun_sn = GUN_SN0;
    // }
     return ret;
 }
@@ -726,7 +726,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 1;
     thiz->iobuff[0] = 'A';
-    bit_set(task->this_job, CMD_JOB_ABORT);
+    bit_set(task->this_job[0], CMD_JOB_ABORT);
     return ret;
 }
 
@@ -736,7 +736,7 @@ int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 1;
     thiz->iobuff[0] = 'P';
-    bit_set(task->this_job, CMD_JOB_MAN_PAUSE);
+    bit_set(task->this_job[0], CMD_JOB_MAN_PAUSE);
     return ret;
 }
 
@@ -746,7 +746,7 @@ int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 1;
     thiz->iobuff[0] = 'R';
-    bit_clr(task->this_job, CMD_JOB_MAN_PAUSE);
+    bit_clr(task->this_job[0], CMD_JOB_MAN_PAUSE);
     return ret;
 }
 
@@ -762,7 +762,7 @@ int ajax_debug_bit_read(struct ajax_xml_struct *thiz)
     if ( index >=0 && index < FLAG_END ) {
         for (i=0;i<512;i++)
          thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "%d", bit_read(task->this_job, i));
+            "%d", bit_read(task->this_job[0], i));
     } else {
         ret = ERR_ERR;
     }
@@ -782,16 +782,16 @@ int ajax_debug_bit_write(struct ajax_xml_struct *thiz)
     index = atoi(var);
     if ( index >=0 && index < FLAG_END ) {
         if ( val[0] == '0' ) {
-            bit_clr(task->this_job, index);
+            bit_clr(task->this_job[0], index);
         } else if ( val[0] == '1') {
-            bit_set(task->this_job, index);
+            bit_set(task->this_job[0], index);
         }
     } else {
         ret =  ERR_ERR;
     }
 
     thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
-            "%d", bit_read(task->this_job, index));
+            "%d", bit_read(task->this_job[0], index));
     return ret;
 }
 

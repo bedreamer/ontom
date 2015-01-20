@@ -1487,43 +1487,40 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             cmd &= ~GUN2_ASSIT_PWN_ON;
         }
 #endif
-        if ( task->this_job == NULL ) {
-            cmd = 0;
+
+        if ( self->job->job_gun_sn == GUN_SN0 ) {
+            if ( bit_read(self->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
+                cmd |= GUN1_ASSIT_PWN_ON;
+                cmd &= ~GUN2_ASSIT_PWN_ON;
+            } else {
+                cmd &= ~GUN1_ASSIT_PWN_ON;
+            }
+            if ( bit_read(self->job, CMD_GUN_1_OUTPUT_ON) ) {
+                cmd |= GUN1_OUTPUT_ON;
+                cmd &= ~GUN2_OUTPUT_ON;
+            } else {
+                cmd &= ~GUN1_OUTPUT_ON;
+            }
+        } else if  ( self->job->job_gun_sn == GUN_SN1 ) {
+            if ( bit_read(self->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
+                cmd |= GUN2_ASSIT_PWN_ON;
+                cmd &= ~GUN1_ASSIT_PWN_ON;
+            } else {
+                cmd &= ~GUN2_ASSIT_PWN_ON;
+            }
+            if ( bit_read(self->job, CMD_GUN_1_OUTPUT_ON) ) {
+                cmd |= GUN2_OUTPUT_ON;
+                cmd &= ~GUN1_OUTPUT_ON;
+            } else {
+                cmd &= ~GUN2_OUTPUT_ON;
+            }
         } else {
-            if ( task->this_job->job_gun_sn == GUN_SN0 ) {
-                if ( bit_read(self->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
-                    cmd |= GUN1_ASSIT_PWN_ON;
-                    cmd &= ~GUN2_ASSIT_PWN_ON;
-                } else {
-                    cmd &= ~GUN1_ASSIT_PWN_ON;
-                }
-                if ( bit_read(self->job, CMD_GUN_1_OUTPUT_ON) ) {
-                    cmd |= GUN1_OUTPUT_ON;
-                    cmd &= ~GUN2_OUTPUT_ON;
-                } else {
-                    cmd &= ~GUN1_OUTPUT_ON;
-                }
-            } else if  ( task->this_job->job_gun_sn == GUN_SN1 ) {
-                if ( bit_read(self->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
-                    cmd |= GUN2_ASSIT_PWN_ON;
-                    cmd &= ~GUN1_ASSIT_PWN_ON;
-                } else {
-                    cmd &= ~GUN2_ASSIT_PWN_ON;
-                }
-                if ( bit_read(self->job, CMD_GUN_1_OUTPUT_ON) ) {
-                    cmd |= GUN2_OUTPUT_ON;
-                    cmd &= ~GUN1_OUTPUT_ON;
-                } else {
-                    cmd &= ~GUN2_OUTPUT_ON;
-                }
-            } else {
-                cmd = 0;
-            }
-            if ( bit_read(self->job, CMD_DC_OUTPUT_SWITCH_ON) ) {
-                cmd |= DC_SWITCH_ON;
-            } else {
-                cmd &= ~DC_SWITCH_ON;
-            }
+            cmd = 0;
+        }
+        if ( bit_read(self->job, CMD_DC_OUTPUT_SWITCH_ON) ) {
+            cmd |= DC_SWITCH_ON;
+        } else {
+            cmd &= ~DC_SWITCH_ON;
         }
 
        // if ( bit_read(task, ))

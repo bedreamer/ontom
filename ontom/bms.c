@@ -227,7 +227,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
         for ( i = 0;
               (unsigned int)i < sizeof(thiz->bms.generator) / sizeof(struct can_pack_generator); i++ ) {
             gen = & thiz->bms.generator[i];
-            if ( task->this_job && gen->stage == thiz->bms.charge_stage ) {
+            if ( task->this_job[0] && gen->stage == thiz->bms.charge_stage ) {
                 if ( gen->heartbeat < gen->period ) {
                     //thiz->heartbeat += 10;
                     gen->heartbeat += 1;
