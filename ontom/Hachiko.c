@@ -15,8 +15,7 @@
 #define SIG SIGRTMIN
 #define NR_POOL 32
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                       } while (0)
+#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); } while (0)
 struct Hachiko_food *pool[NR_POOL] = {NULL};
 
 /*
@@ -24,7 +23,7 @@ struct Hachiko_food *pool[NR_POOL] = {NULL};
  *
  * 按照设定的分辨率，定时进入该过程完成，相应条件的判定和处理
  */
-static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
+static void Hachiko_wangwang(int sig, int *si, void *uc)
 {
     unsigned int i, refresh = 0;
 
@@ -72,8 +71,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
                 continue;
             }
         }
-        pool[i]->Hachiko_notify_proc(HACHIKO_ROLLING,
-                                     pool[i]->private, pool[i]);
+        pool[i]->Hachiko_notify_proc(HACHIKO_ROLLING, pool[i]->private, pool[i]);
     }
     if ( 0 == refresh ) return;
 }
