@@ -46,7 +46,7 @@ struct bp_uart uarts[2];
 
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
-    struct termios options={0};
+    struct termios options;
     char dbg[256] = {0};
     int l = 0;
 
@@ -122,7 +122,7 @@ int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity
 }
 int set_speed(int fd, int speed)
 {
-    int   i;
+    unsigned int   i;
     int   status;
     struct termios   Opt;
     int speed_arr[] = {B230400, B115200, B57600, B38400, B19200, \
@@ -414,8 +414,10 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
 {
     struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
     struct bp_user *u;
+    int i;
 
-    for ( u = thiz->users; u->user_evt_handle; u ++ ) {
+    for ( i = 0; i < thiz->users_nr; i ++) {
+        u = & thiz->users[ i ];
         if ( u->seed <= u->frame_freq ) {
             u->seed ++;
         }
@@ -430,7 +432,7 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_OK;
-    int i, nr;
+    int i;
     struct bp_user *hit;
 
     switch ( evt ) {
