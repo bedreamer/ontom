@@ -145,6 +145,9 @@ struct bp_user {
     // 累计超时丢帧数
     unsigned int died_total;
 
+    // 对应的作业
+    struct charge_job *job;
+
     // 已经发送的帧数
     unsigned int sent_frames;
     // 帧校验失败次数
@@ -183,7 +186,7 @@ struct bp_user {
     // 帧校验失败
     // BP_EVT_FRAME_CHECK_ERROR
 
-    int (*user_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
+    int (*user_evt_handle)(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                            struct bp_evt_param *param);
 };
 
@@ -203,9 +206,6 @@ struct bp_uart {
     volatile BP_UART_STAT hw_status;
     // 作为485串口时的收发转换端口
     unsigned int hw_port;
-
-    // 对应的作业
-    struct charge_job *job;
 
     // 初始化标识
     unsigned int init_magic;
