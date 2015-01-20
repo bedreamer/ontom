@@ -417,7 +417,7 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
     unsigned int i;
 
     for ( i = 0; i < thiz->users_nr; i ++) {
-        u = & thiz->users[ i ];
+        u = thiz->users[ i ];
         if ( u->seed <= u->frame_freq ) {
             u->seed ++;
         }
