@@ -570,6 +570,11 @@ struct charge_job {
     // 充电机管理模块
     struct charger_struct chargers;
 
+    // 当前故障列表
+    pthread_mutex_t err_list_lck;
+    unsigned int err_nr;
+    struct list_head *err_head;
+
     // 系统信号, 最多支持64 * 8 种信号标记
     // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
     // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
@@ -604,8 +609,8 @@ struct error_history {
     struct list_head error_me;
 };
 
-unsigned int error_history_begin(unsigned int error_id, char *error_string);
-void error_history_recover(unsigned int error_id);
+unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);
+void error_history_recover(struct charge_job *job, unsigned int error_id);
 
 /*
  * 充电任务描述, 详细描述了系统的配置参数
@@ -624,11 +629,8 @@ struct charge_task {
     // 共计两个串口
     struct bp_uart uarts[2];
 
-    // 当前故障列表
-    pthread_mutex_t err_list_lck;
+    // 任务记录故障总数
     unsigned int err_seq_id_next;
-    unsigned int err_nr;
-    struct list_head *err_head;
 };
 
 /* 系统信号定义

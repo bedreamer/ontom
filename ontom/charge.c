@@ -61,192 +61,192 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
 
     if ( bit_read(thiz, S_AC_INPUT_DOWN) ) {
         fault_nr ++;
-        error_history_begin(S_AC_INPUT_DOWN, "N/A");
+        error_history_begin(thiz, S_AC_INPUT_DOWN, "N/A");
     } else {
-        error_history_recover(S_AC_INPUT_DOWN);
+        error_history_recover(thiz, S_AC_INPUT_DOWN);
     }
     if ( bit_read(thiz, S_ASSIT_POWER_DOWN) ) {
         fault_nr ++;
-        error_history_begin(S_ASSIT_POWER_DOWN, "N/A");
+        error_history_begin(thiz, S_ASSIT_POWER_DOWN, "N/A");
     } else {
-        error_history_recover(S_ASSIT_POWER_DOWN);
+        error_history_recover(thiz, S_ASSIT_POWER_DOWN);
     }
     if ( bit_read(thiz, S_CHARGER_COMM_DOWN) ) {
         fault_nr ++;
-        error_history_begin(S_CHARGER_COMM_DOWN, "N/A");
+        error_history_begin(thiz, S_CHARGER_COMM_DOWN, "N/A");
     } else {
-        error_history_recover(S_CHARGER_COMM_DOWN);
+        error_history_recover(thiz, S_CHARGER_COMM_DOWN);
     }
     if ( bit_read(thiz, S_CHARGER_YX_1_COMM_DOWN) ) {
         err_nr ++;
-        error_history_begin(S_CHARGER_YX_1_COMM_DOWN, "N/A");
+        error_history_begin(thiz, S_CHARGER_YX_1_COMM_DOWN, "N/A");
     } else {
-        error_history_recover(S_CHARGER_YX_1_COMM_DOWN);
+        error_history_recover(thiz, S_CHARGER_YX_1_COMM_DOWN);
     }
     if ( bit_read(thiz, S_CHARGER_YX_2_COMM_DOWN) ) {
         err_nr ++;
-        error_history_begin(S_CHARGER_YX_2_COMM_DOWN, "N/A");
+        error_history_begin(thiz, S_CHARGER_YX_2_COMM_DOWN, "N/A");
     } else {
-        error_history_recover(S_CHARGER_YX_2_COMM_DOWN);
+        error_history_recover(thiz, S_CHARGER_YX_2_COMM_DOWN);
     }
     if ( bit_read(thiz, S_MEASURE_COMM_DOWN) ) {
         fault_nr ++;
-        error_history_begin(S_MEASURE_COMM_DOWN, "N/A");
+        error_history_begin(thiz, S_MEASURE_COMM_DOWN, "N/A");
     } else {
-        error_history_recover(S_MEASURE_COMM_DOWN);
+        error_history_recover(thiz, S_MEASURE_COMM_DOWN);
     }
     if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
         fault_nr ++;
-        error_history_begin(S_BMS_COMM_DOWN, "N/A");
+        error_history_begin(thiz, S_BMS_COMM_DOWN, "N/A");
     } else {
-        error_history_recover(S_BMS_COMM_DOWN);
+        error_history_recover(thiz, S_BMS_COMM_DOWN);
     }
 
     if ( bit_read(thiz, S_CHARGE_MODULE_DOWN) ) {
         err_nr ++;
-        error_history_begin(S_CHARGE_MODULE_DOWN, "N/A");
+        error_history_begin(thiz, S_CHARGE_MODULE_DOWN, "N/A");
     } else {
-        error_history_recover(S_CHARGE_MODULE_DOWN);
+        error_history_recover(thiz, S_CHARGE_MODULE_DOWN);
     }
     // 1# 充电枪物理连接故障
     if ( bit_read(thiz, S_GUN_1_PYH_CONN_DOWN) ) {
         err_nr ++;
-        error_history_begin(S_GUN_1_PYH_CONN_DOWN, "N/A");
+        error_history_begin(thiz, S_GUN_1_PYH_CONN_DOWN, "N/A");
     } else {
-        error_history_recover(S_GUN_1_PYH_CONN_DOWN);
+        error_history_recover(thiz, S_GUN_1_PYH_CONN_DOWN);
     }
     // 2# 充电枪物理连接故障
     if ( bit_read(thiz, S_GUN_2_PYH_CONN_DOWN) ) {
         err_nr ++;
-        error_history_begin(S_GUN_2_PYH_CONN_DOWN, "N/A");
+        error_history_begin(thiz, S_GUN_2_PYH_CONN_DOWN, "N/A");
     } else {
-        error_history_recover(S_GUN_2_PYH_CONN_DOWN);
+        error_history_recover(thiz, S_GUN_2_PYH_CONN_DOWN);
     }
     // 绝缘故障
     if ( bit_read(thiz, S_INSTITUDE_ERR) ) {
         err_nr ++;
-        error_history_begin(S_INSTITUDE_ERR, "N/A");
+        error_history_begin(thiz, S_INSTITUDE_ERR, "N/A");
     } else {
-        error_history_recover(S_INSTITUDE_ERR);
+        error_history_recover(thiz, S_INSTITUDE_ERR);
     }
     // 母线过压
     if ( bit_read(thiz, S_BUS_V_HI) ) {
         err_nr ++;
-        error_history_begin(S_BUS_V_HI, "N/A");
+        error_history_begin(thiz, S_BUS_V_HI, "N/A");
     } else {
-        error_history_recover(S_BUS_V_HI);
+        error_history_recover(thiz, S_BUS_V_HI);
     }
     // 母线欠压
     if ( bit_read(thiz, S_BUS_V_LO) ) {
         err_nr ++;
-        error_history_begin(S_BUS_V_LO, "N/A");
+        error_history_begin(thiz, S_BUS_V_LO, "N/A");
     } else {
-        error_history_recover(S_BUS_V_LO);
+        error_history_recover(thiz, S_BUS_V_LO);
     }
     // 母线短路
     if ( bit_read(thiz, S_BUS_SHORTED) ) {
         err_nr ++;
-        error_history_begin(S_BUS_SHORTED, "N/A");
+        error_history_begin(thiz, S_BUS_SHORTED, "N/A");
     } else {
-        error_history_recover(S_BUS_SHORTED);
+        error_history_recover(thiz, S_BUS_SHORTED);
     }
     // 电池过压
     if ( bit_read(thiz, S_BAT_V_HI) ) {
         err_nr ++;
-        error_history_begin(S_BAT_V_HI, "N/A");
+        error_history_begin(thiz, S_BAT_V_HI, "N/A");
     } else {
-        error_history_recover(S_BAT_V_HI);
+        error_history_recover(thiz, S_BAT_V_HI);
     }
     // 电池欠压
     if ( bit_read(thiz, S_BAT_V_LO) ) {
         err_nr ++;
-        error_history_begin(S_BAT_V_LO, "N/A");
+        error_history_begin(thiz, S_BAT_V_LO, "N/A");
     } else {
-        error_history_recover(S_BAT_V_LO);
+        error_history_recover(thiz, S_BAT_V_LO);
     }
     // 电池短路
     if ( bit_read(thiz, S_BAT_SHORTED) ) {
         err_nr ++;
-        error_history_begin(S_BAT_SHORTED, "N/A");
+        error_history_begin(thiz, S_BAT_SHORTED, "N/A");
     } else {
-        error_history_recover(S_BAT_SHORTED);
+        error_history_recover(thiz, S_BAT_SHORTED);
     }
     // 电池反接故障
     if ( bit_read(thiz, S_BAT_REVERT_CONN) ) {
         err_nr ++;
-        error_history_begin(S_BAT_REVERT_CONN, "N/A");
+        error_history_begin(thiz, S_BAT_REVERT_CONN, "N/A");
     } else {
-        error_history_recover(S_BAT_REVERT_CONN);
+        error_history_recover(thiz, S_BAT_REVERT_CONN);
     }
     // 电池过流
     if ( bit_read(thiz, S_BAT_I_HI) ) {
         err_nr ++;
-        error_history_begin(S_BAT_I_HI, "N/A");
+        error_history_begin(thiz, S_BAT_I_HI, "N/A");
     } else {
-        error_history_recover(S_BAT_I_HI);
+        error_history_recover(thiz, S_BAT_I_HI);
     }
     // 充电桩温度过高
     if ( bit_read(thiz, S_CHARGE_BOX_TEMP_HI) ) {
         err_nr ++;
-        error_history_begin(S_CHARGE_BOX_TEMP_HI, "N/A");
+        error_history_begin(thiz, S_CHARGE_BOX_TEMP_HI, "N/A");
     } else {
-        error_history_recover(S_CHARGE_BOX_TEMP_HI);
+        error_history_recover(thiz, S_CHARGE_BOX_TEMP_HI);
     }
     // 充电桩温度过低
     if ( bit_read(thiz, S_CHARGE_BOX_TEMP_LO) ) {
         err_nr ++;
-        error_history_begin(S_CHARGE_BOX_TEMP_LO, "N/A");
+        error_history_begin(thiz, S_CHARGE_BOX_TEMP_LO, "N/A");
     } else {
-        error_history_recover(S_CHARGE_BOX_TEMP_LO);
+        error_history_recover(thiz, S_CHARGE_BOX_TEMP_LO);
     }
     // 充电桩湿度过高
     if ( bit_read(thiz, S_CHARGE_BOX_WET_HI) ) {
         err_nr ++;
-        error_history_begin(S_CHARGE_BOX_WET_HI, "N/A");
+        error_history_begin(thiz, S_CHARGE_BOX_WET_HI, "N/A");
     } else {
-        error_history_recover(S_CHARGE_BOX_WET_HI);
+        error_history_recover(thiz, S_CHARGE_BOX_WET_HI);
     }
     // 充电桩湿度过低
     if ( bit_read(thiz, S_CHARGE_BOX_WET_LO) ) {
         err_nr ++;
-        error_history_begin(S_CHARGE_BOX_WET_LO, "N/A");
+        error_history_begin(thiz, S_CHARGE_BOX_WET_LO, "N/A");
     } else {
-        error_history_recover(S_CHARGE_BOX_WET_LO);
+        error_history_recover(thiz, S_CHARGE_BOX_WET_LO);
     }
     // 总输出熔断器熔断
     if ( bit_read(thiz, S_DC_RDQ_BREAK) ) {
         err_nr ++;
-        error_history_begin(S_DC_RDQ_BREAK, "N/A");
+        error_history_begin(thiz, S_DC_RDQ_BREAK, "N/A");
     } else {
-        error_history_recover(S_DC_RDQ_BREAK);
+        error_history_recover(thiz, S_DC_RDQ_BREAK);
     }
     // 总输出开关跳闸
     if ( bit_read(thiz, S_DC_SW_BREAK) ) {
         err_nr ++;
-        error_history_begin(S_DC_SW_BREAK, "N/A");
+        error_history_begin(thiz, S_DC_SW_BREAK, "N/A");
     } else {
-        error_history_recover(S_DC_SW_BREAK);
+        error_history_recover(thiz, S_DC_SW_BREAK);
     }
     // 1#枪输出开关跳闸
     if ( bit_read(thiz, S_GUN_1_SW_BREAK) ) {
         err_nr ++;
-        error_history_begin(S_GUN_1_SW_BREAK, "N/A");
+        error_history_begin(thiz, S_GUN_1_SW_BREAK, "N/A");
     } else {
-        error_history_recover(S_GUN_1_SW_BREAK);
+        error_history_recover(thiz, S_GUN_1_SW_BREAK);
     }
     // 2#枪输出开关跳闸
     if ( bit_read(thiz, S_GUN_2_SW_BREAK) ) {
         err_nr ++;
-        error_history_begin(S_GUN_2_SW_BREAK, "N/A");
+        error_history_begin(thiz, S_GUN_2_SW_BREAK, "N/A");
     } else {
-        error_history_recover(S_GUN_2_SW_BREAK);
+        error_history_recover(thiz, S_GUN_2_SW_BREAK);
     }
     // 防雷器故障
     if ( bit_read(thiz, S_FANGLEIQI_BREAK) ) {
         err_nr ++;
-        error_history_begin(S_FANGLEIQI_BREAK, "N/A");
+        error_history_begin(thiz, S_FANGLEIQI_BREAK, "N/A");
     } else {
-        error_history_recover(S_FANGLEIQI_BREAK);
+        error_history_recover(thiz, S_FANGLEIQI_BREAK);
     }
 
     if ( fault_nr ) {
@@ -416,34 +416,34 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
     }
 }
 
-unsigned int error_history_begin(unsigned int error_id, char *error_string)
+unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string)
 {
     struct error_history *thiz;
     struct list_head *head;
     char sql[128], errname[32], timestamp[20];
     int ret;
 
-    pthread_mutex_lock(&task->err_list_lck);
-    if ( task->err_head != NULL ) {
-        head = task->err_head;
+    pthread_mutex_lock(&job->err_list_lck);
+    if ( job->err_head != NULL ) {
+        head = job->err_head;
         do {
             thiz = list_load(struct error_history, error_me, head);
             if ( thiz->error_id == error_id ) {
                 goto out;
             }
             head = head->next;
-        } while ( head != task->err_head );
+        } while ( head != job->err_head );
     }
 
     thiz = (struct error_history*)malloc(sizeof(struct error_history));
     if ( thiz == NULL ) goto out;
     list_ini(thiz->error_me);
-    if ( task->err_head == NULL ) {
-        task->err_head = & thiz->error_me;
+    if ( job->err_head == NULL ) {
+        job->err_head = & thiz->error_me;
     } else {
-        list_inserttail(task->err_head, &thiz->error_me);
+        list_inserttail(job->err_head, &thiz->error_me);
     }
-    task->err_nr ++;
+    job->err_nr ++;
     thiz->error_seqid = task->err_seq_id_next ++;
     thiz->error_id = error_id;
     strncpy(thiz->error_string, error_string, 32);
@@ -463,39 +463,39 @@ unsigned int error_history_begin(unsigned int error_id, char *error_string)
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     log_printf(INF, "ZEUS: %s:%d", sql, ret);
 out:
-    pthread_mutex_unlock (&task->err_list_lck);
+    pthread_mutex_unlock (&job->err_list_lck);
 
     return error_id;
 }
 
-void error_history_recover(unsigned int error_id)
+void error_history_recover(struct charge_job *job, unsigned int error_id)
 {
     struct error_history *thiz;
     struct list_head *head;
     char sql[128], errname[32], timestamp[20];
     int ret;
 
-    pthread_mutex_lock(&task->err_list_lck);
+    pthread_mutex_lock(&job->err_list_lck);
 
-    if ( task->err_head == NULL ) goto out;
+    if ( job->err_head == NULL ) goto out;
 
-    head = task->err_head;
+    head = job->err_head;
     do {
         thiz = list_load(struct error_history, error_me, head);
         if ( thiz->error_id == error_id ) {
             goto del;
         }
         head = head->next;
-    } while ( head != task->err_head );
+    } while ( head != job->err_head );
     goto out;
 del:
-    if ( task->err_head == & thiz->error_me ) {
-        task->err_head = thiz->error_me.next;
+    if ( job->err_head == & thiz->error_me ) {
+        job->err_head = thiz->error_me.next;
     }
     list_remove(&thiz->error_me);
-    task->err_nr --;
-    if ( task->err_nr == 0 ) {
-        task->err_head = NULL;
+    job->err_nr --;
+    if ( job->err_nr == 0 ) {
+        job->err_head = NULL;
     }
     __get_timestamp(timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
@@ -508,5 +508,5 @@ del:
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     log_printf(INF, "ZEUS: %s:%d", sql, ret);
 out:
-    pthread_mutex_unlock (&task->err_list_lck);
+    pthread_mutex_unlock (&job->err_list_lck);
 }
