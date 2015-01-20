@@ -857,11 +857,11 @@ static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_task *thiz)
 {
     if ( ! thiz->this_job ) return GUN_INVALID;
     if ( thiz->this_job->job_gun_sn == GUN_SN0 ) {
-        if ( bit_read(thiz, F_GUN_1_PHY_CONN_STATUS) ) {
+        if ( bit_read(thiz->this_job, F_GUN_1_PHY_CONN_STATUS) ) {
             return GUN_SN0;
         } else return GUN_INVALID;
     } else if ( thiz->this_job->job_gun_sn == GUN_SN1 ) {
-        if ( bit_read(thiz, F_GUN_2_PHY_CONN_STATUS) ) {
+        if ( bit_read(thiz->this_job, F_GUN_2_PHY_CONN_STATUS) ) {
             return GUN_SN1;
         } else return GUN_INVALID;
     } else if ( thiz->this_job->job_gun_sn == GUN_UNDEFINE ) {
