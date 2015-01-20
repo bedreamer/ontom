@@ -23,13 +23,6 @@ struct bp_uart;
 #define INVALID_TIMESTAMP  0x00000000
 // BMS 通信时的缓冲区
 #define CAN_BUFF_SIZE         1024
-/* 支持的BMS个数
- * 安徽合肥电动公交车项目的配置需求是一个监控器管理两把充电枪
- * 但是由于充电限流问题的限制，同一时刻只能有一把枪在进行充电
- * 现在也不排除以后可能需要一个监控同时给一个或多个电池组充电
- * 进行管理，因此在这里将支持的BMS配置成可变参数的形式。
- */
-#define CONFIG_SUPPORT_BMS_NR 2
 #define BUFF_NR               CONFIG_SUPPORT_BMS_NR
 typedef enum {
     // 0# 充电枪
@@ -621,16 +614,50 @@ struct charge_task {
 
     // 工作列表中的工作个数
     unsigned int nr_jobs;
+    // 预约工作列表
+    struct charge_job *book_jobs[CONFIG_SUPPORT_BOOK_JOBS];
     // 当前进行的充电工作
-    struct charge_job *this_job[1];
+    struct charge_job *this_job[CONFIG_SUPPORT_CHARGE_JOBS];
     // 空闲作业
-    struct charge_job idle[1];
+    struct charge_job idle[CONFIG_SUPPORT_CHARGE_JOBS];
 
     // 共计两个串口
     struct bp_uart uarts[2];
-
     // 任务记录故障总数
     unsigned int err_seq_id_next;
+
+    // {{ 以下为充电桩系统监控的配置数据
+    /* 充电冲突映射表
+     * 充电冲突根据系统配置的充电枪个数确定, 目前系统最多支持4把枪
+     *   -------------+-------------+---------------+-----------+----------+
+     *        \冲突枪  |             |               |           |          |
+     *   充电枪 \      |  1 #充电枪   |   2 #充电枪   | 3 #充电枪  | 4 #充电枪 |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      1 #充电枪  |     /      |    CONFLICT   |    OK      |    OK    |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      2 #充电枪  |  CONFLICT   |       /      |    OK      |    OK    |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      3 #充电枪  |     OK      |      OK       |     /     | CONFLICT |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      4 #充电枪  |     OK      |      OK       |  CONFLICT |    /     |
+     *   -------------+-------------+---------------+-----------+----------+
+     * 对应位置上 / 和 OK为TRUE 表示不冲突, CONFLICT 对应位置为FALSE表示冲突
+     * 默认表格，两把枪
+     *   -------------+-------------+---------------+
+     *        \冲突枪  |             |               |
+     *   充电枪 \      |  1 #充电枪   |   2 #充电枪   |
+     *   -------------+-------------+---------------+
+     *      1 #充电枪  |     /      |    CONFLICT   |
+     *   -------------+-------------+---------------+
+     *      2 #充电枪  |  CONFLICT   |       /      |
+     *   -------------+-------------+---------------+
+     */
+    bool sys_conflict_map[CONFIG_SUPPORT_BMS_NR][CONFIG_SUPPORT_BMS_NR];
+    /*系统配置的充电枪个数*/
+    unsigned int sys_config_gun_nr;
+    /* 不同充电接口对应的CAN设备名称*/
+    char sys_can_name[CONFIG_SUPPORT_BMS_NR][128];
+    //}}
 };
 
 /* 系统信号定义

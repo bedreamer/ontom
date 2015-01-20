@@ -26,8 +26,17 @@
  *采用同步等待发送方式发送数据后，现象得到改善。
  */
 #define CONFIG_SUPPORT_ASYNC_UART_TX   0
-// 充电管理中可添加的最多的充电作业个数
-#define CONFIG_SUPPORT_CHARGE_JOBS     8
+// 充电管理中可添加的最多的充电作业个数, 4把枪，最多四个任务同时执行
+#define CONFIG_SUPPORT_CHARGE_JOBS     4
+// 最多可预约充电作业个数
+#define CONFIG_SUPPORT_BOOK_JOBS       8
+/* 支持的BMS个数
+ * 安徽合肥电动公交车项目的配置需求是一个监控器管理两把充电枪
+ * 但是由于充电限流问题的限制，同一时刻只能有一把枪在进行充电
+ * 现在也不排除以后可能需要一个监控同时给一个或多个电池组充电
+ * 进行管理，因此在这里将支持的BMS配置成可变参数的形式。
+ */
+#define CONFIG_SUPPORT_BMS_NR          4
 //}}}}}}}}}}}}}
 
 // 默认数据库文件
