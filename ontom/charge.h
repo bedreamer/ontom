@@ -623,7 +623,7 @@ struct charge_task {
     // 工作列表中的工作个数
     unsigned int nr_jobs;
     // 当前进行的充电工作
-    struct charge_job *this_job;
+    struct charge_job *this_job[1];
     // 空闲作业
     struct charge_job idle;
 
