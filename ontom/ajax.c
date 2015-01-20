@@ -273,7 +273,7 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
     log_printf(DBG, "card.xml?mode=<%s>&start=<%s>", mode, start);
 
     return ERR_OK;
-#else
+//#else
     // 充电模式声明
     char mode[ 8 + 1 ] = {0};
     // 刷卡是否有效
@@ -531,6 +531,7 @@ int ajax_query_xml_proc(struct ajax_xml_struct *thiz)
      thiz->xml_len = output_len;
      return ERR_OK;
 #endif
+     return ERR_ERR;
 }
 
 /* 充电确认
@@ -678,6 +679,7 @@ int ajax_query_json_proc(struct ajax_xml_struct *thiz)
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 {
+#if 0
     int ret = ERR_ERR, i = S_ERROR;
     char buff[32] = "";
     thiz->ct = "application/json";
@@ -697,6 +699,9 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     task->this_job[0]->job_gun_sn = GUN_SN0;
    // }
     return ret;
+#else
+    return ERR_ERR;
+#endif
 }
 
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)

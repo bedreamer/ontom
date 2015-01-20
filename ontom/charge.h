@@ -611,21 +611,15 @@ void error_history_recover(unsigned int error_id);
  * 充电任务描述, 详细描述了系统的配置参数
  */
 struct charge_task {
-    // 任务状态
-    CHARGE_TASK_STAT charge_task_stat;
     // 已经编译为多线程安全模式，所以不用加锁
     sqlite3 *database;
 
-    // 充电工作列表
-    struct charge_job jobs[CONFIG_SUPPORT_CHARGE_JOBS];
-    // 作业执行列顺序列表
-    struct charge_job *job_list[CONFIG_SUPPORT_CHARGE_JOBS];
     // 工作列表中的工作个数
     unsigned int nr_jobs;
     // 当前进行的充电工作
     struct charge_job *this_job[1];
     // 空闲作业
-    struct charge_job idle;
+    struct charge_job idle[1];
 
     // 共计两个串口
     struct bp_uart uarts[2];
@@ -774,24 +768,7 @@ typedef enum {
     FLAG_END
 }ONTOM_FLAG_SINGLE;
 
-// 创建充电任务
-struct charge_task * charge_task_create(void);
-// 实施充电任务
-void charge_task_implemention(struct charge_task *thiz);
-// 析构充电任务
-void charge_task_destroy(struct charge_task *thiz);
-// 重置充电任务
-void charge_task_reset(struct charge_task *thiz);
 extern struct charge_task *task;
-
-// 扩展测量数据刷新
-void deal_with_measure_data(struct charge_task *);
-// 后台控制逻辑处理
-void deal_with_master_contrl_logig(struct charge_task *);
-// BMS 控制逻辑处理
-void deal_with_BMS_logic(struct charge_task *);
-// 充电动作逻辑处理
-void deal_with_charge_logic(struct charge_task *);
 
 // 位设置
 static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
@@ -857,18 +834,17 @@ static inline unsigned short swap_hi_lo_bytes(unsigned short b)
 #define b2l swap_hi_lo_bytes
 #define l2b swap_hi_lo_bytes
 
-static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_task *thiz)
+static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_job *thiz)
 {
-    if ( ! thiz->this_job[0] ) return GUN_INVALID;
-    if ( thiz->this_job[0]->job_gun_sn == GUN_SN0 ) {
-        if ( bit_read(thiz->this_job[0], F_GUN_1_PHY_CONN_STATUS) ) {
+    if ( thiz->job_gun_sn == GUN_SN0 ) {
+        if ( bit_read(thiz, F_GUN_1_PHY_CONN_STATUS) ) {
             return GUN_SN0;
         } else return GUN_INVALID;
-    } else if ( thiz->this_job[0]->job_gun_sn == GUN_SN1 ) {
-        if ( bit_read(thiz->this_job[0], F_GUN_2_PHY_CONN_STATUS) ) {
+    } else if ( thiz->job_gun_sn == GUN_SN1 ) {
+        if ( bit_read(thiz, F_GUN_2_PHY_CONN_STATUS) ) {
             return GUN_SN1;
         } else return GUN_INVALID;
-    } else if ( thiz->this_job[0]->job_gun_sn == GUN_UNDEFINE ) {
+    } else if ( thiz->job_gun_sn == GUN_UNDEFINE ) {
         return GUN_UNDEFINE;
     } else {
         return GUN_INVALID;
