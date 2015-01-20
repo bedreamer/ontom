@@ -11,6 +11,7 @@
 
 struct charge_task;
 struct MDATA_ACK;
+struct bp_uart;
 #include <pthread.h>
 #include "list.h"
 #include "Hachiko.h"
