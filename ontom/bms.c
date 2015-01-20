@@ -1018,8 +1018,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     unsigned int dbg_packets = 0;
 
-    task->bms.can_tp_private.status = PRIVATE_INVALID;
-    task->bms.can_tp_bomb.private = (void *)&task->can_tp_private;
+    thiz->bms.can_tp_private.status = PRIVATE_INVALID;
+    thiz->bms.can_tp_bomb.private = (void *)&task->can_tp_private;
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
@@ -1123,7 +1123,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 log_printf(DBG_LV3,
                            "BMS: data transfer complete PGN=%08X change to ACK",
                            thiz->bms.can_tp_param.tp_pgn);
-                can_packet_callback(task, EVENT_RX_DONE, &param);
+                can_packet_callback(thiz, EVENT_RX_DONE, &param);
                 // 数据链接接受完成
                 thiz->bms.can_bms_status = CAN_TP_RD | CAN_TP_ACK;
             }
@@ -1201,7 +1201,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 thiz->bms.can_tp_param.tp_size = tp_packets_size;
                 thiz->bms.can_tp_param.tp_pgn = tp_packet_PGN;
                 thiz->bms.can_tp_param.tp_rcv_bytes = 0;
-                task->bms.can_tp_param.tp_rcv_pack_nr = 0;
+                thiz->bms.can_tp_param.tp_rcv_pack_nr = 0;
                 thiz->bms.can_bms_status = CAN_TP_RD | CAN_TP_CTS;
                 log_printf(DBG_LV2,
                            "BMS: data connection accepted, rolling..."
@@ -1266,7 +1266,7 @@ void on_charge_stage_change
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 // 握手-CRM-充电机辨识报文
-int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[0];
 
@@ -1291,7 +1291,7 @@ int gen_packet_PGN256(struct charge_task * thiz, struct event_struct* param)
 }
 
 // 配置-CTS-充电机发送时间同步信息
-int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[1];
     struct pgn1792_CTS cts;
