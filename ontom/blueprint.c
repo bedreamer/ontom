@@ -1570,7 +1570,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me,
     return ret;
 }
 
-static int uart5_background_evt_handle(struct bp_uart *self, bp_user *me, BP_UART_EVENT evt,
+static int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
