@@ -677,11 +677,11 @@ int about_packet_reciev_done(struct charge_job *thiz,
                param->buff.rx_buff, sizeof(struct pgn4096_BCL));
         if ( thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f > 750 ) {
             log_printf(WRN, "BMS: spn3072 range 0-750V gave: %d V",
-                       thiz->bms_charge_need_now.spn3072_need_voltage);
+                       thiz->bms.bms_charge_need_now.spn3072_need_voltage);
         }
         if ( thiz->bms.bms_charge_need_now.spn3073_need_current/10.0f > 400 ) {
             log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
-                       thiz->bms_charge_need_now.spn3073_need_current);
+                       thiz->bms.bms_charge_need_now.spn3073_need_current);
         }
 
         log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
@@ -860,7 +860,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
         if ( 0x7F != thiz->bms.bms_write_init_ok ) {
             // 进行数据结构的初始化操作
-            can_packet_callback(task, EVENT_CAN_INIT, &param);
+            can_packet_callback(thiz, EVENT_CAN_INIT, &param);
             thiz->bms.bms_write_init_ok = 0x7f;
             thiz->ref_nr ++;
         } else if ( thiz->job_status == JOB_DETACHING ) {
@@ -878,20 +878,20 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         param.buff_size = sizeof(txbuff);
         param.evt_param = EVT_RET_INVALID;
         if ( thiz->bms.can_bms_status & CAN_NORMAL ) {
-            can_packet_callback(task, EVENT_TX_REQUEST, &param);
+            can_packet_callback(thiz, EVENT_TX_REQUEST, &param);
         } else if ( thiz->bms.can_bms_status & CAN_TP_RD ) {
             switch ( thiz->bms.can_bms_status & 0xF0 ) {
             case CAN_TP_CTS:
-                can_packet_callback(task, EVENT_TX_TP_CTS, &param);
+                can_packet_callback(thiz, EVENT_TX_TP_CTS, &param);
                 break;
             case CAN_TP_TX:
             case CAN_TP_RX:
                 break;
             case CAN_TP_ACK:
-                can_packet_callback(task, EVENT_TX_TP_ACK, &param);
+                can_packet_callback(thiz, EVENT_TX_TP_ACK, &param);
                 break;
             case CAN_TP_ABRT:
-                can_packet_callback(task, EVENT_TX_TP_ABRT, &param);
+                can_packet_callback(thiz, EVENT_TX_TP_ABRT, &param);
                 break;
             default:
                 log_printf(WRN, "BMS: can_bms_status crashed(%d).",
@@ -920,7 +920,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         param.evt_param = EVT_RET_INVALID;
         // 链接模式下的数据包发送不需要确认, 并且也不能被中止
         if ( thiz->bms.can_bms_status == CAN_NORMAL ) {
-            can_packet_callback(task, EVENT_TX_PRE, &param);
+            can_packet_callback(thiz, EVENT_TX_PRE, &param);
             if ( EVT_RET_TX_ABORT == param.evt_param ) {
                 // packet sent abort.
                 continue;
@@ -941,10 +941,10 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             nbytes = write(s, &frame, sizeof(struct can_frame));
             if ( (unsigned int)nbytes < param.buff_payload ) {
                 param.evt_param = EVT_RET_ERR;
-                can_packet_callback(task, EVENT_TX_FAILS, &param);
+                can_packet_callback(thiz, EVENT_TX_FAILS, &param);
             } else {
                 param.evt_param = EVT_RET_OK;
-                can_packet_callback(task, EVENT_TX_DONE, &param);
+                can_packet_callback(thiz, EVENT_TX_DONE, &param);
             }
         } else if ( param.buff_payload > 8 ) {
             // 大于8字节的数据包在这里处理，程序向后兼容
