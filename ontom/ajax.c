@@ -688,7 +688,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
             "\"jobs\":{\"nr\":1}");
     for (; i < S_ERR_END; i ++) {
-        if ( bit_read(task, i) ) {
+        if ( bit_read(task->this_job, i) ) {
             sprintf(buff, "E%04X", i);
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "%s ", config_read(buff));
@@ -726,7 +726,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 1;
     thiz->iobuff[0] = 'A';
-    bit_set(task, CMD_JOB_ABORT);
+    bit_set(task->this_job, CMD_JOB_ABORT);
     return ret;
 }
 
@@ -736,7 +736,7 @@ int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 1;
     thiz->iobuff[0] = 'P';
-    bit_set(task, CMD_JOB_MAN_PAUSE);
+    bit_set(task->this_job, CMD_JOB_MAN_PAUSE);
     return ret;
 }
 
@@ -746,7 +746,7 @@ int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 1;
     thiz->iobuff[0] = 'R';
-    bit_clr(task, CMD_JOB_MAN_PAUSE);
+    bit_clr(task->this_job, CMD_JOB_MAN_PAUSE);
     return ret;
 }
 
@@ -762,7 +762,7 @@ int ajax_debug_bit_read(struct ajax_xml_struct *thiz)
     if ( index >=0 && index < FLAG_END ) {
         for (i=0;i<512;i++)
          thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "%d", bit_read(task, i));
+            "%d", bit_read(task->this_job, i));
     } else {
         ret = ERR_ERR;
     }
@@ -782,16 +782,16 @@ int ajax_debug_bit_write(struct ajax_xml_struct *thiz)
     index = atoi(var);
     if ( index >=0 && index < FLAG_END ) {
         if ( val[0] == '0' ) {
-            bit_clr(task, index);
+            bit_clr(task->this_job, index);
         } else if ( val[0] == '1') {
-            bit_set(task, index);
+            bit_set(task->this_job, index);
         }
     } else {
         ret =  ERR_ERR;
     }
 
     thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
-            "%d", bit_read(task, index));
+            "%d", bit_read(task->this_job, index));
     return ret;
 }
 
