@@ -414,7 +414,7 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
 {
     struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
     struct bp_user *u;
-    int i;
+    unsigned int i;
 
     for ( i = 0; i < thiz->users_nr; i ++) {
         u = & thiz->users[ i ];
@@ -1679,6 +1679,7 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
                        len);
         }
     } while (0);
+    return 1;
 }
 
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
