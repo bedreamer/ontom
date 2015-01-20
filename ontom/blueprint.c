@@ -1475,18 +1475,6 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-#if 0
-        if ( task->measure.yx_gun_1_conn_stat == GUN_CONN_CONNECTIVE ) {
-            cmd |= GUN1_ASSIT_PWN_ON;
-        } else {
-            cmd &= ~GUN1_ASSIT_PWN_ON;
-        }
-        if ( task->measure.yx_gun_2_conn_stat == GUN_CONN_CONNECTIVE ) {
-            cmd |= GUN2_ASSIT_PWN_ON;
-        } else {
-            cmd &= ~GUN2_ASSIT_PWN_ON;
-        }
-#endif
 
         if ( self->job->job_gun_sn == GUN_SN0 ) {
             if ( bit_read(self->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
@@ -1522,8 +1510,6 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else {
             cmd &= ~DC_SWITCH_ON;
         }
-
-       // if ( bit_read(task, ))
 
         buff[ nr ++ ] = 0xF0;
         buff[ nr ++ ] = 0xE1;
@@ -1656,9 +1642,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     int mydone = 0;
     unsigned int i = 0;
     int ret = 0;
-    struct bp_uart *thiz = &task->uarts[0];
+    struct bp_uart *thiz = (struct bp_uart *)arg;
     struct bp_user *self;
-    int retval, max_handle = 0;
+    int retval;
     size_t cursor;
     fd_set rfds;
     struct timeval tv ;
@@ -1673,21 +1659,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         thiz->init_magic = 5;
     }
 
-#if (CONFIG_SUPPORT_SIGIO > 0)
-    if ( SIG_ERR == signal(SIGIO, uarts_async_sigio) ) {
-        log_printf(ERR, "UART: signal(SIGIO, uarts_async_sigio) failed!!!"
-                   "errno: %d", errno);
-    }
-#endif
-
-    while ( ! *done ) {
+    while ( 1 ) {
         usleep(1000);
         if ( thiz == NULL ) continue;
         if ( thiz->bp_evt_handle == NULL ) continue;
         if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
-
-        //signal(SIGIO, uarts_async_sigio);
-
         if ( thiz->status == BP_UART_STAT_INVALID ) {
             if ( thiz->init_magic <= 0 ) {
                 thiz->status = BP_UART_STAT_ALIENT;
@@ -1763,10 +1739,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->status = BP_UART_STAT_ALIENT;
                 log_printf(ERR, "UART: switch to defaute mode faile, thread panic..");
                 continue;
-            }
-
-            if ( thiz->dev_handle > max_handle ) {
-                max_handle = thiz->dev_handle;
             }
 
             log_printf(INF, "UART: open UART %d:%s correct(%X).",
