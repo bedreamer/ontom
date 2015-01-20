@@ -199,13 +199,13 @@ int main()
         }
     }
 
-    task->err_head = NULL;
-    task->err_nr = 0;
-    ret = pthread_mutex_init(&task->err_list_lck, NULL);
-    if ( ret == -1 ) {
-        log_printf(ERR, "TOM: 互斥锁初始化失败.");
-        exit(1);
-    }
+    //task->err_head = NULL;
+    // task->err_nr = 0;
+    //ret = pthread_mutex_init(&task->err_list_lck, NULL);
+    //if ( ret == -1 ) {
+    //    log_printf(ERR, "TOM: 互斥锁初始化失败.");
+    //    exit(1);
+    //}
 
     printf(
             "           ___        _       ____\n"
