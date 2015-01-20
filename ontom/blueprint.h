@@ -22,6 +22,13 @@ struct charge_job;
 struct bp_uart;
 #define CONFIG_BP_IO_BUFF_SIZE   512
 
+#define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
+#define	SERIAL4_CTRL_PIN	GPIO_TO_PIN(0, 19)
+#define	SERIAL5_CTRL_PIN	GPIO_TO_PIN(0, 20)
+
+#define	RX_LOW_LEVEL			0
+#define	TX_HIGH_LEVEL			1
+
 // 串口IO事件
 typedef enum {
     // 串口数据结构初始化

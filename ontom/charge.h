@@ -627,6 +627,9 @@ struct charge_task {
     // 当前进行的充电工作
     struct charge_job *this_job;
 
+    // 共计两个串口
+    struct bp_uart uarts[2];
+
     // 当前故障列表
     pthread_mutex_t err_list_lck;
     unsigned int err_seq_id_next;
