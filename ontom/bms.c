@@ -1018,8 +1018,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     unsigned int dbg_packets = 0;
 
-    thiz->bms.can_tp_private.status = PRIVATE_INVALID;
-    thiz->bms.can_tp_bomb.private = (void *)&task->can_tp_private;
+    thiz->bms.can_tp_bomb.private =
+            (void *)&thiz->bms.can_tp_private_status;
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
