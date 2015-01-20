@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
 static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT evt,
@@ -401,7 +399,7 @@ void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
 /*
  * 串口事件响应函数
  */
-static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
+int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_OK;

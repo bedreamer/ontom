@@ -252,5 +252,6 @@ static inline int bp_user_bind(struct bp_uart *bp, struct bp_user *u) {
 
     return ERR_OK;
 }
+int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt, struct bp_evt_param *param);
 
 #endif // _BLUE_PRINT_INCLUED_H_

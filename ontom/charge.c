@@ -119,7 +119,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     memset((char *)task->jobs, 0, sizeof(task->jobs));
     task->nr_jobs = 0;
     task->this_job = NULL;
-    bit_set(task, F_MANUAL_CHARGE_ALLOW);
+    //bit_set(task, F_MANUAL_CHARGE_ALLOW);
     task->uarts[0].bp_evt_handle = uart4_bp_evt_handle;
     task->uarts[0].dev_handle = -1;
     strcpy(task->uarts[0].dev_name, "/dev/ttyO4");
