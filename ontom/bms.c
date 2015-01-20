@@ -903,7 +903,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             // 当前协议没有用到
             log_printf(WRN, "BMS: CAN_TP_WRITE not implement.");
             continue;
-        } else if ( thiz->can_bms_status == CAN_INVALID ) {
+        } else if ( thiz->bms.can_bms_status == CAN_INVALID ) {
             log_printf(DBG_LV0, "BMS: invalid can_bms_status: %d.",
                        thiz->bms.can_bms_status);
             continue;
@@ -1018,8 +1018,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     unsigned int dbg_packets = 0;
 
-    task->can_tp_private.status = PRIVATE_INVALID;
-    task->can_tp_bomb.private = (void *)&task->can_tp_private;
+    task->bms.can_tp_private.status = PRIVATE_INVALID;
+    task->bms.can_tp_bomb.private = (void *)&task->can_tp_private;
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
@@ -1059,7 +1059,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         /*
          * 非阻塞方式读
          */
-        if ( thiz->bms.job_status == JOB_DETACHING ) {
+        if ( thiz->job_status == JOB_DETACHING ) {
             thiz->bms.bms_read_init_ok = 0;
             thiz->ref_nr --;
             continue;
@@ -1068,7 +1068,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         if ( nbytes != sizeof(struct can_frame) ) {
             param.evt_param = EVT_RET_ERR;
             log_printf(DBG_LV3, "BMS: read frame error %x", frame.can_id);
-            can_packet_callback(task, EVENT_RX_ERROR, &param);
+            can_packet_callback(thiz, EVENT_RX_ERROR, &param);
             continue;
         }
 
@@ -1201,7 +1201,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 thiz->bms.can_tp_param.tp_size = tp_packets_size;
                 thiz->bms.can_tp_param.tp_pgn = tp_packet_PGN;
                 thiz->bms.can_tp_param.tp_rcv_bytes = 0;
-                task->can_tp_param.tp_rcv_pack_nr = 0;
+                task->bms.can_tp_param.tp_rcv_pack_nr = 0;
                 thiz->bms.can_bms_status = CAN_TP_RD | CAN_TP_CTS;
                 log_printf(DBG_LV2,
                            "BMS: data connection accepted, rolling..."
@@ -1225,7 +1225,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             param.buff_payload = frame.can_dlc;
             param.evt_param = EVT_RET_INVALID;
             memcpy((void * __restrict__)param.buff.rx_buff, frame.data, 8);
-            can_packet_callback(task, EVENT_RX_DONE, &param);
+            can_packet_callback(thiz, EVENT_RX_DONE, &param);
             log_printf(DBG_LV0, "BMS: read a frame done. %08X", frame.can_id);
         }
 
@@ -1333,7 +1333,7 @@ int gen_packet_PGN1792(struct charge_task * thiz, struct event_struct* param)
 }
 
 // 配置-CML-充电机最大输出能力
-int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[2];
     struct pgn2048_CML cml;
@@ -1355,7 +1355,7 @@ int gen_packet_PGN2048(struct charge_task * thiz, struct event_struct* param)
 }
 
 // 配置-CRO-充电机输出准备就绪状态
-int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[3];
     struct pgn2560_CRO cro;
@@ -1376,7 +1376,7 @@ int gen_packet_PGN2560(struct charge_task * thiz, struct event_struct* param)
 }
 
 // 充电-CCS-充电机充电状态
-int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[4];
     struct pgn4608_CCS ccs;
@@ -1399,7 +1399,7 @@ int gen_packet_PGN4608(struct charge_task * thiz, struct event_struct* param)
 }
 
 // 充电-CST-充电机中止充电
-int gen_packet_PGN6656(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[5];
     (void)thiz;
@@ -1410,7 +1410,7 @@ int gen_packet_PGN6656(struct charge_task * thiz, struct event_struct* param)
 }
 
 // 结束-CSD-充电机统计数据
-int gen_packet_PGN7424(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[6];
     (void)thiz;
@@ -1421,7 +1421,7 @@ int gen_packet_PGN7424(struct charge_task * thiz, struct event_struct* param)
 }
 
 // 错误-CEM-充电机错误报文
-int gen_packet_PGN7936(struct charge_task * thiz, struct event_struct* param)
+int gen_packet_PGN7936(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &generator[7];
     (void)thiz;
