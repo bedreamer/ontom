@@ -481,6 +481,7 @@ struct bms_struct {
     // 充电作业所处阶段,BMS 链接阶段
     CHARGE_STAGE charge_stage;
 
+    struct charge_job *job;
     // BMS通讯设备名, "can1|can2"
     char *can_dev;
     // BMS写初始化完成
