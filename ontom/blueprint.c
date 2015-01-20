@@ -723,7 +723,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 }
 
 // 只读数据段
-static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, bp_user *me, BP_UART_EVENT evt,
+static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
@@ -1006,7 +1006,7 @@ static int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user 
 }
 
 // 模块操作
-static int uart4_charger_module_evt_handle(struct bp_uart *self, bp_user *me, BP_UART_EVENT evt,
+static int uart4_charger_module_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
@@ -1084,7 +1084,7 @@ static int uart4_charger_module_evt_handle(struct bp_uart *self, bp_user *me, BP
 }
 
 // 系统校时
-static int uart4_charger_date_evt_handle(struct bp_uart *self, bp_user *me, BP_UART_EVENT evt,
+static int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
@@ -1160,7 +1160,7 @@ static int uart4_charger_date_evt_handle(struct bp_uart *self, bp_user *me, BP_U
     return ret;
 }
 
-static int uart4_simple_box_evt_handle(struct bp_uart *self, bp_user *me, BP_UART_EVENT evt,
+static int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, nr = 0, len = 0, errnr = 0;
