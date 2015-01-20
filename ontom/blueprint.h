@@ -18,7 +18,7 @@
 #define _BLUE_PRINT_INCLUED_H_
 
 #include "Hachiko.h"
-
+struct charge_job;
 struct bp_uart;
 #define CONFIG_BP_IO_BUFF_SIZE   512
 
@@ -180,12 +180,14 @@ struct bp_user {
                            struct bp_evt_param *param);
 };
 
+// 串口上最多可以绑定16个适用对象
+#define MAX_BINDER    16
 /*
  * 串口描述结构
  */
 struct bp_uart {
     // 串口名，/dev/uart1, etc
-    const char *dev_name;
+    char dev_name[128];
     // 文件描述序号
     int dev_handle;
     // 串口状态
@@ -194,6 +196,9 @@ struct bp_uart {
     volatile BP_UART_STAT hw_status;
     // 作为485串口时的收发转换端口
     unsigned int hw_port;
+
+    // 对应的作业
+    struct charge_job *job;
 
     // 初始化标识
     unsigned int init_magic;
@@ -221,9 +226,24 @@ struct bp_uart {
     // 连续发送次数
     unsigned int continues_nr;
     // 使用者信息
-    struct bp_user *users;
+    struct bp_user *users[MAX_BINDER];
+    // 使用者个数
+    unsigned int users_nr;
     // 当前使用者
     struct bp_user *master;
 };
+static inline int bp_user_bind(struct bp_uart *bp, struct bp_user *u) {
+    if ( !bp || !u ) return ERR_WRONG_PARAM;
+    if ( bp->users_nr >= MAX_BINDER ) return ERR_WRONG_PARAM;
+    do {
+        struct bp_user * thiz = (struct bp_user *)malloc(sizeof(struct bp_user));
+        if ( thiz == NULL ) return ERR_LOW_MEMORY;
+
+        memcpy(thiz, u, sizeof(struct bp_user));
+        bp->users[ bp->users_nr ++ ] = thiz;
+    } while (0);
+
+    return ERR_OK;
+}
 
 #endif // _BLUE_PRINT_INCLUED_H_

@@ -64,9 +64,10 @@ struct bp_user down_user[] = {
         0, "core_charger_yaoce_50_100",
         uart4_charger_yaoce_50_100_handle},// 盒充电机运行寄存器，只读
 #endif
-    {0, 0, 0, 0, 0, 0, 0,
-             0, "",
-     0, 0, 0, NULL}
+    {50 * 100, 4000, 0, 0,
+     0, 0, 0, 0, 0, 0,
+     0, "",
+     NULL}
 };
 // 串口5 使用者为上位机
 struct bp_user up_user[] = {
@@ -401,8 +402,7 @@ static inline void __dump_uart_hex(char *hex, int len, int lv)
 }
 
 // 串口4的超时响应
-void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private,
-                            const struct Hachiko_food *self)
+void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private, const struct Hachiko_food *self)
 {
     struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
     struct Hachiko_food *p;
@@ -482,7 +482,8 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.payload_size = 0;
         self->rx_param.buff_size = sizeof(self->rx_buff);
 
-        self->users = &down_user[0];
+        self->users_nr = 0;
+        memset(self->users, 0, sizeof(self->users));
         self->master =NULL;// &self->users[0];
         self->sequce = 10;
         self->continues_nr = 0;
@@ -630,19 +631,10 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         /*
          * 采用帧发送均衡算法，该串口上的使用者帧率之和为10000
          */
-        //self->master = NULL;
-        nr = (sizeof(down_user) - sizeof(struct bp_user)) / sizeof(struct bp_user);
-        i = self->sequce % nr;
+        i = self->sequce % self->users_nr;
         log_printf(DBG_LV0, "下一个发送序列为: %d:%d", self->sequce, i);
-        hit = &down_user[ i ];
-        /*
-        for ( u = self->users, hit = self->users; u->user_evt_handle; u ++ ) {
-            if ( u->seed > u->frame_freq && self->master != u &&
-                 u->sent_frames < hit->sent_frames ) {
-                hit = u;
-            }
-        }
-        */
+        hit = self->users[i];
+
         self->sequce ++;
         if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
             self->master = hit;
@@ -773,7 +765,7 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, BP_UART_EVENT e
             bit_clr(task, S_CHARGER_YX_1_COMM_DOWN);
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要0-49)恢复"));
         }
-        memcpy(&task->chargers, &param->buff.rx_buff[3], 100);
+        memcpy(&self->job->chargers.chargers, &param->buff.rx_buff[3], 100);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -859,7 +851,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, BP_UART_EVENT
             bit_clr(task, S_CHARGER_YX_2_COMM_DOWN);
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要50-100)恢复"));
         }
-        memcpy(&task->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
+        memcpy(self->job->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -1673,9 +1665,9 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
-    int mydone = 0, ret;
+    int mydone = 0, ret, i;
     struct bp_uart *thiz = &uarts[0];
-    struct bp_user *self = &down_user[0];
+    struct bp_user *self;
     int retval, max_handle = 0;
     size_t cursor;
     fd_set rfds;
@@ -1688,12 +1680,12 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     FD_ZERO(&rfds);
     uarts[0].bp_evt_handle = uart4_bp_evt_handle;
     uarts[0].dev_handle = -1;
-    uarts[0].dev_name = "/dev/ttyO4";
+    strcpy(uarts[0].dev_name, "/dev/ttyO4");
     uarts[0].hw_port = SERIAL4_CTRL_PIN;
 
     uarts[1].bp_evt_handle = NULL;
     uarts[1].dev_handle = -1;
-    uarts[1].dev_name = "/dev/ttyO5";
+    strcpy(uarts[1].dev_name, "/dev/ttyO5");
     uarts[1].hw_port = SERIAL5_CTRL_PIN;
 
     if ( thiz ) {
@@ -1707,23 +1699,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                    "errno: %d", errno);
     }
 #endif
-
-    // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
-    if ( task->database != NULL ) {
-        for (;self && self->user_evt_handle; self ++ ) {
-            char sql[128] = {0};
-            char *errmsg = NULL;
-            sprintf(sql,
-                    "SELECT config_value FROM configs "
-                    "   WHERE config_name='%s' AND "
-                    "         config_attrib='core'",
-                    self->swap_time_config_name);
-            ret = sqlite3_exec(task->database, sql, sql_init_uart_result, self, &errmsg);
-            if ( ret ) {
-                log_printf(ERR, "UART: SQL error msg: %s", errmsg);
-            }
-        }
-    }
 
     while ( ! *done ) {
         usleep(1000);
@@ -1743,6 +1718,25 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             // 初始化数据结构, 设定串口的初始状态
             // 串口的初始状态决定了串口的工作模式
             thiz->bp_evt_handle(thiz, BP_EVT_INIT, NULL);
+
+            // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
+            if ( task->database != NULL ) {
+                for ( i = 0; i < thiz->users_nr; i ++ ) {
+                    char sql[128] = {0};
+                    char *errmsg = NULL;
+                    self = thiz->users[ i ];
+                    if ( ! self ) continue;
+                    sprintf(sql,
+                            "SELECT config_value FROM configs "
+                            "   WHERE config_name='%s' AND "
+                            "         config_attrib='core'",
+                            self->swap_time_config_name);
+                    ret = sqlite3_exec(task->database, sql, sql_init_uart_result, self, &errmsg);
+                    if ( ret ) {
+                        log_printf(ERR, "UART: SQL error msg: %s", errmsg);
+                    }
+                }
+            }
 
             // 打开并配置串口
             // 如果初始化失败，则会不断的尝试
@@ -2058,6 +2052,7 @@ continue_to_send:
 // 生成串口通信统计页面
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 {
+#if 0
     int output_len = 0, i;
     struct bp_user *me = &down_user[0];
     struct MDATA_ACK *self;
@@ -2298,4 +2293,7 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
     return ERR_OK;
+#else
+    return ERR_ERR;
+#endif
 }

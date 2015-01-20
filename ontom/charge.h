@@ -569,7 +569,7 @@ struct charge_job {
     // 采样单元管理模块
     struct measure_struct measure;
     // 充电机管理模块
-    struct charger_struct charger;
+    struct charger_struct chargers;
 };
 
 // 故障恢复原因

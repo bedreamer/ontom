@@ -23,6 +23,9 @@
 // 串口配置失败
 #define ERR_UART_CONFIG_FAILE (ERR_ERR|0x00000008)
 
+// 内存分配失败
+#define ERR_LOW_MEMORY   (ERR_ERR|0x00000009)
+
 // 数据帧需要立即回应
 #define ERR_NEED_ECHO   (ERR_ERR|0x01000000)
 
