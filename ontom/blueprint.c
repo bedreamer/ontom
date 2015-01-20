@@ -1231,7 +1231,7 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         memcpy(&self->job->measure.measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
         // 故障判定
         me = &self->job->measure.measure;
-        me_pre = &self->job->measure;
+        me_pre = &self->job->measure.measure_pre_copy;
         if ( me->yx_mx_V_high ) {
             len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
             bit_set(task, S_BUS_V_HI);
@@ -1685,7 +1685,8 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
-    int mydone = 0, ret, i;
+    int mydone = 0, ret;
+    unsigned int i;
     struct bp_uart *thiz = &uarts[0];
     struct bp_user *self;
     int retval, max_handle = 0;
