@@ -1686,7 +1686,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
-    unsigned int i = 0
+    unsigned int i = 0;
     int ret = 0;
     struct bp_uart *thiz = &uarts[0];
     struct bp_user *self;
