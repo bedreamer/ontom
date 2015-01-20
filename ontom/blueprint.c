@@ -545,7 +545,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_FRAME_CHECK:
         ret = ERR_ERR;
         if ( self->master && self->master->user_evt_handle ) {
-            ret = self->master->user_evt_handle(self, BP_EVT_FRAME_CHECK, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_FRAME_CHECK, param);
         }
         break;
     // 切换到发送模式
@@ -574,7 +574,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
         if ( self->master && self->master->user_evt_handle ) {
-            ret = self->master->user_evt_handle(self, BP_EVT_RX_DATA, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_RX_DATA, param);
         }
         break;
     // 串口收到完整的数据帧
@@ -589,7 +589,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
          * 的数据结构中加上帧头的魔数长度描述
          */
         if ( self->master && self->master->user_evt_handle ) {
-            ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_RX_FRAME, param);
         }
 
         self->master->rcv_ok_cnt ++;
@@ -629,7 +629,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
             self->master = hit;
             self->master->seed = 0;
-            ret = hit->user_evt_handle(self, BP_EVT_TX_FRAME_REQUEST, param);
+            ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
             log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
                        ret, param->payload_size, hit->sent_frames);
         } else {
@@ -655,7 +655,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
         if ( self->master && self->master->user_evt_handle ) {
-            ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_CONFIRM, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_CONFIRM, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_CONFIRM")" without signal procedure.");
         }
@@ -672,7 +672,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(DBG_LV0, "BP_EVT_TX_FRAME_DONE %p, %d",
                        self->master,
                        self->master->sent_frames);
-            ret = self->master->user_evt_handle(self, BP_EVT_TX_FRAME_DONE, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_DONE, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_TX_FRAME_DONE")" without signal procedure.");
         }
@@ -685,7 +685,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         log_printf(DBG_LV1, "UART: no data fetched.");
         if ( self->master && self->master->user_evt_handle ) {
-            ret = self->master->user_evt_handle(self, BP_EVT_RX_BYTE_TIMEOUT, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_RX_BYTE_TIMEOUT, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_RX_BYTE_TIMEOUT")" without signal procedure.");
         }
@@ -697,7 +697,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         log_printf(DBG_LV1, "UART: not all data fetched yet.");
         if ( self->master && self->master->user_evt_handle ) {
-            ret = self->master->user_evt_handle(self, BP_EVT_RX_FRAME_TIMEOUT, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_RX_FRAME_TIMEOUT, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_RX_FRAME_TIMEOUT")" without signal procedure.");
         }
@@ -713,7 +713,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         log_printf(DBG_LV1, "UART: all data fetched but CRC check failed.");
         if ( self->master && self->master->user_evt_handle ) {
-            ret = self->master->user_evt_handle(self, BP_EVT_FRAME_CHECK_ERROR, param);
+            ret = self->master->user_evt_handle(self, self->master, BP_EVT_FRAME_CHECK_ERROR, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_FRAME_CHECK_ERROR")" without signal procedure.");
         }
