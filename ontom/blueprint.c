@@ -1685,7 +1685,7 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
-    int mydone = 0, ret;
+    int mydone = 0;
     unsigned int i;
     struct bp_uart *thiz = &uarts[0];
     struct bp_user *self;
