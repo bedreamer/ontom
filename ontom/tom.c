@@ -307,6 +307,7 @@ int main()
     }
     log_printf(INF, "CAN-BUS writer start up.                           DONE.");
 #endif
+#if 0
     // 串口服务线程，和读卡器，采样盒，电能表进行数据交换，测量
     ret = pthread_create( & tid, &attr, thread_measure_service, &thread_done[3]);
     if ( 0 != ret ) {
@@ -316,7 +317,8 @@ int main()
         goto die;
     }
     log_printf(INF, "EX-measure service start up.                       DONE.");
-
+#endif
+#if 0
     // 串口服务线程，和充电机进行通信
     ret = pthread_create( & tid, &attr, thread_charger_service,
                           &thread_done[4]);
@@ -327,7 +329,8 @@ int main()
         goto die;
     }
     log_printf(INF, "charger service start up.                          DONE.");
-
+#endif
+#if 0
     // 后台通信线程
     ret = pthread_create( & tid, &attr, thread_backgroud_service,
                           &thread_done[5]);
@@ -338,7 +341,7 @@ int main()
         goto die;
     }
     log_printf(INF, "backgroud service start up.                        DONE.");
-
+#endif
     // 充电线程，负责充电逻辑
     ret = pthread_create( & tid, &attr, thread_charge_task_service,
                           &thread_done[6]);
@@ -349,7 +352,7 @@ int main()
         goto die;
     }
     log_printf(INF, "charge service start up.                           DONE.");
-
+#if 0
     // 串口通信线程
     ret = pthread_create( & tid, &attr, thread_uart_service,
                           &thread_done[7]);
@@ -360,7 +363,7 @@ int main()
         goto die;
     }
     log_printf(INF, "UART framework start up.                           DONE.");
-
+#endif
     if ( s == 0 ) {
         pthread_attr_destroy(&attr);
     }
