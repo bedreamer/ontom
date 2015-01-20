@@ -307,10 +307,10 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
             break;
         }
         if ( ! bit_read(thiz, F_SYSTEM_CHARGE_ALLOW) ) {
-            task->this_job[0]->job_status = thiz->job_status;
-            task->this_job[0]->job_status = JOB_ERR_PAUSE;
+            thiz->job_status = thiz->job_status;
+            thiz->job_status = JOB_ERR_PAUSE;
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(%X)",
-                       task->this_job[0]->job_status);
+                       thiz->job_status);
             break;
         }
         if ( ! bit_read(thiz, F_CARDING_TRIGER) ) {
@@ -319,7 +319,7 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
         if ( ! bit_read(thiz, F_CARDING_CONFIRM) ) {
             break;
         }
-        task->this_job[0]->job_status = JOB_WORKING;
+        thiz->job_status = JOB_WORKING;
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
     case JOB_WORKING:
@@ -327,8 +327,8 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
             bit_clr(thiz, CMD_DC_OUTPUT_SWITCH_ON);
             bit_clr(thiz, CMD_GUN_1_OUTPUT_ON);
             bit_clr(thiz, CMD_GUN_2_OUTPUT_ON);
-            task->this_job[0]->status_befor_fault = JOB_WORKING;
-            task->this_job[0]->job_status = JOB_ERR_PAUSE;
+            thiz->status_befor_fault = JOB_WORKING;
+            thiz->job_status = JOB_ERR_PAUSE;
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(JOB_WORKING)");
             break;
         } else {
@@ -346,14 +346,14 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
             //}}
             if ( bit_read(thiz, CMD_JOB_ABORT) ) {
                 bit_clr(thiz, CMD_JOB_ABORT);
-                task->this_job[0]->status_befor_fault = JOB_WORKING;
-                task->this_job[0]->job_status = JOB_ABORTING;
+                thiz->status_befor_fault = JOB_WORKING;
+                thiz->job_status = JOB_ABORTING;
                 log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
                 break;
             }
             if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
-                task->this_job[0]->status_befor_fault = JOB_WORKING;
-                task->this_job[0]->job_status = JOB_MAN_PAUSE;
+                thiz->status_befor_fault = JOB_WORKING;
+                thiz->job_status = JOB_MAN_PAUSE;
                 log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
                 break;
             }
@@ -366,13 +366,13 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
             if ( bit_read(thiz, CMD_JOB_ABORT) ) {
                 bit_clr(thiz, CMD_JOB_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X)",
-                           task->this_job[0]->status_befor_fault);
-                task->this_job[0]->job_status = JOB_ABORTING;
+                           thiz->status_befor_fault);
+                thiz->job_status = JOB_ABORTING;
             }
         } else {
-            task->this_job[0]->job_status = JOB_RESUMING;
+            thiz->job_status = JOB_RESUMING;
             log_printf(INF, "ZEUS: 故障消除, 充电作业继续进行(%X)",
-                       task->this_job[0]->status_befor_fault);
+                       thiz->status_befor_fault);
         }
         break;
     case JOB_MAN_PAUSE:
@@ -382,16 +382,16 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
             if ( bit_read(thiz, CMD_JOB_ABORT) ) {
                 bit_clr(thiz, CMD_JOB_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
-                           task->this_job[0]->status_befor_fault);
-                task->this_job[0]->job_status = JOB_ABORTING;
+                           thiz->status_befor_fault);
+                thiz->job_status = JOB_ABORTING;
             }
         } else {
             if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
                 break;
             }
-            task->this_job[0]->job_status = JOB_RESUMING;
+            thiz->job_status = JOB_RESUMING;
             log_printf(INF, "ZEUS: 人工恢复作业(%X), 正在恢复",
-                       task->this_job[0]->status_befor_fault);
+                       thiz->status_befor_fault);
         }
         break;
     case JOB_RESUMING:
