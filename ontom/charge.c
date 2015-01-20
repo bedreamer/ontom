@@ -283,10 +283,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     return NULL;
 }
 
-void deal_with_system_protection(struct charge_task *thiz)
+void deal_with_system_protection(struct charge_task *tsk)
 {
     int fault_nr = 0; // 系统关键故障
     int err_nr = 0;   // 系统故障数
+    struct charge_job * thiz = tsk->this_job;
+    if ( tsk->this_job == NULL ) return;
 
     if ( bit_read(thiz, S_AC_INPUT_DOWN) ) {
         fault_nr ++;
