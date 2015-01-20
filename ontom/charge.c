@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <malloc.h>
-#include <unistd.h>
-#include <pthread.h>
-#include "charge.h"
-#include "bms.h"
-#include "config.h"
-#include "log.h"
-#include "error.h"
+#include "stdafx.h"
 
 struct charge_task tom;
 

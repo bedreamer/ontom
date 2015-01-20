@@ -1,30 +1,4 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <time.h>
-#include <signal.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-
-#include <linux/can.h>
-#include <linux/can/raw.h>
-#include "../thirdpart/mongoose/mongoose.h"
-#include "../thirdpart/D8/librf.h"
-#include "../thirdpart/sqlite/sqlite3.h"
-#include "list.h"
-#include "ajax.h"
-#include "config.h"
-#include "error.h"
-#include "log.h"
-#include "Hachiko.h"
-#include "charge.h"
+#include "stdafx.h"
 
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;

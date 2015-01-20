@@ -4,26 +4,7 @@
  * 充电机 - 串口通信过程
  * 读卡器 - 串口通信过程
  */
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <malloc.h>
-#include <time.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <linux/can.h>
-#include <linux/can/raw.h>
-#include "charge.h"
-#include "blueprint.h"
-#include "Hachiko.h"
-#include "bms.h"
-#include "config.h"
-#include "log.h"
-#include "error.h"
+#include "stdafx.h"
 
 // 数据包生成器信息
 struct can_pack_generator generator[] = {

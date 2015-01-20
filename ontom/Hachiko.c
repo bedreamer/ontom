@@ -9,16 +9,8 @@
  * 定时器粒度调整，为了满足串口快速切换和发送数据完成的判断，所以将定时器的分辨率从10ms
  * 提高到1ms。
  */
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <signal.h>
-#include <string.h>
-#include <time.h>
-#include "Hachiko.h"
-#include "log.h"
-#include "config.h"
-#include "error.h"
+#include "stdafx.h"
+
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN
 #define NR_POOL 32

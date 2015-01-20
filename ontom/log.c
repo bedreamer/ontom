@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include <time.h>
-#include <string.h>
-#include <pthread.h>
-#include <sys/types.h>
-#include "log.h"
-#include "config.h"
-#include "charge.h"
+#include "stdafx.h"
 
 int log_printf(unsigned int level, const char *fmt, ...)
 {

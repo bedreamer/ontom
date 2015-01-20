@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include "ajax.h"
-#include "config.h"
-#include "error.h"
-#include "log.h"
-#include "charge.h"
-#include "Hachiko.h"
-#include "../thirdpart/mongoose/mongoose.h"
+#include "stdafx.h"
 
 // 生成xml文件，并返回文件大小，头部由调用者生成
 int ajax_deal_xml_proc(struct ajax_xml_struct *);

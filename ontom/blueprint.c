@@ -1,22 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <termios.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <sys/wait.h>
-#include "config.h"
-#include "log.h"
-#include "error.h"
-#include "Hachiko.h"
-#include "blueprint.h"
-#include "charge.h"
-#include "ajax.h"
-#include "../thirdpart/sqlite/sqlite3.h"
+#include "stdafx.h"
 
 static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);

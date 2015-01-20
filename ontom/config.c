@@ -34,19 +34,7 @@
  * +8987_a=fasdf
  * +------------------------------------------------------------------------
  *******************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <malloc.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>  /* system data type definitions */
-#include <sys/socket.h> /* socket specific definitions */
-#include <netinet/in.h> /* INET constants and stuff */
-#include <arpa/inet.h>  /* IP address conversion stuff */
-#include "config.h"
-#include "error.h"
-#include "log.h"
-#include "ajax.h"
+#include "stdafx.h"
 
 static char *value_type[] = {"STRING", "INT", "FLOAT", "BOOL", "N/A"};
 //static char *value_system[] = {"NO", "YES", "N/A"};
