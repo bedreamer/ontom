@@ -449,7 +449,7 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
     strncpy(thiz->error_string, error_string, 32);
     strcpy(thiz->error_recover, "0000-00-00 00:00:00");
 
-    log_printf(INF, "ZEUS: 故障总数为: %d", task->err_nr);
+    log_printf(INF, "ZEUS: 故障总数为: %d", job->err_nr);
 
     __get_timestamp(timestamp);
     strcpy(thiz->error_begin, timestamp);
