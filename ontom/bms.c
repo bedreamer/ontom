@@ -18,6 +18,7 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include "charge.h"
+#include "blueprint.h"
 #include "Hachiko.h"
 #include "bms.h"
 #include "config.h"
