@@ -36,44 +36,6 @@ static int uart5_background_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 // 共计两个串口
 struct bp_uart uarts[2];
-// 串口4 使用者为充电机和采样盒
-struct bp_user down_user[] = {
-    {50 * 100,    0, 3, 0,
-        0, 0, 0, 0, 0, 0,
-        0, "core_simple_box_swap_time",
-        uart4_simple_box_evt_handle},     // 采样
-    {50 * 100, 1000, 3, 0,
-        0, 0, 0, 0, 0, 0,
-        0, "core_charger_module_time",
-        uart4_charger_module_evt_handle}, // 充电机参数寄存器(模块控制)，读写
-#if 1
-    {50 * 100, 2000, 3, 0,
-        0, 0, 0, 0, 0, 0,
-        0, "core_charger_config",
-        uart4_charger_config_evt_handle}, // 充电机参数寄存器(参数控制)，读写
-    {50 * 100, 3000, 3, 0,
-        0, 0, 0, 0, 0, 0,
-        0, "core_charger_date",
-        uart4_charger_date_evt_handle},   // 充电机参数寄存器(日期时间)，读写
-    {50 * 100, 4000, 3, 0,
-        0, 0, 0, 0, 0, 0,
-        0, "core_charger_yaoce_0_49",
-        uart4_charger_yaoce_0_49_handle},      // 盒充电机运行寄存器，只读
-    {50 * 100, 4000, 3, 0,
-        0, 0, 0, 0, 0, 0,
-        0, "core_charger_yaoce_50_100",
-        uart4_charger_yaoce_50_100_handle},// 盒充电机运行寄存器，只读
-#endif
-    {50 * 100, 4000, 0, 0,
-     0, 0, 0, 0, 0, 0,
-     0, "",
-     NULL}
-};
-// 串口5 使用者为上位机
-struct bp_user up_user[] = {
-    {100, 0, 5, 0, 0, 0, 0, 0, 0, 0, uart5_background_evt_handle},    // 采样盒
-    {0,  0, 0, 0, 0, 0, 0, 0, 0, 0, NULL}
-};
 
 #define GPIO_TO_PIN(bank, gpio)	(32 * (bank) + (gpio))
 #define	SERIAL4_CTRL_PIN	GPIO_TO_PIN(0, 19)
@@ -487,6 +449,61 @@ static int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->master =NULL;// &self->users[0];
         self->sequce = 10;
         self->continues_nr = 0;
+
+        do {
+            struct bp_user u;
+            u.frame_freq = 50 * 100;
+            u.seed = 0;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_simple_box_swap_time";
+            u.user_evt_handle = uart4_simple_box_evt_handle;
+            bp_user_bind(self, &u); // 采样
+
+            u.frame_freq = 50 * 100;
+            u.seed = 1000;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_charger_config";
+            u.user_evt_handle = uart4_charger_config_evt_handle;
+            bp_user_bind(self, &u); // 配置充电电压，电流
+
+            u.frame_freq = 50 * 100;
+            u.seed = 2000;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_charger_yaoce_0_49";
+            u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
+            bp_user_bind(self, &u); // 遥信1
+
+            u.frame_freq = 50 * 100;
+            u.seed = 3000;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_charger_yaoce_50_100";
+            u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
+            bp_user_bind(self, &u); // 遥信2
+        } while (0);
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_HOLD,
                      500, HACHIKO_PAUSE, (void*)self);
