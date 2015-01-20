@@ -26,7 +26,7 @@ struct Hachiko_food *pool[NR_POOL] = {NULL};
  */
 static void Hachiko_wangwang(int sig, siginfo_t *si, void *uc)
 {
-    int i, refresh = 0;
+    unsigned int i, refresh = 0;
 
     for ( i = 0; (unsigned int)i < (sizeof(pool)/sizeof(struct Hachiko_food *)); i ++ ) {
         if ( pool[i] == NULL ) continue;
