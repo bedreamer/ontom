@@ -193,6 +193,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     log_printf(INF, "ZEUS: 数据库初始化完成....%d", done);
     print_POST_configure();
+
+    // 启动八公定时器
+    Hachiko_init();
     while ( 1 );
 
     task->nr_jobs = 0;

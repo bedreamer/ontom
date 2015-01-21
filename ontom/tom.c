@@ -330,8 +330,6 @@ int main()
     }
     log_printf(INF, "UART framework start up.                           DONE.");
 #endif
-    // 启动八公定时器
-    Hachiko_init();
     // mongoose 线程，用来处理AJAX请求，解析由客户提交的请求，返回应答的xml文件或其他数据
     ret = pthread_create( & tid, &attr, thread_xml_service, &thread_done[0]);
     if ( 0 != ret ) {
