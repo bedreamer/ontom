@@ -558,10 +558,6 @@ struct charge_job {
     struct user_card card;
     // BMS 管理模块
     struct bms_struct bms;
-    // 采样单元管理模块
-    struct measure_struct measure;
-    // 充电机管理模块
-    struct charger_struct chargers;
 
     // 当前故障列表
     pthread_mutex_t err_list_lck;
