@@ -33,7 +33,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             printf("< %s >\n", text[i]);
         }
     }
-    *(int *)param ++;
+    (*(int *)param) ++;
     return 0;
 }
 
