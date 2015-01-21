@@ -139,14 +139,14 @@ void print_POST_configure()
     printf("  * 充电枪个数:  %4d  把\n", task->sys_config_gun_nr);
     printf("  * 充电冲突对照表:\n");
     if ( task->sys_config_gun_nr ) {
-        printf("\t\t", task->sys_config_gun_nr);
+        printf("            ");
         for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
-            printf("\t%02d#\t", x + 1);
+            printf("  %02d#  ", x + 1);
         }
         printf("\n");
     }
     for ( y = 0; y < task->sys_config_gun_nr; y ++ ) {
-        printf("  %02d#  ", y + 1);
+        printf("            %02d#  ", y + 1);
         for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
             if ( task->sys_conflict_map[y][x] ) {
                 printf("  "GRN("兼容")"  ");
