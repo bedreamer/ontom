@@ -36,10 +36,10 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
                     break;
                 }
                 if ( text[3][i] == 'C' ) {
-                    task->sys_conflict_map[y][x++] = FALSE;
+                    task->sys_conflict_map[y][x++] = false;
                 }
                 if ( text[3][i] == 'N' ) {
-                    task->sys_conflict_map[y][x++] = TRUE;
+                    task->sys_conflict_map[y][x++] = true;
                 }
                 if ( text[3][i] == ';' ) {
                     y ++;
