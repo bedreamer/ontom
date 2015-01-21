@@ -250,19 +250,6 @@ int main()
         sprintf(buff, "%d", (int)tid);
         config_write("thread_config_server_id", buff);
     }
-
-    // 启动八公定时器
-    Hachiko_init();
-
-    // mongoose 线程，用来处理AJAX请求，解析由客户提交的请求，返回应答的xml文件或其他数据
-    ret = pthread_create( & tid, &attr, thread_xml_service, &thread_done[0]);
-    if ( 0 != ret ) {
-        errcode  = 0x1000;
-        log_printf(ERR,
-                   "mongoose service start up.                     FAILE!!!!");
-        goto die;
-    }
-    log_printf(INF, "mongoose service start up.                         DONE.");
 #if 0
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & tid, &attr, thread_bms_write_service,
@@ -343,6 +330,18 @@ int main()
     }
     log_printf(INF, "UART framework start up.                           DONE.");
 #endif
+    // 启动八公定时器
+    Hachiko_init();
+    // mongoose 线程，用来处理AJAX请求，解析由客户提交的请求，返回应答的xml文件或其他数据
+    ret = pthread_create( & tid, &attr, thread_xml_service, &thread_done[0]);
+    if ( 0 != ret ) {
+        errcode  = 0x1000;
+        log_printf(ERR,
+                   "mongoose service start up.                     FAILE!!!!");
+        goto die;
+    }
+    log_printf(INF, "mongoose service start up.                         DONE.");
+
     if ( s == 0 ) {
         pthread_attr_destroy(&attr);
     }
