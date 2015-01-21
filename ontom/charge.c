@@ -20,7 +20,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
     int i = 0;
 
     if ( nr > 0 && text ) {
-        log_printf(INF, "ZEUS: DB READ [%s=%s]", text[1], text[3]);
+        log_printf(DBG_LV1, "ZEUS: DB READ [%s=%s]", text[1], text[3]);
         if ( 0 == strcmp(text[1], "sys_conflict_map") ) {
             int x = 0, y = 0;
             i = 0;
@@ -203,11 +203,13 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
      * 采样盒需要一个
      */
     if ( task->sys_charge_group_nr == 1 ) {
-        void *tp = malloc(sizeof(void*) * (1 + 1 + 1));
+        void *tp = malloc(sizeof(void*) * task->sys_rs485_dev_nr);
         if ( tp == NULL ) {
             ret = ERR_LOW_MEMORY;
             goto panic;
         }
+        task->uarts = tp;
+        memset()
     }
 
     // 两组充电机
@@ -215,17 +217,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
 
     while ( 1 );
-
-    task->nr_jobs = 0;
-    task->this_job[0] = NULL;
-    task->uarts[0].bp_evt_handle = uart4_bp_evt_handle;
-    task->uarts[0].dev_handle = -1;
-    strcpy(task->uarts[0].dev_name, "/dev/ttyO4");
-    task->uarts[0].hw_port = SERIAL4_CTRL_PIN;
-    task->uarts[1].bp_evt_handle = NULL;
-    task->uarts[1].dev_handle = -1;
-    strcpy(task->uarts[1].dev_name, "/dev/ttyO5");
-    task->uarts[1].hw_port = SERIAL5_CTRL_PIN;
 
     while ( 1 ) {
         // 扩展测量数据刷新
