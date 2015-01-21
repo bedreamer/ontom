@@ -18,7 +18,6 @@ void deal_with_measure_data(struct charge_task *thiz)
 int sql_db_config_result(void *param, int nr, char **text, char **name)
 {
     int i = 0;
-    char buff[128];
 
     if ( nr > 0 && text ) {
         log_printf(INF, "ZEUS: DB READ [%s=%s]", text[1], text[3]);
@@ -58,7 +57,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             }
             task->sys_config_gun_nr = nr;
         }else if( 0 == strcmp(text[1], "sys_can_name") ){
-            int x = 0; y = 0;
+            int x = 0, y = 0;
             i = 0;
             memset(task->sys_can_name, 0, sizeof(task->sys_can_name));
             while ( text[3][i] && i < sizeof(task->sys_can_name) ) {
