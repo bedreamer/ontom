@@ -33,7 +33,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             printf("< %s >\n", text[i]);
         }
     }
-    *(int *)param = 1;
+    *(int *)param ++;
     return 0;
 }
 
@@ -65,6 +65,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     while ( ! done ) {
         log_printf(INF, "ZEUS: 等待数据库初始化完成...." );
     }
+
+    log_printf(INF, "ZEUS: 数据库初始化完成....%d", done);
+    while ( 1 );
 
     task->nr_jobs = 0;
     task->this_job[0] = NULL;
