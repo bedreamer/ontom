@@ -75,15 +75,91 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
                 strcpy(task->sys_can_name[0], "can0");
             }
         }else if( 0 == strcmp(text[1], "sys_simple_box_nr") ){
+            int nr = atoi(text[3]);
+            int ma = atoi(text[5]);
+            int mi = atoi(text[6]);
+            if ( ma < 0 || mi < 0 || ma < mi || nr > ma || nr < mi ) {
+                log_printf(WRN, "ZEUS: 数据库初始化失败，采样盒个数异常，使用默认值");
+                task->sys_simple_box_nr = 1;
+                goto _done;
+            }
+            task->sys_simple_box_nr = nr;
         }else if( 0 == strcmp(text[1], "sys_charge_group_nr") ){
+            int nr = atoi(text[3]);
+            int ma = atoi(text[5]);
+            int mi = atoi(text[6]);
+            if ( ma < 0 || mi < 0 || ma < mi || nr > ma || nr < mi ) {
+                log_printf(WRN, "ZEUS: 数据库初始化失败，充电机组数异常，使用默认值");
+                task->sys_charge_group_nr = 1;
+                goto _done;
+            }
+            task->sys_charge_group_nr = nr;
         }else if( 0 == strcmp(text[1], "sys_rs485_dev_nr") ){
+            int nr = atoi(text[3]);
+            int ma = atoi(text[5]);
+            int mi = atoi(text[6]);
+            if ( ma < 0 || mi < 0 || ma < mi || nr > ma || nr < mi ) {
+                log_printf(WRN, "ZEUS: 数据库初始化失败，RS485设备个数异常，使用默认值");
+                task->sys_rs485_dev_nr = 2;
+                goto _done;
+            }
+            task->sys_rs485_dev_nr = nr;
         }else if( 0 == strcmp(text[1], "sys_uart_name") ){
+            int x = 0, y = 0;
+            i = 0;
+            memset(task->sys_can_name, 0, sizeof(task->sys_can_name));
+            while ( text[3][i] && i < (int)sizeof(task->sys_can_name) ) {
+                if ( text[3][i] == ';' ) {
+                    x = 0;
+                    y ++;
+                } else {
+                    task->sys_uart_name[y][x++] = text[3][i];
+                }
+                i ++;
+            }
+            if ( ! task->sys_uart_name[0][0] ) {
+                log_printf(WRN, "ZEUS: 数据库初始化失败，RS485设备文件名异常，使用默认值");
+                memset(task->sys_uart_name, 0, sizeof(task->sys_uart_name));
+                strcpy(task->sys_uart_name[0], "/dev/ttyO4");
+                strcpy(task->sys_uart_name[1], "/dev/ttyO5");
+            }
         } else {
         }
     }
 _done:
     (*(int *)param) ++;
     return 0;
+}
+
+void print_POST_configure()
+{
+    int x = 0, y;
+    log_printf(INF, "ZEUS: 读取数据库配置数据完成， 清单如下：");
+    printf("-----------------------BEGIN--------------------------\n");
+    printf("  * 充电枪个数:  %4d  把\n", task->sys_config_gun_nr);
+    printf("  * 充电冲突对照表:\n");
+    if ( task->sys_config_gun_nr ) {
+        printf("\t\t", task->sys_config_gun_nr);
+        for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
+            printf("\t%02d#\t", x + 1);
+        }
+        printf("\n");
+    }
+    for ( y = 0; y < task->sys_config_gun_nr; y ++ ) {
+        printf("\t%02d#\t", y + 1);
+        for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
+            if ( task->sys_conflict_map[y][x] ) {
+                printf("\t"GRN("兼容")"\t");
+            } else {
+                printf("\t"RED("冲突")"\t");
+            }
+        }
+        printf("\n");
+    }
+    printf("  * 采样盒个数:  %4d  个\n", task->sys_simple_box_nr);
+    printf("  * 充电机组数:  %4d  组\n", task->sys_charge_group_nr);
+    printf("  * RS485个数:  %4d  个\n", task->sys_rs485_dev_nr);
+    printf("-----------------------END---------------------------\n");
 }
 
 #define true_express(i) (keyerr[i] == '1' || keyerr[i] == 't' || keyerr[i] =='T'|| keyerr[i] == 'y' || keyerr[i] == 'Y')
@@ -116,6 +192,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
 
     log_printf(INF, "ZEUS: 数据库初始化完成....%d", done);
+    print_POST_configure();
     while ( 1 );
 
     task->nr_jobs = 0;
