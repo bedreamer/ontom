@@ -133,7 +133,7 @@ _done:
 
 void print_POST_configure()
 {
-    int x = 0, y;
+    unsigned int x = 0, y;
     log_printf(INF, "ZEUS: 读取数据库配置数据完成， 清单如下：");
     printf("-----------------------BEGIN--------------------------\n");
     printf("  * 充电枪个数:  %4d  把\n", task->sys_config_gun_nr);
