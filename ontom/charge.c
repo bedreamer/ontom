@@ -139,7 +139,7 @@ void print_POST_configure()
     printf("  * 充电枪个数:  %4d  把\n", task->sys_config_gun_nr);
     printf("  * 充电冲突对照表:\n");
     if ( task->sys_config_gun_nr ) {
-        printf("            ");
+        printf("                 ");
         for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
             printf("  %02d#  ", x + 1);
         }
