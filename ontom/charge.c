@@ -141,7 +141,7 @@ void print_POST_configure()
     if ( task->sys_config_gun_nr ) {
         printf("                 ");
         for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
-            printf("  %02d#  ", x + 1);
+            printf("  %02d#   ", x + 1);
         }
         printf("\n");
     }
