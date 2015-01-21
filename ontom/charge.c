@@ -60,7 +60,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             int x = 0, y = 0;
             i = 0;
             memset(task->sys_can_name, 0, sizeof(task->sys_can_name));
-            while ( text[3][i] && i < sizeof(task->sys_can_name) ) {
+            while ( text[3][i] && i < (int)sizeof(task->sys_can_name) ) {
                 if ( text[3][i] == ';' ) {
                     x = 0;
                     y ++;
