@@ -174,12 +174,13 @@ void print_POST_configure()
 void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     char sql[256];
+    char buff[32] = {0};
+
     int ret, done = 0;
     char *errmsg;
 
     log_printf(INF, "ZUES: %s running...sizeof(struct charge_task)=%d",
             __FUNCTION__, sizeof(struct charge_task));
-
 
     sprintf(sql, "SELECT * FROM configs");
     ret = sqlite3_exec(task->database, sql, sql_db_config_result, &done, &errmsg);
@@ -196,6 +197,23 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     // 启动八公定时器
     Hachiko_init();
+
+    /*  只有一组充电机
+     * 最多配置两把枪，且两把枪必须是互斥的，即不能同时进行充电操作
+     * 采样盒需要一个
+     */
+    if ( task->sys_charge_group_nr == 1 ) {
+        void *tp = malloc(sizeof(void*) * (1 + 1 + 1));
+        if ( tp == NULL ) {
+            ret = ERR_LOW_MEMORY;
+            goto panic;
+        }
+    }
+
+    // 两组充电机
+    if ( task->sys_charge_group_nr == 2 ) {
+    }
+
     while ( 1 );
 
     task->nr_jobs = 0;
@@ -219,7 +237,13 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
         usleep(5000);
     }
-
+panic:
+    log_printf(ERR, "ZEUS: 关键错误，系统退出 %d", ret);
+    __get_timestamp(buff);
+    sprintf(sql, "INSERT INTO log VALUES('%s', '关键错误，系统退出 %d", buff, ret);
+    sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+    sqlite3_close(task->database);
+    exit(ret);
     return NULL;
 }
 
