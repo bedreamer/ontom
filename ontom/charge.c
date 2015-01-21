@@ -61,6 +61,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         log_printf(ERR, "TOM: SQL error: %s", errmsg);
     }
 
+    while (1) ;
+
     task->nr_jobs = 0;
     task->this_job[0] = NULL;
     task->uarts[0].bp_evt_handle = uart4_bp_evt_handle;
