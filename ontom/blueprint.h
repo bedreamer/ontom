@@ -147,6 +147,10 @@ struct bp_user {
 
     // 对应的作业
     struct charge_job *job;
+    // 对应的充电机管理单元
+    struct charger_struct *chargers;
+    // 对应的采样管理单元
+    struct measure_struct *measure;
 
     // 已经发送的帧数
     unsigned int sent_frames;

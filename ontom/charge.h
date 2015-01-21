@@ -626,6 +626,11 @@ struct charge_task {
     // 任务记录故障总数
     unsigned int err_seq_id_next;
 
+    // 采样单元管理模块
+    struct measure_struct *measure;
+    // 充电机管理模块
+    struct charger_struct *chargers;
+
     // {{ 以下为充电桩系统监控的配置数据
     /* 充电冲突映射表
      * 充电冲突根据系统配置的充电枪个数确定, 目前系统最多支持4把枪
@@ -647,7 +652,7 @@ struct charge_task {
      *        \冲突枪  |             |               |
      *   充电枪 \      |  1 #充电枪   |   2 #充电枪   |
      *   -------------+-------------+---------------+
-     *      1 #充电枪  |     /      |    CONFLICT   |
+     *      1 #充电枪  |     /       |    CONFLICT   |
      *   -------------+-------------+---------------+
      *      2 #充电枪  |  CONFLICT   |       /      |
      *   -------------+-------------+---------------+
@@ -657,6 +662,10 @@ struct charge_task {
     unsigned int sys_config_gun_nr;
     /* 不同充电接口对应的CAN设备名称*/
     char sys_can_name[CONFIG_SUPPORT_BMS_NR][128];
+    /*采样单元个数, 默认为1个，若配置两个采样盒则可以*/
+    unsigned int sys_simple_box_nr;
+    /*充电机组数， 默认1组.*/
+    unsigned int sys_charge_group_nr;
     //}}
 };
 

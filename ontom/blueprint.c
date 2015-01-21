@@ -755,7 +755,7 @@ static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user 
             bit_clr(me->job, S_CHARGER_YX_1_COMM_DOWN);
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要0-49)恢复"));
         }
-        memcpy(&me->job->chargers.chargers, &param->buff.rx_buff[3], 100);
+        memcpy(&me->chargers->chargers, &param->buff.rx_buff[3], 100);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -841,7 +841,7 @@ static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_use
             bit_clr(me->job, S_CHARGER_YX_2_COMM_DOWN);
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要50-100)恢复"));
         }
-        memcpy(&me->job->chargers.chargers.charge_module_status, &param->buff.rx_buff[3], 100);
+        memcpy(&me->chargers->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -1199,10 +1199,10 @@ static int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me,
         bit_clr(me->job, S_MEASURE_COMM_DOWN);
         self->master->died = 0;
 
-        memcpy(&me->job->measure.measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
+        memcpy(&me->measure->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
         // 故障判定
-        box = &me->job->measure.measure;
-        me_pre = &me->job->measure.measure_pre_copy;
+        box = &me->measure->measure;
+        me_pre = &me->measure->measure_pre_copy;
         if ( box->yx_mx_V_high ) {
             len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
             bit_set(me->job, S_BUS_V_HI);
