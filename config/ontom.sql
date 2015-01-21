@@ -248,3 +248,140 @@ INSERT INTO configs VALUES
 	'充电屏监控配置通信时间调整',
 	'解决485收发时间切换问题'
     );
+INSERT INTO configs VALUES
+    (
+	'factory',
+	'sys_conflict_map',
+	'STRING',
+	'NC;CN;',
+	'N/A',
+	'N/A',
+	'N/A',
+	'NC;CN',
+	'NC;CN',
+	'false',
+	'false',
+	'2015-01-21 11:21:23',
+	'充电枪充电充电冲突配置表',
+	'false',
+	'冲突配置表',
+	'用于配置2把枪或4把枪是否可以同时进行充电，N标识不冲突C标识冲突'
+
+    );
+INSERT INTO configs VALUES
+    (
+	'factory',
+	'sys_config_gun_nr',
+	'INT',
+	'2',
+	'N/A',
+	'4',
+	'0',
+	'2',
+	'2',
+	'false',
+	'false',
+	'2015-01-21 11:26:43',
+	'系统配置充电枪个数',
+	'false',
+	'充电枪个数',
+	'用户配置系统中存在的充电枪个数'
+    );
+INSERT INTO configs VALUES
+    (
+	'factory',
+	'sys_can_name',
+	'STRING',
+	'can0;can1;',
+	'N/A',
+	'N/A',
+	'N/A',
+	'can0;can1;',
+	'can0;can1;',
+	'false',
+	'false',
+	'2015-01-21 11:29:02',
+	'BMS通信用CAN设备文件名称',
+	'false',
+	'BMS通讯设备',
+	'若系统支持同时对多辆车进行充电那么就需要支持多个CAN设备'
+
+    );
+INSERT INTO configs VALUES
+    (
+	'factory',
+	'sys_simple_box_nr',
+	'STRING',
+	'1',
+	'N/A',
+	'4',
+	'0',
+	'1',
+	'1',
+	'false',
+	'false',
+	'2015-01-21 11:31:02',
+	'采样盒个数',
+	'false',
+	'综合采样盒个数',
+	'系统中现有综合采样盒个数'
+    );
+INSERT INTO configs VALUES
+    (
+	'factory',
+	'sys_charge_group_nr',
+	'STRING',
+	'1',
+	'N/A',
+	'4',
+	'0',
+	'1',
+	'1',
+	'false',
+	'false',
+	'2015-01-21 11:31:02',
+	'充电机分组数',
+	'false',
+	'充电机组数',
+	'系统进行多机同时充电时充电机组数'
+    );
+INSERT INTO configs VALUES
+    (
+	'factory',
+	'sys_rs485_dev_nr',
+	'STRING',
+	'1',
+	'N/A',
+	'4',
+	'0',
+	'1',
+	'1',
+	'false',
+	'false',
+	'2015-01-21 12:19:02',
+	'RS485串口个数',
+	'false',
+	'通信串口个数',
+	'系统进行多机同时充电时485串口个数'
+
+    );
+INSERT INTO configs VALUES
+    (
+	'factory',
+	'sys_uart_name',
+	'STRING',
+	'/dev/ttyO4;/dev/ttyO5',
+	'N/A',
+	'N/A',
+	'N/A',
+	'/dev/ttyO4;/dev/ttyO5',
+	'/dev/ttyO4;/dev/ttyO5',
+	'false',
+	'false',
+	'2015-01-21 12:19:02',
+	'RS485串口文件名',
+	'false',
+	'通信串口文件名',
+	'系统进行多机同时充电时485串口文件名'
+
+    );
