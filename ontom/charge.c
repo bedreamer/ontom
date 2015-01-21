@@ -146,12 +146,12 @@ void print_POST_configure()
         printf("\n");
     }
     for ( y = 0; y < task->sys_config_gun_nr; y ++ ) {
-        printf("\t%02d#\t", y + 1);
+        printf("\t%02d#", y + 1);
         for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
             if ( task->sys_conflict_map[y][x] ) {
-                printf("\t"GRN("兼容")"\t");
+                printf(""GRN("兼容")"\t");
             } else {
-                printf("\t"RED("冲突")"\t");
+                printf(""RED("冲突")"\t");
             }
         }
         printf("\n");
