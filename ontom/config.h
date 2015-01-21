@@ -37,6 +37,8 @@
  * 进行管理，因此在这里将支持的BMS配置成可变参数的形式。
  */
 #define CONFIG_SUPPORT_BMS_NR          4
+/*系统支持的485串口设备个数*/
+#define CONFIG_SUPPORT_RS485_NR        2
 //}}}}}}}}}}}}}
 
 // 默认数据库文件

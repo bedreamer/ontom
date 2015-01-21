@@ -617,11 +617,11 @@ struct charge_task {
     // 空闲作业
     struct charge_job idle[CONFIG_SUPPORT_CHARGE_JOBS];
 
-    // 共计两个串口
-    struct bp_uart uarts[2];
     // 任务记录故障总数
     unsigned int err_seq_id_next;
 
+    // 串口设备管理模块
+    struct bp_uart *uarts;
     // 采样单元管理模块
     struct measure_struct *measure;
     // 充电机管理模块
@@ -662,6 +662,10 @@ struct charge_task {
     unsigned int sys_simple_box_nr;
     /*充电机组数， 默认1组.*/
     unsigned int sys_charge_group_nr;
+    /*通信用485串口数个数*/
+    unsigned int sys_rs485_dev_nr;
+    /*通信用485串口设备文件名*/
+    char sys_uart_name[CONFIG_SUPPORT_RS485_NR][128];
     //}}
 };
 

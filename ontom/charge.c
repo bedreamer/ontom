@@ -15,6 +15,27 @@ void deal_with_measure_data(struct charge_task *thiz)
 {
 }
 
+int sql_db_config_result(void *param, int nr, char **text, char **name)
+{
+    int i, item = 0;
+
+    if ( nr > 0 && text ) {
+        for ( i = 0; i < nr; i ++ ) {
+            if ( 0 == strcmp(text[ item * 16 + 1], "sys_conflict_map") ) {
+            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_config_gun_nr") ){
+            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_can_name") ){
+            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_simple_box_nr") ){
+            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_charge_group_nr") ){
+            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_rs485_dev_nr") ){
+            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_uart_name") ){
+            } else {
+            }
+            printf("< %s >\n", text[i]);
+        }
+    }
+    return 0;
+}
+
 #define true_express(i) (keyerr[i] == '1' || keyerr[i] == 't' || keyerr[i] =='T'|| keyerr[i] == 'y' || keyerr[i] == 'Y')
 #define false_express(i) (keyerr[i] == '0' || keyerr[i] == 'f' || keyerr[i] =='F'|| keyerr[i] == 'n' || keyerr[i] == 'N')
 /* 充电任务服务线程
@@ -26,8 +47,19 @@ void deal_with_measure_data(struct charge_task *thiz)
  */
 void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
+    char sql[256];
+    int ret;
+    char *errmsg;
+
     log_printf(INF, "ZUES: %s running...sizeof(struct charge_task)=%d",
             __FUNCTION__, sizeof(struct charge_task));
+
+
+    sprintf(sql, "SELECT * FROM configs");
+    ret = sqlite3_exec(task->database, sql, sql_db_config_result, NULL, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "TOM: SQL error: %s", errmsg);
+    }
 
     task->nr_jobs = 0;
     task->this_job[0] = NULL;
