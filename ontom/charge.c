@@ -17,21 +17,20 @@ void deal_with_measure_data(struct charge_task *thiz)
 
 int sql_db_config_result(void *param, int nr, char **text, char **name)
 {
-    int i, item = 0;
+    int item = 0;
 
     if ( nr > 0 && text ) {
-        for ( i = 0; i < nr; i ++ ) {
-            if ( 0 == strcmp(text[ item * 16 + 1], "sys_conflict_map") ) {
-            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_config_gun_nr") ){
-            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_can_name") ){
-            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_simple_box_nr") ){
-            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_charge_group_nr") ){
-            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_rs485_dev_nr") ){
-            }else if( 0 == strcmp(text[ item * 16 + 1], "sys_uart_name") ){
-            } else {
-            }
-            printf("< %s > %d\n", text[i], nr);
+        log_printf(INF, "ZEUS: DB READ [%s=%s]", text[1], text[3]);
+        if ( 0 == strcmp(text[1], "sys_conflict_map") ) {
+        }else if( 0 == strcmp(text[1], "sys_config_gun_nr") ){
+        }else if( 0 == strcmp(text[1], "sys_can_name") ){
+        }else if( 0 == strcmp(text[1], "sys_simple_box_nr") ){
+        }else if( 0 == strcmp(text[1], "sys_charge_group_nr") ){
+        }else if( 0 == strcmp(text[1], "sys_rs485_dev_nr") ){
+        }else if( 0 == strcmp(text[1], "sys_uart_name") ){
+        } else {
         }
+        printf("< %s > %d\n", text[i], nr);
     }
     (*(int *)param) ++;
     return 0;
