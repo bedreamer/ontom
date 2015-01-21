@@ -209,7 +209,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             goto panic;
         }
         task->uarts = tp;
-        memset()
     }
 
     // 两组充电机
