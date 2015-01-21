@@ -37,8 +37,11 @@
  * 进行管理，因此在这里将支持的BMS配置成可变参数的形式。
  */
 #define CONFIG_SUPPORT_BMS_NR          4
+#define CONFIG_SUPPORT_SIMPLE_BOX_NR   CONFIG_SUPPORT_BMS_NR
 /*系统支持的485串口设备个数*/
 #define CONFIG_SUPPORT_RS485_NR        2
+// 系统支持的充电机组数
+#define CONFIG_SUPPORT_CHARGE_GRP_NR   2
 //}}}}}}}}}}}}}
 
 // 默认数据库文件

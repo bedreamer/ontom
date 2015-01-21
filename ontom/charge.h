@@ -621,11 +621,11 @@ struct charge_task {
     unsigned int err_seq_id_next;
 
     // 串口设备管理模块
-    struct bp_uart **uarts;
+    struct bp_uart *uarts[CONFIG_SUPPORT_RS485_NR];
     // 采样单元管理模块
-    struct measure_struct **measure;
+    struct measure_struct *measure[CONFIG_SUPPORT_SIMPLE_BOX_NR];
     // 充电机管理模块
-    struct charger_struct **chargers;
+    struct charger_struct *chargers[CONFIG_SUPPORT_CHARGE_GRP_NR];
 
     // {{ 以下为充电桩系统监控的配置数据
     /* 充电冲突映射表

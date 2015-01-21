@@ -146,12 +146,12 @@ void print_POST_configure()
         printf("\n");
     }
     for ( y = 0; y < task->sys_config_gun_nr; y ++ ) {
-        printf("\t%02d#\t", y + 1);
+        printf("  %02d#  ", y + 1);
         for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
             if ( task->sys_conflict_map[y][x] ) {
-                printf("\t"GRN("兼容")"\t");
+                printf("  "GRN("兼容")"  ");
             } else {
-                printf("\t"RED("冲突")"\t");
+                printf("  "RED("冲突")"  ");
             }
         }
         printf("\n");
@@ -198,17 +198,31 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     // 启动八公定时器
     Hachiko_init();
 
-    /*  只有一组充电机
-     * 最多配置两把枪，且两把枪必须是互斥的，即不能同时进行充电操作
-     * 采样盒需要一个
+    /* 方案1：
+     *   一组充电机， 一个采样盒，两把枪
+     *   两把枪分时充电
      */
-    if ( task->sys_charge_group_nr == 1 ) {
-        void *tp = malloc(sizeof(void*) * task->sys_rs485_dev_nr);
-        if ( tp == NULL ) {
-            ret = ERR_LOW_MEMORY;
-            goto panic;
-        }
-        task->uarts = tp;
+    if ( task->sys_charge_group_nr == 1 &&
+         task->sys_simple_box_nr == 1   &&
+         task->sys_config_gun_nr == 2 ) {
+    }
+
+    /* 方案2：
+     *   两组充电机， 一个采样盒，两把枪
+     *   一个采样盒采两段母线，两把枪可同时充电
+     */
+    if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 1   &&
+         task->sys_config_gun_nr == 2 ) {
+    }
+
+    /* 方案3：
+     *   两组充电机， 两个采样盒，两把枪
+     *   一个采样盒采一段母线，两把枪可同时充电
+     */
+    if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 1   &&
+         task->sys_config_gun_nr == 2 ) {
     }
 
     // 两组充电机
