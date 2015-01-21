@@ -129,7 +129,7 @@ int sql_result(void *param, int nr, char **text, char **name)
         if ( text[0] ) {
             task->err_seq_id_next = atoi(text[0]);
         } else {
-            log_printf(INF, "TOM: SQL init err_seq=%s", text[0]);
+            //log_printf(INF, "TOM: SQL init err_seq=%s", text[0]);
         }
     } else {
         task->err_seq_id_next = 1;
