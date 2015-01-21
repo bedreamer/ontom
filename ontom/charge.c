@@ -33,6 +33,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             printf("< %s >\n", text[i]);
         }
     }
+    *(int *)param = 1;
     return 0;
 }
 
@@ -48,7 +49,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
 void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     char sql[256];
-    int ret;
+    int ret, done = 0;
     char *errmsg;
 
     log_printf(INF, "ZUES: %s running...sizeof(struct charge_task)=%d",
@@ -56,12 +57,14 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
 
     sprintf(sql, "SELECT * FROM configs");
-    ret = sqlite3_exec(task->database, sql, sql_db_config_result, NULL, &errmsg);
+    ret = sqlite3_exec(task->database, sql, sql_db_config_result, &done, &errmsg);
     if ( ret ) {
         log_printf(ERR, "TOM: SQL error: %s", errmsg);
     }
 
-    while (1) ;
+    while ( ! done ) {
+        log_printf(INF, "ZEUS: 等待数据库初始化完成...." );
+    }
 
     task->nr_jobs = 0;
     task->this_job[0] = NULL;
