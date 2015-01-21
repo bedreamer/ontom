@@ -28,10 +28,10 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             while (text[3][i]) {
                 if ( x > CONFIG_SUPPORT_BMS_NR ||
                      y > CONFIG_SUPPORT_BMS_NR ) {
-                    task->sys_conflict_map[0][0] = TRUE;
-                    task->sys_conflict_map[0][1] = FALSE;
-                    task->sys_conflict_map[1][0] = FALSE;
-                    task->sys_conflict_map[1][1] = TRUE;
+                    task->sys_conflict_map[0][0] = true;
+                    task->sys_conflict_map[0][1] = false;
+                    task->sys_conflict_map[1][0] = false;
+                    task->sys_conflict_map[1][1] = true;
                     log_printf(WRN, "ZEUS: 输出据初始化错误，充电枪冲突配置异常. 使用默认值");
                     break;
                 }
