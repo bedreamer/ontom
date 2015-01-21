@@ -158,7 +158,7 @@ void print_POST_configure()
     }
     printf("  * %16s  %4d  个\n", "采样盒个数:", task->sys_simple_box_nr);
     printf("  * %16s  %4d  组\n", "充电机组数:", task->sys_charge_group_nr);
-    printf("  * %12s  %4d  个\n", "RS485个数:", task->sys_rs485_dev_nr);
+    printf("  * %13s  %4d  个\n", "RS485个数:", task->sys_rs485_dev_nr);
     printf("-----------------------END---------------------------\n");
 }
 
