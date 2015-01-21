@@ -17,8 +17,6 @@ void deal_with_measure_data(struct charge_task *thiz)
 
 int sql_db_config_result(void *param, int nr, char **text, char **name)
 {
-    int item = 0;
-
     if ( nr > 0 && text ) {
         log_printf(INF, "ZEUS: DB READ [%s=%s]", text[1], text[3]);
         if ( 0 == strcmp(text[1], "sys_conflict_map") ) {
@@ -30,7 +28,6 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
         }else if( 0 == strcmp(text[1], "sys_uart_name") ){
         } else {
         }
-        printf("< %s > %d\n", text[i], nr);
     }
     (*(int *)param) ++;
     return 0;
