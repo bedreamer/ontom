@@ -149,9 +149,9 @@ void print_POST_configure()
         printf("\t%02d#", y + 1);
         for ( x = 0; x < task->sys_config_gun_nr; x ++ ) {
             if ( task->sys_conflict_map[y][x] ) {
-                printf(""GRN("兼容")"\t");
+                printf("%8s", GRN("兼容"));
             } else {
-                printf(""RED("冲突")"\t");
+                printf("%8s", RED("冲突"));
             }
         }
         printf("\n");
