@@ -30,7 +30,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             }else if( 0 == strcmp(text[ item * 16 + 1], "sys_uart_name") ){
             } else {
             }
-            printf("< %s >\n", text[i]);
+            printf("< %s > %d\n", text[i], nr);
         }
     }
     (*(int *)param) ++;
