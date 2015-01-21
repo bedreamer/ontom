@@ -17,11 +17,64 @@ void deal_with_measure_data(struct charge_task *thiz)
 
 int sql_db_config_result(void *param, int nr, char **text, char **name)
 {
+    int i = 0;
+    char buff[128];
+
     if ( nr > 0 && text ) {
         log_printf(INF, "ZEUS: DB READ [%s=%s]", text[1], text[3]);
         if ( 0 == strcmp(text[1], "sys_conflict_map") ) {
+            int x = 0, y = 0;
+            i = 0;
+            while (text[3][i]) {
+                if ( x > CONFIG_SUPPORT_BMS_NR ||
+                     y > CONFIG_SUPPORT_BMS_NR ) {
+                    task->sys_conflict_map[0][0] = TRUE;
+                    task->sys_conflict_map[0][1] = FALSE;
+                    task->sys_conflict_map[1][0] = FALSE;
+                    task->sys_conflict_map[1][1] = TRUE;
+                    log_printf(WRN, "ZEUS: 输出据初始化错误，充电枪冲突配置异常. 使用默认值");
+                    break;
+                }
+                if ( text[3][i] == 'C' ) {
+                    task->sys_conflict_map[y][x++] = FALSE;
+                }
+                if ( text[3][i] == 'N' ) {
+                    task->sys_conflict_map[y][x++] = TRUE;
+                }
+                if ( text[3][i] == ';' ) {
+                    y ++;
+                    x = 0;
+                }
+                i ++;
+            }
         }else if( 0 == strcmp(text[1], "sys_config_gun_nr") ){
+            int nr = atoi(text[3]);
+            int ma = atoi(text[5]);
+            int mi = atoi(text[6]);
+            if ( ma < 0 || mi < 0 || ma < mi || nr > ma || nr < mi ) {
+                log_printf(WRN, "ZEUS: 数据库初始化失败，充电枪个数异常，使用默认值");
+                task->sys_config_gun_nr = 2;
+                goto _done;
+            }
+            task->sys_config_gun_nr = nr;
         }else if( 0 == strcmp(text[1], "sys_can_name") ){
+            int x = 0; y = 0;
+            i = 0;
+            memset(task->sys_can_name, 0, sizeof(task->sys_can_name));
+            while ( text[3][i] && i < sizeof(task->sys_can_name) ) {
+                if ( text[3][i] == ';' ) {
+                    x = 0;
+                    y ++;
+                } else {
+                    task->sys_can_name[y][x++] = text[3][i];
+                }
+                i ++;
+            }
+            if ( ! task->sys_can_name[0][0] ) {
+                log_printf(WRN, "ZEUS: 数据库初始化失败，CAN设备文件名异常，使用默认值");
+                memset(task->sys_can_name, 0, sizeof(task->sys_can_name));
+                strcpy(task->sys_can_name[0], "can0");
+            }
         }else if( 0 == strcmp(text[1], "sys_simple_box_nr") ){
         }else if( 0 == strcmp(text[1], "sys_charge_group_nr") ){
         }else if( 0 == strcmp(text[1], "sys_rs485_dev_nr") ){
@@ -29,6 +82,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
         } else {
         }
     }
+_done:
     (*(int *)param) ++;
     return 0;
 }
