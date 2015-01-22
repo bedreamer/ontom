@@ -152,7 +152,7 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
                        len);
         }
     } while (0);
-    return 1;
+    return 0;
 }
 
 void print_POST_configure()
