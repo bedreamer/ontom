@@ -402,8 +402,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.payload_size = 0;
         self->rx_param.buff_size = sizeof(self->rx_buff);
 
-        self->users_nr = 0;
-        memset(self->users, 0, sizeof(self->users));
         self->master =NULL;// &self->users[0];
         self->sequce = 10;
         self->continues_nr = 0;
