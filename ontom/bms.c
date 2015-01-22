@@ -532,8 +532,8 @@ int about_packet_reciev_done(struct charge_job *thiz,
     case PGN_CEM :// 0x001F00
         break;
     case PGN_BRM :// 0x000200, BMS 车辆辨识报文
-        statistics[I_BRM].can_counter ++;
-        statistics[I_BRM].can_silence = 0;
+        thiz->bms.statistics[I_BRM].can_counter ++;
+        thiz->bms.statistics[I_BRM].can_silence = 0;
         if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
@@ -1268,7 +1268,7 @@ void on_charge_stage_change
 // 握手-CRM-充电机辨识报文
 int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[0];
+    struct can_pack_generator *gen = &thiz->bms.generator[0];
 
     if ( 0 == bit_read(thiz, F_BMS_RECOGNIZED) ) {
         param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
@@ -1285,7 +1285,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    statistics[I_BRM].can_counter ++;
+    thiz->bms.statistics[I_BRM].can_counter ++;
 
     return 0;
 }
@@ -1293,7 +1293,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
 // 配置-CTS-充电机发送时间同步信息
 int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[1];
+    struct can_pack_generator *gen = &thiz->bms.generator[1];
     struct pgn1792_CTS cts;
     time_t timep;
     struct tm *p;
@@ -1327,7 +1327,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    statistics[I_CTS].can_counter ++;
+    thiz->bms.statistics[I_CTS].can_counter ++;
 
     return 0;
 }
@@ -1335,7 +1335,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
 // 配置-CML-充电机最大输出能力
 int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[2];
+    struct can_pack_generator *gen = &thiz->bms.generator[2];
     struct pgn2048_CML cml;
 
     cml.spn2824_max_output_voltage = 7500;
@@ -1349,7 +1349,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    statistics[I_CML].can_counter ++;
+    thiz->bms.statistics[I_CML].can_counter ++;
 
     return 0;
 }
@@ -1357,7 +1357,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
 // 配置-CRO-充电机输出准备就绪状态
 int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[3];
+    struct can_pack_generator *gen = &thiz->bms.generator[3];
     struct pgn2560_CRO cro;
 
     cro.spn2830_charger_ready_for_charge = CHARGER_READY_FOR_CHARGE;
@@ -1370,7 +1370,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    statistics[I_CRO].can_counter ++;
+    thiz->bms.statistics[I_CRO].can_counter ++;
 
     return 0;
 }
@@ -1378,7 +1378,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
 // 充电-CCS-充电机充电状态
 int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[4];
+    struct can_pack_generator *gen = &thiz->bms.generator[4];
     struct pgn4608_CCS ccs;
 
     ccs.spn3081_output_voltage = 7500;
@@ -1393,7 +1393,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    statistics[I_CCS].can_counter ++;
+    thiz->bms.statistics[I_CCS].can_counter ++;
 
     return 0;
 }
