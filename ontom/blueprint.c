@@ -1793,6 +1793,7 @@ ___fast_switch_2_rx:
 
             usleep(400 * 1000);
 
+            log_printf(INF, "catch bugs %s:%d", __FILE__, __LINE__);
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
             if ( ret != ERR_OK || thiz->tx_param.payload_size <= 0 ||
