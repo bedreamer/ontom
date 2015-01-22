@@ -159,6 +159,10 @@ void print_POST_configure()
     printf("  * %16s  %4d  个\n", "采样盒个数:", task->sys_simple_box_nr);
     printf("  * %16s  %4d  组\n", "充电机组数:", task->sys_charge_group_nr);
     printf("  * %13s  %4d  个\n", "RS485个数:", task->sys_rs485_dev_nr);
+    printf("  * %16s  %s\n"     , "充电方式:",
+           task->sys_charge_group_nr==1?
+               task->sys_config_gun_nr>1?"分时充电":"独立充电":
+                "独立充电");
     printf("-----------------------END---------------------------\n");
 }
 
@@ -208,26 +212,23 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
 
     /* 方案2：
-     *   两组充电机， 一个采样盒，两把枪
+     *   两组充电机， 一个采样盒，4把枪
      *   一个采样盒采两段母线，两把枪可同时充电
      */
-    if ( task->sys_charge_group_nr == 2 &&
+    else if ( task->sys_charge_group_nr == 2 &&
          task->sys_simple_box_nr == 1   &&
-         task->sys_config_gun_nr == 2 ) {
+         task->sys_config_gun_nr == 4 ) {
     }
 
     /* 方案3：
-     *   两组充电机， 两个采样盒，两把枪
-     *   一个采样盒采一段母线，两把枪可同时充电
+     *   两组充电机， 一个采样盒，4把枪
+     *   一个采样盒采两段母线，两把枪可同时充电
      */
-    if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 1   &&
-         task->sys_config_gun_nr == 2 ) {
+    else if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 2   &&
+         task->sys_config_gun_nr == 4 ) {
     }
 
-    // 两组充电机
-    if ( task->sys_charge_group_nr == 2 ) {
-    }
 
     while ( 1 );
 
