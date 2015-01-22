@@ -1865,12 +1865,19 @@ continue_to_send:
                 thiz->tx_param.payload_size = 0;
                 log_printf(DBG_LV0, "UART: packet send done.");
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
-                thiz->status = BP_UART_STAT_RD;
-                if ( thiz->role == BP_UART_MASTER ) {
-                    // 主动设备，需要进行接收超时判定
-                    Hachiko_resume(&thiz->rx_seed);
+                if ( thiz->rx_param.need_bytes ) {
+                    thiz->status = BP_UART_STAT_RD;
+                    if ( thiz->role == BP_UART_MASTER ) {
+                        // 主动设备，需要进行接收超时判定
+                        Hachiko_resume(&thiz->rx_seed);
+                    }
+                    goto ___fast_switch_2_rx;
+                } else {
+                    thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                    thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                    thiz->tx_param.payload_size = 0;
+                    thiz->tx_param.cursor = 0;
                 }
-                goto ___fast_switch_2_rx;
 #endif
             } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送了一部分
