@@ -225,7 +225,7 @@ int main()
         int stack_KB;
         const char *stack_size = config_read("thread_stack_size");
         if ( stack_size == NULL ) {
-            log_printf(INF, "thread_stack_size not set, use 1024K");
+            log_printf(DBG_LV1, "thread_stack_size not set, use 1024K");
             stack_size = "1024";
         }
         stack_KB = atoi(stack_size);
@@ -235,7 +235,7 @@ int main()
             stack_KB = 1024;
         }
         if ( 0 == pthread_attr_setstacksize(&attr, stack_KB * 1024) ) {
-            log_printf(INF, "set all thread stack size to: %d KB", stack_KB);
+            log_printf(DBG_LV1, "set all thread stack size to: %d KB", stack_KB);
         } else {
             log_printf(ERR, "set all thread stack_size to %d KB faile, "
                        "use system default size.", stack_KB);

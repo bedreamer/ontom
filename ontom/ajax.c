@@ -865,7 +865,7 @@ void *thread_xml_service(void *arg) ___THREAD_ENTRY___
     struct mg_server *server;
     if ( done == NULL ) done = &mydone;
 
-    log_printf(INF, "%s running...", __FUNCTION__);
+    log_printf(DBG_LV1, "%s running...", __FUNCTION__);
     server = mg_create_server(NULL, ev_handler);
     mg_set_option(server, "listening_port", "8081");
 
