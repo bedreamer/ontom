@@ -138,8 +138,6 @@ int sql_result(void *param, int nr, char **text, char **name)
 int main()
 {
     const char *user_cfg = NULL;
-    pthread_t tid = 0;
-    pthread_attr_t task->attr;
     int s;
     int thread_done[ 8 ] = {0};
     char buff[32];
