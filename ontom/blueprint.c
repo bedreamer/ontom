@@ -557,8 +557,8 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
             self->master = hit;
             self->master->seed = 0;
+            log_printf(INF, "catch bugs, %s:%d, %p", __FILE__, __LINE__, self->master);
             ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
-            log_printf(INF, "catch bugs, %s:%d", __FILE__, __LINE__);
             log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
                        ret, param->payload_size, hit->sent_frames);
         } else {
