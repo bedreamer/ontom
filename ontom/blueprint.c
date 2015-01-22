@@ -403,7 +403,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->rx_param.buff_size = sizeof(self->rx_buff);
 
         self->master =NULL;// &self->users[0];
-        self->sequce = 10;
+        self->sequce = 0;
         self->continues_nr = 0;
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_HOLD,
