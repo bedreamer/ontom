@@ -313,7 +313,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         } while (0);
         // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
         if ( task->database != NULL ) {
-            int i;
+            unsigned int i;
             for ( i = 0; i < bp->users_nr; i ++ ) {
                 char sql[128] = {0};
                 char *errmsg = NULL;
