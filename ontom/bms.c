@@ -1401,7 +1401,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
 // 充电-CST-充电机中止充电
 int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[5];
+    struct can_pack_generator *gen = &thiz->bms.generator[5];
     (void)thiz;
     (void)param;
     (void)gen;
@@ -1412,7 +1412,7 @@ int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param)
 // 结束-CSD-充电机统计数据
 int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[6];
+    struct can_pack_generator *gen = &thiz->bms.generator[6];
     (void)thiz;
     (void)param;
     (void)gen;
@@ -1423,7 +1423,7 @@ int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param)
 // 错误-CEM-充电机错误报文
 int gen_packet_PGN7936(struct charge_job * thiz, struct event_struct* param)
 {
-    struct can_pack_generator *gen = &generator[7];
+    struct can_pack_generator *gen = &thiz->bms.generator[7];
     (void)thiz;
     (void)param;
     (void)gen;
