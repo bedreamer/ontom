@@ -270,7 +270,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_simple_box_swap_time";
             u.user_evt_handle = uart4_simple_box_evt_handle;
-            bp_user_bind(self, &u); // 采样
+            bp_user_bind(bp, &u); // 采样
 
             u.frame_freq = 50 * 100;
             u.seed = 1000;
@@ -283,7 +283,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_charger_config";
             u.user_evt_handle = uart4_charger_config_evt_handle;
-            bp_user_bind(self, &u); // 配置充电电压，电流
+            bp_user_bind(bp, &u); // 配置充电电压，电流
 
             u.frame_freq = 50 * 100;
             u.seed = 2000;
@@ -296,7 +296,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_charger_yaoce_0_49";
             u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
-            bp_user_bind(self, &u); // 遥信1
+            bp_user_bind(bp, &u); // 遥信1
 
             u.frame_freq = 50 * 100;
             u.seed = 3000;
@@ -309,7 +309,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_charger_yaoce_50_100";
             u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
-            bp_user_bind(self, &u); // 遥信2
+            bp_user_bind(bp, &u); // 遥信2
         } while (0);
         // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
         if ( task->database != NULL ) {
