@@ -179,7 +179,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     int ret, done = 0;
     char *errmsg;
 
-    log_printf(INF, "ZUES: %s running...sizeof(struct charge_task)=%d",
+    log_printf(DBG_LV1, "ZUES: %s running...sizeof(struct charge_task)=%d",
             __FUNCTION__, sizeof(struct charge_task));
 
     sprintf(sql, "SELECT * FROM configs");
