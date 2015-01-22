@@ -399,55 +399,55 @@ static int can_packet_callback(
             param->evt_param = EVT_RET_ERR;
             break;
         case CHARGE_STAGE_HANDSHACKING:
-            if ( generator[0].heartbeat >= generator[0].period ) {
+            if ( thiz->bms.generator[0].heartbeat >= thiz->bms.generator[0].period ) {
                 gen_packet_PGN256(thiz, param);
-                generator[0].heartbeat = 0;
+                thiz->bms.generator[0].heartbeat = 0;
             }
-            if ( generator[7].heartbeat >= generator[7].period ) {
+            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
                 gen_packet_PGN7936(thiz, param);
-                generator[7].heartbeat = 0;
+                thiz->bms.generator[7].heartbeat = 0;
             }
             break;
         case CHARGE_STAGE_CONFIGURE:
-            if ( generator[1].heartbeat >= generator[1].period ) {
+            if ( thiz->bms.generator[1].heartbeat >= thiz->bms.generator[1].period ) {
                 gen_packet_PGN1792(thiz, param);
-                generator[1].heartbeat = 0;
+                thiz->bms.generator[1].heartbeat = 0;
             }
-            else if ( generator[2].heartbeat >= generator[2].period ) {
+            else if ( thiz->bms.generator[2].heartbeat >= thiz->bms.generator[2].period ) {
                 gen_packet_PGN2048(thiz, param);
-                generator[2].heartbeat = 0;
+                thiz->bms.generator[2].heartbeat = 0;
             }
-            else if ( generator[3].heartbeat >= generator[3].period ) {
+            else if ( thiz->bms.generator[3].heartbeat >= thiz->bms.generator[3].period ) {
                 gen_packet_PGN2560(thiz, param);
-                generator[3].heartbeat = 0;
+                thiz->bms.generator[3].heartbeat = 0;
             }
-            if ( generator[7].heartbeat >= generator[7].period ) {
+            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
                 gen_packet_PGN7936(thiz, param);
-                generator[7].heartbeat = 0;
+                thiz->bms.generator[7].heartbeat = 0;
             }
             break;
         case CHARGE_STAGE_CHARGING:
-            if ( generator[4].heartbeat >= generator[4].period ) {
+            if ( thiz->bms.generator[4].heartbeat >= thiz->bms.generator[4].period ) {
                 gen_packet_PGN4608(thiz, param);
-                generator[4].heartbeat = 0;
+                thiz->bms.generator[4].heartbeat = 0;
             }
-            else if ( generator[5].heartbeat >= generator[5].period ) {
+            else if ( thiz->bms.generator[5].heartbeat >= thiz->bms.generator[5].period ) {
                 gen_packet_PGN6656(thiz, param);
-                generator[5].heartbeat = 0;
+                thiz->bms.generator[5].heartbeat = 0;
             }
-            if ( generator[7].heartbeat >= generator[7].period ) {
+            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
                 gen_packet_PGN7936(thiz, param);
-                generator[7].heartbeat = 0;
+                thiz->bms.generator[7].heartbeat = 0;
             }
             break;
         case CHARGE_STAGE_DONE:
-            if ( generator[6].heartbeat >= generator[6].period ) {
+            if ( thiz->bms.generator[6].heartbeat >= thiz->bms.generator[6].period ) {
                 gen_packet_PGN7424(thiz, param);
-                generator[6].heartbeat = 0;
+                thiz->bms.generator[6].heartbeat = 0;
             }
-            if ( generator[7].heartbeat >= generator[7].period ) {
+            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
                 gen_packet_PGN7936(thiz, param);
-                generator[7].heartbeat = 0;
+                thiz->bms.generator[7].heartbeat = 0;
             }
             break;
         default:
