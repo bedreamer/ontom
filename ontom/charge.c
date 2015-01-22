@@ -338,7 +338,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                        "UART framework start up.                       FAILE!!!!");
             goto __panic;
         }
-        log_printf(INF, "UART framework start up.              DONE(%ld).", task->tid);
+        log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
         // }}
     }
 
