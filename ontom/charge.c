@@ -131,6 +131,30 @@ _done:
     return 0;
 }
 
+// 从数据库初始化
+int sql_init_uart_result(void *param, int nr, char **text, char **name)
+{
+    struct bp_user *self = (struct bp_user *)(param);
+
+    if (  nr <= 0 ) {
+        return 0;
+    }
+    do {
+        int len = atoi(text[0]);
+        if ( len >= 0 ) {
+            log_printf(INF, "UART: database init %s = %d",
+                       self->swap_time_config_name,
+                       len);
+            self->swap_time_modify = len;
+        } else {
+            log_printf(WRN, "UART: dabase init exception %s = %d",
+                       self->swap_time_config_name,
+                       len);
+        }
+    } while (0);
+    return 1;
+}
+
 void print_POST_configure()
 {
     unsigned int x = 0, y;
@@ -205,19 +229,108 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     /* 方案1：
      *   一组充电机， 一个采样盒，两把枪
      *   两把枪分时充电
+     *
+     *  串口服务线程:   2 个{电度表,[采样盒,充电机] }
+     *    暂时先忽略电度表线程,后期可能会添加串口IO方式的读卡器
      */
     if ( task->sys_charge_group_nr == 1 &&
          task->sys_simple_box_nr == 1   &&
          task->sys_config_gun_nr == 2 ) {
-    }
+        // {{ 采样盒 充电机
+        struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
+        if ( NULL == bp ) {
+            ret = ERR_LOW_MEMORY;
+            log_printf(ERR, "ZEUS: 分配系统内存失败");
+            goto __panic;
+        }
+        memset(bp, 0, sizeof(struct bp_uart));
+        bp->bp_evt_handle = uart4_bp_evt_handle;
+        if ( ! task->sys_uart_name[0][0] ) {
+            log_printf(WRN, "ZEUS: 未配置采样盒通信用RS485设备文件, 使用默认值.");
+            strcpy(task->sys_uart_name[0], "/dev/ttyO4");
+        }
+        strcpy(bp->dev_name, task->sys_uart_name[0]);
+        bp->dev_handle = -1;
+        bp->status = BP_UART_STAT_INVALID;
+        bp->hw_status = BP_UART_STAT_INVALID;
+        bp->role = BP_UART_MASTER;
+        bp->init_magic = 0;
+        bp->hw_port = SERIAL4_CTRL_PIN;
 
-    /* 方案2：
-     *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采两段母线，两把枪可同时充电
-     */
-    else if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 1   &&
-         task->sys_config_gun_nr == 4 ) {
+        do {
+            struct bp_user u;
+            u.frame_freq = 50 * 100;
+            u.seed = 0;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_simple_box_swap_time";
+            u.user_evt_handle = uart4_simple_box_evt_handle;
+            bp_user_bind(self, &u); // 采样
+
+            u.frame_freq = 50 * 100;
+            u.seed = 1000;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_charger_config";
+            u.user_evt_handle = uart4_charger_config_evt_handle;
+            bp_user_bind(self, &u); // 配置充电电压，电流
+
+            u.frame_freq = 50 * 100;
+            u.seed = 2000;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_charger_yaoce_0_49";
+            u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
+            bp_user_bind(self, &u); // 遥信1
+
+            u.frame_freq = 50 * 100;
+            u.seed = 3000;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_charger_yaoce_50_100";
+            u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
+            bp_user_bind(self, &u); // 遥信2
+        } while (0);
+        // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
+        if ( task->database != NULL ) {
+            for ( i = 0; i < bp->users_nr; i ++ ) {
+                char sql[128] = {0};
+                char *errmsg = NULL;
+                struct bp_user *self = bp->users[ i ];
+                if ( ! self ) continue;
+                sprintf(sql,
+                        "SELECT config_value FROM configs "
+                        "   WHERE config_name='%s' AND "
+                        "         config_attrib='core'",
+                        self->swap_time_config_name);
+                ret = sqlite3_exec(task->database, sql, sql_init_uart_result, self, &errmsg);
+                if ( ret ) {
+                    log_printf(ERR, "UART: SQL error msg: %s", errmsg);
+                }
+            }
+        }
+
+        // }}
     }
 
     /* 方案3：
@@ -229,8 +342,18 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
          task->sys_config_gun_nr == 4 ) {
     }
 
-
-    while ( 1 );
+    /* 方案2：
+     *   两组充电机， 一个采样盒，4把枪
+     *   一个采样盒采两段母线，两把枪可同时充电
+     */
+    else if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 1   &&
+         task->sys_config_gun_nr == 4 ) {
+    }
+    else {
+        log_printf(ERR, "ZEUS: 系统模型无法识别，系统恢复默认模型");
+        while ( 1 );
+    }
 
     while ( 1 ) {
         // 扩展测量数据刷新
@@ -242,7 +365,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
         usleep(5000);
     }
-panic:
+__panic:
     log_printf(ERR, "ZEUS: 关键错误，系统退出 %d", ret);
     __get_timestamp(buff);
     sprintf(sql, "INSERT INTO log VALUES('%s', '关键错误，系统退出 %d", buff, ret);

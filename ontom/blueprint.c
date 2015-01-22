@@ -1,20 +1,5 @@
 #include "stdafx.h"
 
-static int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
-static int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
-static int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
-static int uart4_charger_module_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
-static int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
-static int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
-static int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param);
-
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
     struct termios options;
@@ -422,61 +407,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->master =NULL;// &self->users[0];
         self->sequce = 10;
         self->continues_nr = 0;
-
-        do {
-            struct bp_user u;
-            u.frame_freq = 50 * 100;
-            u.seed = 0;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 0;
-            u.swap_time_config_name = "core_simple_box_swap_time";
-            u.user_evt_handle = uart4_simple_box_evt_handle;
-            bp_user_bind(self, &u); // 采样
-
-            u.frame_freq = 50 * 100;
-            u.seed = 1000;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 0;
-            u.swap_time_config_name = "core_charger_config";
-            u.user_evt_handle = uart4_charger_config_evt_handle;
-            bp_user_bind(self, &u); // 配置充电电压，电流
-
-            u.frame_freq = 50 * 100;
-            u.seed = 2000;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 0;
-            u.swap_time_config_name = "core_charger_yaoce_0_49";
-            u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
-            bp_user_bind(self, &u); // 遥信1
-
-            u.frame_freq = 50 * 100;
-            u.seed = 3000;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 0;
-            u.swap_time_config_name = "core_charger_yaoce_50_100";
-            u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
-            bp_user_bind(self, &u); // 遥信2
-        } while (0);
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_HOLD,
                      500, HACHIKO_PAUSE, (void*)self);
@@ -1612,30 +1542,6 @@ static int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me,
     return ret;
 }
 
-// 从数据库初始化
-int sql_init_uart_result(void *param, int nr, char **text, char **name)
-{
-    struct bp_user *self = (struct bp_user *)(param);
-
-    if (  nr <= 0 ) {
-        return 0;
-    }
-    do {
-        int len = atoi(text[0]);
-        if ( len >= 0 ) {
-            log_printf(INF, "UART: database init %s = %d",
-                       self->swap_time_config_name,
-                       len);
-            self->swap_time_modify = len;
-        } else {
-            log_printf(WRN, "UART: dabase init exception %s = %d",
-                       self->swap_time_config_name,
-                       len);
-        }
-    } while (0);
-    return 1;
-}
-
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
@@ -1674,25 +1580,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             // 初始化数据结构, 设定串口的初始状态
             // 串口的初始状态决定了串口的工作模式
             thiz->bp_evt_handle(thiz, BP_EVT_INIT, NULL);
-
-            // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
-            if ( task->database != NULL ) {
-                for ( i = 0; i < thiz->users_nr; i ++ ) {
-                    char sql[128] = {0};
-                    char *errmsg = NULL;
-                    self = thiz->users[ i ];
-                    if ( ! self ) continue;
-                    sprintf(sql,
-                            "SELECT config_value FROM configs "
-                            "   WHERE config_name='%s' AND "
-                            "         config_attrib='core'",
-                            self->swap_time_config_name);
-                    ret = sqlite3_exec(task->database, sql, sql_init_uart_result, self, &errmsg);
-                    if ( ret ) {
-                        log_printf(ERR, "UART: SQL error msg: %s", errmsg);
-                    }
-                }
-            }
 
             // 打开并配置串口
             // 如果初始化失败，则会不断的尝试

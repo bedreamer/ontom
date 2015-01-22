@@ -257,5 +257,21 @@ static inline int bp_user_bind(struct bp_uart *bp, struct bp_user *u) {
     return ERR_OK;
 }
 int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt, struct bp_evt_param *param);
-
+int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+int uart4_charger_module_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+void * thread_uart_service(void *arg) ___THREAD_ENTRY___;
+void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
+                            const struct Hachiko_food *self);
 #endif // _BLUE_PRINT_INCLUED_H_
