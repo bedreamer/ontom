@@ -117,7 +117,7 @@ void Hachiko_init()
     memset(pool, 0, sizeof(pool));
     /* Establish handler for timer signal */
 
-    log_printf(INF, "Hachiko: Establishing handler for signal %d", SIG);
+    log_printf(DBG_LV1, "Hachiko: Establishing handler for signal %d", SIG);
     sa.sa_flags = SA_SIGINFO;
     sa.sa_sigaction = Hachiko_wangwang;
     sigemptyset(&sa.sa_mask);
@@ -128,7 +128,7 @@ void Hachiko_init()
 
     /* Block timer signal temporarily */
 
-    log_printf(INF, "Hachiko: Blocking signal %d", SIG);
+    log_printf(DBG_LV1, "Hachiko: Blocking signal %d", SIG);
     sigemptyset(&mask);
     sigaddset(&mask, SIG);
     if (sigprocmask(SIG_SETMASK, &mask, NULL) == -1) {
@@ -146,7 +146,7 @@ void Hachiko_init()
         errExit("Hachiko: timer_create");
     }
 
-    log_printf(INF, "Hachiko: timer ID is 0x%lx", (long) timerid);
+    log_printf(DBG_LV1, "Hachiko: timer ID is 0x%lx", (long) timerid);
 
     /* Start the timer , 默认10ms*/
     freq_nanosecs = atoll(config_read("HachikoTTL"));
@@ -159,7 +159,7 @@ void Hachiko_init()
     its.it_interval.tv_sec = its.it_value.tv_sec;
     its.it_interval.tv_nsec = its.it_value.tv_nsec;
 
-    log_printf(INF, "HACHIKO: timer resolution: %ld", freq_nanosecs);
+    log_printf(DBG_LV1, "HACHIKO: timer resolution: %ld", freq_nanosecs);
 
     if (timer_settime(timerid, 0, &its, NULL) == -1) {
         log_printf(ERR, "Hachiko: timer_settime faile.");
@@ -169,7 +169,7 @@ void Hachiko_init()
     /* Unlock the timer signal, so that timer notification
        can be delivered */
 
-    log_printf(INF, "Hachiko: Unblocking signal %d", SIG);
+    log_printf(DBG_LV1, "Hachiko: Unblocking signal %d", SIG);
     if (sigprocmask(SIG_UNBLOCK, &mask, NULL) == -1) {
         log_printf(ERR, "Hachiko: sigprocmask faile.");
         errExit("Hachiko: sigprocmask");
