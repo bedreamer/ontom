@@ -552,6 +552,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
          * 采用帧发送均衡算法，该串口上的使用者帧率之和为10000
          */
         i = self->sequce % self->users_nr;
+        log_printf(INF, "catch bugs %s:%d", __FILE__, __LINE__);
         log_printf(DBG_LV0, "下一个发送序列为: %d:%d", self->sequce, i);
         hit = self->users[i];
 
@@ -1793,7 +1794,6 @@ ___fast_switch_2_rx:
 
             usleep(400 * 1000);
 
-            log_printf(INF, "catch bugs %s:%d", __FILE__, __LINE__);
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
             if ( ret != ERR_OK || thiz->tx_param.payload_size <= 0 ||
