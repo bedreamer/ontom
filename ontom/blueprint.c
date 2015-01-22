@@ -557,7 +557,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
             self->master = hit;
             self->master->seed = 0;
-            log_printf(INF, "catch bugs, %s:%d, %p", __FILE__, __LINE__, self->master);
             ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
             log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
                        ret, param->payload_size, hit->sent_frames);
@@ -1122,6 +1121,10 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( ! me->job ) {
+            ret = ERR_ERR;
+            break;
+        }
         if ( bit_read(me->job, S_MEASURE_COMM_DOWN) ) {
             log_printf(INF, "UART: "GRN("综合采样盒通信恢复."));
         }
@@ -1404,40 +1407,43 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-
-        if ( me->job->job_gun_sn == GUN_SN0 ) {
-            if ( bit_read(me->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
-                cmd |= GUN1_ASSIT_PWN_ON;
-                cmd &= ~GUN2_ASSIT_PWN_ON;
+        if ( me->job ) {
+            if ( me->job->job_gun_sn == GUN_SN0 ) {
+                if ( bit_read(me->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
+                    cmd |= GUN1_ASSIT_PWN_ON;
+                    cmd &= ~GUN2_ASSIT_PWN_ON;
+                } else {
+                    cmd &= ~GUN1_ASSIT_PWN_ON;
+                }
+                if ( bit_read(me->job, CMD_GUN_1_OUTPUT_ON) ) {
+                    cmd |= GUN1_OUTPUT_ON;
+                    cmd &= ~GUN2_OUTPUT_ON;
+                } else {
+                    cmd &= ~GUN1_OUTPUT_ON;
+                }
+            } else if  ( me->job->job_gun_sn == GUN_SN1 ) {
+                if ( bit_read(me->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
+                    cmd |= GUN2_ASSIT_PWN_ON;
+                    cmd &= ~GUN1_ASSIT_PWN_ON;
+                } else {
+                    cmd &= ~GUN2_ASSIT_PWN_ON;
+                }
+                if ( bit_read(me->job, CMD_GUN_1_OUTPUT_ON) ) {
+                    cmd |= GUN2_OUTPUT_ON;
+                    cmd &= ~GUN1_OUTPUT_ON;
+                } else {
+                    cmd &= ~GUN2_OUTPUT_ON;
+                }
             } else {
-                cmd &= ~GUN1_ASSIT_PWN_ON;
+                cmd = 0;
             }
-            if ( bit_read(me->job, CMD_GUN_1_OUTPUT_ON) ) {
-                cmd |= GUN1_OUTPUT_ON;
-                cmd &= ~GUN2_OUTPUT_ON;
+            if ( bit_read(me->job, CMD_DC_OUTPUT_SWITCH_ON) ) {
+                cmd |= DC_SWITCH_ON;
             } else {
-                cmd &= ~GUN1_OUTPUT_ON;
-            }
-        } else if  ( me->job->job_gun_sn == GUN_SN1 ) {
-            if ( bit_read(me->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
-                cmd |= GUN2_ASSIT_PWN_ON;
-                cmd &= ~GUN1_ASSIT_PWN_ON;
-            } else {
-                cmd &= ~GUN2_ASSIT_PWN_ON;
-            }
-            if ( bit_read(me->job, CMD_GUN_1_OUTPUT_ON) ) {
-                cmd |= GUN2_OUTPUT_ON;
-                cmd &= ~GUN1_OUTPUT_ON;
-            } else {
-                cmd &= ~GUN2_OUTPUT_ON;
+                cmd &= ~DC_SWITCH_ON;
             }
         } else {
             cmd = 0;
-        }
-        if ( bit_read(me->job, CMD_DC_OUTPUT_SWITCH_ON) ) {
-            cmd |= DC_SWITCH_ON;
-        } else {
-            cmd &= ~DC_SWITCH_ON;
         }
 
         buff[ nr ++ ] = 0xF0;
