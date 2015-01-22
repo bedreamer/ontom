@@ -142,7 +142,7 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
     do {
         int len = atoi(text[0]);
         if ( len >= 0 ) {
-            log_printf(INF, "UART: database init %s = %d",
+            log_printf(DBG_LV1, "UART: database init %s = %d",
                        self->swap_time_config_name,
                        len);
             self->swap_time_modify = len;
