@@ -150,7 +150,7 @@ int main()
 
     signal(SIGINT, sig_interrupt);
 
-    log_printf(INF, "TOM: 系统准备启动...");
+    log_printf(DBG_LV1, "TOM: 系统准备启动...");
     ret = sqlite3_open(DEFAULT_DB, &task->database);
     if ( ret != SQLITE_OK ) {
         log_printf(ERR, "TOM: 打开数据库失败..");
@@ -317,7 +317,7 @@ int main()
                    "charge service start up.                       FAILE!!!!");
         goto die;
     }
-    log_printf(INF, "charge service start up.                           DONE.");
+    log_printf(DBG_LV1, "charge service start up.                           DONE.");
 #if 0
     // 串口通信线程
     ret = pthread_create( & tid, &attr, thread_uart_service,
@@ -338,7 +338,7 @@ int main()
                    "mongoose service start up.                     FAILE!!!!");
         goto die;
     }
-    log_printf(INF, "mongoose service start up.                         DONE.");
+    log_printf(DBG_LV1, "mongoose service start up.                         DONE.");
 
     if ( s == 0 ) {
         pthread_attr_destroy(&attr);

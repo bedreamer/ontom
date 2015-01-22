@@ -134,7 +134,7 @@ _done:
 void print_POST_configure()
 {
     unsigned int x = 0, y;
-    log_printf(INF, "ZEUS: 读取数据库配置数据完成， 清单如下：");
+    printf("读取数据库配置数据完成， 清单如下：\n");
     printf("-----------------------BEGIN--------------------------\n");
     printf("  * 充电枪个数:  %4d  把\n", task->sys_config_gun_nr);
     printf("  * 充电冲突对照表:\n");
@@ -192,7 +192,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         log_printf(INF, "ZEUS: 等待数据库初始化完成...." );
     }
 
-    log_printf(INF, "ZEUS: 数据库初始化完成....%d", done);
+    log_printf(DBG_LV1, "ZEUS: 数据库初始化完成....%d", done);
     print_POST_configure();
 
     // 启动八公定时器
