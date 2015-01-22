@@ -330,7 +330,15 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 }
             }
         }
-
+        // 串口通信线程
+        ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
+        if ( 0 != ret ) {
+            ret  = 0x1006;
+            log_printf(ERR,
+                       "UART framework start up.                       FAILE!!!!");
+            goto __panic;
+        }
+        log_printf(INF, "UART framework start up.              DONE(%ld).", tid);
         // }}
     }
 

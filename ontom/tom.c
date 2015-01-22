@@ -139,7 +139,7 @@ int main()
 {
     const char *user_cfg = NULL;
     pthread_t tid = 0;
-    pthread_attr_t attr;
+    pthread_attr_t task->attr;
     int s;
     int thread_done[ 8 ] = {0};
     char buff[32];
@@ -214,7 +214,7 @@ int main()
     }
     config_initlize(user_cfg);
 
-    s = pthread_attr_init(&attr);
+    s = pthread_attr_init(&task->attr);
     if ( 0 != s ) {
         log_printf(WRN, "could not set thread stack size, use default.");
     }
@@ -232,7 +232,7 @@ int main()
                        "use default 1024 K instead.", stack_KB);
             stack_KB = 1024;
         }
-        if ( 0 == pthread_attr_setstacksize(&attr, stack_KB * 1024) ) {
+        if ( 0 == pthread_attr_setstacksize(&task->attr, stack_KB * 1024) ) {
             log_printf(DBG_LV1, "set all thread stack size to: %d KB", stack_KB);
         } else {
             log_printf(ERR, "set all thread stack_size to %d KB faile, "
@@ -244,13 +244,13 @@ int main()
     user_cfg = config_read("socket_config");
     if ( strcmp(user_cfg, "TURE") ||
          strcmp(user_cfg, "true") ) {
-        pthread_create( & tid, &attr, config_drive_service, NULL);
-        sprintf(buff, "%d", (int)tid);
+        pthread_create( & task->tid, &task->attr, config_drive_service, NULL);
+        sprintf(buff, "%d", (int)task->tid);
         config_write("thread_config_server_id", buff);
     }
 #if 0
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
-    ret = pthread_create( & tid, &attr, thread_bms_write_service,
+    ret = pthread_create( & task->tid, &task->attr, thread_bms_write_service,
                           &thread_done[1]);
     if ( 0 != ret ) {
         errcode  = 0x1001;
@@ -261,7 +261,7 @@ int main()
     log_printf(INF, "CAN-BUS reader start up.                           DONE.");
 
     // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
-    ret = pthread_create( & tid, &attr, thread_bms_read_service,
+    ret = pthread_create( & task->tid, &task->attr, thread_bms_read_service,
                           &thread_done[2]);
     if ( 0 != ret ) {
         errcode  = 0x1002;
@@ -273,7 +273,7 @@ int main()
 #endif
 #if 0
     // 串口服务线程，和读卡器，采样盒，电能表进行数据交换，测量
-    ret = pthread_create( & tid, &attr, thread_measure_service, &thread_done[3]);
+    ret = pthread_create( & task->tid, &task->attr, thread_measure_service, &thread_done[3]);
     if ( 0 != ret ) {
         errcode  = 0x1003;
         log_printf(ERR,
@@ -284,7 +284,7 @@ int main()
 #endif
 #if 0
     // 串口服务线程，和充电机进行通信
-    ret = pthread_create( & tid, &attr, thread_charger_service,
+    ret = pthread_create( & task->tid, &task->attr, thread_charger_service,
                           &thread_done[4]);
     if ( 0 != ret ) {
         errcode  = 0x1004;
@@ -296,7 +296,7 @@ int main()
 #endif
 #if 0
     // 后台通信线程
-    ret = pthread_create( & tid, &attr, thread_backgroud_service,
+    ret = pthread_create( & task->tid, &task->attr, thread_backgroud_service,
                           &thread_done[5]);
     if ( 0 != ret ) {
         errcode  = 0x1004;
@@ -307,7 +307,7 @@ int main()
     log_printf(INF, "backgroud service start up.                        DONE.");
 #endif
     // 充电线程，负责充电逻辑
-    ret = pthread_create( & tid, &attr, thread_charge_task_service,
+    ret = pthread_create( & task->tid, &task->attr, thread_charge_task_service,
                           &thread_done[6]);
     if ( 0 != ret ) {
         errcode  = 0x1005;
@@ -318,7 +318,7 @@ int main()
     log_printf(DBG_LV1, "charge service start up.                           DONE.");
 #if 0
     // 串口通信线程
-    ret = pthread_create( & tid, &attr, thread_uart_service,
+    ret = pthread_create( & task->tid, &task->attr, thread_uart_service,
                           &thread_done[7]);
     if ( 0 != ret ) {
         errcode  = 0x1006;
@@ -329,7 +329,7 @@ int main()
     log_printf(INF, "UART framework start up.                           DONE.");
 #endif
     // mongoose 线程，用来处理AJAX请求，解析由客户提交的请求，返回应答的xml文件或其他数据
-    ret = pthread_create( & tid, &attr, thread_xml_service, &thread_done[0]);
+    ret = pthread_create( & task->tid, &task->attr, thread_xml_service, &thread_done[0]);
     if ( 0 != ret ) {
         errcode  = 0x1000;
         log_printf(ERR,
@@ -338,9 +338,6 @@ int main()
     }
     log_printf(DBG_LV1, "mongoose service start up.                         DONE.");
 
-    if ( s == 0 ) {
-        pthread_attr_destroy(&attr);
-    }
 
 #if CONFIG_DEBUG_CONFIG >= 1
     config_print();
@@ -348,6 +345,9 @@ int main()
     // 主循环中放置看门狗代码
     for ( ;; ) {
         sleep(3);
+    }
+    if ( s == 0 ) {
+        pthread_attr_destroy(&task->attr);
     }
     return 0;
 die:

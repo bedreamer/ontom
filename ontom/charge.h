@@ -607,6 +607,8 @@ void error_history_recover(struct charge_job *job, unsigned int error_id);
 struct charge_task {
     // 已经编译为多线程安全模式，所以不用加锁
     sqlite3 *database;
+    pthread_t tid;
+    pthread_attr_t attr;
 
     // 工作列表中的工作个数
     unsigned int nr_jobs;
