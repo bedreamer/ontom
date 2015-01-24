@@ -6,6 +6,7 @@ struct charge_task tom;
 struct charge_task *task = &tom;
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
 void deal_with_job_business(struct charge_task *, struct charge_job *);
+struct charge_job * create_new_job(struct charge_task *, struct job_commit *need);
 
 /*
  * 扩展测量数据刷新
@@ -258,7 +259,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         bp->hw_port = SERIAL4_CTRL_PIN;
 
         do {
-            struct bp_user u;
+            struct bp_user u = {0};
             u.frame_freq = 50 * 100;
             u.seed = 0;
             u.died_line = 3;
@@ -270,6 +271,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_simple_box_swap_time";
             u.user_evt_handle = uart4_simple_box_evt_handle;
+            u.uart = bp;
             ret = bp_user_bind(bp, &u); // 采样
 
             u.frame_freq = 50 * 100;
@@ -283,6 +285,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_charger_config";
             u.user_evt_handle = uart4_charger_config_evt_handle;
+            u.uart = bp;
             ret = bp_user_bind(bp, &u); // 配置充电电压，电流
 
             u.frame_freq = 50 * 100;
@@ -296,6 +299,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_charger_yaoce_0_49";
             u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
+            u.uart = bp;
             ret = bp_user_bind(bp, &u); // 遥信1
 
             u.frame_freq = 50 * 100;
@@ -309,6 +313,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_modify = 0;
             u.swap_time_config_name = "core_charger_yaoce_50_100";
             u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
+            u.uart = bp;
             ret = bp_user_bind(bp, &u); // 遥信2
         } while (0);
         // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
@@ -344,7 +349,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     /* 方案3：
      *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采两段母线，两把枪可同时充电
+     *   一个采样盒采一段母线，两把枪可同时充电
      */
     else if ( task->sys_charge_group_nr == 2 &&
          task->sys_simple_box_nr == 2   &&
@@ -745,6 +750,14 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
         break;
     }
 }
+
+struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *need)
+{
+    struct charge_job *thiz = NULL;
+
+    return thiz;
+}
+
 
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string)
 {

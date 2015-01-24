@@ -151,6 +151,8 @@ struct bp_user {
     struct charger_struct *chargers;
     // 对应的采样管理单元
     struct measure_struct *measure;
+    // 对应绑定的串口
+    struct bp_uart *uart;
 
     // 已经发送的帧数
     unsigned int sent_frames;

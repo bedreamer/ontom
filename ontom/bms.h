@@ -494,5 +494,14 @@ typedef enum {
     I_BEM = 18,
     I_CEM = 19
 }CAN_PGN_STATISTICS;
+int about_packet_reciev_done(struct charge_job *thiz, struct event_struct *param);
+int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param);
+int gen_packet_PGN7936(struct charge_job * thiz, struct event_struct* param);
 
 #endif /*_BMS_PACKAGE_INCLUDED_H_*/

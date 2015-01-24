@@ -504,8 +504,10 @@ struct bms_struct {
     // BMS 动力蓄电池状态信息
     struct pgn4864_BSM bms_battery_status;
 
-    struct can_pack_generator generator[8];
-    struct bms_statistics statistics[20];
+    unsigned int can_pack_gen_nr;
+    struct can_pack_generator *generator;
+    unsigned int can_statistics_nr;
+    struct bms_statistics statistics;
 };
 
 // 采样盒 通讯管理描述结构，JOB的下属成员结构
@@ -525,6 +527,11 @@ struct charger_struct {
     COMM_M_STRUCT_STATUS status;
     // 充电屏信息
     struct charger_config_10h chargers;
+};
+
+// 作业提交结构
+struct job_commit {
+    unsigned int nr;
 };
 
 /*
