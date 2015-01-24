@@ -212,7 +212,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
                             const struct Hachiko_food *self)
 {
     if (evt == HACHIKO_TIMEOUT ) {
-        int i = 0;
+        unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)private;
         struct can_pack_generator *gen;
         struct bms_statistics *me;
