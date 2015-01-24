@@ -400,7 +400,7 @@ CREATE TABLE bms_can_pack_generator(
 	);
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_HAND_SHAKING',
+	'STAGE_HANDSHACKING',
 	'CRM',
 	'充电机辨识报文',
 	'256',
@@ -414,7 +414,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_HAND_SHAKING',
+	'STAGE_HANDSHACKING',
 	'BRM',
 	'BMS辨识报文',
 	'512',
@@ -428,7 +428,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CONFIGURATION',
+	'STAGE_CONFIGURE',
 	'BCP',
 	'动力蓄电池充电参数',
 	'1536',
@@ -442,7 +442,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CONFIGURATION',
+	'STAGE_CONFIGURE',
 	'CTS',
 	'充电机发送时间同步信息',
 	'1792',
@@ -456,7 +456,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CONFIGURATION',
+	'STAGE_CONFIGURE',
 	'CML',
 	'充电机最大输出能力',
 	'2048',
@@ -470,7 +470,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CONFIGURATION',
+	'STAGE_CONFIGURE',
 	'BRO',
 	'电池充电准备就绪状态',
 	'2304',
@@ -484,7 +484,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CONFIGURATION',
+	'STAGE_CONFIGURE',
 	'CRO',
 	'充电机充电准备就绪状态',
 	'2560',
@@ -498,7 +498,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'BCL',
 	'电池充电需求',
 	'4096',
@@ -512,7 +512,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'BCS',
 	'电池充电总状态',
 	'4352',
@@ -526,7 +526,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'CCS',
 	'充电机充电总状态',
 	'4608',
@@ -540,7 +540,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'BSM',
 	'动力蓄电池状态信息',
 	'4864',
@@ -554,7 +554,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'BMV',
 	'单体动力蓄电池电压',
 	'5376',
@@ -568,7 +568,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'BMT',
 	'单体动力蓄电池温度',
 	'5632',
@@ -582,7 +582,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'BSP',
 	'动力蓄电池保留报文',
 	'5888',
@@ -596,7 +596,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'BST',
 	'BMS中止充电',
 	'6400',
@@ -610,7 +610,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_CHARGE',
+	'STAGE_CHARGING',
 	'CST',
 	'充电机中止充电',
 	'6656',
@@ -677,4 +677,33 @@ INSERT INTO bms_can_pack_generator VALUES
 	'250',
 	'C2B',
 	'ENABLE'
+    );
+CREATE TABLE symbol_define(
+	symbol_name string,
+	symbol_value string
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'STAGE_HANDSHACKING',
+	'0x01'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'STAGE_CONFIGURE',
+	'0x02'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'STAGE_CHARGING',
+	'0x03'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'CHARGE_STAGE_DONE',
+	'0x04'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'STAGE_ANY',
+	'0x04'
     );
