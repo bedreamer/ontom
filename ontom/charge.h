@@ -507,7 +507,7 @@ struct bms_struct {
     unsigned int can_pack_gen_nr;
     struct can_pack_generator *generator;
     unsigned int can_statistics_nr;
-    struct bms_statistics statistics;
+    struct bms_statistics *statistics;
 };
 
 // 采样盒 通讯管理描述结构，JOB的下属成员结构
