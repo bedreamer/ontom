@@ -624,7 +624,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_END',
+	'STAGE_DONE',
 	'BSD',
 	'BMS统计数据',
 	'7168',
@@ -638,7 +638,7 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 INSERT INTO bms_can_pack_generator VALUES
     (
-	'STAGE_END',
+	'STAGE_DONE',
 	'CSD',
 	'充电机统计数据',
 	'7424',
