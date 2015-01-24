@@ -385,3 +385,296 @@ INSERT INTO configs VALUES
 	'系统进行多机同时充电时485串口文件名'
 
     );
+CREATE TABLE bms_can_pack_generator(
+	bms_can_stage string,
+	bms_can_mnemonic string,
+	bms_can_name string,
+	bms_can_pgn string,
+	bms_can_pgn_hex string,
+	bms_can_prioriy string,
+	bms_can_datalen string,
+	bms_can_period string,
+	bms_can_tolerate_silence,
+	bms_can_source string,
+	bms_can_status string
+	);
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_HAND_SHAKING',
+	'CRM',
+	'充电机辨识报文',
+	'256',
+	'0x000100',
+	'6',
+	'8',
+	'250',
+	'250',
+	'C2B',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_HAND_SHAKING',
+	'BRM',
+	'BMS辨识报文',
+	'512',
+	'0x000200',
+	'6',
+	'41',
+	'250',
+	'250',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CONFIGURATION',
+	'BCP',
+	'动力蓄电池充电参数',
+	'1536',
+	'0x000600',
+	'6',
+	'13',
+	'500',
+	'500',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CONFIGURATION',
+	'CTS',
+	'充电机发送时间同步信息',
+	'1792',
+	'0x000700',
+	'6',
+	'7',
+	'500',
+	'500',
+	'C2B',
+	'DISABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CONFIGURATION',
+	'CML',
+	'充电机最大输出能力',
+	'2048',
+	'0x000800',
+	'6',
+	'6',
+	'250',
+	'250',
+	'C2B',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CONFIGURATION',
+	'BRO',
+	'电池充电准备就绪状态',
+	'2304',
+	'0x000900',
+	'4',
+	'1',
+	'250',
+	'250',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CONFIGURATION',
+	'CRO',
+	'充电机充电准备就绪状态',
+	'2560',
+	'0x000A00',
+	'4',
+	'1',
+	'250',
+	'250',
+	'C2B',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'BCL',
+	'电池充电需求',
+	'4096',
+	'0x001000',
+	'6',
+	'5',
+	'50',
+	'50',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'BCS',
+	'电池充电总状态',
+	'4352',
+	'0x001100',
+	'6',
+	'9',
+	'250',
+	'250',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'CCS',
+	'充电机充电总状态',
+	'4608',
+	'0x001200',
+	'6',
+	'6',
+	'50',
+	'50',
+	'C2B',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'BSM',
+	'动力蓄电池状态信息',
+	'4864',
+	'0x001300',
+	'6',
+	'7',
+	'250',
+	'250',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'BMV',
+	'单体动力蓄电池电压',
+	'5376',
+	'0x001500',
+	'6',
+	'-1',
+	'1000',
+	'1000',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'BMT',
+	'单体动力蓄电池温度',
+	'5632',
+	'0x001600',
+	'6',
+	'-1',
+	'1000',
+	'1000',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'BSP',
+	'动力蓄电池保留报文',
+	'5888',
+	'0x001700',
+	'6',
+	'-1',
+	'50',
+	'50',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'BST',
+	'BMS中止充电',
+	'6400',
+	'0x001900',
+	'4',
+	'4',
+	'10',
+	'10',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_CHARGE',
+	'CST',
+	'充电机中止充电',
+	'6656',
+	'0x001A00',
+	'4',
+	'4',
+	'10',
+	'10',
+	'C2B',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_END',
+	'BSD',
+	'BMS统计数据',
+	'7168',
+	'0x001C00',
+	'6',
+	'7',
+	'250',
+	'250',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_END',
+	'CSD',
+	'充电机统计数据',
+	'7424',
+	'0x001D00',
+	'6',
+	'5',
+	'250',
+	'250',
+	'C2B',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_ANY',
+	'BEM',
+	'BMS错误报文',
+	'7680',
+	'0x001E00',
+	'2',
+	'4',
+	'250',
+	'250',
+	'B2C',
+	'ENABLE'
+    );
+INSERT INTO bms_can_pack_generator VALUES
+    (
+	'STAGE_ANY',
+	'CEM',
+	'充电机错误报文',
+	'7936',
+	'0x001F00',
+	'2',
+	'4',
+	'250',
+	'250',
+	'C2B',
+	'ENABLE'
+    );
