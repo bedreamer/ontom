@@ -542,9 +542,9 @@ static inline int commit_job(struct charge_task *tsk, const struct job_commit *j
         thiz = (struct job_commit *)malloc(sizeof(struct job_commit));
         memcpy(thiz, jc, sizeof(struct job_commit));
         thiz->cmd = cmd;
-        list_ini(*thiz);
+        list_ini(thiz->job_node);
         if ( tsk->commit_head == NULL ) {
-            task->commit_head = &thiz->job_node;
+            tsk->commit_head = &thiz->job_node;
         } else {
             list_inserttail(tsk->commit_head, &thiz->job_node);
         }
