@@ -503,5 +503,6 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param);
 int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param);
 int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param);
 int gen_packet_PGN7936(struct charge_job * thiz, struct event_struct* param);
-
+extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;
+extern void * thread_bms_read_service(void *) ___THREAD_ENTRY___;
 #endif /*_BMS_PACKAGE_INCLUDED_H_*/
