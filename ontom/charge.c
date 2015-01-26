@@ -156,6 +156,33 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
     return 0;
 }
 
+// 获取下一个查询的数据集个数
+int sql_query_result_conter(void *param, int nr, char *text, char **name)
+{
+    if ( param ) {
+        *(int *)param = atoi( text[0] );
+    }
+    return 0;
+}
+
+// 获取BMS数据包生成信息
+int sql_query_BMS_pack_gen(void *param, int nr, char *text, char **name)
+{
+    struct charge_job *thiz = (struct charge_job *)param;
+    struct can_pack_generator *me = NULL;
+    if ( thiz ) {
+        if ( thiz->bms.readed >= thiz->bms.can_pack_gen_nr )
+            return 0;
+        me = thiz->bms.generator + thiz->bms.readed;
+        me->stage = atoh( text[0] );
+        me->pgn = atoi( text[1] );
+        me->prioriy = atoi( text[2] );
+        me->datalen = atoi( text[3] );
+        me->period = atoi( text[4] );
+    }
+    return 0;
+}
+
 void print_POST_configure()
 {
     unsigned int x = 0, y;
@@ -556,25 +583,25 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
         error_history_recover(thiz, S_DC_RDQ_BREAK);
     }
     // 总输出开关跳闸
-    if ( bit_read(thiz, S_DC_SW_BREAK) ) {
+    if ( bit_read(thiz, S_DC_SW_TRIP) ) {
         err_nr ++;
-        error_history_begin(thiz, S_DC_SW_BREAK, "N/A");
+        error_history_begin(thiz, S_DC_SW_TRIP, "N/A");
     } else {
-        error_history_recover(thiz, S_DC_SW_BREAK);
+        error_history_recover(thiz, S_DC_SW_TRIP);
     }
     // 1#枪输出开关跳闸
-    if ( bit_read(thiz, S_GUN_1_SW_BREAK) ) {
+    if ( bit_read(thiz, S_GUN_1_SW_TRIP) ) {
         err_nr ++;
-        error_history_begin(thiz, S_GUN_1_SW_BREAK, "N/A");
+        error_history_begin(thiz, S_GUN_1_SW_TRIP, "N/A");
     } else {
-        error_history_recover(thiz, S_GUN_1_SW_BREAK);
+        error_history_recover(thiz, S_GUN_1_SW_TRIP);
     }
     // 2#枪输出开关跳闸
-    if ( bit_read(thiz, S_GUN_2_SW_BREAK) ) {
+    if ( bit_read(thiz, S_GUN_2_SW_TRIP) ) {
         err_nr ++;
-        error_history_begin(thiz, S_GUN_2_SW_BREAK, "N/A");
+        error_history_begin(thiz, S_GUN_2_SW_TRIP, "N/A");
     } else {
-        error_history_recover(thiz, S_GUN_2_SW_BREAK);
+        error_history_recover(thiz, S_GUN_2_SW_TRIP);
     }
     // 防雷器故障
     if ( bit_read(thiz, S_FANGLEIQI_BREAK) ) {
@@ -754,7 +781,67 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
 struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *need)
 {
     struct charge_job *thiz = NULL;
+    char sql[512] = {0};
+    int ret, nr_gen = 0, nr_pgn = 0, s = 0;
+    char *errmsg = NULL;
 
+    sprintf(sql,
+            "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
+                "WHERE symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage AND "
+                "bms_can_pack_generator.bms_can_source='C2B' AND "
+                "bms_can_pack_generator.bms_can_status='ENABLE'");
+    ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_gen, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+    }
+    if ( nr <= 0 ) {
+        log_printf(ERR, "ZEUS: DATA LOST, job aborted!!");
+        // 中止作业
+    }
+
+    sprintf(sql,
+            "SELECT COUNT(*) from bms_can_pack_generator "
+                "WHERE bms_can_pack_generator.bms_can_status='ENABLE'");
+    ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_pgn, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+    }
+    if ( nr <= 0 ) {
+        log_printf(ERR, "ZEUS: DATA NOT SITISFIED, job aborted!!");
+        // 中止作业
+    }
+    s = sizeof(struct charge_job);
+    s = s + sizeof(struct can_pack_generator) * nr_gen;
+    s = s + sizeof(struct bms_statistics) * nr_pgn;
+    thiz = (struct charge_job *)malloc(s);
+    if (thiz == NULL) {
+        log_printf(ERR, "ZEUS: LOW memory, job create faile, aborted.");
+        // 中止作业
+    }
+    memset(thiz, 0, s);
+
+    thiz->bms.readed = 0;
+    thiz->bms.can_pack_gen_nr = nr_gen;
+    thiz->bms.generator =
+       (struct can_pack_generator*)(((char *)thiz) + sizeof(struct charge_job));
+    thiz->bms.can_statistics_nr = nr_pgn;
+    thiz->bms.statistics =
+       (struct can_pack_generator*)(((char *)thiz->bms.generator) +
+                                    sizeof(struct can_pack_generator) * nr_gen);
+    sprintf(sql,
+            "SELECT symbol_define.symbol_value,"
+            "bms_can_pack_generator.bms_can_pgn,"
+            "bms_can_pack_generator.bms_can_prioriy,"
+            "bms_can_pack_generator.bms_can_datalen,"
+            "bms_can_pack_generator.bms_can_period,"
+            "bms_can_pack_generator.bms_can_tolerate_silence "
+            "FROM symbol_define,bms_can_pack_generator "
+            "WHERE symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage AND "
+            "bms_can_pack_generator.bms_can_source='C2B'");
+    ret = sqlite3_exec(tsk->database, sql, sql_query_BMS_pack_gen, thiz, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+    }
     return thiz;
 }
 

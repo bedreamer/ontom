@@ -220,21 +220,6 @@ struct MDATA_QRY {
 #define GUN2_OUTPUT_ON      0x10
 #pragma pack()
 
-// 充电扩展测量结果
-struct charge_ex_measure {
-    // 数据更新时间戳, 每更新一次，时间戳也随之更新
-    time_t update_stamp;
-
-    // 充电机输出电压
-    double charger_voltage;
-    // 充电机输出电流
-    double charger_current;
-    // 温度
-    double temprature;
-    // 湿度
-    double wet_degree;
-};
-
 // 充电屏数据读写数据结构
 struct charger_config_03h_04h_10h {
 
@@ -504,6 +489,8 @@ struct bms_struct {
     // BMS 动力蓄电池状态信息
     struct pgn4864_BSM bms_battery_status;
 
+    // 数据库操作计数器
+    unsigned int readed;
     unsigned int can_pack_gen_nr;
     struct can_pack_generator *generator;
     unsigned int can_statistics_nr;
@@ -517,7 +504,6 @@ struct measure_struct {
     struct MDATA_ACK measure;
     // 前一次测量拷贝值
     struct MDATA_ACK measure_pre_copy;
-    struct charge_ex_measure *ex_measure;
     // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
     time_t pre_stamp_ex_measure;
 };
@@ -604,7 +590,6 @@ struct error_history {
 
     struct list_head error_me;
 };
-
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);
 void error_history_recover(struct charge_job *job, unsigned int error_id);
 
@@ -802,11 +787,11 @@ typedef enum {
     // 总输出熔断器熔断
     S_DC_RDQ_BREAK,
     // 总输出开关跳闸
-    S_DC_SW_BREAK,
+    S_DC_SW_TRIP,
     // 1#枪输出开关跳闸
-    S_GUN_1_SW_BREAK,
+    S_GUN_1_SW_TRIP,
     // 2#枪输出开关跳闸
-    S_GUN_2_SW_BREAK,
+    S_GUN_2_SW_TRIP,
     // 防雷器故障
     S_FANGLEIQI_BREAK,
     // 故障截至标记
@@ -913,6 +898,26 @@ static inline void __get_timestamp(char *outstring)
             p->tm_sec);
 }
 
+static inline unsigned int __atoh(const char *hex)
+{
+    unsigned int v = 0;
 
+    if ( !hex ) return 0;
+    if ( hex[0] == '0' && (hex[1] == 'X' || hex[1] == 'x' ) )
+        hex ++, hex ++;
+
+    while ( *hex ) {
+        if (*hex >= '0' && *hex <= '9') {
+            v = v * 16 + (*hex) - '0';
+        } else if (*hex >= 'A' && *hex <= 'F') {
+            v = v * 16 + (*hex) - 'A';
+        } else if (*hex >= 'a' && *hex <= 'f') {
+            v = v * 16 + (*hex) - 'a';
+        } else break;
+    }
+
+    return v;
+}
+#define atoh __atoh
 
 #endif /*_CHARGE_INCLUDED_H_*/
