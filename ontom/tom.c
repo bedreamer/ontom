@@ -120,6 +120,19 @@ void sig_interrupt(int signo)
     exit(0);
 }
 
+// 捕捉中止信号，保存重要数据
+void sig_dbg_interrupt(int n, struct siginfo *siginfo, void *myact)
+{
+    int i, num;
+    char **calls;
+    printf("Fault address:%X\n",siginfo->si_addr);
+    num = backtrace(buffer, SIZE);
+    calls = backtrace_symbols(buffer, num);
+    for (i = 0; i < num; i++)
+            printf("%s\n", calls[i]);
+    exit(1);
+}
+
 int sql_result(void *param, int nr, char **text, char **name)
 {
     if ( nr > 0 && text ) {
@@ -142,8 +155,13 @@ int main()
     char buff[32];
     int errcode = 0, ret;
     char *errmsg = NULL;
+    struct sigaction act;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags=SA_SIGINFO;
+    act.sa_sigaction=test;
+    sigaction(SIGSEGV,&act,NULL);
 
-    signal(SIGINT, sig_interrupt);
+    signal(SIGSEGV, sig_dbg_interrupt);
 
     log_printf(DBG_LV1, "TOM: 系统准备启动...");
     ret = sqlite3_open(DEFAULT_DB, &task->database);
