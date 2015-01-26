@@ -187,13 +187,15 @@ static int can_packet_callback(
         case CHARGE_STAGE_HANDSHACKING:
                    if ( thiz->bms.generator[0].heartbeat >= thiz->bms.generator[0].period ) {
                 gen_packet_PGN256(thiz, param);
+                log_printf(DBG_LV0, "BMS: 0CHARGE_STAGE_HANDSHACKING");
                 thiz->bms.generator[0].heartbeat = 0;
             }
             if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
                 gen_packet_PGN7936(thiz, param);
+                log_printf(DBG_LV0, "BMS: 1CHARGE_STAGE_HANDSHACKING");
                 thiz->bms.generator[7].heartbeat = 0;
             }
-            log_printf(DBG_LV0, "BMS: CHARGE_STAGE_HANDSHACKING");
+            log_printf(DBG_LV0, "BMS: 2CHARGE_STAGE_HANDSHACKING");
             break;
         case CHARGE_STAGE_CONFIGURE:
             if ( thiz->bms.generator[1].heartbeat >= thiz->bms.generator[1].period ) {
@@ -704,7 +706,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         if ( EVT_RET_OK != param.evt_param ) {
             continue;
         }
-        log_printf(DBG, "fasdfasdfds");
 
         param.evt_param = EVT_RET_INVALID;
         // 链接模式下的数据包发送不需要确认, 并且也不能被中止
