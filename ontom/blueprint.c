@@ -1571,7 +1571,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     }
 
     while ( 1 ) {
-        usleep(5000);
+        usleep(50000);
         if ( thiz == NULL ) continue;
         if ( thiz->bp_evt_handle == NULL ) continue;
         if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
