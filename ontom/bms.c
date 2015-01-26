@@ -1071,7 +1071,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.statistics[I_BRM].can_counter ++;
+    thiz->bms.generator[I_BRM].can_counter ++;
 
     return 0;
 }
