@@ -517,10 +517,41 @@ struct charger_struct {
     struct charger_config_10h chargers;
 };
 
+// 提交命令
+typedef enum {
+    // 创建任务
+    COMMIT_CMD_FORK,
+    // 中止任务
+    COMMIT_CMD_ABORT
+}COMMIT_CMD;
+
 // 作业提交结构
 struct job_commit {
     unsigned int nr;
+
+    COMMIT_CMD cmd;
+
+    struct list_head job_node;
 };
+static inline int commit_job(const struct job_commit *jc, COMMIT_CMD cmd)
+{
+    struct job_commit *thiz = NULL;
+    switch ( cmd ) {
+    case COMMIT_CMD_FORK:
+        thiz = (struct job_commit *)malloc(sizeof(struct job_commit));
+        thiz->cmd = cmd;
+        list_init(*thiz);
+        if ( task->commit_head == NULL ) {
+            task->commit_head = thiz;
+        } else {
+            list_inserttail(task->commit_head, thiz);
+        }
+        break;
+    case COMMIT_CMD_ABORT:
+        break;
+    }
+    return 0;
+}
 
 /*
  * 充电作业描述，充电管理的最小单位
@@ -617,6 +648,10 @@ struct charge_task {
     struct charge_job *this_job[CONFIG_SUPPORT_CHARGE_JOBS];
     // 空闲作业
     struct charge_job idle[CONFIG_SUPPORT_CHARGE_JOBS];
+    // 作业任务提交列表
+    struct list_head *commit_head;
+    // 作业任务提交列表锁
+    pthread_mutex_t commit_lck;
 
     // 任务记录故障总数
     unsigned int err_seq_id_next;

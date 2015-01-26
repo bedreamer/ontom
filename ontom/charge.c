@@ -398,6 +398,23 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
 
     while ( 1 ) {
+        if ( task->commit_head ) {
+            struct list_head *next = task->commit_head->next;
+            struct job_commit *thiz = list_load(struct job_commit, job_node, task->commit_head);
+            if ( next = task->commit_head ) {
+                next = NULL;
+            }
+            list_remove(task->commit_head);
+            task->commit_head = next;
+
+            switch ( thiz->cmd ) {
+            case COMMIT_CMD_FORK:
+                create_new_job(task, thiz);
+                break;
+            case COMMIT_CMD_ABORT:
+                break;
+            }
+        }
         // 扩展测量数据刷新
         deal_with_measure_data(task);
         if ( task && task->this_job[0] ) {
