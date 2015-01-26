@@ -786,6 +786,8 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     int ret, nr_gen = 0, s = 0;
     char *errmsg = NULL;
 
+    log_printf(INF, "开始创建作业");
+
     sprintf(sql,
             "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
             "WHERE bms_can_pack_generator.bms_can_status='ENABLE' AND "
