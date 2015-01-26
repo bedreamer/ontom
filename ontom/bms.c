@@ -27,6 +27,8 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
             }
         }
 
+        debug_track();
+
         /*
          * 为了能够侦探到接受数据包的超时事件，需要在这里进行一个计数操作
          * 当can_silence 计数大于等于 can_tolerate_silence 时认为对应数据包接收超时，需要在BMS逻辑主线程
