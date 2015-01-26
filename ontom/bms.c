@@ -185,6 +185,7 @@ static int can_packet_callback(
             param->evt_param = EVT_RET_ERR;
             break;
         case CHARGE_STAGE_HANDSHACKING:
+            log_printf(DBG_LV0, "BMS: CHARGE_STAGE_HANDSHACKING");
             if ( thiz->bms.generator[0].heartbeat >= thiz->bms.generator[0].period ) {
                 gen_packet_PGN256(thiz, param);
                 thiz->bms.generator[0].heartbeat = 0;
