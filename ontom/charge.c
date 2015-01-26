@@ -157,7 +157,7 @@ int sql_init_uart_result(void *param, int nr, char **text, char **name)
 }
 
 // 获取下一个查询的数据集个数
-int sql_query_result_conter(void *param, int nr, char *text, char **name)
+int sql_query_result_conter(void *param, int nr, char **text, char **name)
 {
     if ( param ) {
         *(int *)param = atoi( text[0] );
@@ -166,7 +166,7 @@ int sql_query_result_conter(void *param, int nr, char *text, char **name)
 }
 
 // 获取BMS数据包生成信息
-int sql_query_BMS_pack_gen(void *param, int nr, char *text, char **name)
+int sql_query_BMS_pack_gen(void *param, int nr, char **text, char **name)
 {
     struct charge_job *thiz = (struct charge_job *)param;
     struct can_pack_generator *me = NULL;
