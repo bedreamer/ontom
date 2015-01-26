@@ -179,6 +179,7 @@ int sql_query_BMS_pack_gen(void *param, int nr, char **text, char **name)
         me->prioriy = atoi( text[2] );
         me->datalen = atoi( text[3] );
         me->period = atoi( text[4] );
+        me->can_tolerate_silence = atoi( text[5] );
         me->heartbeat = 0;
     }
     return 0;
