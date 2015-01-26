@@ -375,7 +375,7 @@ struct can_pack_generator {
     // 所属阶段
     CHARGE_STAGE stage;
     // 生成PGN
-    unsigned int pgn;
+    unsigned int can_pgn;
     // 数据包优先级
     unsigned int prioriy;
     // 数据包长度

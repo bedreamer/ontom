@@ -175,7 +175,7 @@ int sql_query_BMS_pack_gen(void *param, int nr, char **text, char **name)
             return 0;
         me = thiz->bms.generator + thiz->bms.readed;
         me->stage = atoh( text[0] );
-        me->pgn = atoi( text[1] );
+        me->can_pgn = atoi( text[1] );
         me->prioriy = atoi( text[2] );
         me->datalen = atoi( text[3] );
         me->period = atoi( text[4] );
