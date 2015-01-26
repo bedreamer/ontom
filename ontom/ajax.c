@@ -700,6 +700,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
    // }
     return ret;
 #else
+    create_new_job(task, NULL);
     return ERR_ERR;
 #endif
 }
