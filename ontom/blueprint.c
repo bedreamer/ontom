@@ -680,7 +680,7 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
         if ( self->master->died >= self->master->died_line ) {
-            bit_clr(me->job, S_CHARGER_YX_1_COMM_DOWN);
+            bit_clr(task, S_CHARGER_YX_1_COMM_DOWN);
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要0-49)恢复"));
         }
         memcpy(&me->chargers->chargers, &param->buff.rx_buff[3], 100);
@@ -719,7 +719,7 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
-            bit_set(me->job, S_CHARGER_YX_1_COMM_DOWN);
+            bit_set(task, S_CHARGER_YX_1_COMM_DOWN);
             log_printf(ERR, "UART: "RED("充电机监控通讯(次要0-49)中断"));
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
@@ -766,7 +766,7 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
         if ( self->master->died >= self->master->died_line ) {
-            bit_clr(me->job, S_CHARGER_YX_2_COMM_DOWN);
+            bit_clr(task, S_CHARGER_YX_2_COMM_DOWN);
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要50-100)恢复"));
         }
         memcpy(&me->chargers->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
@@ -805,7 +805,7 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
-            bit_set(me->job, S_CHARGER_YX_2_COMM_DOWN);
+            bit_set(task, S_CHARGER_YX_2_COMM_DOWN);
             log_printf(ERR, "UART: "RED("充电机监控通讯(次要50-100)中断"));
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
@@ -853,8 +853,8 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
-        if ( bit_read(me->job, S_CHARGER_COMM_DOWN) ) {
-            bit_clr(me->job, S_CHARGER_COMM_DOWN);
+        if ( bit_read(task, S_CHARGER_COMM_DOWN) ) {
+            bit_clr(task, S_CHARGER_COMM_DOWN);
             log_printf(INF, "UART: "GRN("充电桩监控通信(主要)恢复"));
         }
         break;
@@ -915,7 +915,7 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
-            bit_set(me->job, S_CHARGER_COMM_DOWN);
+            bit_set(task, S_CHARGER_COMM_DOWN);
             log_printf(ERR, "UART: "RED("充电机监控通讯(主要)中断"));
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
@@ -1125,10 +1125,10 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             ret = ERR_ERR;
             break;
         }
-        if ( bit_read(me->job, S_MEASURE_COMM_DOWN) ) {
+        if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
             log_printf(INF, "UART: "GRN("综合采样盒通信恢复."));
         }
-        bit_clr(me->job, S_MEASURE_COMM_DOWN);
+        bit_clr(task, S_MEASURE_COMM_DOWN);
         self->master->died = 0;
 
         memcpy(&me->measure->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
@@ -1411,26 +1411,26 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         param->attrib = BP_FRAME_UNSTABLE;
         if ( me->job ) {
             if ( me->job->job_gun_sn == GUN_SN0 ) {
-                if ( bit_read(me->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
+                if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
                     cmd |= GUN1_ASSIT_PWN_ON;
                     cmd &= ~GUN2_ASSIT_PWN_ON;
                 } else {
                     cmd &= ~GUN1_ASSIT_PWN_ON;
                 }
-                if ( bit_read(me->job, CMD_GUN_1_OUTPUT_ON) ) {
+                if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
                     cmd |= GUN1_OUTPUT_ON;
                     cmd &= ~GUN2_OUTPUT_ON;
                 } else {
                     cmd &= ~GUN1_OUTPUT_ON;
                 }
             } else if  ( me->job->job_gun_sn == GUN_SN1 ) {
-                if ( bit_read(me->job, CMD_GUN_1_ASSIT_PWN_ON) ) {
+                if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
                     cmd |= GUN2_ASSIT_PWN_ON;
                     cmd &= ~GUN1_ASSIT_PWN_ON;
                 } else {
                     cmd &= ~GUN2_ASSIT_PWN_ON;
                 }
-                if ( bit_read(me->job, CMD_GUN_1_OUTPUT_ON) ) {
+                if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
                     cmd |= GUN2_OUTPUT_ON;
                     cmd &= ~GUN1_OUTPUT_ON;
                 } else {
@@ -1439,7 +1439,7 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             } else {
                 cmd = 0;
             }
-            if ( bit_read(me->job, CMD_DC_OUTPUT_SWITCH_ON) ) {
+            if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
                 cmd |= DC_SWITCH_ON;
             } else {
                 cmd &= ~DC_SWITCH_ON;
@@ -1486,11 +1486,11 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             //self->master->died ++;
         } else {
             //self->master->died ++;
-            if ( ! bit_read(me->job, S_MEASURE_COMM_DOWN) ) {
+            if ( ! bit_read(task, S_MEASURE_COMM_DOWN) ) {
             }
             log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
                                         " 已禁止充电(%d)."), self->master->died);
-            bit_set(me->job, S_MEASURE_COMM_DOWN);
+            bit_set(task, S_MEASURE_COMM_DOWN);
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
