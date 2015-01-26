@@ -872,7 +872,7 @@ void *thread_xml_service(void *arg) ___THREAD_ENTRY___
 
     //printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
     for (; ! *done; ) {
-        mg_poll_server(server, 1000);
+        mg_poll_server(server, 500);
     }
     mg_destroy_server(&server);
 
