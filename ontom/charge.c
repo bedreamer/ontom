@@ -415,14 +415,15 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 break;
             }
         }
+#if 0
         // 扩展测量数据刷新
         deal_with_measure_data(task);
         if ( task && task->this_job[0] ) {
             deal_with_system_protection(task, task->this_job[0]);
             deal_with_job_business(task, task->this_job[0]);
         }
-
-        usleep(5000);
+#endif
+        usleep(50000);
     }
 __panic:
     log_printf(ERR, "ZEUS: 关键错误，系统退出 %d", ret);
