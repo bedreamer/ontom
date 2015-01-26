@@ -370,7 +370,6 @@ typedef enum {
     CAN_TP_ABRT= 0x60
 }CAN_TP_STATUS;
 
-struct can_pack_generator;
 // 通信报文生成依据
 struct can_pack_generator {
     // 所属阶段
@@ -385,8 +384,13 @@ struct can_pack_generator {
     unsigned int period;
     // 心跳计数
     unsigned int heartbeat;
-    // 数据包名称
-    const char *mnemonic;
+
+    // 数据包静默时间，只针对接受数据包有效
+    unsigned int can_silence;
+    // 接受数据包容忍的沉默时常，针对接收数据有效
+    unsigned int can_tolerate_silence;
+    // 计数器，接收或发送的次数
+    unsigned int can_counter;
 };
 
 // 充电作业状态
@@ -493,8 +497,6 @@ struct bms_struct {
     unsigned int readed;
     unsigned int can_pack_gen_nr;
     struct can_pack_generator *generator;
-    unsigned int can_statistics_nr;
-    struct bms_statistics *statistics;
 };
 
 // 采样盒 通讯管理描述结构，JOB的下属成员结构
