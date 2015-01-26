@@ -953,6 +953,7 @@ static inline unsigned int __atoh(const char *hex)
         } else if (*hex >= 'a' && *hex <= 'f') {
             v = v * 16 + (*hex) - 'a';
         } else break;
+        hex ++;
     }
 
     return v;
