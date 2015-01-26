@@ -819,6 +819,7 @@ extern struct charge_task *task;
 // 位设置
 static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
+    if ( ! byte ) return;
     byte += single / 8;
     * byte |= (1 << (single % 8 ));
 }
@@ -827,6 +828,7 @@ static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE sin
 // 位清除
 static inline void __bit_clr(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
+    if ( ! byte ) return;
     byte += single / 8;
     * byte &= (~(1 << (single % 8 )));
 }
@@ -835,6 +837,7 @@ static inline void __bit_clr(volatile unsigned char *byte, ONTOM_FLAG_SINGLE sin
 // 位读取
 static inline int __bit_read(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
+    if ( ! byte ) return 0;
     byte += single / 8;
 
     return (* byte & (1 << (single % 8 ))) ? 1 : 0;
