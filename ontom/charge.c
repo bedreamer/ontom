@@ -796,6 +796,27 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
     }
 }
 
+int commit_job(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd)
+{
+    struct job_commit *thiz = NULL;
+    switch ( cmd ) {
+    case COMMIT_CMD_FORK:
+        thiz = (struct job_commit *)malloc(sizeof(struct job_commit));
+        memcpy(thiz, jc, sizeof(struct job_commit));
+        thiz->cmd = cmd;
+        list_ini(thiz->job_node);
+        if ( tsk->commit_head == NULL ) {
+            tsk->commit_head = &thiz->job_node;
+        } else {
+            list_inserttail(tsk->commit_head, &thiz->job_node);
+        }
+        break;
+    case COMMIT_CMD_ABORT:
+        break;
+    }
+    return 0;
+}
+
 struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *need)
 {
     struct charge_job *thiz = NULL;
