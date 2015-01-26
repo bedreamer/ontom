@@ -394,7 +394,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
     else {
         log_printf(ERR, "ZEUS: 系统模型无法识别，系统恢复默认模型");
-        while ( 1 );
+        exit(-1);
     }
 
     while ( 1 ) {
