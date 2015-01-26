@@ -1,15 +1,17 @@
 #include "stdafx.h"
 
-int log_printf(unsigned int level, const char *fmt, ...)
+int log_printf(unsigned int level, unsigned int line, const char *fmt, ...)
 {
     char buff[512]={0};
 	va_list ap;
     //char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
     const char *cfg;
-    char timestamp[20] = {0};
+    char timestamp[20] = {0}, lines[10] = {0};
 
 	va_start(ap, fmt);
     __get_timestamp(timestamp);
+    sprintf(".%d", line);
+    strcat(timestamp, line);
 
     switch (level) {
     case INF:
