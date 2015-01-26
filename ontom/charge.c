@@ -788,28 +788,16 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
 
     sprintf(sql,
             "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
-                "WHERE symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage AND "
                 "bms_can_pack_generator.bms_can_status='ENABLE'");
     ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_gen, &errmsg);
     if ( ret ) {
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
     }
-    if ( nr <= 0 ) {
+    if ( nr_gen <= 0 ) {
         log_printf(ERR, "ZEUS: DATA LOST, job aborted!!");
         // 中止作业
     }
 
-    sprintf(sql,
-            "SELECT COUNT(*) from bms_can_pack_generator "
-                "WHERE bms_can_pack_generator.bms_can_status='ENABLE'");
-    ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_pgn, &errmsg);
-    if ( ret ) {
-        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
-    }
-    if ( nr <= 0 ) {
-        log_printf(ERR, "ZEUS: DATA NOT SITISFIED, job aborted!!");
-        // 中止作业
-    }
     s = sizeof(struct charge_job);
     s = s + sizeof(struct can_pack_generator) * nr_gen;
     thiz = (struct charge_job *)malloc(s);
