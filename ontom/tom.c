@@ -1,7 +1,6 @@
 #include "stdafx.h"
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
-extern void * thread_bms_write_service(void *) ___THREAD_ENTRY___;
-extern void * thread_bms_read_service(void *) ___THREAD_ENTRY___;
+
 extern void * thread_measure_service(void *) ___THREAD_ENTRY___;
 extern void * thread_charger_service(void *) ___THREAD_ENTRY___;
 extern void * thread_backgroud_service(void *) ___THREAD_ENTRY___;
