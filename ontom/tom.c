@@ -120,19 +120,18 @@ void sig_interrupt(int signo)
     exit(0);
 }
 
-// 捕捉中止信号，保存重要数据
-void sig_dbg_interrupt(int signo)
+void sig_dbg_interrupt(int n, struct siginfo *siginfo, void *myact)
 {
-    #define SIZE 1000
-        void *buffer[SIZE];
-        int i, num;
-        char **calls;
-        printf("Fault address:%X\n",siginfo->si_addr);
-        num = backtrace(buffer, SIZE);
-        calls = backtrace_symbols(buffer, num);
-        for (i = 0; i < num; i++)
-                printf("%s\n", calls[i]);
-        exit(1);
+#define SIZE 1000
+    void *buffer[SIZE];
+    int i, num;
+    char **calls;
+    printf("Fault address:%X\n",siginfo->si_addr);
+    num = backtrace(buffer, SIZE);
+    calls = backtrace_symbols(buffer, num);
+    for (i = 0; i < num; i++)
+            printf("%s\n", calls[i]);
+    exit(1);
 }
 
 int sql_result(void *param, int nr, char **text, char **name)
