@@ -10,6 +10,7 @@
 #define _CHARGE_INCLUDED_H_
 
 struct charge_task;
+extern struct charge_task *task;
 struct MDATA_ACK;
 struct bp_uart;
 #include <pthread.h>
@@ -855,8 +856,6 @@ typedef enum {
     // }}}
     FLAG_END
 }ONTOM_FLAG_SINGLE;
-
-extern struct charge_task *task;
 
 // 位设置
 static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
