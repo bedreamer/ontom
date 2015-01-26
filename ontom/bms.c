@@ -1056,6 +1056,8 @@ int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[0];
 
+    log_printf(DBG_LV0, "BMS: 握手-CRM-充电机辨识报文");
+
     if ( 0 == bit_read(thiz, F_BMS_RECOGNIZED) ) {
         param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
     } else {
