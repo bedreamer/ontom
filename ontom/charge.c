@@ -822,7 +822,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
 {
     struct charge_job* thiz = NULL;
     char sql[512] = {0};
-    int ret, nr_gen = 0, s = 0;
+    int ret, nr_gen = 0, s = 0, i;
     char *errmsg = NULL;
 
     log_printf(INF, "开始创建作业");
@@ -869,6 +869,16 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     ret = sqlite3_exec(tsk->database, sql, sql_query_BMS_pack_gen, thiz, &errmsg);
     if ( ret ) {
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+    }
+
+    for ( i = 0; i < thiz->bms.can_pack_gen_nr; i ++) {
+        printf("\t%4d  %08X  %2d   %9d  %5d   %d\n",
+               thiz->bms.generator[i].stage,
+               thiz->bms.generator[i].can_pgn,
+               thiz->bms.generator[i].prioriy,
+               thiz->bms.generator[i].datalen,
+               thiz->bms.generator[i].period,
+               thiz->bms.generator[i].can_tolerate_silence);
     }
 
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
