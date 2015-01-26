@@ -839,6 +839,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
         log_printf(ERR, "ZEUS: DATA LOST, job aborted!!");
         // 中止作业
     }
+    log_printf(INF, "%s:%d +++++++++++=wef", __FILE__, __LINE__);
 
     s = sizeof(struct charge_job);
     s = s + sizeof(struct can_pack_generator) * nr_gen;
@@ -848,6 +849,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
         // 中止作业
     }
     memset(thiz, 0, s);
+    log_printf(INF, "%s:%d +++++++++++=wef", __FILE__, __LINE__);
 
     thiz->bms.readed = 0; // 用户操作数据记录时的临时记录
     thiz->bms.can_pack_gen_nr = nr_gen;
@@ -867,12 +869,16 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     if ( ret ) {
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
     }
+    log_printf(INF, "%s:%d +++++++++++=wef", __FILE__, __LINE__);
+
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & thiz->tid_write, &task->attr, thread_bms_write_service, thiz);
     if ( 0 != ret ) {
         log_printf(ERR, "CAN-BUS reader start up.                       FAILE!!!!");
         goto die;
     }
+    log_printf(INF, "%s:%d +++++++++++=wef", __FILE__, __LINE__);
+
     // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
     ret = pthread_create( & thiz->tid_read, &task->attr, thread_bms_read_service,
                           thiz);
@@ -880,6 +886,8 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
         log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
         goto die;
     }
+    log_printf(INF, "%s:%d +++++++++++=wef", __FILE__, __LINE__);
+
 die:
     log_printf(INF, "ZEUS: create job.");
     return thiz;
