@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-int log_printf(unsigned int level, unsigned int line, const char *fmt, ...)
+int log_printf(unsigned int level, const char *fmt, ...)
 {
     char buff[512]={0};
 	va_list ap;
