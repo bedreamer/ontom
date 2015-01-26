@@ -1132,6 +1132,7 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         self->master->died = 0;
 
         memcpy(&me->measure->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
+#if 0
         // 故障判定
         box = &me->measure->measure;
         me_pre = &me->measure->measure_pre_copy;
@@ -1226,21 +1227,21 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         }
         if ( box->yx_dc_output_tiaozha ) {
             len += sprintf(&errstr[len], "[%d: 总输出跳闸] ", ++errnr);
-            bit_set(me->job, S_DC_SW_BREAK);
+            bit_set(me->job, S_DC_SW_TRIP);
         } else {
-            bit_clr(me->job, S_DC_SW_BREAK);
+            bit_clr(me->job, S_DC_SW_TRIP);
         }
         if ( box->yx_dc_output_tiaozha1 ) {
             len += sprintf(&errstr[len], "[%d: 一路输出跳闸] ", ++errnr);
-            bit_set(me->job, S_GUN_1_SW_BREAK);
+            bit_set(me->job, S_GUN_1_SW_TRIP);
         } else {
-            bit_clr(me->job, S_GUN_1_SW_BREAK);
+            bit_clr(me->job, S_GUN_1_SW_TRIP);
         }
         if ( box->yx_dc_output_tiaozha2 ) {
             len += sprintf(&errstr[len], "[%d: 二路输出跳闸] ", ++errnr);
-            bit_set(me->job, S_GUN_2_SW_BREAK);
+            bit_set(me->job, S_GUN_2_SW_TRIP);
         } else {
-            bit_clr(me->job, S_GUN_2_SW_BREAK);
+            bit_clr(me->job, S_GUN_2_SW_TRIP);
         }
         if ( box->yx_flq ) {
             len += sprintf(&errstr[len], "[%d: 防雷器故障] ", ++errnr);
@@ -1397,6 +1398,7 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             len += sprintf(&infstr[len], "[2#枪辅助电源"RED("分闸")"] ");
         }
         log_printf(DBG_LV3, "采样盒: 遥信: %s", infstr);
+#endif
         memcpy(me_pre, me, sizeof(struct MDATA_ACK));
         if ( need_echo ) {
             ret = ERR_NEED_ECHO;
