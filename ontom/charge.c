@@ -173,7 +173,7 @@ int sql_query_BMS_pack_gen(void *param, int nr, char **text, char **name)
     if ( thiz ) {
         if ( thiz->bms.readed >= thiz->bms.can_pack_gen_nr )
             return 0;
-        me = thiz->bms.generator + thiz->bms.readed;
+        me = thiz->bms.generator + (thiz->bms.readed ++);
         me->stage = atoh( text[0] );
         me->can_pgn = atoi( text[1] );
         me->prioriy = atoi( text[2] );
