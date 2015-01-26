@@ -850,6 +850,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     memset(thiz, 0, s);
     thiz->bms.can_dev = "can0";
     thiz->bms.can_bms_status = CAN_INVALID;
+    thiz->bms.job = thiz;
 
     thiz->bms.readed = 0; // 用户操作数据记录时的临时记录
     thiz->bms.can_pack_gen_nr = nr_gen;
