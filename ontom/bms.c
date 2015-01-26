@@ -8,7 +8,7 @@
 #include "Hachiko.h"
 
 // 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
-void heart_beart_notify_proc(Hachiko_EVT evt, void _private, const struct Hachiko_food *self)
+void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachiko_food *self)
 {
     if (evt == HACHIKO_TIMEOUT ) {
         unsigned int i = 0;
