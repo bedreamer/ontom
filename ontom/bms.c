@@ -704,6 +704,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         if ( EVT_RET_OK != param.evt_param ) {
             continue;
         }
+        log_printf(DBG, "fasdfasdfds");
 
         param.evt_param = EVT_RET_INVALID;
         // 链接模式下的数据包发送不需要确认, 并且也不能被中止
