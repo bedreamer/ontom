@@ -554,6 +554,11 @@ struct charge_job {
     // BMS 管理模块
     struct bms_struct bms;
 
+    // BMS 读线程ID
+    pthread_t tid_read;
+    // BMS 写线程ID
+    pthread_t tid_write;
+
     // 当前故障列表
     pthread_mutex_t err_list_lck;
     unsigned int err_nr;
@@ -672,6 +677,13 @@ typedef enum {
     FLAG_BEGIN,
     // 扩展测量值刷新标记
     F_MEASURE_DATA_NEW,
+
+    // BMS 结构体初始化完成
+    F_BMS_INIT_DONE,
+    // 创建BMS写线程完成
+    F_BMS_FORK_WRITE_DONE,
+    // 创建BMS读线程完成
+    F_BMS_FORK_READ_DONE,
 
     //{{{ 状态标记
     // BMS 已经识别
@@ -921,5 +933,5 @@ static inline unsigned int __atoh(const char *hex)
     return v;
 }
 #define atoh __atoh
-
+struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *need);
 #endif /*_CHARGE_INCLUDED_H_*/
