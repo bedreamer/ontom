@@ -160,7 +160,7 @@ int main()
     struct sigaction act;
     sigemptyset(&act.sa_mask);
     act.sa_flags=SA_SIGINFO;
-    act.sa_sigaction=test;
+    act.sa_sigaction=sig_dbg_interrupt;
     sigaction(SIGSEGV,&act,NULL);
 
     signal(SIGSEGV, sig_dbg_interrupt);
