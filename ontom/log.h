@@ -13,8 +13,7 @@
 // 输出速度最慢
 #define DBG_LV3 0x03
 
-int __log_printf(unsigned int level, unsigned int line, const char *fmt, ...);
-#define log_printf(lv, fmt, ...) __log_printf(lv, __LINE__, fmt, __VA_ARGS__)
+int log_printf(unsigned int level, const char *fmt, ...);
 #define GRN(s) "\033[32m"s"\033[0m"
 #define RED(s) "\033[31m"s"\033[0m"
 #define YEL(s) "\033[33m"s"\033[0m"

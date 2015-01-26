@@ -10,9 +10,10 @@ int __log_printf(unsigned int level, unsigned int line, const char *fmt, ...)
 
 	va_start(ap, fmt);
     __get_timestamp(timestamp);
+#if 0
     sprintf(".%d", line);
     strcat(timestamp, line);
-
+#endif
     switch (level) {
     case INF:
         vsnprintf(buff, sizeof(buff), fmt, ap);
