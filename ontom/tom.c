@@ -123,6 +123,8 @@ void sig_interrupt(int signo)
 // 捕捉中止信号，保存重要数据
 void sig_dbg_interrupt(int n, struct siginfo *siginfo, void *myact)
 {
+#define SIZE 1000
+    void *buffer[SIZE];
     int i, num;
     char **calls;
     printf("Fault address:%X\n",siginfo->si_addr);
