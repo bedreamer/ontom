@@ -400,6 +400,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     while ( 1 ) {
         if ( task->commit_head ) {
+            debug_track();
             struct list_head *next = task->commit_head->next;
             struct job_commit *thiz = list_load(struct job_commit, job_node, task->commit_head);
             if ( next = task->commit_head ) {
