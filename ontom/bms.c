@@ -766,11 +766,11 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 }
 
 // CAN 数据发送报文
-void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *private,
+void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *_private,
                             const struct Hachiko_food *self)
 {
     if ( evt == HACHIKO_TIMEOUT ) {
-        struct charge_job * thiz = (struct charge_job *)private;
+        struct charge_job * thiz = (struct charge_job *)_private;
         log_printf(WRN, "BMS: CAN data transfer terminal due to time out.");
         thiz->bms.can_bms_status = CAN_NORMAL;
     } else if ( evt == HACHIKO_DIE ) {
@@ -805,7 +805,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     unsigned int dbg_packets = 0;
 
-    thiz->bms.can_tp_bomb.private = (void *)thiz;
+    thiz->bms.can_tp_bomb._private = (void *)thiz;
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);

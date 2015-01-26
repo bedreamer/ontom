@@ -320,9 +320,9 @@ static inline void __dump_uart_hex(char *hex, int len, int lv)
 }
 
 // 串口4的超时响应
-void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private, const struct Hachiko_food *self)
+void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *_private, const struct Hachiko_food *self)
 {
-    struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
+    struct bp_uart * thiz = (struct bp_uart * __restrict__)_private;
     struct Hachiko_food *p;
 
     if ( evt != HACHIKO_TIMEOUT ) return;
@@ -365,10 +365,10 @@ void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *private, const struct Hach
 }
 
 // 串口4的发送节奏定时器
-void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
+void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *_private,
                             const struct Hachiko_food *self)
 {
-    struct bp_uart * thiz = (struct bp_uart * __restrict__)private;
+    struct bp_uart * thiz = (struct bp_uart * __restrict__)_private;
     struct bp_user *u;
     unsigned int i;
 
@@ -395,7 +395,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口数据结构初始化
     case BP_EVT_INIT:
         self->role = BP_UART_MASTER;
-        self->rx_seed.private = (void*)self;
+        self->rx_seed._private = (void*)self;
         self->rx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
         self->rx_param.buff.rx_buff = self->rx_buff;
         self->rx_param.cursor = 0;
@@ -412,7 +412,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "UART: create uart reciever's timer faile.");
         }
 #if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
-        self->tx_seed.private = (void*)self;
+        self->tx_seed._private = (void*)self;
         self->tx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
         self->tx_param.payload_size = 0;
         self->tx_param.cursor = 0;
@@ -424,7 +424,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "UART: create uart transfer's timer faile.");
         }
 #endif
-        self->tx_speed.private = (void*)self;
+        self->tx_speed._private = (void*)self;
         self->tx_speed.Hachiko_notify_proc = uart4_Hachiko_speed_proc;
         ret = _Hachiko_new(&self->tx_speed, HACHIKO_AUTO_FEED,
                      12, HACHIKO_PAUSE, (void*)self);

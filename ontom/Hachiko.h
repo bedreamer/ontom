@@ -40,7 +40,7 @@ typedef enum {
 
 struct Hachiko_food {
     // 定时器事件回调
-    void (*Hachiko_notify_proc)(Hachiko_EVT evt, void *private,
+    void (*Hachiko_notify_proc)(Hachiko_EVT evt, void *_private,
                                 const struct Hachiko_food *self);
     // 定时器类型
     Hachiko_Type type;
@@ -51,14 +51,14 @@ struct Hachiko_food {
     // 定时器状态
     Hachiko_status status;
     // 私有数据
-    void *private;
+    void *_private;
 };
 
 void Hachiko_init();
 int _Hachiko_new(struct Hachiko_food *thiz, Hachiko_Type type,
-                 unsigned int ttl, Hachiko_status status, void *private);
-#define Hachiko_new(food, type, ttl, private) \
-    _Hachiko_new(food, type, ttl, HACHIKO_NORMAL, private)
+                 unsigned int ttl, Hachiko_status status, void *_private);
+#define Hachiko_new(food, type, ttl, _private) \
+    _Hachiko_new(food, type, ttl, HACHIKO_NORMAL, _private)
 
 static inline void Hachiko_kill(struct Hachiko_food *dog)
 {

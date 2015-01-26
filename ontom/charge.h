@@ -72,7 +72,7 @@ struct user_card {
     time_t end_synced_timestamp;
 
     // 卡私有信息
-    void *private;
+    void *_private;
 };
 
 #pragma pack(1)

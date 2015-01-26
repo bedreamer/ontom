@@ -274,6 +274,6 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
 int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 void * thread_uart_service(void *arg) ___THREAD_ENTRY___;
-void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *private,
+void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *_private,
                             const struct Hachiko_food *self);
 #endif // _BLUE_PRINT_INCLUED_H_
