@@ -788,7 +788,8 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
 
     sprintf(sql,
             "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
-                "bms_can_pack_generator.bms_can_status='ENABLE'");
+            "WHERE bms_can_pack_generator.bms_can_status='ENABLE' AND "
+            "symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage");
     ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_gen, &errmsg);
     if ( ret ) {
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
