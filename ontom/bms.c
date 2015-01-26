@@ -38,6 +38,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
          */
         for ( i = 0; i < thiz->bms.can_pack_gen_nr; i++ ) {
             me = &thiz->bms.generator[i];
+            debug_track();
             if ((bit_read(thiz, F_GUN_1_PHY_CONN_STATUS)&&
                  bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))
                     ||
