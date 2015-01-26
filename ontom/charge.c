@@ -828,7 +828,6 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & thiz->tid_write, &task->attr, thread_bms_write_service, thiz);
     if ( 0 != ret ) {
-        errcode  = 0x1001;
         log_printf(ERR, "CAN-BUS reader start up.                       FAILE!!!!");
         goto die;
     }
@@ -836,7 +835,6 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     ret = pthread_create( & thiz->tid_read, &task->attr, thread_bms_read_service,
                           thiz);
     if ( 0 != ret ) {
-        errcode  = 0x1002;
         log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
         goto die;
     }
