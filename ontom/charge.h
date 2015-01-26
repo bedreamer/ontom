@@ -544,9 +544,9 @@ static inline int commit_job(struct charge_task *tsk, const struct job_commit *j
         thiz->cmd = cmd;
         list_init(*thiz);
         if ( tsk->commit_head == NULL ) {
-            task->commit_head = thiz;
+            task->commit_head = &thiz->job_node;
         } else {
-            list_inserttail(tsk->commit_head, thiz);
+            list_inserttail(tsk->commit_head, &thiz->job_node);
         }
         break;
     case COMMIT_CMD_ABORT:
