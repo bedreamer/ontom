@@ -628,6 +628,13 @@ struct charge_task {
     // 充电机管理模块
     struct charger_struct *chargers[CONFIG_SUPPORT_CHARGE_GRP_NR];
 
+    // 系统信号, 最多支持64 * 8 种信号标记
+    // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
+    // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
+    volatile unsigned char single[64];
+    // 系统前一次信号状态，用来做状态跳变比较
+    volatile unsigned char pre_single[64];
+
     // {{ 以下为充电桩系统监控的配置数据
     /* 充电冲突映射表
      * 充电冲突根据系统配置的充电枪个数确定, 目前系统最多支持4把枪
