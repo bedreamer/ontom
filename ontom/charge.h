@@ -534,18 +534,19 @@ struct job_commit {
 
     struct list_head job_node;
 };
-static inline int commit_job(const struct job_commit *jc, COMMIT_CMD cmd)
+static inline int commit_job(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd)
 {
     struct job_commit *thiz = NULL;
     switch ( cmd ) {
     case COMMIT_CMD_FORK:
         thiz = (struct job_commit *)malloc(sizeof(struct job_commit));
+        memcpy(thiz, jc, sizeof(struct job_commit));
         thiz->cmd = cmd;
         list_init(*thiz);
-        if ( task->commit_head == NULL ) {
+        if ( tsk->commit_head == NULL ) {
             task->commit_head = thiz;
         } else {
-            list_inserttail(task->commit_head, thiz);
+            list_inserttail(tsk->commit_head, thiz);
         }
         break;
     case COMMIT_CMD_ABORT:
