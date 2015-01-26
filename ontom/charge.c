@@ -840,6 +840,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
         goto die;
     }
 die:
+    log_printf(INF, "ZEUS: create job.")
     return thiz;
 }
 
