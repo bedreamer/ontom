@@ -23,6 +23,6 @@ static inline __log_printf(int l, const char * f)
     log_printf(DBG, "%s:%d tracked.", f, l);
 }
 
-#define debug_track __log_printf(__LINE__, __FILE__)
+#define debug_track() __log_printf(__LINE__, __FILE__)
 
 #endif
