@@ -5,207 +5,6 @@
  * 读卡器 - 串口通信过程
  */
 #include "stdafx.h"
-#if 0
-// 数据包生成器信息
-struct can_pack_generator generator[] = {
-    {
-    .stage      =  CHARGE_STAGE_HANDSHACKING,
-    .pgn        =  0x000100,
-    .prioriy    =  6,
-    .datalen    =  8,
-    .period     =  250,
-    .heartbeat   =  0,
-    .mnemonic   =  "CRM"
-    },
-    {
-    .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  0x000700,
-    .prioriy    =  6,
-    .datalen    =  7,
-    .period     =  500,
-    .heartbeat   =  0,
-    .mnemonic   =  "CTS"
-    },
-    {
-    .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  0x000800,
-    .prioriy    =  6,
-    .datalen    =  6,
-    .period     =  250,
-    .heartbeat   =  0,
-    .mnemonic   =  "CML"
-    },
-    {
-    .stage      =  CHARGE_STAGE_CONFIGURE,
-    .pgn        =  0x00A00,
-    .prioriy    =  4,
-    .datalen    =  1,
-    .period     =  250,
-    .heartbeat   =  0,
-    .mnemonic   =  "CRO"
-    },
-    {
-    .stage      =  CHARGE_STAGE_CHARGING,
-    .pgn        =  0x001200,
-    .prioriy    =  6,
-    .datalen    =  6,
-    .period     =  50,
-    .heartbeat   =  0,
-    .mnemonic   =  "CCS"
-    },
-    {
-    .stage      =  CHARGE_STAGE_CHARGING,
-    .pgn        =  0x001A00,
-    .prioriy    =  4,
-    .datalen    =  4,
-    .period     =  10,
-    .heartbeat   =  0,
-    .mnemonic   =  "CST"
-    },
-    {
-    .stage      =  CHARGE_STAGE_DONE,
-    .pgn        =  0x001D00,
-    .prioriy    =  6,
-    .datalen    =  5,
-    .period     =  250,
-    .heartbeat   =  0,
-    .mnemonic   =  "CSD"
-    },
-    {
-    .stage      =  CHARGE_STAGE_ANY,
-    .pgn        =  0x001F00,
-    .prioriy    =  2,
-    .datalen    =  4,
-    .period     =  250,
-    .heartbeat   =  0,
-    .mnemonic   =  "CEM"
-    }
-};
-
-// CAN 数据包统计结构
-struct bms_statistics statistics[] = {
-    {
-    .can_pgn = PGN_CRM,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BRM,
-    .can_silence = 0,
-    .can_tolerate_silence = 250,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BCP,
-    .can_silence = 0,
-    .can_tolerate_silence = 500,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_CTS,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_CML,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BRO,
-    .can_silence = 0,
-    .can_tolerate_silence = 250,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_CRO,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BCL,
-    .can_silence = 0,
-    .can_tolerate_silence = 50,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BCS,
-    .can_silence = 0,
-    .can_tolerate_silence = 250,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_CCS,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BSM,
-    .can_silence = 0,
-    .can_tolerate_silence = 250,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BMV,
-    .can_silence = 0,
-    .can_tolerate_silence = 1000,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BMT,
-    .can_silence = 0,
-    .can_tolerate_silence = 1000,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BSP,
-    .can_silence = 0,
-    .can_tolerate_silence = 1000,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BST,
-    .can_silence = 0,
-    .can_tolerate_silence = 10,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_CST,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BSD,
-    .can_silence = 0,
-    .can_tolerate_silence = 250,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_CSD,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_BEM,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    },
-    {
-    .can_pgn = PGN_CEM,
-    .can_silence = 0,
-    .can_tolerate_silence = 0,
-    .can_counter = 0
-    }
-};
-#endif
 
 // 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
 void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
@@ -214,8 +13,7 @@ void Hachiko_packet_heart_beart_notify_proc(Hachiko_EVT evt, void *private,
     if (evt == HACHIKO_TIMEOUT ) {
         unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)private;
-        struct can_pack_generator *gen;
-        struct bms_statistics *me;
+        struct can_pack_generator *gen, *me;
         for ( i = 0;
               (unsigned int)i < sizeof(thiz->bms.generator) / sizeof(struct can_pack_generator); i++ ) {
             gen = & thiz->bms.generator[i];
@@ -769,32 +567,32 @@ int about_packet_reciev_done(struct charge_job *thiz,
         }
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
-        thiz->bms.statistics[I_BMV].can_counter ++;
-        thiz->bms.statistics[I_BMV].can_silence = 0;
+        thiz->bms.generator[I_BMV].can_counter ++;
+        thiz->bms.generator[I_BMV].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
-        thiz->bms.statistics[I_BMT].can_counter ++;
-        thiz->bms.statistics[I_BMT].can_silence = 0;
+        thiz->bms.generator[I_BMT].can_counter ++;
+        thiz->bms.generator[I_BMT].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BMT fetched.");
         break;
     case PGN_BSP :// 0x001700, 动力蓄电池预留报文
-        thiz->bms.statistics[I_BSP].can_counter ++;
-        thiz->bms.statistics[I_BSP].can_silence = 0;
+        thiz->bms.generator[I_BSP].can_counter ++;
+        thiz->bms.generator[I_BSP].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BSP fetched.");
         break;
     case PGN_BST :// 0x001900, BMS 中止充电报文
-        thiz->bms.statistics[I_BST].can_counter ++;
-        thiz->bms.statistics[I_BST].can_silence = 0;
+        thiz->bms.generator[I_BST].can_counter ++;
+        thiz->bms.generator[I_BST].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
-        thiz->bms.statistics[I_BSD].can_counter ++;
-        thiz->bms.statistics[I_BSD].can_silence = 0;
+        thiz->bms.generator[I_BSD].can_counter ++;
+        thiz->bms.generator[I_BSD].can_silence = 0;
         if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
@@ -803,8 +601,8 @@ int about_packet_reciev_done(struct charge_job *thiz,
         log_printf(INF, "BMS: PGN_BSD fetched.");
         break;
     case PGN_BEM :// 0x001E00, BMS 错误报文
-        thiz->bms.statistics[I_BEM].can_counter ++;
-        thiz->bms.statistics[I_BEM].can_silence = 0;
+        thiz->bms.generator[I_BEM].can_counter ++;
+        thiz->bms.generator[I_BEM].can_silence = 0;
 
         log_printf(INF, "BMS: PGN_BEM fetched.");
         break;
@@ -1318,7 +1116,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.statistics[I_CTS].can_counter ++;
+    thiz->bms.generator[I_CTS].can_counter ++;
 
     return 0;
 }
@@ -1340,7 +1138,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.statistics[I_CML].can_counter ++;
+    thiz->bms.generator[I_CML].can_counter ++;
 
     return 0;
 }
@@ -1361,7 +1159,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.statistics[I_CRO].can_counter ++;
+    thiz->bms.generator[I_CRO].can_counter ++;
 
     return 0;
 }
@@ -1384,7 +1182,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.statistics[I_CCS].can_counter ++;
+    thiz->bms.generator[I_CCS].can_counter ++;
 
     return 0;
 }
