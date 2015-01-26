@@ -14,6 +14,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
         unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)_private;
         struct can_pack_generator *gen, *me;
+        debug_track();
         for ( i = 0; thiz->bms.can_pack_gen_nr; i++ ) {
             gen = & thiz->bms.generator[i];
             if ( task->this_job[0] && gen->stage == thiz->bms.charge_stage ) {
@@ -27,7 +28,6 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
             }
         }
 
-        debug_track();
 
         /*
          * 为了能够侦探到接受数据包的超时事件，需要在这里进行一个计数操作
@@ -661,6 +661,8 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             continue;
         }
 
+        debug_track();
+
         /*
          * 写线程同时负责写数据和进行连接管理时的控制数据写出，这里需要对当前CAN的
          * 状态进行判定，当CAN处于CAN_NORMAL时进行普通的写操作，当CAN处于CAN_TP_RD
@@ -708,6 +710,8 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         if ( EVT_RET_OK != param.evt_param ) {
             continue;
         }
+
+        debug_track();
 
         param.evt_param = EVT_RET_INVALID;
         // 链接模式下的数据包发送不需要确认, 并且也不能被中止
