@@ -14,7 +14,6 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
         unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)_private;
         struct can_pack_generator *gen, *me;
-        debug_track();
         for ( i = 0; thiz->bms.can_pack_gen_nr; i++ ) {
             gen = & thiz->bms.generator[i];
             if ( task->this_job[0] && gen->stage == thiz->bms.charge_stage ) {
@@ -27,6 +26,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                 gen->heartbeat = 0;
             }
         }
+        debug_track();
 
 
         /*
