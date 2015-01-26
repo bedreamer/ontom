@@ -179,6 +179,7 @@ int sql_query_BMS_pack_gen(void *param, int nr, char *text, char **name)
         me->prioriy = atoi( text[2] );
         me->datalen = atoi( text[3] );
         me->period = atoi( text[4] );
+        me->heartbeat = 0;
     }
     return 0;
 }
@@ -782,13 +783,12 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
 {
     struct charge_job *thiz = NULL;
     char sql[512] = {0};
-    int ret, nr_gen = 0, nr_pgn = 0, s = 0;
+    int ret, nr_gen = 0, s = 0;
     char *errmsg = NULL;
 
     sprintf(sql,
             "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
                 "WHERE symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage AND "
-                "bms_can_pack_generator.bms_can_source='C2B' AND "
                 "bms_can_pack_generator.bms_can_status='ENABLE'");
     ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_gen, &errmsg);
     if ( ret ) {
@@ -812,7 +812,6 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     }
     s = sizeof(struct charge_job);
     s = s + sizeof(struct can_pack_generator) * nr_gen;
-    s = s + sizeof(struct bms_statistics) * nr_pgn;
     thiz = (struct charge_job *)malloc(s);
     if (thiz == NULL) {
         log_printf(ERR, "ZEUS: LOW memory, job create faile, aborted.");
@@ -824,10 +823,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     thiz->bms.can_pack_gen_nr = nr_gen;
     thiz->bms.generator =
        (struct can_pack_generator*)(((char *)thiz) + sizeof(struct charge_job));
-    thiz->bms.can_statistics_nr = nr_pgn;
-    thiz->bms.statistics =
-       (struct can_pack_generator*)(((char *)thiz->bms.generator) +
-                                    sizeof(struct can_pack_generator) * nr_gen);
+
     sprintf(sql,
             "SELECT symbol_define.symbol_value,"
             "bms_can_pack_generator.bms_can_pgn,"
@@ -836,8 +832,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
             "bms_can_pack_generator.bms_can_period,"
             "bms_can_pack_generator.bms_can_tolerate_silence "
             "FROM symbol_define,bms_can_pack_generator "
-            "WHERE symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage AND "
-            "bms_can_pack_generator.bms_can_source='C2B'");
+            "WHERE symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage");
     ret = sqlite3_exec(tsk->database, sql, sql_query_BMS_pack_gen, thiz, &errmsg);
     if ( ret ) {
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
