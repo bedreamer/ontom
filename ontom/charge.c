@@ -942,6 +942,7 @@ struct charge_job *job_search(time_t ci_timestamp)
             debug_track();
             j = list_load(struct charge_job, job_node, thiz);
             if ( j->job_url_commit_timestamp == ci_timestamp ) {
+                debug_track();
                 break;
             }
             debug_track();
