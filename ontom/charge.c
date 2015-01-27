@@ -935,17 +935,19 @@ struct charge_job *job_search(time_t ci_timestamp)
         }
     }
 
-    pthread_mutex_lock(&task->wait_lck);
-    thiz = task->wait_head;
-    do {
-        j = list_load(struct charge_job, job_node, thiz);
-        if ( j->job_url_commit_timestamp == ci_timestamp ) {
-            break;
-        }
-        thiz = thiz->next;
-        j = NULL;
-    } while ( thiz->next != task->wait_head );
-    pthread_mutex_unlock (&task->wait_lck);
+    if ( task->wait_head ) {
+        pthread_mutex_lock(&task->wait_lck);
+        thiz = task->wait_head;
+        do {
+            j = list_load(struct charge_job, job_node, thiz);
+            if ( j->job_url_commit_timestamp == ci_timestamp ) {
+                break;
+            }
+            thiz = thiz->next;
+            j = NULL;
+        } while ( thiz->next != task->wait_head );
+        pthread_mutex_unlock (&task->wait_lck);
+    }
 
     return j;
 }
