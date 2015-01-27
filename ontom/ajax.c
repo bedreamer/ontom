@@ -735,7 +735,7 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
 
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
 {
-    int ret = ERR_ERR;
+    int ret = ERR_OK;
     struct list_head *h;
     struct charge_job *job;
     thiz->ct = "application/json";
