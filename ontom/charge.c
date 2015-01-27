@@ -808,13 +808,19 @@ int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD 
         memcpy(thiz, jc, sizeof(struct job_commit));
         thiz->cmd = cmd;
         list_ini(thiz->job_node);
+        debug_track();
+        pthread_mutex_lock(&task->commit_lck);
+        debug_track();
         if ( tsk->commit_head == NULL ) {
             tsk->commit_head = &thiz->job_node;
         } else {
-            pthread_mutex_lock(&task->commit_lck);
+            debug_track();
             list_inserttail(tsk->commit_head, &thiz->job_node);
-            pthread_mutex_unlock (&task->commit_lck);
+            debug_track();
         }
+        debug_track();
+        pthread_mutex_unlock (&task->commit_lck);
+        debug_track();
         break;
     case COMMIT_CMD_ABORT:
         break;
