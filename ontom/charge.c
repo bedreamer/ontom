@@ -904,7 +904,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
 
     pthread_mutex_lock(&task->wait_lck);
     if (task->wait_head == NULL) {
-        task->wait_head = thiz;
+        task->wait_head = &thiz->job_node;
         task->wait_job_nr = 1;
     } else {
         list_inserttail(task->wait_head, &thiz->job_node);
