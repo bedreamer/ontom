@@ -749,6 +749,7 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "{\"job_id\":\"%lld\"},",
                     job->job_url_commit_timestamp);
+            h = h->next;
         } while ( h->next != task->wait_head );
         thiz->iobuff[--thiz->xml_len] = '\0';
         pthread_mutex_unlock (&task->wait_lck);
