@@ -4,9 +4,6 @@ struct charge_task tom;
 
 // 充电任务结构
 struct charge_task *task = &tom;
-void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
-void deal_with_job_business(struct charge_task *, struct charge_job *);
-struct charge_job * job_fork(struct charge_task *, struct job_commit *need);
 
 /*
  * 扩展测量数据刷新
@@ -402,6 +399,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->wait_head = NULL;
     task->wait_job_nr = 0;
     pthread_mutex_init(&task->commit_lck, NULL);
+    pthread_mutex_init(&task->wait_lck, NULL);
 
     while ( 1 ) {
         while ( task->commit_head ) {
@@ -418,6 +416,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             switch ( thiz->cmd ) {
             case COMMIT_CMD_FORK:
                 job_fork(task, thiz);
+                break;
+            case COMMIT_CMD_DONE:
                 break;
             case COMMIT_CMD_ABORT:
                 break;
@@ -884,7 +884,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
                thiz->bms.generator[i].period,
                thiz->bms.generator[i].can_tolerate_silence);
     }
-
+#if 0
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & thiz->tid_write, &task->attr, thread_bms_write_service, thiz);
     if ( 0 != ret ) {
@@ -898,7 +898,10 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
         log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
         goto die;
     }
+#endif
+    thiz->job_status = JOB_WAITTING;
 
+    pthread_mutex_lock(&task->wait_lck);
     if (task->wait_head == NULL) {
         task->wait_head = thiz;
         task->wait_job_nr = 1;
@@ -906,6 +909,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
         list_inserttail(task->wait_head, &thiz->job_node);
         task->wait_job_nr ++;
     }
+    pthread_mutex_unlock (&task->wait_lck);
 
     log_printf(INF, "ZEUS: 作业创建完成.");
     return thiz;
@@ -917,6 +921,33 @@ die:
     return thiz;
 }
 
+struct charge_job *job_search(time_t ci_timestamp)
+{
+    int i = 0;
+    struct list_head *thiz;
+    struct charge_job *j = NULL;
+
+    for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
+        if ( task->job[i] == NULL ) continue;
+        if ( task->job[i]->job_url_commit_timestamp == ci_timestamp ) {
+            return task->job[i];
+        }
+    }
+
+    pthread_mutex_lock(&task->wait_lck);
+    thiz = task->wait_head;
+    do {
+        j = list_load(struct charge_job, job_node, thiz);
+        if ( j->job_url_commit_timestamp == ci_timestamp ) {
+            break;
+        }
+        thiz = thiz->next;
+        j = NULL;
+    } while ( thiz->next != task->wait_head );
+    pthread_mutex_unlock (&task->wait_lck);
+
+    return j;
+}
 
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string)
 {
