@@ -974,6 +974,6 @@ int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD 
 struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need);
 int job_exec(struct charge_job *job);
 void job_schedul(void);
-struct charge_job *job_search(time_t ci_timestamp);
+int job_search(time_t ci_timestamp);
 
 #endif /*_CHARGE_INCLUDED_H_*/
