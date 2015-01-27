@@ -727,11 +727,18 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
 {
-    int ret = ERR_OK;
+    int ret = ERR_ERR;
+    thiz->ct = "application/json";
+
+    return ret;
+}
+
+int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_ERR;
     struct list_head *h;
     struct charge_job *job;
     thiz->ct = "application/json";
-
     h = task->wait_head;
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"jobs\":[");
@@ -747,13 +754,6 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
         pthread_mutex_unlock (&task->wait_lck);
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]");
-    return ret;
-}
-
-int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
-{
-    int ret = ERR_ERR;
-    thiz->ct = "application/json";
     return ret;
 }
 
