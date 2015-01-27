@@ -948,6 +948,7 @@ struct charge_job *job_search(time_t ci_timestamp)
             debug_track();
             thiz = thiz->next;
             j = NULL;
+            log_printf(ERR, "%p", thiz);
         } while ( thiz->next != task->wait_head );
         pthread_mutex_unlock (&task->wait_lck);
     }
