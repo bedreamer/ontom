@@ -928,12 +928,31 @@ struct charge_job *job_search(time_t ci_timestamp)
     int i = 0;
     struct list_head *thiz;
     struct charge_job *j = NULL;
+    struct job_commit *c = NULL;
 
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
         if ( task->job[i]->job_url_commit_timestamp == ci_timestamp ) {
             return task->job[i];
         }
+    }
+
+    if ( task->commit_head ) {
+        pthread_mutex_lock(&task->commit_lck);
+        thiz = task->commit_head;
+        do {
+            debug_track();
+            c = list_load(struct charge_job, job_node, thiz);
+            if ( c->url_commit_timestamp == ci_timestamp ) {
+                debug_track();
+                break;
+            }
+            debug_track();
+            thiz = thiz->next;
+            c = NULL;
+            log_printf(ERR, "%p", thiz);
+        } while ( thiz->next != task->commit_head );
+        pthread_mutex_unlock (&task->commit_lck);
     }
 
     if ( task->wait_head ) {
