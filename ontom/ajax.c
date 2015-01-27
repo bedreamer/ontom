@@ -743,7 +743,7 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
                     "{\"job_id\":\"%lld\"},",
                     job->job_url_commit_timestamp);
         } while ( h->next != task->wait_head );
-        sprintf(&thiz->iobuff[--thiz->xml_len] = '\0';
+        thiz->iobuff[--thiz->xml_len] = '\0';
         pthread_mutex_unlock (&task->wait_lck);
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]");
