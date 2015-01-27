@@ -549,7 +549,7 @@ struct charge_job {
     // 产生故障时的状
     JOBSTATUS status_befor_fault;
     // 作业序号
-    unsigned int job_url_commit_timestamp;
+    time_t job_url_commit_timestamp;
     // 作业充电枪
     CHARGE_GUN_SN job_gun_sn;
     // 通信CAN名称
