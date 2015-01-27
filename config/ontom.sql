@@ -680,30 +680,90 @@ INSERT INTO bms_can_pack_generator VALUES
     );
 CREATE TABLE symbol_define(
 	symbol_name string,
-	symbol_value string
+	symbol_value string,
+	symbol_comment string
     );
 INSERT INTO symbol_define VALUES
     (
 	'STAGE_HANDSHACKING',
-	'0x01'
+	'0x01',
+	'BMS充电握手阶段'
     );
 INSERT INTO symbol_define VALUES
     (
 	'STAGE_CONFIGURE',
-	'0x02'
+	'0x02',
+	'BMS充电配置阶段'
     );
 INSERT INTO symbol_define VALUES
     (
 	'STAGE_CHARGING',
-	'0x03'
+	'0x03',
+	'BMS充电阶段'
     );
 INSERT INTO symbol_define VALUES
     (
 	'CHARGE_STAGE_DONE',
-	'0x04'
+	'0x04',
+	'BMS充电完成阶段'
     );
 INSERT INTO symbol_define VALUES
     (
 	'STAGE_ANY',
-	'0x04'
+	'0x04',
+	'BMS充电任意阶段'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'BILLING_MODE_INVALID',
+	'0x00',
+	'无效充电模式，默认值'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'BILLING_MODE_AS_AUTO',
+	'0x01',
+	'自动充电'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'BILLING_MODE_AS_MONEY',
+	'0x02',
+	'按金额充电'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'BILLING_MODE_AS_TIME',
+	'0x03',
+	'按时间充电'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'BILLING_MODE_AS_CAP',
+	'0x04',
+	'按容量充电'
+    );
+INSERT INTO symbol_define VALUES
+    (
+	'BILLING_MODE_AS_FREE',
+	'0x04',
+	'自由充电，不需要刷卡'
+    );
+CREATE TABLE jobs
+    (
+	job_id string,
+	job_commit_timestamp string,
+	job_commit_date_time string,
+	job_commit_result string,
+	job_create_timestamp string,
+	job_create_date_time string,
+	job_use_gun string,
+	job_billing_sn string,
+	job_billing_card_sn string,
+	job_charge_mode string,
+	job_terminal_money string,
+	job_terminal_time string,
+	job_terminal_cap string,
+	job_charge_voltage string,
+	job_charge_current string
     );
