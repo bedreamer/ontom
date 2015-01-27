@@ -398,7 +398,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->commit_head = NULL;
     task->wait_head = NULL;
     task->wait_job_nr = 0;
-    memset(task->job, 0, sizeof(struct task->job));
+    memset(task->job, 0, sizeof(task->job));
     pthread_mutex_init(&task->commit_lck, NULL);
     pthread_mutex_init(&task->wait_lck, NULL);
 
