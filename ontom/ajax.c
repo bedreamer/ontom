@@ -701,7 +701,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 #else
     struct job_commit jc;
     thiz->ct = "application/json";
-    commit_job(task, &jc, COMMIT_CMD_FORK);
+    job_commit(task, &jc, COMMIT_CMD_FORK);
     return ERR_ERR;
 #endif
 }

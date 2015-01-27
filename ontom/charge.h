@@ -528,9 +528,12 @@ typedef enum {
 
 // 作业提交结构
 struct job_commit {
-    unsigned int nr;
-
+    // 作业提交命令
     COMMIT_CMD cmd;
+    // URL端提交的时间戳
+    time_t url_commit_timestamp;
+    // 服务端提交的时间日期
+    time_t ontom_commit_date_time;
 
     struct list_head job_node;
 };
@@ -628,6 +631,9 @@ struct charge_task {
     struct list_head *commit_head;
     // 作业任务提交列表锁
     pthread_mutex_t commit_lck;
+
+    // 当前正在执行的充电任务
+    struct charge_job *job[CONFIG_SUPPORT_CHARGE_JOBS];
 
     // 等待作业列表
     struct list_head *wait_head;

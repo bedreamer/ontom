@@ -6,7 +6,7 @@ struct charge_task tom;
 struct charge_task *task = &tom;
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
 void deal_with_job_business(struct charge_task *, struct charge_job *);
-struct charge_job * create_new_job(struct charge_task *, struct job_commit *need);
+struct charge_job * job_fork(struct charge_task *, struct job_commit *need);
 
 /*
  * 扩展测量数据刷新
@@ -401,34 +401,30 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->commit_head = NULL;
     task->wait_head = NULL;
     task->wait_job_nr = 0;
+    pthread_mutex_init(&task->commit_lck, NULL);
 
     while ( 1 ) {
-        if ( task->commit_head ) {
-            debug_track();
+        while ( task->commit_head ) {
             struct list_head *next = task->commit_head->next;
             struct job_commit *thiz = list_load(struct job_commit, job_node, task->commit_head);
             if ( next = task->commit_head ) {
                 next = NULL;
             }
+            pthread_mutex_lock(&task->commit_lck);
             list_remove(task->commit_head);
+            pthread_mutex_unlock (&task->commit_lck);
             task->commit_head = next;
 
             switch ( thiz->cmd ) {
             case COMMIT_CMD_FORK:
-                create_new_job(task, thiz);
+                job_fork(task, thiz);
                 break;
             case COMMIT_CMD_ABORT:
                 break;
             }
+            memset(thiz, 0, sizeof(struct job_commit));
+            free(thiz);
         }
-#if 0
-        // 扩展测量数据刷新
-        deal_with_measure_data(task);
-        if ( task && task->this_job[0] ) {
-            deal_with_system_protection(task, task->this_job[0]);
-            deal_with_job_business(task, task->this_job[0]);
-        }
-#endif
         usleep(50000);
     }
 __panic:
@@ -803,7 +799,7 @@ void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
     }
 }
 
-int commit_job(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd)
+int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd)
 {
     struct job_commit *thiz = NULL;
     switch ( cmd ) {
@@ -815,7 +811,9 @@ int commit_job(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD 
         if ( tsk->commit_head == NULL ) {
             tsk->commit_head = &thiz->job_node;
         } else {
+            pthread_mutex_lock(&task->commit_lck);
             list_inserttail(tsk->commit_head, &thiz->job_node);
+            pthread_mutex_unlock (&task->commit_lck);
         }
         break;
     case COMMIT_CMD_ABORT:
@@ -824,7 +822,7 @@ int commit_job(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD 
     return 0;
 }
 
-struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *need)
+struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
 {
     struct charge_job* thiz = NULL;
     char sql[512] = {0};
@@ -863,7 +861,6 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     thiz->bms.can_pack_gen_nr = nr_gen;
     thiz->bms.generator =
        (struct can_pack_generator*)(((char *)thiz) + sizeof(struct charge_job));
-
     sprintf(sql,
             "SELECT symbol_define.symbol_value,"
             "bms_can_pack_generator.bms_can_pgn,"
@@ -900,6 +897,14 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     if ( 0 != ret ) {
         log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
         goto die;
+    }
+
+    if (task->wait_head == NULL) {
+        task->wait_head = thiz;
+        task->wait_job_nr = 1;
+    } else {
+        list_inserttail(task->wait_head, &thiz->job_node);
+        task->wait_job_nr ++;
     }
 
     log_printf(INF, "ZEUS: 作业创建完成.");
