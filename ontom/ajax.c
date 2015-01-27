@@ -708,6 +708,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     jc.ontom_commit_date_time = time(NULL);
 
     if ( jc.url_commit_timestamp != 0 ) {
+        debug_track();
         job_commit(task, &jc, COMMIT_CMD_FORK);
     }
     thiz->xml_len = 0;
@@ -720,6 +721,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"status\":\"PENDING\"}");
     }
+    debug_track();
 
 
     return ERR_OK;
