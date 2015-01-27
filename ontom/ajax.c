@@ -747,7 +747,7 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
         do {
             job = list_load(struct charge_job, job_node, h);
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                    "{\"job_id\":\"%lld\"},",
+                    "{\"job_id\":\"%ll\"},",
                     job->job_url_commit_timestamp);
             h = h->next;
         } while ( h->next != task->wait_head );
