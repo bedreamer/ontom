@@ -709,11 +709,11 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 
     if ( jc.url_commit_timestamp != 0 ) {
         job_commit(task, &jc, COMMIT_CMD_FORK);
-        debug_track();
     }
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"jobreturn\":{");
+    debug_track();
     if ( job_search(jc.url_commit_timestamp) ) {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"status\":\"OK\"}");
