@@ -923,7 +923,7 @@ die:
     return thiz;
 }
 
-struct charge_job *job_search(time_t ci_timestamp)
+int job_search(time_t ci_timestamp)
 {
     int i = 0;
     struct list_head *thiz;
@@ -933,7 +933,7 @@ struct charge_job *job_search(time_t ci_timestamp)
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
         if ( task->job[i]->job_url_commit_timestamp == ci_timestamp ) {
-            return task->job[i];
+            return (int)task->job[i];
         }
     }
 
@@ -941,39 +941,32 @@ struct charge_job *job_search(time_t ci_timestamp)
         pthread_mutex_lock(&task->commit_lck);
         thiz = task->commit_head;
         do {
-            debug_track();
             c = list_load(struct charge_job, job_node, thiz);
             if ( c->url_commit_timestamp == ci_timestamp ) {
-                debug_track();
                 break;
             }
-            debug_track();
             thiz = thiz->next;
             c = NULL;
-            log_printf(ERR, "%p", thiz);
         } while ( thiz->next != task->commit_head );
         pthread_mutex_unlock (&task->commit_lck);
+        if ( c ) return (int)c;
     }
 
     if ( task->wait_head ) {
         pthread_mutex_lock(&task->wait_lck);
         thiz = task->wait_head;
         do {
-            debug_track();
             j = list_load(struct charge_job, job_node, thiz);
             if ( j->job_url_commit_timestamp == ci_timestamp ) {
-                debug_track();
                 break;
             }
-            debug_track();
             thiz = thiz->next;
             j = NULL;
-            log_printf(ERR, "%p", thiz);
         } while ( thiz->next != task->wait_head );
         pthread_mutex_unlock (&task->wait_lck);
     }
 
-    return j;
+    return (int)j;
 }
 
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string)
