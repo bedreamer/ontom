@@ -583,6 +583,8 @@ struct charge_job {
     volatile unsigned char single[64];
     // 系统前一次信号状态，用来做状态跳变比较
     volatile unsigned char pre_single[64];
+
+    struct list_head job_node;
 };
 
 // 故障恢复原因
@@ -622,18 +624,15 @@ struct charge_task {
     pthread_t tid;
     pthread_attr_t attr;
 
-    // 工作列表中的工作个数
-    unsigned int nr_jobs;
-    // 预约工作列表
-    struct charge_job *book_jobs[CONFIG_SUPPORT_BOOK_JOBS];
-    // 当前进行的充电工作
-    struct charge_job *this_job[CONFIG_SUPPORT_CHARGE_JOBS];
-    // 空闲作业
-    struct charge_job idle[CONFIG_SUPPORT_CHARGE_JOBS];
     // 作业任务提交列表
     struct list_head *commit_head;
     // 作业任务提交列表锁
     pthread_mutex_t commit_lck;
+
+    // 等待作业列表
+    struct list_head *wait_head;
+    // 等待作业个数
+    unsigned int wait_job_nr;
 
     // 任务记录故障总数
     unsigned int err_seq_id_next;

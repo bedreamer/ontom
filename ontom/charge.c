@@ -398,6 +398,10 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         exit(-1);
     }
 
+    task->commit_head = NULL;
+    task->wait_head = NULL;
+    task->wait_job_nr = 0;
+
     while ( 1 ) {
         if ( task->commit_head ) {
             debug_track();
@@ -853,6 +857,7 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
     thiz->bms.can_dev = "can0";
     thiz->bms.can_bms_status = CAN_INVALID;
     thiz->bms.job = thiz;
+    list_ini(thiz->job_node);
 
     thiz->bms.readed = 0; // 用户操作数据记录时的临时记录
     thiz->bms.can_pack_gen_nr = nr_gen;
@@ -897,8 +902,13 @@ struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *n
         goto die;
     }
 
+    log_printf(INF, "ZEUS: 作业创建完成.");
+    return thiz;
+
 die:
-    log_printf(INF, "ZEUS: create job.");
+    log_printf(ERR, "ZEUS: 创建作业失败");
+    free(thiz);
+    thiz = NULL;
     return thiz;
 }
 
