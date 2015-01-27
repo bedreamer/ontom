@@ -739,9 +739,9 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
     struct list_head *h;
     struct charge_job *job;
     thiz->ct = "application/json";
-    h = task->wait_head;
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"jobs\":[");
+    h = task->wait_head;
     if ( h ) {
         pthread_mutex_lock(&task->wait_lck);
         do {
