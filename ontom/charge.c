@@ -939,10 +939,12 @@ struct charge_job *job_search(time_t ci_timestamp)
         pthread_mutex_lock(&task->wait_lck);
         thiz = task->wait_head;
         do {
+            debug_track();
             j = list_load(struct charge_job, job_node, thiz);
             if ( j->job_url_commit_timestamp == ci_timestamp ) {
                 break;
             }
+            debug_track();
             thiz = thiz->next;
             j = NULL;
         } while ( thiz->next != task->wait_head );
