@@ -361,3 +361,22 @@ INSERT INTO bms_can_pack_generator VALUES
 	'250',
 	'C2B'
     );
+// 充电作业记录表
+CREATE TABLE jobs
+    (
+	job_id string,		    // 作业序号
+	job_commit_timestamp string,// 浏览器端作业提交时间戳，来自浏览器端，用于查询作业状态
+	job_commit_date_time string,// 浏览器端作业提交日期时间
+	job_commit_result string,   // 作业提交结果
+	job_create_timestamp string,// 作业创建时间戳，用于记录接受作业的时间
+	job_create_date_time string,// 浏览器端作业创建日期时间
+	job_use_gun string,	    // 指定充电枪
+	job_billing_sn string,	    // 充电交易流水号
+	job_billing_card_sn string, // 交易卡号
+	job_charge_mode string,	    // 充电模式（BILLING_MODE_INVALID|BILLING_MODE_AS_AUTO...）
+	job_terminal_money string,  // 充电终止金钱
+	job_terminal_time string,   // 充电终止时长
+	job_terminal_cap string,    // 充电终止容量
+	job_charge_voltage string,  // 充电电压
+	job_charge_current string,  // 充电电流
+    );
