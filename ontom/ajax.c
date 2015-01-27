@@ -727,8 +727,26 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
 {
-    int ret = ERR_ERR;
+    int ret = ERR_OK;
+    struct list_head *h;
+    struct charge_job *thiz;
     thiz->ct = "application/json";
+
+    h = task->wait_head;
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"jobs\":[");
+    if ( h ) {
+        pthread_mutex_lock(&task->wait_lck);
+        do {
+            thiz = list_load(struct charge_job, job_node, h);
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                    "{\"job_id\":\"%lld\"},",
+                    thiz->job_url_commit_timestamp);
+        } while ( h->next != task->wait_head );
+        sprintf(&thiz->iobuff[--thiz->xml_len] = '\0';
+        pthread_mutex_unlock (&task->wait_lck);
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]");
     return ret;
 }
 
