@@ -522,6 +522,8 @@ struct charger_struct {
 typedef enum {
     // 创建任务
     COMMIT_CMD_FORK,
+    // 完成任务
+    COMMIT_CMD_DONE,
     // 中止任务
     COMMIT_CMD_ABORT
 }COMMIT_CMD;
@@ -537,7 +539,7 @@ struct job_commit {
 
     struct list_head job_node;
 };
-int commit_job(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
+int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
 /*
  * 充电作业描述，充电管理的最小单位
  */
@@ -547,7 +549,7 @@ struct charge_job {
     // 产生故障时的状
     JOBSTATUS status_befor_fault;
     // 作业序号
-    unsigned int job_sn;
+    unsigned int job_url_commit_timestamp;
     // 作业充电枪
     CHARGE_GUN_SN job_gun_sn;
     // 通信CAN名称
@@ -637,6 +639,8 @@ struct charge_task {
 
     // 等待作业列表
     struct list_head *wait_head;
+    // 作业任务等待列表锁
+    pthread_mutex_t wait_lck;
     // 等待作业个数
     unsigned int wait_job_nr;
 
@@ -964,5 +968,12 @@ static inline unsigned int __atoh(const char *hex)
     return v;
 }
 #define atoh __atoh
-struct charge_job * create_new_job(struct charge_task *tsk, struct job_commit *need);
+void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
+void deal_with_job_business(struct charge_task *, struct charge_job *);
+int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
+struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need);
+int job_exec(struct charge_job *job);
+void job_schedul(void);
+struct charge_job *job_search(time_t ci_timestamp);
+
 #endif /*_CHARGE_INCLUDED_H_*/

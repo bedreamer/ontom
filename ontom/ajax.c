@@ -700,9 +700,29 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     return ret;
 #else
     struct job_commit jc;
+    char timestamp[32] = {0};
+
     thiz->ct = "application/json";
-    job_commit(task, &jc, COMMIT_CMD_FORK);
-    return ERR_ERR;
+    mg_get_var(thiz->xml_conn, "t", timestamp, 32);
+    jc.url_commit_timestamp = atoll(timestamp);
+    jc.ontom_commit_date_time = time(NULL);
+
+    if ( jc.url_commit_timestamp != 0 ) {
+        job_commit(task, &jc, COMMIT_CMD_FORK);
+    }
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"jobreturn\":{");
+    if ( job_search(jc.url_commit_timestamp) ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                "\"status\":\"OK\"}");
+    } else {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                "\"status\":\"PENDING\"}");
+    }
+
+
+    return ERR_OK;
 #endif
 }
 
