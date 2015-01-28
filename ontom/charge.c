@@ -280,6 +280,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         bp->init_magic = 0;
         bp->hw_port = SERIAL4_CTRL_PIN;
 
+        task->chargers[0] = (struct charger_struct *)malloc(sizeof(struct charger_struct));
+
         do {
             struct bp_user u = {0};
             u.frame_freq = 50 * 100;
@@ -294,6 +296,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_config_name = "core_simple_box_swap_time";
             u.user_evt_handle = uart4_simple_box_evt_handle;
             u.uart = bp;
+            u.chargers = task->chargers[0];
             ret = bp_user_bind(bp, &u); // 采样
 
             u.frame_freq = 50 * 100;
@@ -308,6 +311,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_config_name = "core_charger_config";
             u.user_evt_handle = uart4_charger_config_evt_handle;
             u.uart = bp;
+            u.chargers = task->chargers[0];
             ret = bp_user_bind(bp, &u); // 配置充电电压，电流
 
             u.frame_freq = 50 * 100;
@@ -322,6 +326,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_config_name = "core_charger_yaoce_0_49";
             u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
             u.uart = bp;
+            u.chargers = task->chargers[0];
             ret = bp_user_bind(bp, &u); // 遥信1
 
             u.frame_freq = 50 * 100;
@@ -336,6 +341,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.swap_time_config_name = "core_charger_yaoce_50_100";
             u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
             u.uart = bp;
+            u.chargers = task->chargers[0];
             ret = bp_user_bind(bp, &u); // 遥信2
         } while (0);
         // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
