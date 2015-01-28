@@ -911,7 +911,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
     thiz->job_url_commit_timestamp = need->url_commit_timestamp;
 
 
-    thiz->charge_bms_establish_timestamp = rand() + 100000;
+    thiz->charge_bms_establish_timestamp = rand() % 10000 + 5000;
 
     thiz->bms.readed = 0; // 用户操作数据记录时的临时记录
     thiz->bms.can_pack_gen_nr = nr_gen;
