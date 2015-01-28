@@ -531,6 +531,13 @@ typedef enum {
     // 中止任务
     COMMIT_CMD_ABORT
 }COMMIT_CMD;
+// 充电模式
+typedef enum {
+    // 自动充电，带BMS管理
+    CHARGE_AUTO,
+    // 手动充电，不需要BMS
+    CHARGE_MANUAL
+}CHARGE_MODE;
 
 // 作业提交结构
 struct job_commit {
@@ -556,13 +563,6 @@ struct job_commit {
 };
 int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
 
-// 充电模式
-typedef enum {
-    // 自动充电，带BMS管理
-    CHARGE_AUTO,
-    // 手动充电，不需要BMS
-    CHARGE_MANUAL
-}CHARGE_MODE;
 /*
  * 充电作业描述，充电管理的最小单位
  */
