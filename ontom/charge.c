@@ -701,6 +701,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         log_printf(WRN, "ZEUS: 作业执行完成 ");
         return;
     }
+    debug_track();
 
     switch ( thiz->job_status ) {
     case JOB_IDLE:
