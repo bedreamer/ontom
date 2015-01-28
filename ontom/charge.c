@@ -700,7 +700,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
 
     if ( thiz->charge_bms_establish_timestamp <= 1000 ) {
         tsk->job[ thiz->job_gun_sn ] = NULL;
-        break;
+        return;
     }
 
     switch ( thiz->job_status ) {
