@@ -439,23 +439,27 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 job = job_select_wait(task, GUN_SN0);
                 if ( job ) {
                     // ...
+                    task->job[0] = job;
                     log_printf(INF, "ZEUS: 开始执行作业 @ GUN%d", job->job_gun_sn);
                     break;
                 }
 
                 job = job_select_wait(task, GUN_SN1);
                 if ( job ) {
+                    task->job[1] = job;
                     log_printf(INF, "ZEUS: 开始执行作业 @ GUN%d", job->job_gun_sn);
                 }
             }
             if ( task->sys_config_gun_nr == 2 && task->sys_charge_group_nr == 2 ) {
                 job = job_select_wait(task, GUN_SN0);
                 if ( job ) {
+                    task->job[0] = job;
                     // ...
                 }
 
                 job = job_select_wait(task, GUN_SN1);
                 if ( job ) {
+                    task->job[1] = job;
                     // ...
                 }
             }
