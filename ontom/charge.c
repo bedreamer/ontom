@@ -931,6 +931,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
     }
 
+#if 0
     for ( i = 0; i < thiz->bms.can_pack_gen_nr; i ++) {
         printf("\t%4d  %08X  %2d   %9d  %5d   %d\n",
                thiz->bms.generator[i].stage,
@@ -940,7 +941,6 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
                thiz->bms.generator[i].period,
                thiz->bms.generator[i].can_tolerate_silence);
     }
-#if 0
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & thiz->tid_write, &task->attr, thread_bms_write_service, thiz);
     if ( 0 != ret ) {
