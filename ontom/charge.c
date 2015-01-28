@@ -948,7 +948,7 @@ int job_search(time_t ci_timestamp)
             }
             thiz = thiz->next;
             c = NULL;
-        } while ( thiz->next != task->commit_head );
+        } while ( thiz != task->commit_head );
         pthread_mutex_unlock (&task->commit_lck);
         if ( c ) return (int)c;
     }
@@ -963,7 +963,7 @@ int job_search(time_t ci_timestamp)
             }
             thiz = thiz->next;
             j = NULL;
-        } while ( thiz->next != task->wait_head );
+        } while ( thiz != task->wait_head );
         pthread_mutex_unlock (&task->wait_lck);
     }
 
