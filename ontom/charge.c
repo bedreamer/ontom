@@ -696,6 +696,13 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
 
     if ( thiz == NULL ) return;
 
+    thiz->charge_bms_establish_timestamp --;
+
+    if ( thiz->charge_bms_establish_timestamp <= 1000 ) {
+        tsk->job[ thiz->job_gun_sn ] = NULL;
+        break;
+    }
+
     switch ( thiz->job_status ) {
     case JOB_IDLE:
     case JOB_SETTING:
@@ -902,6 +909,9 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
     thiz->bms.job = thiz;
     list_ini(thiz->job_node);
     thiz->job_url_commit_timestamp = need->url_commit_timestamp;
+
+
+    thiz->charge_bms_establish_timestamp = rand() + 100000;
 
     thiz->bms.readed = 0; // 用户操作数据记录时的临时记录
     thiz->bms.can_pack_gen_nr = nr_gen;
