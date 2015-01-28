@@ -243,10 +243,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         log_printf(ERR, "TOM: SQL error: %s", errmsg);
     }
 
-    while ( ! done ) {
-        log_printf(INF, "ZEUS: 等待数据库初始化完成...." );
-    }
-
     log_printf(DBG_LV1, "ZEUS: 数据库初始化完成....%d", done);
     print_POST_configure();
 
@@ -403,29 +399,37 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     pthread_mutex_init(&task->wait_lck, NULL);
 
     while ( 1 ) {
-        while ( task->commit_head ) {
-            struct list_head *next = task->commit_head->next;
-            struct job_commit *thiz = list_load(struct job_commit, job_node, task->commit_head);
-            if ( next = task->commit_head ) {
-                next = NULL;
+        do {
+            // 处理提交事件
+            struct job_commit *thiz = NULL;
+            thiz = job_select_commit(task);
+            while ( thiz ) {
+                switch ( thiz->cmd ) {
+                case COMMIT_CMD_FORK:
+                    job_fork(task, thiz);
+                    break;
+                case COMMIT_CMD_DONE:
+                    break;
+                case COMMIT_CMD_ABORT:
+                    break;
+                }
+                memset(thiz, 0, sizeof(struct job_commit));
+                thiz = job_select_commit(task);
+                free(thiz);
             }
-            pthread_mutex_lock(&task->commit_lck);
-            list_remove(task->commit_head);
-            pthread_mutex_unlock (&task->commit_lck);
-            task->commit_head = next;
+        } while ( 0 );
 
-            switch ( thiz->cmd ) {
-            case COMMIT_CMD_FORK:
-                job_fork(task, thiz);
-                break;
-            case COMMIT_CMD_DONE:
-                break;
-            case COMMIT_CMD_ABORT:
-                break;
+        do {
+            int i = 0;
+            struct charge_job **job;
+            for( i = 0; i < CONFIG_SUPPORT_CHARGE_JOBS; i ++ ) {
+                job = & task->job[ i ];
+                if ( * job ) {
+                    job_running(task, *job);
+                } else {
+                }
             }
-            memset(thiz, 0, sizeof(struct job_commit));
-            free(thiz);
-        }
+        } while ( 0 );
         usleep(50000);
     }
 __panic:
@@ -646,7 +650,7 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
     }
 }
 
-void deal_with_job_business(struct charge_task *tsk, struct charge_job *thiz)
+void job_running(struct charge_task *tsk, struct charge_job *thiz)
 {
     int ret;
 
@@ -968,6 +972,58 @@ int job_search(time_t ci_timestamp)
     }
 
     return (int)j;
+}
+
+// 从等待链表中选出最先提交的作业
+struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun)
+{
+    struct charge_job *thiz = NULL;
+    struct list_head *p, *next;
+    if ( tsk->wait_head != NULL ) {
+        pthread_mutex_lock(&tsk->wait_lck);
+        p = tsk->wait_head;
+        do {
+            next = p->next;
+            thiz = list_load(struct charge_job, job_node, p);
+            if ( thiz->job_gun_sn != gun ) {
+                p = p->next;
+                thiz = NULL;
+                continue;
+            }
+            list_remove(p);
+            if ( p == tsk->wait_head ) {
+                if ( next = tsk->wait_head ) {
+                    tsk->wait_head = NULL;
+                    tsk->wait_job_nr = 0;
+                } else {
+                    tsk->wait_head = next;
+                    tsk->wait_job_nr --;
+                }
+            }
+            break;
+        } while ( p != tsk->wait_head);
+        pthread_mutex_unlock (&tsk->wait_lck);
+    }
+
+    return thiz;
+}
+
+// 从提交链表中取出第一个提交事件
+struct job_commit *job_select_commit(struct charge_task *tsk)
+{
+    struct job_commit *thiz = NULL;
+    if ( tsk->commit_head ) {
+        struct list_head *next = tsk->commit_head->next;
+        thiz = list_load(struct job_commit, job_node, tsk->commit_head);
+        if ( next = tsk->commit_head ) {
+            next = NULL;
+        }
+        pthread_mutex_lock(&tsk->commit_lck);
+        list_remove(tsk->commit_head);
+        pthread_mutex_unlock (&tsk->commit_lck);
+        tsk->commit_head = next;
+    }
+    return thiz;
 }
 
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string)

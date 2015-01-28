@@ -30,6 +30,10 @@ typedef enum {
     GUN_SN0 = 0,
     // 1# 充电枪
     GUN_SN1 = 1,
+    // 2# 充电枪
+    GUN_SN2 = 2,
+    // 3# 充电枪
+    GUN_SN3 = 3,
     // 默认充电枪
     GUN_DEFAULT = 0,
     // 无效枪
@@ -537,9 +541,28 @@ struct job_commit {
     // 服务端提交的时间日期
     time_t ontom_commit_date_time;
 
+    //{{ 创建作业参数
+    CHARGE_GUN_SN charge_gun;    // 充电枪选择
+    CHARGE_MODE charge_mode;     // 选择自动或是手动
+    unsigned int manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
+    unsigned int manual_set_charge_current;  // 手动设置充电电流, 手动充电有效
+    BILLING_MODE  biling_mode; // 充电计费方式
+    unsigned int as_cap;   // 按电量充，KW.h, 自动充电，默认充满
+    unsigned int as_money; // 按金额充，元
+    unsigned int as_time;  // 按时间充电，分钟数
+    //}}
+
     struct list_head job_node;
 };
 int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
+
+// 充电模式
+typedef enum {
+    // 自动充电，带BMS管理
+    CHARGE_AUTO,
+    // 手动充电，不需要BMS
+    CHARGE_MANUAL
+}CHARGE_MODE;
 /*
  * 充电作业描述，充电管理的最小单位
  */
@@ -552,6 +575,8 @@ struct charge_job {
     time_t job_url_commit_timestamp;
     // 作业充电枪
     CHARGE_GUN_SN job_gun_sn;
+    // 充电模式
+    CHARGE_MODE charge_mode;
     // 通信CAN名称
     char job_can_dev_name[32];
     // 充电起始时戳， 闭合充电开关的那一刻
@@ -969,11 +994,12 @@ static inline unsigned int __atoh(const char *hex)
 }
 #define atoh __atoh
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
-void deal_with_job_business(struct charge_task *, struct charge_job *);
+void job_running(struct charge_task *, struct charge_job *);
+void job_running(struct charge_task *tsk, struct charge_job *thiz);
 int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
 struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need);
-int job_exec(struct charge_job *job);
-void job_schedul(void);
 int job_search(time_t ci_timestamp);
+struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun);
+struct job_commit *job_select_commit(struct charge_task *tsk);
 
 #endif /*_CHARGE_INCLUDED_H_*/
