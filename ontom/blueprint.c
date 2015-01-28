@@ -684,6 +684,7 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要0-49)恢复"));
         }
         memcpy(&me->chargers->chargers, &param->buff.rx_buff[3], 100);
+        debug_track();
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
