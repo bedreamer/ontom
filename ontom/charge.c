@@ -698,10 +698,11 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
 
     if ( thiz->charge_bms_establish_timestamp <= 1000 ) {
         tsk->job[ thiz->job_gun_sn ] = NULL;
-        log_printf(WRN, GRN("ZEUS: %ld 作业执行完成 "), thiz->job_url_commit_timestamp);
+        log_printf(WRN, GRN("ZEUS: %ld 作业执行完成 (%d) "),
+                   thiz->job_url_commit_timestamp,
+                   tsk->wait_job_nr);
         return;
     }
-    debug_track();
 
     switch ( thiz->job_status ) {
     case JOB_IDLE:
