@@ -913,7 +913,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
     }
     pthread_mutex_unlock (&task->wait_lck);
 
-    log_printf(INF, "ZEUS: 作业创建完成(%p).", thiz);
+    log_printf(INF, "ZEUS: 作业创建完成(%p:%d).", thiz, task->wait_job_nr);
     return thiz;
 
 die:
