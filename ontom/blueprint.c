@@ -1688,7 +1688,7 @@ ___fast_switch_2_rx:
                 switch ( ret ) {
                 // 数据接收，校验完成, 完成数据接收过程，停止接收
                 case ERR_OK:
-                    __dump_uart_hex(buff, nr, INF);
+                    __dump_uart_hex(buff, nr, DBG_LV3);
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
                     log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
@@ -1711,7 +1711,7 @@ ___fast_switch_2_rx:
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
-                    __dump_uart_hex(buff, nr, WRN);
+                    __dump_uart_hex(buff, nr, DBG_LV3);
                     thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
                                                               &thiz->rx_param);
                     //thiz->master->check_err_cnt ++;
@@ -1755,7 +1755,7 @@ ___fast_switch_2_rx:
                                thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
                             thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
                             load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
-                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
+                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, DBG_LV3);
                 }
                 if ( thiz->rx_param.payload_size == 0 ) {
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
