@@ -420,15 +420,51 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         } while ( 0 );
 
         do {
+            // 执行作业
             int i = 0;
             struct charge_job **job;
-            for( i = 0; i < CONFIG_SUPPORT_CHARGE_JOBS; i ++ ) {
+            for( i = 0; i < task->sys_config_gun_nr; i ++ ) {
                 job = & task->job[ i ];
-                if ( * job ) {
-                    job_running(task, *job);
-                } else {
+                if ( * job == NULL ) continue;
+                job_running(task, *job);
+            }
+        } while ( 0 );
+
+        do {
+            // 选取可执行的作业并准备执行
+            struct charge_job *job;
+            if ( task->sys_config_gun_nr == 2 && task->sys_charge_group_nr == 1 ) {
+                if ( task->job[0] || task->job[1] ) break;
+
+                job = job_select_wait(task, GUN_SN0);
+                if ( job ) {
+                    // ...
+                    log_printf(INF, "ZEUS: 开始执行作业 @ GUN%d", job->job_gun_sn);
+                    break;
+                }
+
+                job = job_select_wait(task, GUN_SN1);
+                if ( job ) {
+                    log_printf(INF, "ZEUS: 开始执行作业 @ GUN%d", job->job_gun_sn);
                 }
             }
+            if ( task->sys_config_gun_nr == 2 && task->sys_charge_group_nr == 2 ) {
+                job = job_select_wait(task, GUN_SN0);
+                if ( job ) {
+                    // ...
+                }
+
+                job = job_select_wait(task, GUN_SN1);
+                if ( job ) {
+                    // ...
+                }
+            }
+            // {{{ 没实现
+            if ( task->sys_config_gun_nr == 4 && task->sys_charge_group_nr == 2 ) {
+            }
+            if ( task->sys_config_gun_nr == 4 && task->sys_charge_group_nr == 4 ) {
+            }
+            //}}} 没实现
         } while ( 0 );
         usleep(50000);
     }
