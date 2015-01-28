@@ -422,11 +422,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         do {
             // 执行作业
             int i = 0;
-            struct charge_job **job;
             for( i = 0; i < task->sys_config_gun_nr; i ++ ) {
-                job = & task->job[ i ];
-                if ( * job == NULL ) continue;
-                job_running(task, *job);
+                if ( task->job[ i ] == NULL ) continue;
+                job_running(task, task->job[ i ]);
             }
         } while ( 0 );
 
@@ -700,6 +698,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
 
     if ( thiz->charge_bms_establish_timestamp <= 1000 ) {
         tsk->job[ thiz->job_gun_sn ] = NULL;
+        log_printf(WRN, "ZEUS: 作业执行完成 ");
         return;
     }
 
