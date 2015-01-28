@@ -987,6 +987,10 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
             "N/A", "N/A", "N/A", "N/A", "N/A",
             "N/A", "N/A", "N/A", "N/A", "N/A"
             );
+    ret = sqlite3_exec(tsk->database, sql, NULL, NULL, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+    }
 
     log_printf(INF, "ZEUS: 作业创建完成(%p:%d:%ld).",
                thiz, task->wait_job_nr, thiz->job_url_commit_timestamp);
