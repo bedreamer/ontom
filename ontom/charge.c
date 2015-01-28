@@ -1045,7 +1045,7 @@ struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun)
             }
             list_remove(p);
             if ( p == tsk->wait_head ) {
-                if ( next = tsk->wait_head ) {
+                if ( next == tsk->wait_head ) {
                     tsk->wait_head = NULL;
                     tsk->wait_job_nr = 0;
                 } else {
