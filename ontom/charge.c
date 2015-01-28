@@ -976,7 +976,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
     }
     pthread_mutex_unlock (&task->wait_lck);
 
-    sprintf(sql, "INSERT INTO jobs VALUS("
+    sprintf(sql, "INSERT INTO jobs VALUES("
             "\'%ld\',\'%ld\',\'%s\',\'%ld\',\'%d\',"
             "\'%d\',\'%s\',\'%s\',\'%s\',\'%s\',"
             "\'%s\',\'%s\',\'%s\',\'%s\',\'%s\')",
