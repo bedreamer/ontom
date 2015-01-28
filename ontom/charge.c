@@ -976,6 +976,18 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
     }
     pthread_mutex_unlock (&task->wait_lck);
 
+    sprintf(sql, "INSERT INTO jobs VALUS("
+            "\'%ld\',\'%ld\',\'%s\',\'%ld\',\'%d\',"
+            "\'%d\',\'%s\',\'%s\',\'%s\',\'%s\',"
+            "\'%s\',\'%s\',\'%s\',\'%s\',\'%s\')",
+            thiz->job_url_commit_timestamp,
+            thiz->charge_begin_timestamp,
+            "SUCCESS", time(NULL), thiz->job_gun_sn,
+
+            "N/A", "N/A", "N/A", "N/A", "N/A",
+            "N/A", "N/A", "N/A", "N/A", "N/A"
+            );
+
     log_printf(INF, "ZEUS: 作业创建完成(%p:%d:%ld).",
                thiz, task->wait_job_nr, thiz->job_url_commit_timestamp);
     return thiz;
