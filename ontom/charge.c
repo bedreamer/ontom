@@ -942,7 +942,7 @@ int job_search(time_t ci_timestamp)
         pthread_mutex_lock(&task->commit_lck);
         thiz = task->commit_head;
         do {
-            c = list_load(struct charge_job, job_node, thiz);
+            c = list_load(struct job_commit, job_node, thiz);
             if ( c->url_commit_timestamp == ci_timestamp ) {
                 break;
             }
