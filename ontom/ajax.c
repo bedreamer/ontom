@@ -710,13 +710,18 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"jobreturn\":{");
-    if ( job_search(jc.url_commit_timestamp) ) {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                "\"status\":\"OK\"}");
+    if ( task->wait_job_nr < 16 ) {
+        if ( job_search(jc.url_commit_timestamp) ) {
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                    "\"status\":\"OK\"}");
+        } else {
+            job_commit(task, &jc, COMMIT_CMD_FORK);
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                    "\"status\":\"PENDING\"}");
+        }
     } else {
-        job_commit(task, &jc, COMMIT_CMD_FORK);
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                "\"status\":\"PENDING\"}");
+                "\"status\":\"REJECTED\"}");
     }
 
     return ERR_OK;
