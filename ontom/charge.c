@@ -266,6 +266,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             log_printf(ERR, "ZEUS: 分配系统内存失败");
             goto __panic;
         }
+        task->uarts[0] = bp;
         memset(bp, 0, sizeof(struct bp_uart));
         bp->bp_evt_handle = uart4_bp_evt_handle;
         if ( ! task->sys_uart_name[0][0] ) {
@@ -920,7 +921,8 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
     thiz->bms.job = thiz;
     list_ini(thiz->job_node);
     thiz->job_url_commit_timestamp = need->url_commit_timestamp;
-
+    thiz->charge_billing.mode = need->biling_mode;
+    thiz->charge_mode = need->charge_mode;
 
     thiz->charge_bms_establish_timestamp = rand() % 10000 + 5000;
 

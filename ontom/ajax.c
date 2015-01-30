@@ -706,6 +706,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     mg_get_var(thiz->xml_conn, "t", timestamp, 32);
     jc.url_commit_timestamp = atoll(timestamp);
     jc.ontom_commit_date_time = time(NULL);
+    jc.biling_mode = BILLING_MODE_AS_AUTO;
 
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
