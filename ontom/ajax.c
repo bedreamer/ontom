@@ -738,18 +738,43 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
 
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
 {
-    xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-            "{\"status\":\"0x%08x\","    // 状态
-            "\"id\":\"0x%08x\","  // 作业ID，序号
-            "\"port\":\"0x%08x\""  // 充电端口
-            "\"cmode\":\"0x%08x\""  // 充电模式
-            "\"bmode\":\"0x%08x\""  // 计费方式
+    char *status_string[] = {
+        "JOB_IDLE",
+        "JOB_SETTING",
+        "JOB_WAITTING",
+        "JOB_STANDBY",
+        "JOB_WORKING",
+        "JOB_ERR_PAUSE",
+        "JOB_MAN_PAUSE",
+        "JOB_RESUMING",
+        "JOB_ABORTING",
+        "JOB_DONE",
+        "JOB_EXITTING",
+        "JOB_DETACHING"
+    };
+    char *cmode_string[] = {
+        "CHARGE_AUTO",
+        "CHARGE_MANUAL"
+    };
+    char *bmode_string[] = {
+        "BILLING_MODE_INVALID",
+        "BILLING_MODE_AS_AUTO",
+        "BILLING_MODE_AS_MONEY",
+        "BILLING_MODE_AS_TIME",
+        "BILLING_MODE_AS_CAP",
+        "BILLING_MODE_AS_FREE"
+    };    xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+            "{\"status\":\"%s\","    // 状态
+            "\"id\":\"0x%08x\","     // 作业ID，序号
+            "\"port\":\"%d#\""       // 充电端口
+            "\"cmode\":\"%s\""       // 充电模式
+            "\"bmode\":\"%s\""       // 计费方式
             "},",
-            job->job_status,
+            status_string[job->job_status],
             job->job_url_commit_timestamp,
             job->job_gun_sn,
-            job->charge_mode,
-            job->charge_billing.mode);
+            cmode_string[job->charge_mode],
+            bmode_string[job->charge_billing.mode]);
 }
 
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
