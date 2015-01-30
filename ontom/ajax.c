@@ -736,22 +736,43 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
+void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
+{
+    xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+            "{\"status\":\"0x%08x\","    // 状态
+            "\"id\":\"0x%08x\","  // 作业ID，序号
+            "\"port\":\"0x%08x\""  // 充电端口
+            "\"cmode\":\"0x%08x\""  // 充电模式
+            "\"bmode\":\"0x%08x\""  // 计费方式
+            "},",
+            job->job_status,
+            job->job_url_commit_timestamp,
+            job->job_gun_sn,
+            job->charge_mode,
+            job->charge_billing.mode);
+}
+
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
 {
-    int ret = ERR_OK;
+    int ret = ERR_OK, i;
     struct list_head *h;
     struct charge_job *job;
     thiz->ct = "application/json";
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"jobs\":[");
+    for ( i = 0; i < CONFIG_SUPPORT_CHARGE_JOBS; i ++ ) {
+        if ( task->job[i] == NULL ) continue;
+        job_query_json_fromat(thiz, task->job[i]);
+    }
     h = task->wait_head;
     if ( h ) {
         pthread_mutex_lock(&task->wait_lck);
         do {
             job = list_load(struct charge_job, job_node, h);
-            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                    "{\"job_id\":\"%ld\",\"pointer\":\"%p\"},",
-                    job->job_url_commit_timestamp, job);
+            job_query_json_fromat(thiz, job);
+            //thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            //        "{\"job_id\":\"%ld\",\"pointer\":\"%p\"},",
+            //        job->job_url_commit_timestamp, job);
             h = h->next;
         } while ( h != task->wait_head );
         thiz->iobuff[--thiz->xml_len] = '\0';
