@@ -715,10 +715,12 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
     switch ( thiz->job_status ) {
     case JOB_IDLE:
     case JOB_SETTING:
+        break;
     case JOB_WAITTING:
         bit_clr(thiz, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(thiz, CMD_GUN_1_OUTPUT_ON);
         bit_clr(thiz, CMD_GUN_2_OUTPUT_ON);
+        thiz->job_status = JOB_STANDBY;
         break;
     case JOB_STANDBY:
         bit_clr(thiz, CMD_DC_OUTPUT_SWITCH_ON);
