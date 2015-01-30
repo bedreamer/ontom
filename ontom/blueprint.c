@@ -871,8 +871,8 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
 
         val = (unsigned int)atoi(config_read("初始电压"));
         // 初始电压
-        buff[nr ++] = l2b((unsigned short)val);
-        buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = (unsigned short)val >> 8;
+        buff[nr ++] = (unsigned short)val;
 
         // 充电命令
         buff[nr ++] = 0x00;
@@ -880,13 +880,13 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
 
         val = (unsigned int)atoi(config_read("需求电压"));
         // 需求电压
-        buff[nr ++] = l2b((unsigned short)val);
-        buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = (unsigned short)val >> 8;
+        buff[nr ++] = (unsigned short)val;
 
         val = (unsigned int)atoi(config_read("需求电流"));
         // 需求电流
-        buff[nr ++] = l2b((unsigned short)val);
-        buff[nr ++] = l2b((unsigned short)val) >> 8;
+        buff[nr ++] = (unsigned short)val >> 8;
+        buff[nr ++] = (unsigned short)val;
         s = nr;
 
         // CRC
@@ -1902,7 +1902,7 @@ continue_to_send:
 // 生成串口通信统计页面
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 {
-#if 0
+#if 1
     int output_len = 0, i;
     struct bp_user *me = &down_user[0];
     struct MDATA_ACK *self;
