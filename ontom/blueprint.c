@@ -1902,7 +1902,7 @@ continue_to_send:
 // 生成串口通信统计页面
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 {
-#if 1
+#if 0
     int output_len = 0, i;
     struct bp_user *me = &down_user[0];
     struct MDATA_ACK *self;
