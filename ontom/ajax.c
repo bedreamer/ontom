@@ -711,6 +711,10 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     char b_time[8] = {0};
 
     thiz->ct = "application/json";
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"jobreturn\":{");
+
     mg_get_var(thiz->xml_conn, "t", timestamp, 32);
     mg_get_var(thiz->xml_conn, "gun", gun, 8);
 
@@ -811,9 +815,6 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         }
     }
 
-    thiz->xml_len = 0;
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"jobreturn\":{");
     if ( task->wait_job_nr < 16 ) {
         if ( job_search(jc.url_commit_timestamp) ) {
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
