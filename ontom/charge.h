@@ -1000,6 +1000,6 @@ int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT
 struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *need);
 int job_search(time_t ci_timestamp);
 struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun);
-struct job_commit *job_select_commit(struct charge_task *tsk);
+struct job_commit_data *job_select_commit(struct charge_task *tsk);
 
 #endif /*_CHARGE_INCLUDED_H_*/
