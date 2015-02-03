@@ -437,8 +437,8 @@ struct billing_methord {
         double set_money;
         // 设定充电时长, 0 - 600
         unsigned int set_time;
-        // 设定充电目标容量, 0 - 100
-        unsigned int set_cap;
+        // 设定充电目标电量, 0 - 100
+        double set_kwh;
     }option;
 };
 
@@ -540,7 +540,7 @@ typedef enum {
 }CHARGE_MODE;
 
 // 作业提交结构
-struct job_commit {
+struct job_commit_data {
     // 作业提交命令
     COMMIT_CMD cmd;
     // URL端提交的时间戳
@@ -551,17 +551,17 @@ struct job_commit {
     //{{ 创建作业参数
     CHARGE_GUN_SN charge_gun;    // 充电枪选择
     CHARGE_MODE charge_mode;     // 选择自动或是手动
-    unsigned int manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
-    unsigned int manual_set_charge_current;  // 手动设置充电电流, 手动充电有效
+    double manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
+    double manual_set_charge_current;  // 手动设置充电电流, 手动充电有效
     BILLING_MODE  biling_mode; // 充电计费方式
-    unsigned int as_cap;   // 按电量充，KW.h, 自动充电，默认充满
-    unsigned int as_money; // 按金额充，元
+    double as_kwh;   // 按电量充，KW.h, 自动充电，默认充满
+    double as_money; // 按金额充，元
     unsigned int as_time;  // 按时间充电，分钟数
     //}}
 
     struct list_head job_node;
 };
-int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
+int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
 
 /*
  * 充电作业描述，充电管理的最小单位
@@ -996,8 +996,8 @@ static inline unsigned int __atoh(const char *hex)
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
 void job_running(struct charge_task *, struct charge_job *);
 void job_running(struct charge_task *tsk, struct charge_job *thiz);
-int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd);
-struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need);
+int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
+struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *need);
 int job_search(time_t ci_timestamp);
 struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun);
 struct job_commit *job_select_commit(struct charge_task *tsk);

@@ -699,14 +699,117 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
    // }
     return ret;
 #else
-    struct job_commit jc;
+    struct job_commit_data jc;
     char timestamp[32] = {0};
+    char gun[8] = {0};
+    char c_mode[16] = {0};
+    char set_V[8] = {0};
+    char set_I[8] = {0};
+    char b_mode[16] = {0};
+    char b_kwh[8] = {0};
+    char b_money[8] = {0};
+    char b_time[8] = {0};
 
     thiz->ct = "application/json";
     mg_get_var(thiz->xml_conn, "t", timestamp, 32);
+    mg_get_var(thiz->xml_conn, "gun", gun, 8);
+
+    mg_get_var(thiz->xml_conn, "c_mode", c_mode, 16);
+    if ( strlen(c_mode) ) {
+        mg_get_var(thiz->xml_conn, "set_V", set_V, 8);
+        mg_get_var(thiz->xml_conn, "set_I", set_I, 8);
+    }
+
+    mg_get_var(thiz->xml_conn, "b_mode", b_mode, 16);
+    if ( strlen(b_mode) ) {
+        mg_get_var(thiz->xml_conn, "b_kwh", b_kwh, 8);
+        mg_get_var(thiz->xml_conn, "b_money", b_money, 8);
+        mg_get_var(thiz->xml_conn, "b_time", b_time, 8);
+    }
+
     jc.url_commit_timestamp = atoll(timestamp);
     jc.ontom_commit_date_time = time(NULL);
     jc.biling_mode = BILLING_MODE_AS_AUTO;
+    jc.charge_mode = CHARGE_AUTO;
+
+    if ( strlen(gun) <= 0 ) goto reject;
+    switch (atoi(gun)) {
+    case 0:
+        jc.charge_gun = GUN_SN0;
+        break;
+    case 1:
+        jc.charge_gun = GUN_SN1;
+        break;
+    case 2:
+        jc.charge_gun = GUN_SN2;
+        break;
+    case 3:
+        jc.charge_gun = GUN_SN3;
+        break;
+    default:
+        goto reject;
+    }
+
+    if ( strlen(b_mode) > 0 ) {
+        if ( 0 == strstr(b_mode, "auto") ) {
+            jc.biling_mode = BILLING_MODE_AS_AUTO;
+        } else if ( 0 == strstr(b_mode, "kwh") ) {
+            jc.biling_mode = BILLING_MODE_AS_CAP;
+        } else if ( 0 == strstr(b_mode, "cap") ) {
+            jc.biling_mode = BILLING_MODE_AS_CAP;
+        } else if ( 0 == strstr(b_mode, "time") ) {
+            jc.biling_mode = BILLING_MODE_AS_TIME;
+        } else if ( 0 == strstr(b_mode, "money") ) {
+            jc.biling_mode = BILLING_MODE_AS_MONEY;
+        } else {
+            goto reject;
+        }
+    }
+
+    if ( strlen(c_mode) > 0 ) {
+        if (  0 == strstr(c_mode, "auto") ) {
+            jc.charge_mode = CHARGE_AUTO;
+        } else if ( 0 == strstr(c_mode, "manual") ) {
+            jc.charge_mode = CHARGE_MANUAL;
+        } else {
+            goto reject;
+        }
+    }
+
+    switch ( jc.biling_mode ) {
+    case BILLING_MODE_AS_AUTO:
+        break;
+    case BILLING_MODE_AS_CAP:
+        if ( 0 == strlen(b_kwh) ) goto reject;
+        jc.as_kwh = atof(b_kwh);
+        if ( jc.as_kwh < 0.09999999f ) goto reject;
+        break;
+    case BILLING_MODE_AS_MONEY:
+        if ( 0 == strlen(b_money) ) goto reject;
+        jc.as_money = atof(b_money);
+        if ( jc.as_money < 0.09999999f ) goto reject;
+        break;
+    case BILLING_MODE_AS_TIME:
+        if ( 0 == strlen(b_time) ) goto reject;
+        jc.b_time = atoi(b_time);
+        if ( jc.b_time < 1 ) goto reject;
+        break;
+    default:
+        break;
+    }
+
+    if ( jc.charge_mode == CHARGE_MANUAL ) {
+        if ( strlen(set_V) <= 0 ) goto reject;
+        if ( strlen(set_I) <= 0 ) goto reject;
+        jc.manual_set_charge_volatage = atof(set_V);
+        jc.manual_set_charge_current = atof(set_I);
+        if ( jc.manual_set_charge_volatage < 50.0f ) {
+            goto reject;
+        }
+        if ( jc.manual_set_charge_current < 1.0f ) {
+            goto reject;
+        }
+    }
 
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
@@ -721,10 +824,12 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
                     "\"status\":\"PENDING\"}");
         }
     } else {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                "\"status\":\"REJECTED\"}");
+        goto reject;
     }
-
+    return ERR_OK;
+reject:
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"status\":\"REJECTED\"}");
     return ERR_OK;
 #endif
 }
@@ -764,10 +869,11 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         "BILLING_MODE_AS_TIME",
         "BILLING_MODE_AS_CAP",
         "BILLING_MODE_AS_FREE"
-    };    xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+    };
+    xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
             "\"id\":\"0x%08x\","     // 作业ID，序号
-            "\"port\":\"%d#\""       // 充电端口
+            "\"port\":\"%ld#\""       // 充电端口
             "\"cmode\":\"%s\""       // 充电模式
             "\"bmode\":\"%s\""       // 计费方式
             "},",
