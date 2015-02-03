@@ -408,7 +408,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     while ( 1 ) {
         do {
             // 处理提交事件
-            struct job_commit *thiz = NULL;
+            struct job_commit_data *thiz = NULL;
             thiz = job_select_commit(task);
             while ( thiz ) {
                 switch ( thiz->cmd ) {
@@ -420,7 +420,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 case COMMIT_CMD_ABORT:
                     break;
                 }
-                memset(thiz, 0, sizeof(struct job_commit));
+                memset(thiz, 0, sizeof(struct job_commit_data));
                 thiz = job_select_commit(task);
                 free(thiz);
             }
@@ -863,13 +863,13 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
     }
 }
 
-int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD cmd)
+int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd)
 {
-    struct job_commit *thiz = NULL;
+    struct job_commit_data *thiz = NULL;
     switch ( cmd ) {
     case COMMIT_CMD_FORK:
-        thiz = (struct job_commit *)malloc(sizeof(struct job_commit));
-        memcpy(thiz, jc, sizeof(struct job_commit));
+        thiz = (struct job_commit_data *)malloc(sizeof(struct job_commit_data));
+        memcpy(thiz, jc, sizeof(struct job_commit_data));
         thiz->cmd = cmd;
         list_ini(thiz->job_node);
         pthread_mutex_lock(&task->commit_lck);
@@ -886,7 +886,7 @@ int job_commit(struct charge_task *tsk, const struct job_commit *jc, COMMIT_CMD 
     return 0;
 }
 
-struct charge_job * job_fork(struct charge_task *tsk, struct job_commit *need)
+struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *need)
 {
     struct charge_job* thiz = NULL;
     char sql[512] = {0};
@@ -1012,7 +1012,7 @@ int job_search(time_t ci_timestamp)
     int i = 0;
     struct list_head *thiz;
     struct charge_job *j = NULL;
-    struct job_commit *c = NULL;
+    struct job_commit_data *c = NULL;
 
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
@@ -1025,7 +1025,7 @@ int job_search(time_t ci_timestamp)
         pthread_mutex_lock(&task->commit_lck);
         thiz = task->commit_head;
         do {
-            c = list_load(struct job_commit, job_node, thiz);
+            c = list_load(struct job_commit_data, job_node, thiz);
             if ( c->url_commit_timestamp == ci_timestamp ) {
                 break;
             }
@@ -1088,12 +1088,12 @@ struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun)
 }
 
 // 从提交链表中取出第一个提交事件
-struct job_commit *job_select_commit(struct charge_task *tsk)
+struct job_commit_data *job_select_commit(struct charge_task *tsk)
 {
-    struct job_commit *thiz = NULL;
+    struct job_commit_data *thiz = NULL;
     if ( tsk->commit_head ) {
         struct list_head *next = tsk->commit_head->next;
-        thiz = list_load(struct job_commit, job_node, tsk->commit_head);
+        thiz = list_load(struct job_commit_data, job_node, tsk->commit_head);
         if ( next = tsk->commit_head ) {
             next = NULL;
         }
