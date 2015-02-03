@@ -791,8 +791,8 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         break;
     case BILLING_MODE_AS_TIME:
         if ( 0 == strlen(b_time) ) goto reject;
-        jc.b_time = atoi(b_time);
-        if ( jc.b_time < 1 ) goto reject;
+        jc.as_time = atoi(b_time);
+        if ( jc.as_time < 1 ) goto reject;
         break;
     default:
         break;
