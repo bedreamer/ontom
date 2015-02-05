@@ -9,6 +9,7 @@ int ajax_version_xml_proc(struct ajax_xml_struct *);
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
 int ajax_query_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_query_json_proc(struct ajax_xml_struct *thiz);
+int ajax_system_query_json_proc(struct ajax_xml_struct *thiz);
 int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_debug_list(struct ajax_xml_struct *thiz);
 int ajax_debug_json_list(struct ajax_xml_struct *thiz);
