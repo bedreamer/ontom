@@ -41,6 +41,7 @@ struct xml_generator {
     {"/version.xml",            ajax_version_xml_proc},
     {"/autheticate.xml",        ajax_autheticate_xml_proc},
     {"/confirm.xml",            ajax_confirm_charge_xml_proc},
+    {"/system/query.json",      ajax_system_query_json_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -673,6 +674,51 @@ int ajax_query_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_ERR;
     thiz->ct = "application/json";
+    return ret;
+}
+
+/*
+ * 查询系统状态
+ * ------------------------------------------
+ * @ 版本 V1.0
+ * @ 充电机是否故障
+ * @ 母线电池绝缘故障
+ * @ 1# 充电枪是否链接
+ * @ 2# 充电枪是否链接
+ * -------------------------------------------
+ */
+int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_ERR;
+    thiz->ct = "application/json";
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"system\":{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 版本
+            "\"version\":\"V1.0\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 系统状态
+            "\"system_status\":\"N/A\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 充电机状态
+            "\"charger_status\":\"N/A\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线绝缘状态
+            "\"bus0_institude\":\"N/A\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
+            "\"bus1_institude\":\"N/A\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
+            "\"card_sn\":\"N/A\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 如果刷卡了，当前卡内余额
+            "\"card_remain\":\"0.00\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 1# 充电枪连接状态
+            "\"gun0\":\"detached\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 2# 充电枪连接状态
+            "\"gun1\":\"detached\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 3# 充电枪连接状态
+            "\"gun2\":\"detached\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"gun3\":\"detached\",");
+    thiz->iobuff[--thiz->xml_len] = '\0';
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "}");
     return ret;
 }
 
