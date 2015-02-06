@@ -943,7 +943,7 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
     struct charge_job *job;
     thiz->ct = "application/json";
     thiz->xml_len = 0;
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "[");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{[");
     for ( i = 0; i < CONFIG_SUPPORT_CHARGE_JOBS; i ++ ) {
         if ( task->job[i] == NULL ) continue;
         job_query_json_fromat(thiz, task->job[i]);
@@ -959,7 +959,7 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
         pthread_mutex_unlock (&task->wait_lck);
     }
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
     return ret;
 }
 
