@@ -925,8 +925,8 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
             "\"id\":\"0x%08x\","     // 作业ID，序号
-            "\"port\":\"%ld#\""       // 充电端口
-            "\"cmode\":\"%s\""       // 充电模式
+            "\"port\":\"%ld#\","       // 充电端口
+            "\"cmode\":\"%s\","       // 充电模式
             "\"bmode\":\"%s\""       // 计费方式
             "},",
             status_string[job->job_status],
