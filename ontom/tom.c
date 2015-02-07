@@ -299,7 +299,7 @@ int main()
     }
     log_printf(INF, "CAN-BUS writer start up.                           DONE.");
 #endif
-#if 0
+#if 1
     // 串口服务线程，和读卡器，采样盒，电能表进行数据交换，测量
     ret = pthread_create( & task->tid, &task->attr, thread_measure_service, &thread_done[3]);
     if ( 0 != ret ) {
