@@ -713,7 +713,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             "\"card_sn\":\"%s\",", config_read("triger_card_sn"));
     config_write("triger_card_sn", "N/A");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 如果刷卡了，当前卡内余额
-            "\"card_remain\":\"0.00\",");
+            "\"card_remain\":\"0.00 V\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 1# 充电枪连接状态
             "\"gun0\":\"detached\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 2# 充电枪连接状态
@@ -765,7 +765,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"jobreturn\":{");
+            "{");
 
     mg_get_var(thiz->xml_conn, "t", timestamp, 32);
     mg_get_var(thiz->xml_conn, "gun", gun, 8);
