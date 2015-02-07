@@ -710,7 +710,8 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
             "\"bus1_V\":\"0.0\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
-            "\"card_sn\":\"N/A\",");
+            "\"card_sn\":\"%s\",", config_read("triger_card_sn"));
+    config_write("triger_card_sn", "N/A");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 如果刷卡了，当前卡内余额
             "\"card_remain\":\"0.00\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 1# 充电枪连接状态
