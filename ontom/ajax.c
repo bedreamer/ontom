@@ -960,6 +960,9 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
         pthread_mutex_unlock (&task->wait_lck);
     }
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
     return ret;
 }
