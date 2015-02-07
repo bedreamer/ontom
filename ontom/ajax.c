@@ -698,11 +698,11 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 版本
             "\"version\":\"V1.0\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 系统状态
-            "\"system_status\":\"N/A\",");
+            "\"system_status\":\"正常\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 充电机状态
-            "\"charger_status\":\"N/A\",");
+            "\"charger_status\":\"正常\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线绝缘状态
-            "\"bus0_institude\":\"N/A\",");
+            "\"bus0_institude\":\"正常\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
             "\"bus1_institude\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
