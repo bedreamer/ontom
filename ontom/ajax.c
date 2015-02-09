@@ -899,7 +899,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     }
 
     //log_printf(INF, "jc.charge_mode == CHARGE_MANUAL %x", jc.charge_mode);
-    if ( jc.charge_mode == CHARGE_MANUAL ) {
+    if ( jc.charge_mode != CHARGE_AUTO ) {
         if ( strlen(set_V) <= 0 ) {
             log_printf(DBG_LV3, "1错误的充电参数 %s %x %x", c_mode, CHARGE_AUTO, CHARGE_MANUAL);
             goto reject;
