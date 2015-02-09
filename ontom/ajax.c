@@ -976,11 +976,11 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     CHARGE_GUN_SN g = __is_gun_phy_conn_ok(job);
     char buff[16] = {0};
     if ( g == GUN_SN0 ) {
-        sprintf(buff, "枪%d已连接", g);
+        sprintf(buff, "枪%d已连接", job->job_gun_sn);
     } else if ( g == GUN_SN1 ) {
-        sprintf(buff, "枪%d已连接", g);
+        sprintf(buff, "枪%d已连接", job->job_gun_sn);
     } else {
-        sprintf(buff, "枪%d未连接", g);
+        sprintf(buff, "未%d连接", job->job_gun_sn);
     }
 
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
