@@ -691,12 +691,16 @@ int ajax_query_json_proc(struct ajax_xml_struct *thiz)
 int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
+    static int doreset = 0;
     thiz->ct = "application/json";
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 版本
             "\"version\":\"V1.0\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 版本
+            "\"doreset\":\"%s\",", doreset ? "false" : "true");
+    doreset = 1;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 系统状态
             "\"system_status\":\"正常\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 充电机状态
