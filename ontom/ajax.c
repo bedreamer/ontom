@@ -974,6 +974,14 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         "自由"
     };
     CHARGE_GUN_SN g = __is_gun_phy_conn_ok(job);
+    char buff[16] = {0};
+    if ( g == GUN_SN0 ) {
+        sprintf(buff, "枪%d已连接", g);
+    } else if ( g == GUN_SN1 ) {
+        sprintf(buff, "枪%d已连接", g);
+    } else {
+        sprintf(buff, "枪%d未连接", g);
+    }
 
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
@@ -998,7 +1006,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             0.0f,
             0.0f,
             "N/A",
-            (g == GUN_SN0 || g == GUN_SN1 ) ? "已连接" : "未连接"
+            buff
             );
 }
 
