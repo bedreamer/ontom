@@ -842,7 +842,10 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     case BILLING_MODE_AS_AUTO:
         break;
     case BILLING_MODE_AS_CAP:
-        if ( 0 == strlen(b_kwh) ) goto reject;
+        if ( 0 == strlen(b_kwh) ) {
+            log_printf(DBG_LV3, "错误的计费参数");
+            goto reject;
+        }
         jc.as_kwh = atof(b_kwh);
         if ( jc.as_kwh < 0.09999999f ) {
             log_printf(DBG_LV3, "错误的计费参数");
@@ -850,7 +853,10 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         }
         break;
     case BILLING_MODE_AS_MONEY:
-        if ( 0 == strlen(b_money) ) goto reject;
+        if ( 0 == strlen(b_money) ) {
+            log_printf(DBG_LV3, "错误的计费参数");
+            goto reject;
+        }
         jc.as_money = atof(b_money);
         if ( jc.as_money < 0.09999999f ) {
             log_printf(DBG_LV3, "错误的计费参数");
@@ -858,7 +864,10 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         }
         break;
     case BILLING_MODE_AS_TIME:
-        if ( 0 == strlen(b_time) ) goto reject;
+        if ( 0 == strlen(b_time) ) {
+            log_printf(DBG_LV3, "错误的计费参数");
+            goto reject;
+        }
         jc.as_time = atoi(b_time);
         if ( jc.as_time < 1 ) {
             log_printf(DBG_LV3, "错误的计费参数");
