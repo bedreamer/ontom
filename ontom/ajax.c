@@ -767,11 +767,6 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     char b_money[8] = {0};
     char b_time[8] = {0};
 
-    thiz->ct = "application/json";
-    thiz->xml_len = 0;
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{");
-
     mg_get_var(thiz->xml_conn, "t", timestamp, 32);
     mg_get_var(thiz->xml_conn, "cid", cid, 32);
     mg_get_var(thiz->xml_conn, "gun", gun, 8);
@@ -793,6 +788,11 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     jc.ontom_commit_date_time = time(NULL);
     jc.biling_mode = BILLING_MODE_AS_AUTO;
     jc.charge_mode = CHARGE_AUTO;
+
+    thiz->ct = "application/json";
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"id\":\"%08X\"", jc.url_commit_timestamp);
 
     if ( strlen(gun) <= 0 ) {
         log_printf(DBG_LV3, "充电枪编号错误");
