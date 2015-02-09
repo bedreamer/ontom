@@ -980,7 +980,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             0.0f,
             0.0f,
             "N/A",
-            '未连接'
+            "未连接"
             );
 }
 
