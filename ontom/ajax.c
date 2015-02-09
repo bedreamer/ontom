@@ -959,16 +959,29 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     };
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
-            "\"id\":\"%08x\","     // 作业ID，序号
-            "\"port\":\"%ld#\","       // 充电端口
+            "\"id\":\"%08x\","       // 作业ID，序号
+            "\"port\":\"%ld#\","     // 充电端口
             "\"cmode\":\"%s\","       // 充电模式
-            "\"bmode\":\"%s\""       // 计费方式
+            "\"bmode\":\"%s\","       // 计费方式
+            "\"cid\":\"%s\","       // 卡号ID
+            "\"cremain\":\"%.2f\","       // 余额
+            "\"CV\":\"%.1f\","       // 充电电压
+            "\"CI\":\"%.1f\","       // 充电电流
+            "\"ycdl\":\"%s\","       // 已充电量
+            "\"gun_stat\":\"%s\""       // 充电枪连接状态
             "},",
             status_string[job->job_status],
             job->job_url_commit_timestamp,
             job->job_gun_sn,
             cmode_string[job->charge_mode],
-            bmode_string[job->charge_billing.mode]);
+            bmode_string[job->charge_billing.mode],
+            job->card.triger_card_sn,
+            0.00f,
+            0.0f,
+            0.0f,
+            "N/A",
+            '未连接'
+            );
 }
 
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
