@@ -879,8 +879,14 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     }
 
     if ( jc.charge_mode == CHARGE_MANUAL ) {
-        if ( strlen(set_V) <= 0 ) goto reject;
-        if ( strlen(set_I) <= 0 ) goto reject;
+        if ( strlen(set_V) <= 0 ) {
+            log_printf(DBG_LV3, "错误的充电参数");
+            goto reject;
+        }
+        if ( strlen(set_I) <= 0 ) {
+            log_printf(DBG_LV3, "错误的充电参数");
+            goto reject;
+        }
         jc.manual_set_charge_volatage = atof(set_V);
         jc.manual_set_charge_current = atof(set_I);
         if ( jc.manual_set_charge_volatage < 50.0f ) {
