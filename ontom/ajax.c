@@ -871,9 +871,11 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         jc.manual_set_charge_volatage = atof(set_V);
         jc.manual_set_charge_current = atof(set_I);
         if ( jc.manual_set_charge_volatage < 50.0f ) {
+            log_printf(DBG, "错误的充电参数");
             goto reject;
         }
         if ( jc.manual_set_charge_current < 1.0f ) {
+            log_printf(DBG, "错误的充电参数");
             goto reject;
         }
     }
