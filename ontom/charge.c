@@ -731,28 +731,28 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
         }
-        if ( ret == GUN_SN0 ) {
-            if ( ! bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
-                if ( !bit_read(thiz, S_ASSIT_POWER_DOWN) ) {
-                    if ( ! bit_read(thiz, CMD_GUN_1_ASSIT_PWN_ON) ) {
-                        log_printf(INF, "ZEUS: 1# 充电枪辅助电源开始供电");
-                    }
-                    bit_set(thiz, CMD_GUN_1_ASSIT_PWN_ON);
-                }
-            }
-        } else {
-            if ( ! bit_read(thiz, F_GUN_2_ASSIT_PWN_SWITCH_STATUS) ) {
-                if ( !bit_read(thiz, S_ASSIT_POWER_DOWN) ) {
-                    if ( ! bit_read(thiz, CMD_GUN_2_ASSIT_PWN_ON) ) {
-                        log_printf(INF, "ZEUS: 2# 充电枪辅助电源开始供电");
-                    }
-                    bit_set(thiz, CMD_GUN_2_ASSIT_PWN_ON);
-                }
-            }
-        }
 
-
+        // 充电模式为自动充电，需要和BMS通信，此时才需要将辅助电源合闸
         if ( thiz->charge_mode == CHARGE_AUTO ) {
+            if ( ret == GUN_SN0 ) {
+                if ( ! bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
+                    if ( !bit_read(thiz, S_ASSIT_POWER_DOWN) ) {
+                        if ( ! bit_read(thiz, CMD_GUN_1_ASSIT_PWN_ON) ) {
+                            log_printf(INF, "ZEUS: 1# 充电枪辅助电源开始供电");
+                        }
+                        bit_set(thiz, CMD_GUN_1_ASSIT_PWN_ON);
+                    }
+                }
+            } else {
+                if ( ! bit_read(thiz, F_GUN_2_ASSIT_PWN_SWITCH_STATUS) ) {
+                    if ( !bit_read(thiz, S_ASSIT_POWER_DOWN) ) {
+                        if ( ! bit_read(thiz, CMD_GUN_2_ASSIT_PWN_ON) ) {
+                            log_printf(INF, "ZEUS: 2# 充电枪辅助电源开始供电");
+                        }
+                        bit_set(thiz, CMD_GUN_2_ASSIT_PWN_ON);
+                    }
+                }
+            }
             if ( ! bit_read(thiz, F_BMS_RECOGNIZED) ) {
                 break;
             }

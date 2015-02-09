@@ -709,6 +709,10 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             "\"bus0_V\":\"%.1f V\",", b2l(task->chargers[0]->chargers.charger_v_out) / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
             "\"bus1_V\":\"N/A\",");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电流
+            "\"bus0_I\":\"%.1f V\",", b2l(task->chargers[0]->chargers.charger_i_out) / 10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电流
+            "\"bus1_I\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
             "\"card_sn\":\"%s\",", config_read("triger_card_sn"));
     config_write("triger_card_sn", "N/A");
