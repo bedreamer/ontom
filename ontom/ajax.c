@@ -818,6 +818,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         } else if ( 0 == strstr(b_mode, "money") ) {
             jc.biling_mode = BILLING_MODE_AS_MONEY;
         } else {
+            log_printf(DBG, "错误的计费模式");
             goto reject;
         }
     }
@@ -828,6 +829,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         } else if ( 0 == strstr(c_mode, "manual") ) {
             jc.charge_mode = CHARGE_MANUAL;
         } else {
+            log_printf(DBG, "错误的充电模式");
             goto reject;
         }
     }
@@ -838,17 +840,26 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     case BILLING_MODE_AS_CAP:
         if ( 0 == strlen(b_kwh) ) goto reject;
         jc.as_kwh = atof(b_kwh);
-        if ( jc.as_kwh < 0.09999999f ) goto reject;
+        if ( jc.as_kwh < 0.09999999f ) {
+            log_printf(DBG, "错误的计费参数");
+            goto reject;
+        }
         break;
     case BILLING_MODE_AS_MONEY:
         if ( 0 == strlen(b_money) ) goto reject;
         jc.as_money = atof(b_money);
-        if ( jc.as_money < 0.09999999f ) goto reject;
+        if ( jc.as_money < 0.09999999f ) {
+            log_printf(DBG, "错误的计费参数");
+            goto reject;
+        }
         break;
     case BILLING_MODE_AS_TIME:
         if ( 0 == strlen(b_time) ) goto reject;
         jc.as_time = atoi(b_time);
-        if ( jc.as_time < 1 ) goto reject;
+        if ( jc.as_time < 1 ) {
+            log_printf(DBG, "错误的计费参数");
+            goto reject;
+        }
         break;
     default:
         break;
