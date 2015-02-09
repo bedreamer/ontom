@@ -1411,43 +1411,24 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        if ( me->job ) {
-            if ( me->job->job_gun_sn == GUN_SN0 ) {
-                if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
-                    cmd |= GUN1_ASSIT_PWN_ON;
-                    cmd &= ~GUN2_ASSIT_PWN_ON;
-                } else {
-                    cmd &= ~GUN1_ASSIT_PWN_ON;
-                }
-                if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
-                    cmd |= GUN1_OUTPUT_ON;
-                    cmd &= ~GUN2_OUTPUT_ON;
-                } else {
-                    cmd &= ~GUN1_OUTPUT_ON;
-                }
-            } else if  ( me->job->job_gun_sn == GUN_SN1 ) {
-                if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
-                    cmd |= GUN2_ASSIT_PWN_ON;
-                    cmd &= ~GUN1_ASSIT_PWN_ON;
-                } else {
-                    cmd &= ~GUN2_ASSIT_PWN_ON;
-                }
-                if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
-                    cmd |= GUN2_OUTPUT_ON;
-                    cmd &= ~GUN1_OUTPUT_ON;
-                } else {
-                    cmd &= ~GUN2_OUTPUT_ON;
-                }
-            } else {
-                cmd = 0;
-            }
-            if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
-                cmd |= DC_SWITCH_ON;
-            } else {
-                cmd &= ~DC_SWITCH_ON;
-            }
+
+        if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
+            cmd |= GUN1_ASSIT_PWN_ON;
+            cmd &= ~GUN2_ASSIT_PWN_ON;
         } else {
-            cmd = 0;
+            cmd &= ~GUN1_ASSIT_PWN_ON;
+        }
+        if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
+            cmd |= GUN1_OUTPUT_ON;
+            cmd &= ~GUN2_OUTPUT_ON;
+        } else {
+            cmd &= ~GUN1_OUTPUT_ON;
+        }
+
+        if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
+            cmd |= DC_SWITCH_ON;
+        } else {
+            cmd &= ~DC_SWITCH_ON;
         }
 
         buff[ nr ++ ] = 0xF0;
