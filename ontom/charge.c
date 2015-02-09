@@ -702,7 +702,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
     int ret;
 
     if ( thiz == NULL ) return;
-
+#if 0
     thiz->charge_bms_establish_timestamp -= 10;
 
     if ( thiz->charge_bms_establish_timestamp <= 1000 ) {
@@ -712,7 +712,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                    tsk->wait_job_nr);
         return;
     }
-
+#endif
     switch ( thiz->job_status ) {
     case JOB_IDLE:
     case JOB_SETTING:
@@ -754,7 +754,6 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             break;
         }
         if ( ! bit_read(thiz, F_SYSTEM_CHARGE_ALLOW) ) {
-            thiz->job_status = thiz->job_status;
             thiz->job_status = JOB_ERR_PAUSE;
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(%X)",
                        thiz->job_status);
@@ -886,6 +885,17 @@ int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT
     return 0;
 }
 
+void dump_commit_struct (struct job_commit_data *need)
+{
+    printf("\tcmd:%x\n", need->cmd);
+    printf("\turl_commit_timestamp:%ld\n",need->url_commit_timestamp);
+    printf("\tontom_commit_date_time:%ld\n", need->ontom_commit_date_time);
+    printf("\tcharge_gun:%x\n", need->charge_gun);
+    printf("\tcharge_mode:%x\n", need->charge_mode);
+    printf("\tmanual_set_charge_volatage:%f\n", need->manual_set_charge_volatage);
+    printf("\tmanual_set_charge_current:%f\n", need->manual_set_charge_current);
+}
+
 struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *need)
 {
     struct charge_job* thiz = NULL;
@@ -923,6 +933,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->job_url_commit_timestamp = need->url_commit_timestamp;
     thiz->charge_billing.mode = need->biling_mode;
     thiz->charge_mode = need->charge_mode;
+    thiz->job_gun_sn = need->charge_gun;
 
     thiz->charge_bms_establish_timestamp = rand() % 10000 + 5000;
 
@@ -995,6 +1006,8 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     if ( ret ) {
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
     }
+
+    dump_commit_struct(need);
 
     log_printf(INF, "ZEUS: 作业创建完成(%p:%d:%ld).",
                thiz, task->wait_job_nr, thiz->job_url_commit_timestamp);
