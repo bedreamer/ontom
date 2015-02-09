@@ -1059,7 +1059,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
 
     mg_get_var(thiz->xml_conn, "id", id, 16);
-    j = job_search(atol(id));
+    j = job_search(__atoh(id));
 
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
