@@ -811,15 +811,15 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     }
 
     if ( strlen(b_mode) > 0 ) {
-        if ( 0 == strstr(b_mode, "auto") ) {
+        if ( 0 == strcmp(b_mode, "auto") ) {
             jc.biling_mode = BILLING_MODE_AS_AUTO;
-        } else if ( 0 == strstr(b_mode, "kwh") ) {
+        } else if ( 0 == strcmp(b_mode, "kwh") ) {
             jc.biling_mode = BILLING_MODE_AS_CAP;
-        } else if ( 0 == strstr(b_mode, "cap") ) {
+        } else if ( 0 == strcmp(b_mode, "cap") ) {
             jc.biling_mode = BILLING_MODE_AS_CAP;
-        } else if ( 0 == strstr(b_mode, "time") ) {
+        } else if ( 0 == strcmp(b_mode, "time") ) {
             jc.biling_mode = BILLING_MODE_AS_TIME;
-        } else if ( 0 == strstr(b_mode, "money") ) {
+        } else if ( 0 == strcmp(b_mode, "money") ) {
             jc.biling_mode = BILLING_MODE_AS_MONEY;
         } else {
             log_printf(DBG_LV3, "错误的计费模式");
@@ -828,9 +828,9 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     }
 
     if ( strlen(c_mode) > 0 ) {
-        if (  0 == strstr(c_mode, "auto") ) {
+        if (  0 == strcmp(c_mode, "auto") ) {
             jc.charge_mode = CHARGE_AUTO;
-        } else if ( 0 == strstr(c_mode, "manual") ) {
+        } else if ( 0 == strcmp(c_mode, "manual") ) {
             jc.charge_mode = CHARGE_MANUAL;
         } else {
             log_printf(DBG_LV3, "错误的充电模式");
