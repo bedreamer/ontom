@@ -964,10 +964,10 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"cmode\":\"%s\","       // 充电模式
             "\"bmode\":\"%s\","       // 计费方式
             "\"cid\":\"%s\","       // 卡号ID
-            "\"cremain\":\"%.2f\","       // 余额
-            "\"CV\":\"%.1f\","       // 充电电压
-            "\"CI\":\"%.1f\","       // 充电电流
-            "\"ycdl\":\"%s\","       // 已充电量
+            "\"cremain\":\"%.2f 元\","       // 余额
+            "\"CV\":\"%.1f V\","       // 充电电压
+            "\"CI\":\"%.1f A\","       // 充电电流
+            "\"ycdl\":\"%s %%\","       // 已充电量
             "\"gun_stat\":\"%s\""       // 充电枪连接状态
             "},",
             status_string[job->job_status],
