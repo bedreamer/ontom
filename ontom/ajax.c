@@ -706,7 +706,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
             "\"bus1_institude\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
-            "\"bus0_V\":\"%.1f\",", (double)(b2l(task->chargers[0]->chargers.charger_v_out)));
+            "\"bus0_V\":\"%.1f\",", b2l(task->chargers[0]->chargers.charger_v_out) / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
             "\"bus1_V\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
