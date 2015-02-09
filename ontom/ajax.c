@@ -980,7 +980,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     } else if ( g == GUN_SN1 ) {
         sprintf(buff, "枪%d已连接", job->job_gun_sn);
     } else {
-        sprintf(buff, "枪%d连接", job->job_gun_sn);
+        sprintf(buff, "枪%d未连接", job->job_gun_sn);
     }
 
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
