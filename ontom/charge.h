@@ -549,6 +549,7 @@ struct job_commit_data {
     time_t ontom_commit_date_time;
 
     //{{ 创建作业参数
+    char card_sn[32];            // 所刷卡卡号
     CHARGE_GUN_SN charge_gun;    // 充电枪选择
     CHARGE_MODE charge_mode;     // 选择自动或是手动
     double manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
