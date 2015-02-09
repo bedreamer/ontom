@@ -921,7 +921,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     }
 
     if ( task->wait_job_nr < 16 ) {
-        if ( job_search(jc.url_commit_timestamp) ) {
+        if ( job_exsit(jc.url_commit_timestamp) ) {
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "\"status\":\"OK\"}");
         } else {
@@ -1054,9 +1054,26 @@ int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz)
 int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
+    char id[16] = {0};
+    struct charge_job * thiz = NULL;
     thiz->ct = "application/json";
-    thiz->xml_len = 1;
-    thiz->iobuff[0] = 'A';
+
+    mg_get_var(thiz->xml_conn, "id", id, 16);
+    thiz = job_search(atol(id));
+
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"id\":\"%s\"", id);
+
+    if ( thiz == NULL ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\"", id);
+    } else {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"", id);
+        thiz->job_status = JOB_ABORTING;
+    }
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+
     return ret;
 }
 
