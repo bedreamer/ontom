@@ -703,6 +703,7 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
 void job_running(struct charge_task *tsk, struct charge_job *thiz)
 {
     int ret;
+    char buff[64] = {0};
 
     if ( thiz == NULL ) return;
 #if 0
@@ -772,6 +773,13 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
     case JOB_WORKING:
+        if ( thiz->charge_mode != CHARGE_AUTO ) {
+            sprintf(buff, "%.1f", thiz->need_V);
+            config_write("需求电压", buff);
+            sprintf(buff, "%.1f", thiz->need_I);
+            config_write("需求电流", buff);
+        }
+
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
             bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
             bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -938,6 +946,11 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->charge_mode = need->charge_mode;
     thiz->job_gun_sn = need->charge_gun;
     strcpy(thiz->card.triger_card_sn, need->card_sn);
+
+    if ( thiz->charge_mode != CHARGE_AUTO ) {
+        thiz->need_I = need->manual_set_charge_current;
+        thiz->need_V = need->manual_set_charge_volatage;
+    }
 
     thiz->charge_bms_establish_timestamp = rand() % 10000 + 5000;
 
