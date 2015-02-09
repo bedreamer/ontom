@@ -788,7 +788,10 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     jc.biling_mode = BILLING_MODE_AS_AUTO;
     jc.charge_mode = CHARGE_AUTO;
 
-    if ( strlen(gun) <= 0 ) goto reject;
+    if ( strlen(gun) <= 0 ) {
+        log_printf(DBG_LV3, "充电枪编号错误");
+        goto reject;
+    }
     switch (atoi(gun)) {
     case 0:
         jc.charge_gun = GUN_SN0;
