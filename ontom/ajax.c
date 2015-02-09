@@ -710,7 +710,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
             "\"bus1_V\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电流
-            "\"bus0_I\":\"%.1f V\",", b2l(task->chargers[0]->chargers.charger_i_out) / 10.0f);
+            "\"bus0_I\":\"%.1f A\",", b2l(task->chargers[0]->chargers.charger_i_out) / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电流
             "\"bus1_I\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
@@ -971,6 +971,8 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         "按电量",
         "自由"
     };
+    CHARGE_GUN_SN g = __is_gun_phy_conn_ok(job);
+
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
             "\"id\":\"%08X\","       // 作业ID，序号
@@ -994,7 +996,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             0.0f,
             0.0f,
             "N/A",
-            "未连接"
+            (g == GUN_SN0 || g == GUN_SN1 ) ? "已连接" : "未连接"
             );
 }
 
