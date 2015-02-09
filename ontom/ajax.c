@@ -806,9 +806,9 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         jc.charge_gun = GUN_SN3;
         break;
     default:
-        log_printf(DBG_LV3, "无效的充电枪");
         goto reject;
     }
+    log_printf(INF, "atoi(gun) jc.charge_gun %x", jc.charge_gun);
 
     if ( strlen(b_mode) > 0 ) {
         if ( 0 == strcmp(b_mode, "auto") ) {
