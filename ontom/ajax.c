@@ -792,7 +792,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"id\":\"%08X\"", jc.url_commit_timestamp);
+            "{\"id\":\"%08X\",", jc.url_commit_timestamp);
 
     if ( strlen(gun) <= 0 ) {
         log_printf(DBG_LV3, "充电枪编号错误");
