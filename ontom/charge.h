@@ -535,8 +535,10 @@ typedef enum {
 typedef enum {
     // 自动充电，带BMS管理
     CHARGE_AUTO,
-    // 手动充电，不需要BMS
-    CHARGE_MANUAL
+    // 手动恒压充电，不需要BMS
+    CHARGE_BV,
+    // 手动恒流充电，不需要BMS
+    CHARGE_BI
 }CHARGE_MODE;
 
 // 作业提交结构
@@ -590,6 +592,11 @@ struct charge_job {
     time_t charge_bms_establish_timestamp;
     // 结构体引用计数
     unsigned int ref_nr;
+
+    // {{ 充电需求
+    double need_V;
+    double need_I;
+    // }}
 
     // 充电计费方式
     struct billing_methord charge_billing;
