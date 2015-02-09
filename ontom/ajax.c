@@ -1055,21 +1055,21 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     char id[16] = {0};
-    struct charge_job * thiz = NULL;
+    struct charge_job * j = NULL;
     thiz->ct = "application/json";
 
     mg_get_var(thiz->xml_conn, "id", id, 16);
-    thiz = job_search(atol(id));
+    j = job_search(atol(id));
 
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"id\":\"%s\"", id);
 
-    if ( thiz == NULL ) {
+    if ( j == NULL ) {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\"", id);
     } else {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"", id);
-        thiz->job_status = JOB_ABORTING;
+        j->job_status = JOB_ABORTING;
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
