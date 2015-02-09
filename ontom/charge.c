@@ -435,6 +435,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             for( i = 0; i < task->sys_config_gun_nr; i ++ ) {
                 if ( task->job[ i ] == NULL ) continue;
                 job_running(task, task->job[ i ]);
+
+                if ( task->job[ i ]->job_status == JOB_DETACHING ) {
+                    // 删除作业
+                    free(task->job[i]);
+                    task->job[i] = NULL;
+                }
             }
         } while ( 0 );
 
@@ -480,6 +486,25 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             }
             //}}} 没实现
         } while ( 0 );
+
+        do {
+            list_head *thiz;
+            struct charge_job *j;
+            if ( task->wait_head ) {
+                pthread_mutex_lock(&task->wait_lck);
+                thiz = task->wait_head;
+                do {
+                    j = list_load(struct charge_job, job_node, thiz);
+                    if ( j->job_url_commit_timestamp == ci_timestamp ) {
+                        break;
+                    }
+                    thiz = thiz->next;
+                    j = NULL;
+                } while ( thiz != task->wait_head );
+                pthread_mutex_unlock (&task->wait_lck);
+            }
+        } while ( 0 );
+
         usleep(50000);
     }
 __panic:
@@ -856,6 +881,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
     case JOB_ABORTING:
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        thiz->job_status = JOB_DETACHING;
         break;
     case JOB_DONE:
         break;
@@ -867,7 +893,6 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        thiz->job_status = JOB_IDLE;
         thiz = NULL;
         break;
     }
@@ -1037,7 +1062,8 @@ die:
     return thiz;
 }
 
-int job_search(time_t ci_timestamp)
+// 检查作业是否存在
+int job_exsit(time_t id)
 {
     int i = 0;
     struct list_head *thiz;
@@ -1064,6 +1090,36 @@ int job_search(time_t ci_timestamp)
         } while ( thiz != task->commit_head );
         pthread_mutex_unlock (&task->commit_lck);
         if ( c ) return (int)c;
+    }
+
+    if ( task->wait_head ) {
+        pthread_mutex_lock(&task->wait_lck);
+        thiz = task->wait_head;
+        do {
+            j = list_load(struct charge_job, job_node, thiz);
+            if ( j->job_url_commit_timestamp == ci_timestamp ) {
+                break;
+            }
+            thiz = thiz->next;
+            j = NULL;
+        } while ( thiz != task->wait_head );
+        pthread_mutex_unlock (&task->wait_lck);
+    }
+
+    return (int)j;
+}
+
+struct charge_job* job_search(time_t ci_timestamp)
+{
+    int i = 0;
+    struct list_head *thiz;
+    struct charge_job *j = NULL;
+
+    for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
+        if ( task->job[i] == NULL ) continue;
+        if ( task->job[i]->job_url_commit_timestamp == ci_timestamp ) {
+            return (int)task->job[i];
+        }
     }
 
     if ( task->wait_head ) {
