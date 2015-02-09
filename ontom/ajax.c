@@ -708,7 +708,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
             "\"bus0_V\":\"%.1f\",", task->chargers[0]->chargers.charger_v_out);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
-            "\"bus1_V\":\"0.0\",");
+            "\"bus1_V\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
             "\"card_sn\":\"%s\",", config_read("triger_card_sn"));
     config_write("triger_card_sn", "N/A");
@@ -719,9 +719,9 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 2# 充电枪连接状态
             "\"gun1\":\"detached\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 3# 充电枪连接状态
-            "\"gun2\":\"detached\",");
+            "\"gun2\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
-            "\"gun3\":\"detached\",");
+            "\"gun3\":\"N/A\",");
     thiz->iobuff[--thiz->xml_len] = '\0';
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "}");
