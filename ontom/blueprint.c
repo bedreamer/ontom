@@ -1121,14 +1121,16 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
-        if ( ! me->job ) {
-            ret = ERR_ERR;
-            break;
-        }
         if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
             log_printf(INF, "UART: "GRN("综合采样盒通信恢复."));
         }
         bit_clr(task, S_MEASURE_COMM_DOWN);
+        #if 0
+        if ( ! me->job ) {
+            ret = ERR_ERR;
+            break;
+        }
+        #endif
         self->master->died = 0;
 
         memcpy(&me->measure->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
