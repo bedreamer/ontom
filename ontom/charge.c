@@ -1057,7 +1057,7 @@ int job_exsit(time_t id)
 
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
-        if ( task->job[i]->job_url_commit_timestamp == ci_timestamp ) {
+        if ( task->job[i]->job_url_commit_timestamp == id ) {
             return (int)task->job[i];
         }
     }
@@ -1067,7 +1067,7 @@ int job_exsit(time_t id)
         thiz = task->commit_head;
         do {
             c = list_load(struct job_commit_data, job_node, thiz);
-            if ( c->url_commit_timestamp == ci_timestamp ) {
+            if ( c->url_commit_timestamp == id ) {
                 break;
             }
             thiz = thiz->next;
@@ -1082,7 +1082,7 @@ int job_exsit(time_t id)
         thiz = task->wait_head;
         do {
             j = list_load(struct charge_job, job_node, thiz);
-            if ( j->job_url_commit_timestamp == ci_timestamp ) {
+            if ( j->job_url_commit_timestamp == id ) {
                 break;
             }
             thiz = thiz->next;
