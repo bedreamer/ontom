@@ -901,21 +901,21 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     //log_printf(INF, "jc.charge_mode == CHARGE_MANUAL %x", jc.charge_mode);
     if ( jc.charge_mode != CHARGE_AUTO ) {
         if ( strlen(set_V) <= 0 ) {
-            log_printf(DBG_LV3, "1错误的充电参数 %s %x %x", c_mode, CHARGE_AUTO, CHARGE_MANUAL);
+            log_printf(DBG_LV3, "1错误的充电参数");
             goto reject;
         }
         if ( strlen(set_I) <= 0 ) {
-            log_printf(DBG_LV3, "2错误的充电参数 %s %x %x", c_mode, CHARGE_AUTO, CHARGE_MANUAL);
+            log_printf(DBG_LV3, "2错误的充电参数");
             goto reject;
         }
         jc.manual_set_charge_volatage = atof(set_V);
         jc.manual_set_charge_current = atof(set_I);
         if ( jc.manual_set_charge_volatage < 50.0f ) {
-            log_printf(DBG_LV3, "3错误的充电参数 %s %x %x", c_mode, CHARGE_AUTO, CHARGE_MANUAL);
+            log_printf(DBG_LV3, "3错误的充电参数");
             goto reject;
         }
         if ( jc.manual_set_charge_current < 1.0f ) {
-            log_printf(DBG_LV3, "4错误的充电参数 %s %x %x", c_mode, CHARGE_AUTO, CHARGE_MANUAL);
+            log_printf(DBG_LV3, "4错误的充电参数");
             goto reject;
         }
     }
