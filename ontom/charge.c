@@ -282,6 +282,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         bp->hw_port = SERIAL4_CTRL_PIN;
 
         task->chargers[0] = (struct charger_struct *)malloc(sizeof(struct charger_struct));
+        task->measure[0] = (struct measure_struct *)malloc(sizeof(struct measure_struct));
 
         do {
             struct bp_user u = {0};
@@ -298,6 +299,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.user_evt_handle = uart4_simple_box_evt_handle;
             u.uart = bp;
             u.chargers = task->chargers[0];
+            u.measure = task->measure[0];
             ret = bp_user_bind(bp, &u); // 采样
 
             u.frame_freq = 50 * 100;
