@@ -1418,12 +1418,25 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         } else {
             cmd &= ~GUN1_ASSIT_PWN_ON;
         }
+        if ( bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
+            cmd |= GUN2_ASSIT_PWN_ON;
+            cmd &= ~GUN1_ASSIT_PWN_ON;
+        } else {
+            cmd &= ~GUN2_ASSIT_PWN_ON;
+        }
         if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
             cmd |= GUN1_OUTPUT_ON;
             cmd &= ~GUN2_OUTPUT_ON;
         } else {
             cmd &= ~GUN1_OUTPUT_ON;
         }
+        if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
+            cmd |= GUN2_OUTPUT_ON;
+            cmd &= ~GUN1_OUTPUT_ON;
+        } else {
+            cmd &= ~GUN2_OUTPUT_ON;
+        }
+
 
         if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
             cmd |= DC_SWITCH_ON;
