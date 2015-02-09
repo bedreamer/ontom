@@ -593,7 +593,7 @@ struct charge_job {
     // 结构体引用计数
     unsigned int ref_nr;
 
-    // {{ 充电需求
+    // {{ 充电控制参数
     double need_V;
     double need_I;
     // }}

@@ -849,9 +849,9 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         if (  0 == strcmp(c_mode, "auto") ) {
             jc.charge_mode = CHARGE_AUTO;
         } else if ( 0 == strcmp(c_mode, "BV") ) {
-            jc.charge_mode = CHARGE_MANUAL;
+            jc.charge_mode = CHARGE_BV;
         } else if ( 0 == strcmp(c_mode, "BI") ) {
-            jc.charge_mode = CHARGE_MANUAL;
+            jc.charge_mode = CHARGE_BI;
         } else {
             log_printf(DBG_LV3, "错误的充电模式");
             goto reject;
