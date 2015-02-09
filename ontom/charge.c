@@ -1103,7 +1103,7 @@ struct charge_job* job_search(time_t ci_timestamp)
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
         if ( task->job[i]->job_url_commit_timestamp == ci_timestamp ) {
-            return (int)task->job[i];
+            return task->job[i];
         }
     }
 
@@ -1121,7 +1121,7 @@ struct charge_job* job_search(time_t ci_timestamp)
         pthread_mutex_unlock (&task->wait_lck);
     }
 
-    return (int)j;
+    return j;
 }
 
 // 从等待链表中选出最先提交的作业
