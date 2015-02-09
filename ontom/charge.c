@@ -750,21 +750,21 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                 }
             }
         }
-        if ( ! bit_read(thiz, F_BMS_RECOGNIZED) ) {
-            break;
+
+
+        if ( thiz->charge_mode == CHARGE_AUTO ) {
+            if ( ! bit_read(thiz, F_BMS_RECOGNIZED) ) {
+                break;
+            }
         }
+
         if ( ! bit_read(thiz, F_SYSTEM_CHARGE_ALLOW) ) {
             thiz->job_status = JOB_ERR_PAUSE;
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(%X)",
                        thiz->job_status);
             break;
         }
-        if ( ! bit_read(thiz, F_CARDING_TRIGER) ) {
-            break;
-        }
-        if ( ! bit_read(thiz, F_CARDING_CONFIRM) ) {
-            break;
-        }
+
         thiz->job_status = JOB_WORKING;
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
