@@ -898,30 +898,30 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
 {
     char *status_string[] = {
-        "JOB_IDLE",
-        "JOB_SETTING",
-        "JOB_WAITTING",
-        "JOB_STANDBY",
-        "JOB_WORKING",
-        "JOB_ERR_PAUSE",
-        "JOB_MAN_PAUSE",
-        "JOB_RESUMING",
-        "JOB_ABORTING",
-        "JOB_DONE",
-        "JOB_EXITTING",
-        "JOB_DETACHING"
+        "空闲",
+        "设置",
+        "等待",
+        "就绪",
+        "在充",
+        "因故暂停",
+        "人工暂停",
+        "正在恢复",
+        "正在中止",
+        "作业完成",
+        "正在退出",
+        "正在清除"
     };
     char *cmode_string[] = {
-        "CHARGE_AUTO",
-        "CHARGE_MANUAL"
+        "自动",
+        "手动"
     };
     char *bmode_string[] = {
-        "BILLING_MODE_INVALID",
-        "BILLING_MODE_AS_AUTO",
-        "BILLING_MODE_AS_MONEY",
-        "BILLING_MODE_AS_TIME",
-        "BILLING_MODE_AS_CAP",
-        "BILLING_MODE_AS_FREE"
+        "无效",
+        "自动",
+        "按金额",
+        "按时间",
+        "按电量",
+        "自由"
     };
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
