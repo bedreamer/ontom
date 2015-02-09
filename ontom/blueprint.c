@@ -1133,6 +1133,7 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         #endif
         self->master->died = 0;
 
+        memcpy(&me->measure->measure_pre_copy, &me->measure->measure, sizeof(struct MDATA_ACK));
         memcpy(&me->measure->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
 #if 1
         // 故障判定
