@@ -487,23 +487,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             //}}} 没实现
         } while ( 0 );
 
-        do {
-            list_head *thiz;
-            struct charge_job *j;
-            if ( task->wait_head ) {
-                pthread_mutex_lock(&task->wait_lck);
-                thiz = task->wait_head;
-                do {
-                    j = list_load(struct charge_job, job_node, thiz);
-                    if ( j->job_url_commit_timestamp == ci_timestamp ) {
-                        break;
-                    }
-                    thiz = thiz->next;
-                    j = NULL;
-                } while ( thiz != task->wait_head );
-                pthread_mutex_unlock (&task->wait_lck);
-            }
-        } while ( 0 );
+        // 清除无效的作业
+        job_detach_wait(task);
 
         usleep(50000);
     }
@@ -1171,6 +1156,40 @@ struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun)
     }
 
     return thiz;
+}
+
+// 从等待列表中删除
+void job_detach_wait(struct charge_task *tsk)
+{
+    struct charge_job *thiz = NULL;
+    struct list_head *p, *next;
+    if ( tsk->wait_head != NULL ) {
+        pthread_mutex_lock(&tsk->wait_lck);
+        p = tsk->wait_head;
+        do {
+            next = p->next;
+            thiz = list_load(struct charge_job, job_node, p);
+            if ( thiz->job_status == JOB_DETACHING ) {
+                p = p->next;
+                thiz = NULL;
+                continue;
+            }
+            list_remove(p);
+            if ( p == tsk->wait_head ) {
+                if ( next == tsk->wait_head ) {
+                    tsk->wait_head = NULL;
+                    tsk->wait_job_nr = 0;
+                } else {
+                    tsk->wait_head = next;
+                    tsk->wait_job_nr --;
+                }
+            }
+            break;
+        } while ( p != tsk->wait_head);
+        pthread_mutex_unlock (&tsk->wait_lck);
+    }
+
+    free(thiz);
 }
 
 // 从提交链表中取出第一个提交事件
