@@ -753,6 +753,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 #else
     struct job_commit_data jc;
     char timestamp[32] = {0};
+    char cid[32] = {0};
     char gun[8] = {0};
     char c_mode[16] = {0};
     char set_V[8] = {0};
@@ -768,6 +769,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
             "{");
 
     mg_get_var(thiz->xml_conn, "t", timestamp, 32);
+    mg_get_var(thiz->xml_conn, "cid", cid, 32);
     mg_get_var(thiz->xml_conn, "gun", gun, 8);
 
     mg_get_var(thiz->xml_conn, "c_mode", c_mode, 16);
@@ -792,6 +794,14 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         log_printf(DBG_LV3, "充电枪编号错误");
         goto reject;
     }
+
+    if ( strlen(cid) <= 0 ) {
+        log_printf(DBG_LV3, "卡编号错误");
+        goto reject;
+    }
+
+    strcpy(jc.card_sn, cid);
+
     switch (atoi(gun)) {
     case 0:
         jc.charge_gun = GUN_SN0;
@@ -959,7 +969,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     };
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
-            "\"id\":\"%08x\","       // 作业ID，序号
+            "\"id\":\"%08X\","       // 作业ID，序号
             "\"port\":\"%ld#\","     // 充电端口
             "\"cmode\":\"%s\","       // 充电模式
             "\"bmode\":\"%s\","       // 计费方式
