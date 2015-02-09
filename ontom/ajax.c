@@ -891,6 +891,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
                     "\"status\":\"PENDING\"}");
         }
     } else {
+        log_printf(DBG_LV3, "作业数太多");
         goto reject;
     }
     return ERR_OK;
