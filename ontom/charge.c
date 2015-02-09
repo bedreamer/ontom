@@ -934,6 +934,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->charge_billing.mode = need->biling_mode;
     thiz->charge_mode = need->charge_mode;
     thiz->job_gun_sn = need->charge_gun;
+    strcpy(thiz->card.triger_card_sn, need->card_sn);
 
     thiz->charge_bms_establish_timestamp = rand() % 10000 + 5000;
 
