@@ -1172,7 +1172,7 @@ void job_detach_wait(struct charge_task *tsk)
             thiz = list_load(struct charge_job, job_node, p);
             log_printf(INF, "id: %08X %x", thiz->job_url_commit_timestamp,
                        thiz->job_status);
-            if ( thiz->job_status != JOB_DETACHING ) {
+            if ( thiz->job_status != JOB_ABORTING ) {
                 p = p->next;
                 thiz = NULL;
                 continue;
