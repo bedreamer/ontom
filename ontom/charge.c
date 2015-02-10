@@ -435,6 +435,11 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             for( i = 0; i < task->sys_config_gun_nr; i ++ ) {
                 if ( task->job[ i ] == NULL ) continue;
                 job_running(task, task->job[ i ]);
+                if ( task->job[i]->job_status == JOB_DETACHING ) {
+                    free(task->job[i]);
+                    log_printf(INF, "ZEUS: 作业中止");
+                    task->job[i] = NULL;
+                }
             }
         } while ( 0 );
 
@@ -1093,6 +1098,8 @@ struct charge_job* job_search(time_t ci_timestamp)
     int i = 0;
     struct list_head *thiz;
     struct charge_job *j = NULL;
+
+    log_printf(INF. "search for id %08X", ci_timestamp);
 
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
