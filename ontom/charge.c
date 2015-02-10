@@ -785,9 +785,9 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         break;
     case JOB_WORKING:
         if ( thiz->charge_mode != CHARGE_AUTO ) {
-            sprintf(buff, "%.1f", thiz->need_V);
+            sprintf(buff, "%d", (unsigned int)(thiz->need_V * 10.0f) );
             config_write("需求电压", buff);
-            sprintf(buff, "%.1f", thiz->need_I);
+            sprintf(buff, "%d", (unsigned int)(thiz->need_I * 10.0f) );
             config_write("需求电流", buff);
         }
 
