@@ -482,7 +482,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         } while ( 0 );
 
         // 清除无效的作业
-        job_detach_wait(task);
+        //job_detach_wait(task);
 
         usleep(50000);
     }
