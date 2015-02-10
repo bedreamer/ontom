@@ -1099,7 +1099,7 @@ struct charge_job* job_search(time_t ci_timestamp)
     struct list_head *thiz;
     struct charge_job *j = NULL;
 
-    log_printf(INF. "search for id %08X", ci_timestamp);
+    log_printf(INF, "search for id %08X", ci_timestamp);
 
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
