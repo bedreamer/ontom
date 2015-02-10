@@ -409,6 +409,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     pthread_mutex_init(&task->wait_lck, NULL);
 
     while ( 1 ) {
+        // 清除无效的作业
+        job_detach_wait(task);
+
         do {
             // 处理提交事件
             struct job_commit_data *thiz = NULL;
@@ -485,9 +488,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             }
             //}}} 没实现
         } while ( 0 );
-
-        // 清除无效的作业
-        job_detach_wait(task);
 
         usleep(50000);
     }
