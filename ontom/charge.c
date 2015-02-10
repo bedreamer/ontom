@@ -1170,7 +1170,8 @@ void job_detach_wait(struct charge_task *tsk)
         do {
             next = p->next;
             thiz = list_load(struct charge_job, job_node, p);
-            log_printf(INF, "id: %08X", thiz->job_url_commit_timestamp);
+            log_printf(INF, "id: %08X %x", thiz->job_url_commit_timestamp,
+                       thiz->job_status);
             if ( thiz->job_status != JOB_DETACHING ) {
                 p = p->next;
                 thiz = NULL;
@@ -1188,7 +1189,6 @@ void job_detach_wait(struct charge_task *tsk)
             }
             log_printf(INF, "ZEUS: 作业 %ld 被释放", thiz->job_url_commit_timestamp);
             free(thiz);
-            break;
         } while ( p != tsk->wait_head);
         pthread_mutex_unlock (&tsk->wait_lck);
     }
