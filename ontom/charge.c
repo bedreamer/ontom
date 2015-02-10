@@ -437,12 +437,13 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             int i = 0;
             for( i = 0; i < task->sys_config_gun_nr; i ++ ) {
                 if ( task->job[ i ] == NULL ) continue;
-                job_running(task, task->job[ i ]);
                 if ( task->job[i]->job_status == JOB_ABORTING ) {
                     free(task->job[i]);
                     log_printf(INF, "ZEUS: 作业中止");
                     task->job[i] = NULL;
+                    continue;
                 }
+                job_running(task, task->job[ i ]);
             }
         } while ( 0 );
 
