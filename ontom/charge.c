@@ -1170,6 +1170,7 @@ void job_detach_wait(struct charge_task *tsk)
         do {
             next = p->next;
             thiz = list_load(struct charge_job, job_node, p);
+            log_printf(INF, "dfadfdsa");
             if ( thiz->job_status != JOB_DETACHING ) {
                 p = p->next;
                 thiz = NULL;
