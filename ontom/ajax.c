@@ -967,7 +967,8 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     };
     char *cmode_string[] = {
         "自动",
-        "手动"
+        "恒压",
+        "恒流"
     };
     char *bmode_string[] = {
         "无效",
@@ -1066,7 +1067,8 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"id\":\"%s\"", id);
 
     if ( j == NULL ) {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\"", id);
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\",", id);
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"", id);
     } else {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"", id);
         j->job_status = JOB_ABORTING;
