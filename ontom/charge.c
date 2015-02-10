@@ -435,12 +435,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             for( i = 0; i < task->sys_config_gun_nr; i ++ ) {
                 if ( task->job[ i ] == NULL ) continue;
                 job_running(task, task->job[ i ]);
-
-                if ( task->job[ i ]->job_status == JOB_DETACHING ) {
-                    // 删除作业
-                    free(task->job[i]);
-                    task->job[i] = NULL;
-                }
             }
         } while ( 0 );
 
@@ -1189,6 +1183,7 @@ void job_detach_wait(struct charge_task *tsk)
         pthread_mutex_unlock (&tsk->wait_lck);
     }
 
+    log_printf(INF, "ZEUS: 作业 %ld 被释放", thiz->job_url_commit_timestamp);
     free(thiz);
 }
 
