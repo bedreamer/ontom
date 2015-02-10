@@ -1071,7 +1071,13 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"", id);
     } else {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"", id);
-        j->job_status = JOB_ABORTING;
+        if ( j->job_status == JOB_WORKING ||
+             j->job_status == JOB_ERR_PAUSE ||
+             j->job_status == JOB_MAN_PAUSE ) {
+                j->job_status = JOB_ABORTING;
+        } else {
+            j->job_status = JOB_DETACHING;
+        }
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
