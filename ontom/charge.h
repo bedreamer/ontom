@@ -991,9 +991,9 @@ static inline unsigned int __atoh(const char *hex)
         if (*hex >= '0' && *hex <= '9') {
             v = v * 16 + (*hex) - '0';
         } else if (*hex >= 'A' && *hex <= 'F') {
-            v = v * 16 + (*hex) - 'A';
+            v = v * 16 + (*hex) - 'A' + 10;
         } else if (*hex >= 'a' && *hex <= 'f') {
-            v = v * 16 + (*hex) - 'a';
+            v = v * 16 + (*hex) - 'a' + 10;
         } else break;
         hex ++;
     }
