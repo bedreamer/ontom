@@ -889,6 +889,10 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         buff[nr ++] = (unsigned short)val;
         s = nr;
 
+        log_printf(INF, "初始电压:%s V, 需求电压: %s V, 需求电流: %s A",
+                   config_read("初始电压"), config_read("需求电压"),
+                   config_read("需求电流"));
+
         // CRC
         buff[nr ++] = load_crc(s, (char*)buff);
         buff[nr ++] = load_crc(s, (char*)buff) >> 8;
