@@ -1189,6 +1189,7 @@ void job_detach_wait(struct charge_task *tsk)
             }
             log_printf(INF, "ZEUS: 作业 %ld 被释放", thiz->job_url_commit_timestamp);
             free(thiz);
+            break;
         } while ( p != tsk->wait_head);
         pthread_mutex_unlock (&tsk->wait_lck);
     }
