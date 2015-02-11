@@ -1018,8 +1018,8 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             job->charge_billing.option.set_money,
             job->card.triger_card_sn,
             0.00f,
-            task->chargers[0]->chargers.charger_v_out,
-            task->chargers[0]->chargers.charger_i_out,
+            (float)(b2l(task->chargers[0]->chargers.charger_v_out))/10,
+            (float)(b2l(task->chargers[0]->chargers.charger_i_out))/10,
             "0",
             buff
             );
