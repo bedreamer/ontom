@@ -877,9 +877,11 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_DETACHING:
-        bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
-        bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
-        bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        if ( thiz->job_status > JOB_WORKING ){
+            bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
+            bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
+            bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        }
         thiz = NULL;
         break;
     }
