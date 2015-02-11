@@ -992,10 +992,15 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "{\"status\":\"%s\","    // 状态
             "\"id\":\"%08X\","       // 作业ID，序号
             "\"port\":\"%ld#\","     // 充电端口
-            "\"cmode\":\"%s\","       // 充电模式
-            "\"bmode\":\"%s\","       // 计费方式
-            "\"cid\":\"%s\","       // 卡号ID
-            "\"cremain\":\"%.2f 元\","       // 余额
+            "\"cmode\":\"%s\","      // 充电模式
+            "\"LV\":\"%.1f V\","       // 充电限压
+            "\"LI\":\"%.1f A\","     // 充电限流
+            "\"bmode\":\"%s\","      // 计费方式
+            "\"hwk\":\"%.1f KW.H\"," // 电量
+            "\"time\":\"%.d 分钟\","  // 时间
+            "\"money\":\"%.1f 元\","  // 金额
+            "\"cid\":\"%s\","          // 卡号ID
+            "\"cremain\":\"%.2f 元\"," // 余额
             "\"CV\":\"%.1f V\","       // 充电电压
             "\"CI\":\"%.1f A\","       // 充电电流
             "\"ycdl\":\"%s %%\","       // 已充电量
@@ -1005,12 +1010,17 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             job->job_url_commit_timestamp,
             job->job_gun_sn,
             cmode_string[job->charge_mode],
+            job->need_V,
+            job->need_I,
             bmode_string[job->charge_billing.mode],
+            job->charge_billing.set_kwh,
+            job->charge_billing.set_time,
+            job->charge_billing.set_money,
             job->card.triger_card_sn,
             0.00f,
-            0.0f,
-            0.0f,
-            "N/A",
+            task->chargers[0]->chargers.charger_v_out,
+            task->chargers[0]->chargers.charger_i_out,
+            "0",
             buff
             );
 }
