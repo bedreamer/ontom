@@ -172,9 +172,9 @@ int main()
 
     signal(SIGINT, sig_interrupt);
     sigemptyset(&act.sa_mask);
-    act.sa_flags=SA_SIGINFO;
-    act.sa_sigaction=sig_dbg_interrupt;
-    sigaction(SIGSEGV,&act,NULL);
+    //act.sa_flags=SA_SIGINFO;
+    //act.sa_sigaction=sig_dbg_interrupt;
+    //sigaction(SIGSEGV,&act,NULL);
 
     log_printf(DBG_LV1, "TOM: 系统准备启动...");
     ret = sqlite3_open(DEFAULT_DB, &task->database);
