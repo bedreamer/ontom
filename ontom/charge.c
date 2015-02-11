@@ -1066,8 +1066,8 @@ int job_exsit(time_t id)
         }
     }
 
+    pthread_mutex_lock(&task->commit_lck);
     if ( task->commit_head ) {
-        pthread_mutex_lock(&task->commit_lck);
         thiz = task->commit_head;
         do {
             c = list_load(struct job_commit_data, job_node, thiz);
@@ -1077,12 +1077,12 @@ int job_exsit(time_t id)
             thiz = thiz->next;
             c = NULL;
         } while ( thiz != task->commit_head );
-        pthread_mutex_unlock (&task->commit_lck);
-        if ( c ) return (int)c;
     }
+    pthread_mutex_unlock (&task->commit_lck);
+    if ( c ) return (int)c;
 
+    pthread_mutex_lock(&task->wait_lck);
     if ( task->wait_head ) {
-        pthread_mutex_lock(&task->wait_lck);
         thiz = task->wait_head;
         do {
             j = list_load(struct charge_job, job_node, thiz);
@@ -1092,8 +1092,8 @@ int job_exsit(time_t id)
             thiz = thiz->next;
             j = NULL;
         } while ( thiz != task->wait_head );
-        pthread_mutex_unlock (&task->wait_lck);
     }
+    pthread_mutex_unlock (&task->wait_lck);
 
     return (int)j;
 }
@@ -1113,8 +1113,8 @@ struct charge_job* job_search(time_t ci_timestamp)
         }
     }
 
+    pthread_mutex_lock(&task->wait_lck);
     if ( task->wait_head ) {
-        pthread_mutex_lock(&task->wait_lck);
         thiz = task->wait_head;
         do {
             j = list_load(struct charge_job, job_node, thiz);
@@ -1124,8 +1124,8 @@ struct charge_job* job_search(time_t ci_timestamp)
             thiz = thiz->next;
             j = NULL;
         } while ( thiz != task->wait_head );
-        pthread_mutex_unlock (&task->wait_lck);
     }
+    pthread_mutex_unlock (&task->wait_lck);
 
     return j;
 }
@@ -1135,8 +1135,8 @@ struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun)
 {
     struct charge_job *thiz = NULL;
     struct list_head *p, *next;
+    pthread_mutex_lock(&tsk->wait_lck);
     if ( tsk->wait_head != NULL ) {
-        pthread_mutex_lock(&tsk->wait_lck);
         p = tsk->wait_head;
         do {
             next = p->next;
@@ -1158,8 +1158,8 @@ struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun)
             }
             break;
         } while ( p != tsk->wait_head);
-        pthread_mutex_unlock (&tsk->wait_lck);
     }
+    pthread_mutex_unlock (&tsk->wait_lck);
 
     return thiz;
 }
@@ -1169,8 +1169,8 @@ void job_detach_wait(struct charge_task *tsk)
 {
     struct charge_job *thiz = NULL;
     struct list_head *p, *next;
+    pthread_mutex_lock(&tsk->wait_lck);
     if ( tsk->wait_head != NULL ) {
-        pthread_mutex_lock(&tsk->wait_lck);
         p = tsk->wait_head;
         do {
             next = p->next;
@@ -1196,25 +1196,25 @@ void job_detach_wait(struct charge_task *tsk)
             free(thiz);
             break;
         } while ( p != tsk->wait_head);
-        pthread_mutex_unlock (&tsk->wait_lck);
     }
+    pthread_mutex_unlock (&tsk->wait_lck);
 }
 
 // 从提交链表中取出第一个提交事件
 struct job_commit_data *job_select_commit(struct charge_task *tsk)
 {
     struct job_commit_data *thiz = NULL;
+    pthread_mutex_lock(&tsk->commit_lck);
     if ( tsk->commit_head ) {
         struct list_head *next = tsk->commit_head->next;
         thiz = list_load(struct job_commit_data, job_node, tsk->commit_head);
         if ( next = tsk->commit_head ) {
             next = NULL;
         }
-        pthread_mutex_lock(&tsk->commit_lck);
         list_remove(tsk->commit_head);
-        pthread_mutex_unlock (&tsk->commit_lck);
         tsk->commit_head = next;
     }
+    pthread_mutex_unlock (&tsk->commit_lck);
     return thiz;
 }
 
