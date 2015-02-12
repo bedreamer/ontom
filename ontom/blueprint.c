@@ -684,6 +684,9 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要0-49)恢复"));
         }
         memcpy(&me->chargers->chargers, &param->buff.rx_buff[3], 100);
+        if ( me->chargers->chargers.charger_status!= 0) {
+            log_printf(WRN, "UART: 充电机组故障.");
+        }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -889,9 +892,9 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         buff[nr ++] = (unsigned short)val;
         s = nr;
 
-        log_printf(INF, "初始电压:%s V, 需求电压: %s V, 需求电流: %s A",
-                   config_read("初始电压"), config_read("需求电压"),
-                   config_read("需求电流"));
+        log_printf(INF, "初始电压:%.1f V, 需求电压: %.1f V, 需求电流: %.1f A",
+                   atof(config_read("初始电压"))/10.0f, config_read("需求电压"))/10.0f,
+                   atof(config_read("需求电流"))/10.0f);
 
         // CRC
         buff[nr ++] = load_crc(s, (char*)buff);
