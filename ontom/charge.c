@@ -511,190 +511,190 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
     int fault_nr = 0; // 系统关键故障
     int err_nr = 0;   // 系统故障数
 
-    if ( bit_read(thiz, S_AC_INPUT_DOWN) ) {
+    if ( bit_read(tsk, S_AC_INPUT_DOWN) ) {
         fault_nr ++;
         error_history_begin(thiz, S_AC_INPUT_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_AC_INPUT_DOWN);
     }
-    if ( bit_read(thiz, S_ASSIT_POWER_DOWN) ) {
+    if ( bit_read(tsk, S_ASSIT_POWER_DOWN) ) {
         fault_nr ++;
         error_history_begin(thiz, S_ASSIT_POWER_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_ASSIT_POWER_DOWN);
     }
-    if ( bit_read(thiz, S_CHARGER_COMM_DOWN) ) {
+    if ( bit_read(tsk, S_CHARGER_COMM_DOWN) ) {
         fault_nr ++;
         error_history_begin(thiz, S_CHARGER_COMM_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGER_COMM_DOWN);
     }
-    if ( bit_read(thiz, S_CHARGER_YX_1_COMM_DOWN) ) {
+    if ( bit_read(tsk, S_CHARGER_YX_1_COMM_DOWN) ) {
         err_nr ++;
         error_history_begin(thiz, S_CHARGER_YX_1_COMM_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGER_YX_1_COMM_DOWN);
     }
-    if ( bit_read(thiz, S_CHARGER_YX_2_COMM_DOWN) ) {
+    if ( bit_read(tsk, S_CHARGER_YX_2_COMM_DOWN) ) {
         err_nr ++;
         error_history_begin(thiz, S_CHARGER_YX_2_COMM_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGER_YX_2_COMM_DOWN);
     }
-    if ( bit_read(thiz, S_MEASURE_COMM_DOWN) ) {
+    if ( bit_read(tsk, S_MEASURE_COMM_DOWN) ) {
         fault_nr ++;
         error_history_begin(thiz, S_MEASURE_COMM_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_MEASURE_COMM_DOWN);
     }
-    if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
+    if ( bit_read(tsk, S_BMS_COMM_DOWN) ) {
         fault_nr ++;
         error_history_begin(thiz, S_BMS_COMM_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_BMS_COMM_DOWN);
     }
 
-    if ( bit_read(thiz, S_CHARGE_MODULE_DOWN) ) {
+    if ( bit_read(tsk, S_CHARGE_MODULE_DOWN) ) {
         err_nr ++;
         error_history_begin(thiz, S_CHARGE_MODULE_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGE_MODULE_DOWN);
     }
     // 1# 充电枪物理连接故障
-    if ( bit_read(thiz, S_GUN_1_PYH_CONN_DOWN) ) {
+    if ( bit_read(tsk, S_GUN_1_PYH_CONN_DOWN) ) {
         err_nr ++;
         error_history_begin(thiz, S_GUN_1_PYH_CONN_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_GUN_1_PYH_CONN_DOWN);
     }
     // 2# 充电枪物理连接故障
-    if ( bit_read(thiz, S_GUN_2_PYH_CONN_DOWN) ) {
+    if ( bit_read(tsk, S_GUN_2_PYH_CONN_DOWN) ) {
         err_nr ++;
         error_history_begin(thiz, S_GUN_2_PYH_CONN_DOWN, "N/A");
     } else {
         error_history_recover(thiz, S_GUN_2_PYH_CONN_DOWN);
     }
     // 绝缘故障
-    if ( bit_read(thiz, S_INSTITUDE_ERR) ) {
+    if ( bit_read(tsk, S_INSTITUDE_ERR) ) {
         err_nr ++;
         error_history_begin(thiz, S_INSTITUDE_ERR, "N/A");
     } else {
         error_history_recover(thiz, S_INSTITUDE_ERR);
     }
     // 母线过压
-    if ( bit_read(thiz, S_BUS_V_HI) ) {
+    if ( bit_read(tsk, S_BUS_V_HI) ) {
         err_nr ++;
         error_history_begin(thiz, S_BUS_V_HI, "N/A");
     } else {
         error_history_recover(thiz, S_BUS_V_HI);
     }
     // 母线欠压
-    if ( bit_read(thiz, S_BUS_V_LO) ) {
+    if ( bit_read(tsk, S_BUS_V_LO) ) {
         err_nr ++;
         error_history_begin(thiz, S_BUS_V_LO, "N/A");
     } else {
         error_history_recover(thiz, S_BUS_V_LO);
     }
     // 母线短路
-    if ( bit_read(thiz, S_BUS_SHORTED) ) {
+    if ( bit_read(tsk, S_BUS_SHORTED) ) {
         err_nr ++;
         error_history_begin(thiz, S_BUS_SHORTED, "N/A");
     } else {
         error_history_recover(thiz, S_BUS_SHORTED);
     }
     // 电池过压
-    if ( bit_read(thiz, S_BAT_V_HI) ) {
+    if ( bit_read(tsk, S_BAT_V_HI) ) {
         err_nr ++;
         error_history_begin(thiz, S_BAT_V_HI, "N/A");
     } else {
         error_history_recover(thiz, S_BAT_V_HI);
     }
     // 电池欠压
-    if ( bit_read(thiz, S_BAT_V_LO) ) {
+    if ( bit_read(tsk, S_BAT_V_LO) ) {
         err_nr ++;
         error_history_begin(thiz, S_BAT_V_LO, "N/A");
     } else {
         error_history_recover(thiz, S_BAT_V_LO);
     }
     // 电池短路
-    if ( bit_read(thiz, S_BAT_SHORTED) ) {
+    if ( bit_read(tsk, S_BAT_SHORTED) ) {
         err_nr ++;
         error_history_begin(thiz, S_BAT_SHORTED, "N/A");
     } else {
         error_history_recover(thiz, S_BAT_SHORTED);
     }
     // 电池反接故障
-    if ( bit_read(thiz, S_BAT_REVERT_CONN) ) {
+    if ( bit_read(tsk, S_BAT_REVERT_CONN) ) {
         err_nr ++;
         error_history_begin(thiz, S_BAT_REVERT_CONN, "N/A");
     } else {
         error_history_recover(thiz, S_BAT_REVERT_CONN);
     }
     // 电池过流
-    if ( bit_read(thiz, S_BAT_I_HI) ) {
+    if ( bit_read(tsk, S_BAT_I_HI) ) {
         err_nr ++;
         error_history_begin(thiz, S_BAT_I_HI, "N/A");
     } else {
         error_history_recover(thiz, S_BAT_I_HI);
     }
     // 充电桩温度过高
-    if ( bit_read(thiz, S_CHARGE_BOX_TEMP_HI) ) {
+    if ( bit_read(tsk, S_CHARGE_BOX_TEMP_HI) ) {
         err_nr ++;
         error_history_begin(thiz, S_CHARGE_BOX_TEMP_HI, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGE_BOX_TEMP_HI);
     }
     // 充电桩温度过低
-    if ( bit_read(thiz, S_CHARGE_BOX_TEMP_LO) ) {
+    if ( bit_read(tsk, S_CHARGE_BOX_TEMP_LO) ) {
         err_nr ++;
         error_history_begin(thiz, S_CHARGE_BOX_TEMP_LO, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGE_BOX_TEMP_LO);
     }
     // 充电桩湿度过高
-    if ( bit_read(thiz, S_CHARGE_BOX_WET_HI) ) {
+    if ( bit_read(tsk, S_CHARGE_BOX_WET_HI) ) {
         err_nr ++;
         error_history_begin(thiz, S_CHARGE_BOX_WET_HI, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGE_BOX_WET_HI);
     }
     // 充电桩湿度过低
-    if ( bit_read(thiz, S_CHARGE_BOX_WET_LO) ) {
+    if ( bit_read(tsk, S_CHARGE_BOX_WET_LO) ) {
         err_nr ++;
         error_history_begin(thiz, S_CHARGE_BOX_WET_LO, "N/A");
     } else {
         error_history_recover(thiz, S_CHARGE_BOX_WET_LO);
     }
     // 总输出熔断器熔断
-    if ( bit_read(thiz, S_DC_RDQ_BREAK) ) {
+    if ( bit_read(tsk, S_DC_RDQ_BREAK) ) {
         err_nr ++;
         error_history_begin(thiz, S_DC_RDQ_BREAK, "N/A");
     } else {
         error_history_recover(thiz, S_DC_RDQ_BREAK);
     }
     // 总输出开关跳闸
-    if ( bit_read(thiz, S_DC_SW_TRIP) ) {
+    if ( bit_read(tsk, S_DC_SW_TRIP) ) {
         err_nr ++;
         error_history_begin(thiz, S_DC_SW_TRIP, "N/A");
     } else {
         error_history_recover(thiz, S_DC_SW_TRIP);
     }
     // 1#枪输出开关跳闸
-    if ( bit_read(thiz, S_GUN_1_SW_TRIP) ) {
+    if ( bit_read(tsk, S_GUN_1_SW_TRIP) ) {
         err_nr ++;
         error_history_begin(thiz, S_GUN_1_SW_TRIP, "N/A");
     } else {
         error_history_recover(thiz, S_GUN_1_SW_TRIP);
     }
     // 2#枪输出开关跳闸
-    if ( bit_read(thiz, S_GUN_2_SW_TRIP) ) {
+    if ( bit_read(tsk, S_GUN_2_SW_TRIP) ) {
         err_nr ++;
         error_history_begin(thiz, S_GUN_2_SW_TRIP, "N/A");
     } else {
         error_history_recover(thiz, S_GUN_2_SW_TRIP);
     }
     // 防雷器故障
-    if ( bit_read(thiz, S_FANGLEIQI_BREAK) ) {
+    if ( bit_read(tsk, S_FANGLEIQI_BREAK) ) {
         err_nr ++;
         error_history_begin(thiz, S_FANGLEIQI_BREAK, "N/A");
     } else {
@@ -702,15 +702,15 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
     }
 
     if ( fault_nr ) {
-        bit_set(thiz, F_SYSTEM_CHARGE_ALLOW);
+        bit_set(tsk, F_SYSTEM_CHARGE_ALLOW);
     } else {
-        bit_clr(thiz, F_SYSTEM_CHARGE_ALLOW);
+        bit_clr(tsk, F_SYSTEM_CHARGE_ALLOW);
     }
 
     if ( fault_nr + err_nr ) {
-        bit_set(thiz, S_ERROR);
+        bit_set(tsk, S_ERROR);
     } else {
-        bit_clr(thiz, S_ERROR);
+        bit_clr(tsk, S_ERROR);
     }
 }
 
