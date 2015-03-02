@@ -2071,7 +2071,7 @@ ___fast_switch_2_rx:
                     //thiz->master->check_err_cnt ++;
                     thiz->status = BP_UART_STAT_WR;
                     Hachiko_pause(&thiz->rx_seed);
-                    log_printf(DBG_LV2,
+                    log_printf(WRN,
                                "UART: lenth fetched but check "RED("faile."));
                     break;
                 // 数据接收长度不足，继续接收
