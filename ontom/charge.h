@@ -699,11 +699,6 @@ struct charge_job {
     // BMS 写线程ID
     pthread_t tid_write;
 
-    // 当前故障列表
-    pthread_mutex_t err_list_lck;
-    unsigned int err_nr;
-    struct list_head *err_head;
-
     // 系统信号, 最多支持64 * 8 种信号标记
     // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
     // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
@@ -765,6 +760,11 @@ struct charge_task {
     pthread_mutex_t wait_lck;
     // 等待作业个数
     unsigned int wait_job_nr;
+
+    // 当前故障列表
+    pthread_mutex_t err_list_lck;
+    unsigned int err_nr;
+    struct list_head *err_head;
 
     // 任务记录故障总数
     unsigned int err_seq_id_next;

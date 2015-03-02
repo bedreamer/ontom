@@ -271,6 +271,10 @@ int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                      struct bp_evt_param *param);
 int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
+int uart4_convert_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
+int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                                       struct bp_evt_param *param);
 int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 void * thread_uart_service(void *arg) ___THREAD_ENTRY___;
