@@ -957,7 +957,7 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
 int ajax_system_error_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    struct error_history *thiz;
+    struct error_history *te;
     struct list_head *head;
     char errname[32];
     int ret;
@@ -968,15 +968,15 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
     if ( task->err_head != NULL ) {
         head = task->err_head;
         do {
-            thiz = list_load(struct error_history, error_me, head);
+            te = list_load(struct error_history, error_me, head);
             // ...
             sprintf(errname, "E%04X", thiz->error_id);
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "{\"eid\":\"%d\","
                     "\"ebt\":\"%s\","
                     "\"estr\":\"%s\"},",
-                    thiz->error_id,
-                    thiz->error_begin,
+                    te->error_id,
+                    te->error_begin,
                     config_read(errname));
             head = head->next;
         } while ( head != task->err_head );
