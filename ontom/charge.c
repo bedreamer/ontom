@@ -413,7 +413,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         // 清除无效的作业
         job_detach_wait(task);
 
-        //deal_with_system_protection(task, NULL);
+        deal_with_system_protection(task, NULL);
 
         do {
             // 处理提交事件
