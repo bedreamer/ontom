@@ -1735,7 +1735,7 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
 
-        self->rx_param.need_bytes = 32;
+        self->rx_param.need_bytes = sizeof(struct MDATA_ACK);
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
@@ -1762,6 +1762,90 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
                                         " 已禁止充电(%d)."), self->master->died);
             bit_set(task, S_MEASURE_COMM_DOWN);
         }
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 一体机直接读取转换盒通信
+int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 配置转换盒数据
+int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
