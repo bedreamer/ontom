@@ -960,7 +960,6 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
     struct error_history *te;
     struct list_head *head;
     char errname[32];
-    int ret;
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
 
@@ -970,7 +969,7 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
         do {
             te = list_load(struct error_history, error_me, head);
             // ...
-            sprintf(errname, "E%04X", thiz->error_id);
+            sprintf(errname, "E%04X", te->error_id);
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "{\"eid\":\"%d\","
                     "\"ebt\":\"%s\","
