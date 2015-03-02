@@ -952,6 +952,51 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
+
+// 返回当前故障
+int ajax_system_error_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    struct error_history *thiz;
+    struct list_head *head;
+    char errname[32];
+    int ret;
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
+
+    pthread_mutex_lock(&task->err_list_lck);
+    if ( task->err_head != NULL ) {
+        head = task->err_head;
+        do {
+            thiz = list_load(struct error_history, error_me, head);
+            // ...
+            sprintf(errname, "E%04X", thiz->error_id);
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                    "{\"eid\":\"%d\","
+                    "\"ebt\":\"%s\","
+                    "\"estr\":\"%s\"},",
+                    thiz->error_id,
+                    thiz->error_begin,
+                    config_read(errname));
+            head = head->next;
+        } while ( head != task->err_head );
+    }
+    pthread_mutex_unlock (&task->err_list_lck);
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
+    return ret;
+}
+
+// 返回历史故障
+int ajax_system_history_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+
+    return ret;
+}
+
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
 {
     char *status_string[] = {
@@ -1026,22 +1071,6 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "0",
             buff
             );
-}
-
-// 返回当前故障
-int ajax_system_error_proc(struct ajax_xml_struct *thiz)
-{
-    int ret = ERR_OK;
-
-    return ret;
-}
-
-// 返回历史故障
-int ajax_system_history_proc(struct ajax_xml_struct *thiz)
-{
-    int ret = ERR_OK;
-
-    return ret;
 }
 
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
