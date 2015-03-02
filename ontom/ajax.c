@@ -17,7 +17,8 @@ int ajax_debug_commit(struct ajax_xml_struct *thiz);
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz);
 int ajax_debug_bit_read(struct ajax_xml_struct *thiz);
 int ajax_debug_bit_write(struct ajax_xml_struct *thiz);
-
+int ajax_system_error_proc(struct ajax_xml_struct *thiz);
+int ajax_system_history_proc(struct ajax_xml_struct *thiz);
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz);
@@ -43,6 +44,8 @@ struct xml_generator {
     {"/autheticate.xml",        ajax_autheticate_xml_proc},
     {"/confirm.xml",            ajax_confirm_charge_xml_proc},
     {"/system/query.json",      ajax_system_query_json_proc},
+    {"/system/error.json",      ajax_system_error_proc},
+    {"/system/history.json",    ajax_system_history_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -710,11 +713,11 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
             "\"bus1_institude\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
-            "\"bus0_V\":\"%.1f V\",", b2l(task->chargers[0]->chargers.charger_v_out) / 10.0f);
+            "\"bus0_V\":\"%.1f V\",", task->measure[0]->measure.VinKM0 / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
             "\"bus1_V\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电流
-            "\"bus0_I\":\"%.1f A\",", b2l(task->chargers[0]->chargers.charger_i_out) / 10.0f);
+            "\"bus0_I\":\"%.1f A\",", task->measure[0]->measure.IoutBAT0 / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电流
             "\"bus1_I\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
@@ -1023,6 +1026,22 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "0",
             buff
             );
+}
+
+// 返回当前故障
+int ajax_system_error_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+
+    return ret;
+}
+
+// 返回历史故障
+int ajax_system_history_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+
+    return ret;
 }
 
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
