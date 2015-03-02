@@ -893,7 +893,7 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         s = nr;
 
         log_printf(INF, "初始电压:%.1f V, 需求电压: %.1f V, 需求电流: %.1f A",
-                   atof(config_read("初始电压"))/10.0f, config_read("需求电压")/10.0f,
+                   atof(config_read("初始电压"))/10.0f, atof(config_read("需求电压"))/10.0f,
                    atof(config_read("需求电流"))/10.0f);
 
         // CRC
