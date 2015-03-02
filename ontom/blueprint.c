@@ -1646,14 +1646,14 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             }
             bit_clr(task, F_GUN_2_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪未链接] ");
-        } else if ((box->Flag_run2 & (0x02|0x04)) == GUN_CONN_PROTECTED ) {
+        } else if ((box->Flag_run2 & (0x02|0x04)) >> 1 == GUN_CONN_PROTECTED ) {
             bit_clr(task, F_GUN_2_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪链接保护] ");
-        } else if ( (box->Flag_run2 & (0x02|0x04)) == GUN_CONN_EXCEPTION ) {
+        } else if ( (box->Flag_run2 & (0x02|0x04)) >> 1 == GUN_CONN_EXCEPTION ) {
             bit_clr(task, F_GUN_2_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[2#枪连接异常] ");
-        } else if ( (box->Flag_run2 & (0x02|0x04)) == GUN_CONN_CONNECTIVE ) {
-            if ( (me_pre->Flag_run2 & (0x02|0x04)) != GUN_CONN_CONNECTIVE ) {
+        } else if ( (box->Flag_run2 & (0x02|0x04)) >> 1 == GUN_CONN_CONNECTIVE ) {
+            if ( (me_pre->Flag_run2 & (0x02|0x04)) >> 1 != GUN_CONN_CONNECTIVE ) {
                 log_printf(INF, "采样盒: 2#枪连接完成.");
                 need_echo ++;
             }
