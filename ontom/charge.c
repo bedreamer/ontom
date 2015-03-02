@@ -407,10 +407,13 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     memset(task->job, 0, sizeof(task->job));
     pthread_mutex_init(&task->commit_lck, NULL);
     pthread_mutex_init(&task->wait_lck, NULL);
+    pthread_mutex_init(&task->err_list_lck, NULL);
 
     while ( 1 ) {
         // 清除无效的作业
         job_detach_wait(task);
+
+        deal_with_system_protection(task, NULL);
 
         do {
             // 处理提交事件
@@ -1225,33 +1228,33 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
     char sql[128], errname[32], timestamp[20];
     int ret;
 
-    pthread_mutex_lock(&job->err_list_lck);
-    if ( job->err_head != NULL ) {
-        head = job->err_head;
+    pthread_mutex_lock(&task->err_list_lck);
+    if ( task->err_head != NULL ) {
+        head = task->err_head;
         do {
             thiz = list_load(struct error_history, error_me, head);
             if ( thiz->error_id == error_id ) {
                 goto out;
             }
             head = head->next;
-        } while ( head != job->err_head );
+        } while ( head != task->err_head );
     }
 
     thiz = (struct error_history*)malloc(sizeof(struct error_history));
     if ( thiz == NULL ) goto out;
     list_ini(thiz->error_me);
-    if ( job->err_head == NULL ) {
-        job->err_head = & thiz->error_me;
+    if ( task->err_head == NULL ) {
+        task->err_head = & thiz->error_me;
     } else {
-        list_inserttail(job->err_head, &thiz->error_me);
+        list_inserttail(task->err_head, &thiz->error_me);
     }
-    job->err_nr ++;
+    task->err_nr ++;
     thiz->error_seqid = task->err_seq_id_next ++;
     thiz->error_id = error_id;
     strncpy(thiz->error_string, error_string, 32);
     strcpy(thiz->error_recover, "0000-00-00 00:00:00");
 
-    log_printf(INF, "ZEUS: 故障总数为: %d", job->err_nr);
+    log_printf(INF, "ZEUS: 故障总数为: %d", task->err_nr);
 
     __get_timestamp(timestamp);
     strcpy(thiz->error_begin, timestamp);
@@ -1265,7 +1268,7 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     log_printf(INF, "ZEUS: %s:%d", sql, ret);
 out:
-    pthread_mutex_unlock (&job->err_list_lck);
+    pthread_mutex_unlock (&task->err_list_lck);
 
     return error_id;
 }
@@ -1277,27 +1280,27 @@ void error_history_recover(struct charge_job *job, unsigned int error_id)
     char sql[128], errname[32], timestamp[20];
     int ret;
 
-    pthread_mutex_lock(&job->err_list_lck);
+    pthread_mutex_lock(&task->err_list_lck);
 
-    if ( job->err_head == NULL ) goto out;
+    if ( task->err_head == NULL ) goto out;
 
-    head = job->err_head;
+    head = task->err_head;
     do {
         thiz = list_load(struct error_history, error_me, head);
         if ( thiz->error_id == error_id ) {
             goto del;
         }
         head = head->next;
-    } while ( head != job->err_head );
+    } while ( head != task->err_head );
     goto out;
 del:
-    if ( job->err_head == & thiz->error_me ) {
-        job->err_head = thiz->error_me.next;
+    if ( task->err_head == & thiz->error_me ) {
+        task->err_head = thiz->error_me.next;
     }
     list_remove(&thiz->error_me);
-    job->err_nr --;
-    if ( job->err_nr == 0 ) {
-        job->err_head = NULL;
+    task->err_nr --;
+    if ( task->err_nr == 0 ) {
+        task->err_head = NULL;
     }
     __get_timestamp(timestamp);
     sprintf(errname, "E%04X", thiz->error_id);
@@ -1310,5 +1313,5 @@ del:
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     log_printf(INF, "ZEUS: %s:%d", sql, ret);
 out:
-    pthread_mutex_unlock (&job->err_list_lck);
+    pthread_mutex_unlock (&task->err_list_lck);
 }
