@@ -85,6 +85,7 @@ struct user_card {
  * 综合采样盒通信数据定义
  */
 struct MDATA_ACK {
+#if 0
     // 数据包起始魔数
     unsigned char magic[5];
     // 地址
@@ -178,6 +179,94 @@ struct MDATA_ACK {
     unsigned char yx_run3_rsv;
 
     unsigned short crc;
+#else
+    // 数据包起始魔数
+    unsigned char magic[5];
+    // 地址
+    unsigned char addr;
+    // 载荷长度
+    unsigned char len;
+
+    unsigned short VinKM0; //母线0电压 实际电压*10
+    unsigned short VinKM1;//母线1电压 实际电压*10
+    unsigned short VinBAT0;//电池0组电压，实际电压*10
+    unsigned short VinBAT1;//电池1组电压，实际电压*10
+    unsigned short IoutBAT0; //电池0组电流，实际电流*10
+    unsigned short IoutBAT1; //电池1组电流，实际电流*10
+    unsigned short VinBAT0RESP;//电池0组正对地电阻，实际电阻*10（K）
+    unsigned short VinBAT1RESP;//电池1组正对地电阻，实际电阻*10（K）
+    unsigned short VinBAT0RESN;//电池0组负对地电阻，实际电阻*10（K）
+    unsigned short VinBAT1RESN;//电池1组负对地电阻，实际电阻*10（K）
+    unsigned short Temp ;//当前温度，实际温度*10
+    unsigned short Humi; //当前湿度，实际湿度*10
+    unsigned short Reserve2;// 预留
+    unsigned short Reserve3; //预留
+    unsigned char Ver; //软件版本号， 如10 表示 Ver= 1.0;  数据一共29字节
+
+
+    unsigned char Flag_prtc1;   //充电断开类保护状态字节1：（同步状态）
+    //BIT0：母线0过压状态位；0 = 无故障，1 = 母线过压；
+    //BIT1：母线0欠压状态位；0 = 无故障，1 = 母线欠压；
+    //BIT2：母线0短路状态位；0 = 无故障，1 = 母线短路；
+    //BIT3：母线1过压状态位；0 = 无故障，1 = 母线过压；
+    //BIT4：母线1欠压状态位；0 = 无故障，1 = 母线欠压；
+    //BIT5：母线1短路状态位；0 = 无故障，1 = 母线短路；
+    //剩余bit保留
+
+    unsigned char Flag_prtc2;   //充电断开类保护状态字节2：（同步状态）
+    //BIT0：电池0组过压状态位；0 = 无故障，1 = 电池过压；
+    //BIT1：电池0组欠压状态位：0 = 无故障，1 = 电池欠压；
+    //BIT2：电池0组短路状态位：0 = 无故障，1 = 电池短路；
+    //BIT3：电池0组反接状态位；0 = 无故障，1 = 电池反接；
+    //BIT4：电池0组绝缘状态位；0 = 无故障，1 = 电池绝缘故障；
+    //BIT5：电池0组过流状态位；0 = 无故障，1 = 电池过流；
+    //剩余bit保留
+
+    unsigned char Flag_prtc3;   //充电断开类保护状态字节3：（同步状态）
+    //BIT0：电池1组过压状态位；0 = 无故障，1 = 电池过压；
+    //BIT1：电池1组欠压状态位：0 = 无故障，1 = 电池欠压；
+    //BIT2：电池1组短路状态位：0 = 无故障，1 = 电池短路；
+    //BIT3：电池1组反接状态位；0 = 无故障，1 = 电池反接；
+    //BIT4：电池1组绝缘状态位；0 = 无故障，1 = 电池绝缘故障；
+    //BIT5：电池1组过流状态位；0 = 无故障，1 = 电池过流；
+    //剩余bit保留
+
+    unsigned char Flag_prtc4;   //充电断开类保护状态字节4：（同步状态）
+    //BIT0：辅助电源状态位；0 = 无故障，1 = 辅助电源异常；
+    //BIT1..2：温度状态位；0 0= 无故障，01 = 温度过高，10= 温度过低
+    //BIT3..4：湿度状态位；0 0= 无故障，01 = 湿度过大，10=湿度过低
+    //剩余bit保留
+
+    unsigned char Flag_prtc5;   //充电断开类保护状态字节5：保留（同步状态）
+
+    unsigned char Flag_prtc6;   //充电断开类保护状态字节4：（异步状态）
+    //BIT0：总直流输出熔断器状态位：0 = 无故障，1 = 熔断；
+    //BIT1：总直流输出跳闸状态位：0 = 无故障，1 = 跳闸；
+    //BIT2：充电1路输出跳闸状态位；0 = 无故障，1 = 跳闸；
+    //BIT3：充电2路输出跳闸状态位；0 = 无故障，1 = 跳闸；
+    //BIT4：防雷器状态位；0 = 无故障，1 = 防雷器故障；
+    //剩余bit保留
+
+    unsigned char Flag_prtc7;   //充电断开类保护状态字节5：（异步状态）保留
+
+    unsigned char Flag_run1;   //当前运行状态字节1：
+    //BIT 0: 交流输入是否合闸： 0 = 分；1 = 合； //一般情况常1
+    //BIT 1：加热状态：    0 = 未加热；1 = 加热；
+    //BIT 2：风扇状态：  0 = 未启动； 1 = 启动；
+    //BIT 3：总直流输出是否合闸：0 =分；1 =合；
+    //BIT 4：充电枪1合闸状态： 0 = 分； 1 = 合；
+    //BIT 5..6：充电枪1连接状态：00= 未连接； 1 1= 连接；01=连接保护状态；10= 连接异常
+    //BIT 7：充电枪1通信辅助电源合闸状态： 0 = 分； 1 = 合；
+
+    unsigned char Flag_run2;   //当前运行状态字节2：
+    //BIT 0：充电枪2合闸状态：0 = 分； 1 = 合；
+    //BIT 1..2：充电枪2连接状态：00 = 未连接； 11 = 连接；01=连接保护状态；10= 连接异常
+    //BIT 3：充电枪2通信辅助电源合闸状态： 0 = 分； 1 = 合；
+
+    unsigned char Flag_run3;   //当前运行状态字节3：保留 状态一共10字节
+
+    unsigned short crc;
+#endif
 };
 typedef enum {
     // 分离的，未连接
