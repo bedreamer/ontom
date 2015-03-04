@@ -1075,24 +1075,28 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     int lf = 0, nr = 12, n;
+    unsigned short kn;
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"modules\":[");
 
     for ( n = 0; n < CONFIG_SUPPORT_CHARGE_MODULE; n ++ ) {
+
+        kn = b2l(task->chargers[0]->chargers.charge_module_status[n/2]);
+
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "{\"V\":\"%.1f V\","
                  "\"I\":\"%.1f A\","
                  "\"T\":\"%.1f ℃\","
                  "\"N\":\"\%04X%04X%04X\""
-                 "\"S\":\"%s\"},",
+                 "\"S\":\"%04X\"},",
                 b2l(task->chargers[0]->chargers.charge_module_v[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_i[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_t[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_sn[n][0]),
                 b2l(task->chargers[0]->chargers.charge_module_sn[n][1]),
                 b2l(task->chargers[0]->chargers.charge_module_sn[n][2]),
-                "N/A"
+                kn
                 );
     }
 
