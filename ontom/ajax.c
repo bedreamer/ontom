@@ -971,7 +971,7 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
     struct error_history *te;
     struct list_head *head;
     char errname[32];
-    char sql[256];
+    char sql[256], *errmsg;
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
