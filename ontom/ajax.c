@@ -1002,6 +1002,8 @@ int sql_history_result(void *param, int nr, char **text, char **name)
             "\"ebt\":\"%s\",", text[3]);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"rbt\":\"%s\"},", text[5]);
+
+    return 0;
 }
 
 // 返回历史故障
