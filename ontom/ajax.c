@@ -988,11 +988,41 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
+int sql_history_result(void *param, int nr, char **text, char **name)
+{
+    struct ajax_xml_struct *thiz = (struct ajax_xml_struct *)param;
+    if ( nr <=0 ) return 0;
+    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+            "{\"hid\":\"%s\",", text[0]);
+    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+            "\"eid\":\"%s\",", text[1]);
+    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+            "\"estr\":\"%s\",", text[2]);
+    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+            "\"ebt\":\"%s\",", text[3]);
+    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+            "\"rbt\":\"%s\"},", text[5]);
+}
+
 // 返回历史故障
 int ajax_system_history_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
+    int lf = 0, nr = 16;
+    char sql[256] = {0};
 
+    spritf(sql, "select * from errors limit %d,%d", lf, nr);
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
+    ret = sqlite3_exec(task->database, sql, sql_history_result, thiz, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+        ret = ERR_ERR;
+    }
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
     return ret;
 }
 
