@@ -992,15 +992,15 @@ int sql_history_result(void *param, int nr, char **text, char **name)
 {
     struct ajax_xml_struct *thiz = (struct ajax_xml_struct *)param;
     if ( nr <=0 ) return 0;
-    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"hid\":\"%s\",", text[0]);
-    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"eid\":\"%s\",", text[1]);
-    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"estr\":\"%s\",", text[2]);
-    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"ebt\":\"%s\",", text[3]);
-    thiz->xml_len += sprintf(thiz->iobuff[thiz->xml_len],
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"rbt\":\"%s\"},", text[5]);
 }
 
