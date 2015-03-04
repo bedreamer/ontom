@@ -997,11 +997,11 @@ int sql_history_result(void *param, int nr, char **text, char **name)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"eid\":\"%s\",", text[1]);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"estr\":\"%s\",", text[2]);
+            "\"estr\":\"%s\",", text[5]);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"ebt\":\"%s\",", text[3]);
+            "\"ebt\":\"%s\",", text[2]);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"rbt\":\"%s\"},", text[5]);
+            "\"rbt\":\"%s\"},", text[3]);
 
     return 0;
 }
