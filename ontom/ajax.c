@@ -1083,13 +1083,19 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
     for ( n = 0; n < CONFIG_SUPPORT_CHARGE_MODULE; n ++ ) {
 
         kn = b2l(task->chargers[0]->chargers.charge_module_status[n/2]);
+        if ( n % 2 ) {
+            kn = kn >> 8;
+        } else {
+            kn = kn & 0xFF;
+        }
 
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "{\"V\":\"%.1f V\","
                  "\"I\":\"%.1f A\","
                  "\"T\":\"%.1f ℃\","
                  "\"N\":\"\%d%d%d%d%d%d\""
-                 "\"S\":\"%04X\"},",
+                 "\"S\":\"%s\","
+                 "\"OF\":\"%s\"},",
                 b2l(task->chargers[0]->chargers.charge_module_v[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_i[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_t[n])/10.0f,
@@ -1099,7 +1105,8 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
                 task->chargers[0]->chargers.charge_module_sn[n][1]&0xFF,
                 task->chargers[0]->chargers.charge_module_sn[n][2]>>8,
                 task->chargers[0]->chargers.charge_module_sn[n][2]&0xFF,
-                kn
+                (kn & 0xF) ? "故障":"正常" ,
+                (kn >> 4) ? "关机" : "开机"
                 );
     }
 
