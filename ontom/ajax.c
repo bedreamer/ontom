@@ -996,7 +996,7 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
                     te->error_begin);
             sprintf(sql,
                     "select errordefine.comment from errordefine "
-                    "where errordefine.dec_val='%d' limit %d,%d", te->error_id, lf, nr);
+                    "where errordefine.dec_val='%d' limit %d,%d", te->error_id);
             ret = sqlite3_exec(task->database, sql, sql_current_error_result, thiz, &errmsg);
             if ( ret ) {
                 log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
