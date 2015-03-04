@@ -51,6 +51,7 @@ struct xml_generator {
     {"/system/error.json",      ajax_system_error_proc},
     {"/system/history.json",    ajax_system_history_proc},
     {"/system/about.json",      ajax_system_about_proc},
+    {"/system/modules.json",      ajax_module_query_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
