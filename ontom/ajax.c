@@ -1194,10 +1194,10 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"id\":\"%s\"", id);
 
     if ( j == NULL ) {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\",", id);
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"", id);
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\",");
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
     } else {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"", id);
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
         if ( j->job_status == JOB_WORKING ||
              j->job_status == JOB_ERR_PAUSE ||
              j->job_status == JOB_MAN_PAUSE ) {
