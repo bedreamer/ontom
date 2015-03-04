@@ -20,6 +20,9 @@ int ajax_debug_bit_write(struct ajax_xml_struct *thiz);
 int ajax_system_error_proc(struct ajax_xml_struct *thiz);
 int ajax_system_history_proc(struct ajax_xml_struct *thiz);
 int ajax_system_about_proc(struct ajax_xml_struct *thiz);
+
+int ajax_module_query_proc(struct ajax_xml_struct *thiz);
+
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz);
@@ -1063,6 +1066,38 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
 }
 
 int ajax_system_about_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    int lf = 0, nr = 12, n;
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"modules\":[");
+
+    for ( n = 0; n < CONFIG_SUPPORT_CHARGE_MODULE; n ++ ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                "{\"V\":\"%.1f V\","
+                 "\"I\":\"%.1f A\","
+                 "\"T\":\"%.1f ℃\","
+                 "\"N\":\"\%04X%04X%04X""
+                 "\"S\":\"%s\"},",
+                b2l(task->chargers[0]->chargers.charge_module_v[i])/10.0f,
+                b2l(task->chargers[0]->chargers.charge_module_i[i])/10.0f,
+                b2l(task->chargers[0]->chargers.charge_module_t[i])/10.0f,
+                task->chargers[0]->chargers.charge_module_sn[0],
+                task->chargers[0]->chargers.charge_module_sn[1],
+                task->chargers[0]->chargers.charge_module_sn[2],
+                "N/A"
+                );
+    }
+
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
+    return ret;
+}
+
+int ajax_module_query_proc(struct ajax_xml_struct *thiz)
 {
 }
 
