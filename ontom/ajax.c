@@ -975,9 +975,6 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
-    sprintf(sql,
-            "select errors.*,errordefine.comment from errors,errordefine "
-            "where errors.error_id=errordefine.dec_val limit %d,%d", lf, nr);
     thiz->ct = "application/json";
 
     pthread_mutex_lock(&task->err_list_lck);
