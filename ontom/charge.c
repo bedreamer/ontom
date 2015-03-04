@@ -1097,7 +1097,7 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
 
     __get_timestamp(timestamp);
     strcpy(thiz->error_begin, timestamp);
-    sprintf(sql, "INSERT INTO errors VALUES('%d','E%04X','%s','%s','ERROR')",
+    sprintf(sql, "INSERT INTO errors VALUES('%d','%d','%s','%s','ERROR')",
             thiz->error_seqid,
             thiz->error_id,
             thiz->error_begin,
@@ -1140,11 +1140,10 @@ del:
         task->err_head = NULL;
     }
     __get_timestamp(timestamp);
-    sprintf(errname, "E%04X", thiz->error_id);
     sprintf(sql,
             "UPDATE errors SET "
             "error_recover='%s',recover_reason='NORMAL' "
-            "WHERE error_id='E%04X' AND error_begin='%s'",
+            "WHERE error_id='%d' AND error_begin='%s'",
             timestamp, thiz->error_id,
             thiz->error_begin);
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
