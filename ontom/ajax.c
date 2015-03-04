@@ -1078,7 +1078,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
                 "{\"V\":\"%.1f V\","
                  "\"I\":\"%.1f A\","
                  "\"T\":\"%.1f ℃\","
-                 "\"N\":\"\%04X%04X%04X""
+                 "\"N\":\"\%04X%04X%04X\""
                  "\"S\":\"%s\"},",
                 b2l(task->chargers[0]->chargers.charge_module_v[i])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_i[i])/10.0f,
