@@ -1204,60 +1204,60 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         }
         if ( box->yx_assit_power_stat ) {
             len += sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
-            bit_set(task, S_ASSIT_POWER_DOWN);
+            bit_set(task, S_ASSIT_PWN_ERR);
         } else {
-            bit_clr(task, S_ASSIT_POWER_DOWN);
+            bit_clr(task, S_ASSIT_PWN_ERR);
         }
         if ( box->yx_temprature == 1 ) {
             len += sprintf(&errstr[len], "[%d: 温度过高] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_TEMP_HI);
+            bit_set(task, S_TEMP_HI);
         } else if ( box->yx_temprature == 2 ) {
             len += sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_TEMP_LO);
+            bit_set(task, S_TEMP_LO);
         } else {
-            bit_clr(task, S_CHARGE_BOX_TEMP_HI);
-            bit_clr(task, S_CHARGE_BOX_TEMP_LO);
+            bit_clr(task, S_TEMP_HI);
+            bit_clr(task, S_TEMP_LO);
         }
         if ( box->yx_wet_rate == 1 ) {
             len = sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_WET_HI);
+            bit_set(task, S_WET_HI);
         } else if ( box->yx_wet_rate == 2 ) {
             len += sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_WET_LO);
+            bit_set(task, S_WET_LO);
         } else {
-            bit_clr(task, S_CHARGE_BOX_WET_HI);
-            bit_clr(task, S_CHARGE_BOX_WET_LO);
+            bit_clr(task, S_WET_HI);
+            bit_clr(task, S_WET_LO);
         }
 
         if ( box->yx_rdq ) {
             len += sprintf(&errstr[len], "[%d: 总输出熔断器熔断] ", ++errnr);
-            bit_set(task, S_DC_RDQ_BREAK);
+            bit_set(task, S_DC_OUTPUT_RD);
         } else {
-            bit_clr(task, S_DC_RDQ_BREAK);
+            bit_clr(task, S_DC_OUTPUT_RD);
         }
         if ( box->yx_dc_output_tiaozha ) {
             len += sprintf(&errstr[len], "[%d: 总输出跳闸] ", ++errnr);
-            bit_set(task, S_DC_SW_TRIP);
+            bit_set(task, S_DC_OUTPUT_TRIP);
         } else {
-            bit_clr(task, S_DC_SW_TRIP);
+            bit_clr(task, S_DC_OUTPUT_TRIP);
         }
         if ( box->yx_dc_output_tiaozha1 ) {
             len += sprintf(&errstr[len], "[%d: 一路输出跳闸] ", ++errnr);
-            bit_set(task, S_GUN_1_SW_TRIP);
+            bit_set(task, S_DC_OUTPUT_0_TRIP);
         } else {
-            bit_clr(task, S_GUN_1_SW_TRIP);
+            bit_clr(task, S_DC_OUTPUT_0_TRIP);
         }
         if ( box->yx_dc_output_tiaozha2 ) {
             len += sprintf(&errstr[len], "[%d: 二路输出跳闸] ", ++errnr);
-            bit_set(task, S_GUN_2_SW_TRIP);
+            bit_set(task, S_DC_OUTPUT_1_TRIP);
         } else {
-            bit_clr(task, S_GUN_2_SW_TRIP);
+            bit_clr(task, S_DC_OUTPUT_1_TRIP);
         }
         if ( box->yx_flq ) {
             len += sprintf(&errstr[len], "[%d: 防雷器故障] ", ++errnr);
-            bit_set(task, S_FANGLEIQI_BREAK);
+            bit_set(task, S_FLQ_ERROR);
         } else {
-            bit_clr(task, S_FANGLEIQI_BREAK);
+            bit_clr(task, S_FLQ_ERROR);
         }
 
         if ( errnr ) {
@@ -1413,117 +1413,171 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         box = &me->measure->measure;
         me_pre = &me->measure->measure_pre_copy;
         if ( box->Flag_prtc1 & 0x01 ) {
-            len += sprintf(&errstr[len], "[%d: 母线过压] ", ++errnr);
-            bit_set(task, S_BUS_V_HI);
+            len += sprintf(&errstr[len], "[%d: 母线0过压] ", ++errnr);
+            bit_set(task, S_BUS_0_VHI);
         } else {
-            bit_clr(task, S_BUS_V_HI);
+            bit_clr(task, S_BUS_0_VHI);
         }
         if ( box->Flag_prtc1 & 0x02 ) {
-            len += sprintf(&errstr[len], "[%d: 母线欠压] ", ++errnr);
-            bit_set(task, S_BUS_V_LO);
+            len += sprintf(&errstr[len], "[%d: 母线0欠压] ", ++errnr);
+            bit_set(task, S_BUS_0_VLO);
         } else {
-            bit_clr(task, S_BUS_V_LO);
+            bit_clr(task, S_BUS_0_VLO);
         }
         if ( box->Flag_prtc1 & 0x04 ) {
-            len += sprintf(&errstr[len], "[%d: 母线短路] ", ++errnr);
-            bit_set(task, S_BUS_SHORTED);
+            len += sprintf(&errstr[len], "[%d: 母线0短路] ", ++errnr);
+            bit_set(task, S_BUS_0_SHORT);
         } else {
-            bit_clr(task, S_BUS_SHORTED);
+            bit_clr(task, S_BUS_0_SHORT);
+        }
+        if ( box->Flag_prtc1 & 0x08 ) {
+            len += sprintf(&errstr[len], "[%d: 母线1过压] ", ++errnr);
+            bit_set(task, S_BUS_1_VHI);
+        } else {
+            bit_clr(task, S_BUS_1_VHI);
+        }
+        if ( box->Flag_prtc1 & 0x10 ) {
+            len += sprintf(&errstr[len], "[%d: 母线1欠压] ", ++errnr);
+            bit_set(task, S_BUS_1_VLO);
+        } else {
+            bit_clr(task, S_BUS_1_VLO);
+        }
+        if ( box->Flag_prtc1 & 0x20 ) {
+            len += sprintf(&errstr[len], "[%d: 母线1短路] ", ++errnr);
+            bit_set(task, S_BUS_1_SHORT);
+        } else {
+            bit_clr(task, S_BUS_1_SHORT);
         }
 
         if ( box->Flag_prtc2 & 0x01 ) {
-            len += sprintf(&errstr[len], "[%d: 电池过压] ", ++errnr);
-            bit_set(task, S_BAT_V_HI);
+            len += sprintf(&errstr[len], "[%d: 电池0过压] ", ++errnr);
+            bit_set(task, S_BAT_0_VHI);
         } else {
-            bit_clr(task, S_BAT_V_HI);
+            bit_clr(task, S_BAT_0_VHI);
         }
         if ( box->Flag_prtc2 & 0x02 ) {
-            len += sprintf(&errstr[len], "[%d: 电池欠压] ", ++errnr);
-            bit_set(task, S_BAT_V_LO);
+            len += sprintf(&errstr[len], "[%d: 电池0欠压] ", ++errnr);
+            bit_set(task, S_BAT_0_VLO);
         } else {
-            bit_clr(task, S_BAT_V_LO);
+            bit_clr(task, S_BAT_0_VLO);
         }
         if ( box->Flag_prtc2 & 0x04 ) {
-            len += sprintf(&errstr[len], "[%d: 电池链接短路] ", ++errnr);
-            bit_set(task, S_BAT_SHORTED);
+            len += sprintf(&errstr[len], "[%d: 电池0链接短路] ", ++errnr);
+            bit_set(task, S_BAT_0_SHORT);
         } else {
-            bit_clr(task, S_BAT_SHORTED);
+            bit_clr(task, S_BAT_0_SHORT);
         }
         if ( box->Flag_prtc2 & 0x08 ) {
-            len += sprintf(&errstr[len], "[%d: 电池反接] ", ++errnr);
-            bit_set(task, S_BAT_REVERT_CONN);
+            len += sprintf(&errstr[len], "[%d: 电池0反接] ", ++errnr);
+            bit_set(task, S_BAT_0_REVERT);
         } else {
-            bit_clr(task, S_BAT_REVERT_CONN);
+            bit_clr(task, S_BAT_0_REVERT);
+        }
+        if ( box->Flag_prtc2 & 0x10 ) {
+            len += sprintf(&errstr[len], "[%d: 电池0绝缘接地] ", ++errnr);
+            bit_set(task, S_BAT_0_INSTITUDE);
+        } else {
+            bit_clr(task, S_BAT_0_INSTITUDE);
         }
         if ( box->Flag_prtc2 & 0x20 ) {
-            len += sprintf(&errstr[len], "[%d: 电池过流] ", ++errnr);
-            bit_set(task, S_BAT_I_HI);
+            len += sprintf(&errstr[len], "[%d: 电池0过流] ", ++errnr);
+            bit_set(task, S_BAT_0_IHI);
         } else {
-            bit_clr(task, S_BAT_I_HI);
+            bit_clr(task, S_BAT_0_IHI);
+        }
+        if ( box->Flag_prtc3 & 0x01 ) {
+            len += sprintf(&errstr[len], "[%d: 电池1过压] ", ++errnr);
+            bit_set(task, S_BAT_1_VHI);
+        } else {
+            bit_clr(task, S_BAT_1_VHI);
+        }
+        if ( box->Flag_prtc3 & 0x02 ) {
+            len += sprintf(&errstr[len], "[%d: 电池1欠压] ", ++errnr);
+            bit_set(task, S_BAT_1_VLO);
+        } else {
+            bit_clr(task, S_BAT_1_VLO);
+        }
+        if ( box->Flag_prtc3 & 0x04 ) {
+            len += sprintf(&errstr[len], "[%d: 电池1链接短路] ", ++errnr);
+            bit_set(task, S_BAT_1_SHORT);
+        } else {
+            bit_clr(task, S_BAT_1_SHORT);
+        }
+        if ( box->Flag_prtc3 & 0x08 ) {
+            len += sprintf(&errstr[len], "[%d: 电池1反接] ", ++errnr);
+            bit_set(task, S_BAT_1_REVERT);
+        } else {
+            bit_clr(task, S_BAT_1_REVERT);
+        }
+        if ( box->Flag_prtc3 & 0x10 ) {
+            len += sprintf(&errstr[len], "[%d: 电池1绝缘接地] ", ++errnr);
+            bit_set(task, S_BAT_1_INSTITUDE);
+        } else {
+            bit_clr(task, S_BAT_1_INSTITUDE);
+        }
+        if ( box->Flag_prtc3 & 0x20 ) {
+            len += sprintf(&errstr[len], "[%d: 电池1过流] ", ++errnr);
+            bit_set(task, S_BAT_1_IHI);
+        } else {
+            bit_clr(task, S_BAT_1_IHI);
         }
 
-        if ( box->Flag_prtc2 & 0x10 ) {
-            len += sprintf(&errstr[len], "[%d: 电池绝缘接地] ", ++errnr);
-            bit_set(task, S_INSTITUDE_ERR);
-        } else {
-            bit_clr(task, S_INSTITUDE_ERR);
-        }
         if ( box->Flag_prtc4 & 0x01 ) {
             len += sprintf(&errstr[len], "[%d: 辅助电源故障] ", ++errnr);
-            bit_set(task, S_ASSIT_POWER_DOWN);
+            bit_set(task, S_ASSIT_PWN_ERR);
         } else {
-            bit_clr(task, S_ASSIT_POWER_DOWN);
+            bit_clr(task, S_ASSIT_PWN_ERR);
         }
         if ( ((box->Flag_prtc4 & (0x02|0x04)) >> 1) == 1 ) {
             len += sprintf(&errstr[len], "[%d: 温度过高] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_TEMP_HI);
+            bit_set(task, S_TEMP_HI);
         } else if ( ((box->Flag_prtc4 & (0x02|0x04)) >> 1) == 2 ) {
             len += sprintf(&errstr[len], "[%d: 温度过低] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_TEMP_LO);
+            bit_set(task, S_TEMP_LO);
         } else {
-            bit_clr(task, S_CHARGE_BOX_TEMP_HI);
-            bit_clr(task, S_CHARGE_BOX_TEMP_LO);
+            bit_clr(task, S_TEMP_HI);
+            bit_clr(task, S_TEMP_LO);
         }
         if ( ((box->Flag_prtc4 & (0x02|0x04)) >> 3) == 1 ) {
             len = sprintf(&errstr[len], "[%d: 湿度过高] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_WET_HI);
+            bit_set(task, S_WET_HI);
         } else if ( ((box->Flag_prtc4 & (0x02|0x04)) >> 3) == 2 ) {
             len += sprintf(&errstr[len], "[%d: 湿度过低] ", ++errnr);
-            bit_set(task, S_CHARGE_BOX_WET_LO);
+            bit_set(task, S_WET_LO);
         } else {
-            bit_clr(task, S_CHARGE_BOX_WET_HI);
-            bit_clr(task, S_CHARGE_BOX_WET_LO);
+            bit_clr(task, S_WET_HI);
+            bit_clr(task, S_WET_LO);
         }
 
         if ( box->Flag_prtc6 & 0x01 ) {
             len += sprintf(&errstr[len], "[%d: 总输出熔断器熔断] ", ++errnr);
-            bit_set(task, S_DC_RDQ_BREAK);
+            bit_set(task, S_DC_OUTPUT_RD);
         } else {
-            bit_clr(task, S_DC_RDQ_BREAK);
+            bit_clr(task, S_DC_OUTPUT_RD);
         }
         if ( box->Flag_prtc6 & 0x02 ) {
             len += sprintf(&errstr[len], "[%d: 总输出跳闸] ", ++errnr);
-            bit_set(task, S_DC_SW_TRIP);
+            bit_set(task, S_DC_OUTPUT_TRIP);
         } else {
-            bit_clr(task, S_DC_SW_TRIP);
+            bit_clr(task, S_DC_OUTPUT_TRIP);
         }
         if ( box->Flag_prtc6 & 0x04 ) {
             len += sprintf(&errstr[len], "[%d: 一路输出跳闸] ", ++errnr);
-            bit_set(task, S_GUN_1_SW_TRIP);
+            bit_set(task, S_DC_OUTPUT_0_TRIP);
         } else {
-            bit_clr(task, S_GUN_1_SW_TRIP);
+            bit_clr(task, S_DC_OUTPUT_0_TRIP);
         }
         if ( box->Flag_prtc6 & 0x08 ) {
             len += sprintf(&errstr[len], "[%d: 二路输出跳闸] ", ++errnr);
-            bit_set(task, S_GUN_2_SW_TRIP);
+            bit_set(task, S_DC_OUTPUT_1_TRIP);
         } else {
-            bit_clr(task, S_GUN_2_SW_TRIP);
+            bit_clr(task, S_DC_OUTPUT_1_TRIP);
         }
         if ( box->Flag_prtc6 & 0x10 ) {
             len += sprintf(&errstr[len], "[%d: 防雷器故障] ", ++errnr);
-            bit_set(task, S_FANGLEIQI_BREAK);
+            bit_set(task, S_FLQ_ERROR);
         } else {
-            bit_clr(task, S_FANGLEIQI_BREAK);
+            bit_clr(task, S_FLQ_ERROR);
         }
 
         if ( errnr ) {
@@ -1535,13 +1589,11 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             if ( ! (me_pre->Flag_run1 & 0x01) ) {
                 log_printf(INF, "采样盒: 交流开关合闸.");
             }
-            bit_set(task, S_AC_INPUT_DOWN);
             len += sprintf(&infstr[len], "[交流"GRN("合闸")"] ");
         } else {
             if ( me_pre->Flag_run1 & 0x01 ) {
                 log_printf(INF, "采样盒: 交流开关分闸.");
             }
-            bit_clr(task, S_AC_INPUT_DOWN);
             len += sprintf(&infstr[len], "[交流"RED("分闸")"] ");
         }
         if ( box->Flag_run1 & 0x02 ) {

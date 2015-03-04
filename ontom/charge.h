@@ -910,71 +910,119 @@ typedef enum {
     // }}
 
     // {{{ 故障标记
-    // 系统遥信量
-    S_ERROR             = 0x0100,
-    // 交流输入停电故障
-    S_AC_INPUT_DOWN,
-    // 辅助电源故障
-    S_ASSIT_POWER_DOWN,
-    // 充电屏监控通信中断
-    S_CHARGER_COMM_DOWN,
-    // 充电屏监控次要要信1通信中断
-    S_CHARGER_YX_1_COMM_DOWN,
-    // 充电屏监控次要要信2通信终端
-    S_CHARGER_YX_2_COMM_DOWN,
-    // 充电模块通信故障
-    S_CHARGE_MODULE_COMM_DOWN,
-    // 采样单元通信中断
-    S_MEASURE_COMM_DOWN,
     // BMS通信故障
     S_BMS_COMM_DOWN,
-    // 充电模块故障
-    S_CHARGE_MODULE_DOWN,
-    // 1# 充电枪物理连接故障
-    S_GUN_1_PYH_CONN_DOWN,
-    // 2# 充电枪物理连接故障
-    S_GUN_2_PYH_CONN_DOWN,
-    // 绝缘故障
-    S_INSTITUDE_ERR,
-    // 母线过压
-    S_BUS_V_HI,
-    // 母线欠压
-    S_BUS_V_LO,
-    // 母线短路
-    S_BUS_SHORTED,
-    // 电池过压
-    S_BAT_V_HI,
-    // 电池欠压
-    S_BAT_V_LO,
-    // 电池短路
-    S_BAT_SHORTED,
-    // 电池反接故障
-    S_BAT_REVERT_CONN,
-    // 电池过流
-    S_BAT_I_HI,
-    // 充电桩温度过高
-    S_CHARGE_BOX_TEMP_HI,
-    // 充电桩温度过低
-    S_CHARGE_BOX_TEMP_LO,
-    // 充电桩湿度过高
-    S_CHARGE_BOX_WET_HI,
-    // 充电桩湿度过低
-    S_CHARGE_BOX_WET_LO,
-    // 总输出熔断器熔断
-    S_DC_RDQ_BREAK,
-    // 总输出开关跳闸
-    S_DC_SW_TRIP,
-    // 1#枪输出开关跳闸
-    S_GUN_1_SW_TRIP,
-    // 2#枪输出开关跳闸
-    S_GUN_2_SW_TRIP,
-    // 防雷器故障
-    S_FANGLEIQI_BREAK,
-    // 故障截至标记
-    S_ERR_END,
     // }}}
-    FLAG_END
+    FLAG_END,
+
+    //总故障, 参照文档 -- 充电桩故障对照表
+    S_ERROR = 0x100,
+    S_BUS_0_VHI,
+    S_BUS_0_VLO,
+    S_BUS_0_SHORT,
+    S_BUS_1_VHI,
+    S_BUS_1_VLO,
+    S_BUS_1_SHORT,
+    S_BAT_0_VHI,
+    S_BAT_0_VLO,
+    S_BAT_0_SHORT,
+    S_BAT_0_REVERT,
+    S_BAT_0_INSTITUDE,
+    S_BAT_0_IHI,
+    S_BAT_1_VHI,
+    S_BAT_1_VLO,
+    S_BAT_1_SHORT,
+    S_BAT_1_REVERT,
+    S_BAT_1_INSTITUDE,
+    S_BAT_1_IHI,
+    S_ASSIT_PWN_ERR,
+    S_TEMP_HI,
+    S_TEMP_LO,
+    S_WET_HI,
+    S_WET_LO,
+    S_DC_OUTPUT_RD,
+    S_DC_OUTPUT_TRIP,
+    S_DC_OUTPUT_0_TRIP,
+    S_DC_OUTPUT_1_TRIP,
+    S_FLQ_ERROR,
+    S_CHARGE_GROUP_ERR,
+    S_CHARGE_M_1_ERR,
+    S_CHARGE_M_2_ERR,
+    S_CHARGE_M_3_ERR,
+    S_CHARGE_M_4_ERR,
+    S_CHARGE_M_5_ERR,
+    S_CHARGE_M_6_ERR,
+    S_CHARGE_M_7_ERR,
+    S_CHARGE_M_8_ERR,
+    S_CHARGE_M_9_ERR,
+    S_CHARGE_M_10_ERR,
+    S_CHARGE_M_11_ERR,
+    S_CHARGE_M_12_ERR,
+    S_CHARGE_M_13_ERR,
+    S_CHARGE_M_14_ERR,
+    S_CHARGE_M_15_ERR,
+    S_CHARGE_M_16_ERR,
+    S_CHARGE_M_17_ERR,
+    S_CHARGE_M_18_ERR,
+    S_CHARGE_M_19_ERR,
+    S_CHARGE_M_20_ERR,
+    system_reserve0,
+    system_reserve1,
+    system_reserve2,
+    system_reserve3,
+    system_reserve4,
+    system_reserve5,
+    system_reserve6,
+    system_reserve7,
+    system_reserve8,
+    system_reserve9,
+    system_reserve10,
+    system_reserve11,
+    system_reserve12,
+    system_reserve13,
+    system_reserve14,
+    system_reserve15,
+    system_reserve16,
+    system_reserve17,
+    system_reserve18,
+    system_reserve19,
+    system_reserve20,
+    S_CHARGER_COMM_DOWN,
+    S_CHARGER_YX_1_COMM_DOWN,
+    S_CHARGER_YX_2_COMM_DOWN,
+    S_MEASURE_COMM_DOWN,
+    S_CONVERT_BOX_COMM_DOWN,
+    system_reserve11,
+    system_reserve12,
+    system_reserve13,
+    system_reserve14,
+    system_reserve15,
+    system_reserve16,
+    system_reserve17,
+    system_reserve18,
+    system_reserve19,
+    system_reserve20,
+    system_reserve21,
+    system_reserve22,
+    system_reserve23,
+    system_reserve24,
+    system_reserve25,
+    system_reserve26,
+    system_reserve27,
+    system_reserve28,
+    system_reserve29,
+    system_reserve30,
+    system_reserve31,
+    system_reserve32,
+    system_reserve33,
+    system_reserve34,
+    system_reserve35,
+    S_END
 }ONTOM_FLAG_SINGLE;
+
+// 系统符号，故障定义
+typedef enum {
+}ONTOM_SINGLES;
 
 // 位设置
 static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
