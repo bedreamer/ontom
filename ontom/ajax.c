@@ -1080,9 +1080,9 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
                  "\"T\":\"%.1f ℃\","
                  "\"N\":\"\%04X%04X%04X\""
                  "\"S\":\"%s\"},",
-                b2l(task->chargers[0]->chargers.charge_module_v[i])/10.0f,
-                b2l(task->chargers[0]->chargers.charge_module_i[i])/10.0f,
-                b2l(task->chargers[0]->chargers.charge_module_t[i])/10.0f,
+                b2l(task->chargers[0]->chargers.charge_module_v[n])/10.0f,
+                b2l(task->chargers[0]->chargers.charge_module_i[n])/10.0f,
+                b2l(task->chargers[0]->chargers.charge_module_t[n])/10.0f,
                 task->chargers[0]->chargers.charge_module_sn[0],
                 task->chargers[0]->chargers.charge_module_sn[1],
                 task->chargers[0]->chargers.charge_module_sn[2],
