@@ -545,7 +545,6 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
 
     for ( ei = S_ERROR; ei < S_END; ei ++ ) {
         if ( bit_read(tsk, ei) ) {
-            fault_nr ++;
             error_history_begin(thiz, ei, "N/A");
         } else {
             error_history_recover(thiz, ei);
