@@ -58,8 +58,8 @@ CONFIG_DOMAIN_BEGIN
    // 充电模块个数
 {"charge_module_nr",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"14"}},
 {"charger_comm_methord",        C_STRING,   yes,    C_VALID,    .cuv.i=0,       {"CAN"}},
-{"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
-{"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5500"}},
+{"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5000"}},
+{"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5000"}},
 {"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"300"}},
 
 // 系统参数不应该出现在配置文件中, 仅供程序内部使用, 不公开
