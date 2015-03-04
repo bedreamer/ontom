@@ -737,6 +737,12 @@ struct error_history {
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);
 void error_history_recover(struct charge_job *job, unsigned int error_id);
 
+// 充电系统类型
+typedef enum {
+    SYSTEM_FENTISHI, // 分体式
+    SYSTEM_YITISHI   // 一体式
+}SYSTEM_TYPE;
+
 /*
  * 充电任务描述, 详细描述了系统的配置参数
  */
@@ -784,6 +790,7 @@ struct charge_task {
     volatile unsigned char pre_single[64];
 
     // {{ 以下为充电桩系统监控的配置数据
+    SYSTEM_TYPE sys_type;
     /* 充电冲突映射表
      * 充电冲突根据系统配置的充电枪个数确定, 目前系统最多支持4把枪
      *   -------------+-------------+---------------+-----------+----------+

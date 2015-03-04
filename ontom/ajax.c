@@ -19,6 +19,7 @@ int ajax_debug_bit_read(struct ajax_xml_struct *thiz);
 int ajax_debug_bit_write(struct ajax_xml_struct *thiz);
 int ajax_system_error_proc(struct ajax_xml_struct *thiz);
 int ajax_system_history_proc(struct ajax_xml_struct *thiz);
+int ajax_system_about_proc(struct ajax_xml_struct *thiz);
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz);
@@ -46,6 +47,7 @@ struct xml_generator {
     {"/system/query.json",      ajax_system_query_json_proc},
     {"/system/error.json",      ajax_system_error_proc},
     {"/system/history.json",    ajax_system_history_proc},
+    {"/system/about.json",      ajax_system_about_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -1037,6 +1039,10 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
     return ret;
+}
+
+int ajax_system_about_proc(struct ajax_xml_struct *thiz)
+{
 }
 
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
