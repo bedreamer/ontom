@@ -1011,7 +1011,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
     int lf = 0, nr = 16;
     char sql[256] = {0}, *errmsg;
 
-    spritf(sql, "select * from errors limit %d,%d", lf, nr);
+    sprintf(sql, "select * from errors limit %d,%d", lf, nr);
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
     ret = sqlite3_exec(task->database, sql, sql_history_result, thiz, &errmsg);
