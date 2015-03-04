@@ -1009,7 +1009,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     int lf = 0, nr = 16;
-    char sql[256] = {0};
+    char sql[256] = {0}, *errmsg;
 
     spritf(sql, "select * from errors limit %d,%d", lf, nr);
     thiz->ct = "application/json";
