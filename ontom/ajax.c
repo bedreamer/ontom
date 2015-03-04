@@ -1027,7 +1027,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
     }
 
     sprintf(sql,
-            "select errors.*,errordefine.comment from errors,errordefine"
+            "select errors.*,errordefine.comment from errors,errordefine "
             "where errors.error_id=errordefine.dec_val limit %d,%d", lf, nr);
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"history\":[");
