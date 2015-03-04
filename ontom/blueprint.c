@@ -2218,6 +2218,7 @@ continue_to_send:
 #else
                 usleep(1000 * thiz->master->time_to_send);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
+                __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 thiz->tx_param.payload_size = 0;
                 log_printf(DBG_LV0, "UART: packet send done.");
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
