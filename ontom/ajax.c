@@ -954,6 +954,15 @@ int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
+int sql_current_error_result(void *param, int nr, char **text, char **name)
+{
+    struct ajax_xml_struct *thiz = (struct ajax_xml_struct *)param;
+
+    if ( nr <=0 ) return 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"estr\":\"%s\"},", text[0]);
+    return 0;
+}
 
 // 返回当前故障
 int ajax_system_error_proc(struct ajax_xml_struct *thiz)
@@ -962,8 +971,14 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
     struct error_history *te;
     struct list_head *head;
     char errname[32];
+    char sql[256];
+
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
+    sprintf(sql,
+            "select errors.*,errordefine.comment from errors,errordefine "
+            "where errors.error_id=errordefine.dec_val limit %d,%d", lf, nr);
+    thiz->ct = "application/json";
 
     pthread_mutex_lock(&task->err_list_lck);
     if ( task->err_head != NULL ) {
@@ -972,13 +987,21 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
             te = list_load(struct error_history, error_me, head);
             // ...
             sprintf(errname, "E%04X", te->error_id);
+            char sql[256];
+
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "{\"eid\":\"%d\","
-                    "\"ebt\":\"%s\","
-                    "\"estr\":\"%s\"},",
+                    "\"ebt\":\"%s\",",
                     te->error_id,
-                    te->error_begin,
-                    config_read(errname));
+                    te->error_begin);
+            sprintf(sql,
+                    "select errordefine.comment from errordefine "
+                    "where errordefine.dec_val='%d' limit %d,%d", te->error_id, lf, nr);
+            ret = sqlite3_exec(task->database, sql, sql_current_error_result, thiz, &errmsg);
+            if ( ret ) {
+                log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+                ret = ERR_ERR;
+            }
             head = head->next;
         } while ( head != task->err_head );
     }
