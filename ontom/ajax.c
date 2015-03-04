@@ -1010,8 +1010,19 @@ int sql_history_result(void *param, int nr, char **text, char **name)
 int ajax_system_history_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    int lf = 0, nr = 16;
-    char sql[256] = {0}, *errmsg;
+    int lf = 0, nr = 12, n;
+    char sql[256] = {0}, *errmsg, buff[32];
+
+    mg_get_var(thiz->xml_conn, "p", buff, 8);
+    n = atoi(buff);
+    if ( n >= 0 ) {
+        lf = n;
+    }
+    mg_get_var(thiz->xml_conn, "n", buff, 8);
+    n = atoi(buff);
+    if ( n > 0 ) {
+        nr = n;
+    }
 
     sprintf(sql, "select * from errors limit %d,%d", lf, nr);
     thiz->ct = "application/json";
