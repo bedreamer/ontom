@@ -1020,10 +1020,6 @@ typedef enum {
     S_END
 }ONTOM_FLAG_SINGLE;
 
-// 系统符号，故障定义
-typedef enum {
-}ONTOM_SINGLES;
-
 // 位设置
 static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
