@@ -1068,6 +1068,11 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
 
 int ajax_system_about_proc(struct ajax_xml_struct *thiz)
 {
+
+}
+
+int ajax_module_query_proc(struct ajax_xml_struct *thiz)
+{
     int ret = ERR_OK;
     int lf = 0, nr = 12, n;
 
@@ -1084,9 +1089,9 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
                 b2l(task->chargers[0]->chargers.charge_module_v[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_i[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_t[n])/10.0f,
-                task->chargers[0]->chargers.charge_module_sn[0],
-                task->chargers[0]->chargers.charge_module_sn[1],
-                task->chargers[0]->chargers.charge_module_sn[2],
+                b2l(task->chargers[0]->chargers.charge_module_sn[0]),
+                b2l(task->chargers[0]->chargers.charge_module_sn[1]),
+                b2l(task->chargers[0]->chargers.charge_module_sn[2]),
                 "N/A"
                 );
     }
@@ -1096,10 +1101,6 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
     return ret;
-}
-
-int ajax_module_query_proc(struct ajax_xml_struct *thiz)
-{
 }
 
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
