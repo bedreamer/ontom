@@ -1094,11 +1094,11 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
                 b2l(task->chargers[0]->chargers.charge_module_i[n])/10.0f,
                 b2l(task->chargers[0]->chargers.charge_module_t[n])/10.0f,
                 task->chargers[0]->chargers.charge_module_sn[n][0]>>8,
-                task->chargers[0]->chargers.charge_module_sn[n][0],
+                task->chargers[0]->chargers.charge_module_sn[n][0]&0xFF,
                 task->chargers[0]->chargers.charge_module_sn[n][1]>>8,
-                task->chargers[0]->chargers.charge_module_sn[n][1],
+                task->chargers[0]->chargers.charge_module_sn[n][1]&0xFF,
                 task->chargers[0]->chargers.charge_module_sn[n][2]>>8,
-                task->chargers[0]->chargers.charge_module_sn[n][2],
+                task->chargers[0]->chargers.charge_module_sn[n][2]&0xFF,
                 kn
                 );
     }
