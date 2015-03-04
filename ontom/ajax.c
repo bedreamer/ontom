@@ -975,7 +975,7 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
-s
+
     pthread_mutex_lock(&task->err_list_lck);
     if ( task->err_head != NULL ) {
         head = task->err_head;
