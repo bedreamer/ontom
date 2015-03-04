@@ -1026,7 +1026,9 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
         nr = n;
     }
 
-    sprintf(sql, "select errors.* from errors limit %d,%d", lf, nr);
+    sprintf(sql,
+            "select errors.*,errordefine.comment from errors,errordefine"
+            "where errors.error_id=errordefine.dec_val limit %d,%d", lf, nr);
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"history\":[");
     ret = sqlite3_exec(task->database, sql, sql_history_result, thiz, &errmsg);
