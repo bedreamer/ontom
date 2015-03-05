@@ -1609,6 +1609,18 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         bit_clr(task, S_CONVERT_BOX_COMM_DOWN);
 
         memcpy(me->chargers->chargers.charge_module_v, &param->buff.rx_buff[3], 91 * 2);
+        do {
+            int i;
+
+            for ( i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+                me->chargers->chargers.charge_module_v[i] =
+                        b2l(me->chargers->chargers.charge_module_v);
+                me->chargers->chargers.charge_module_i[i] =
+                        b2l(me->chargers->chargers.charge_module_v);
+                me->chargers->chargers.charge_module_t[i] =
+                        b2l(me->chargers->chargers.charge_module_v);
+            }
+        } while (0);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
