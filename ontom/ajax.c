@@ -701,6 +701,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     static int doreset = 0;
+    char *p;
     thiz->ct = "application/json";
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
@@ -710,22 +711,42 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 版本
             "\"doreset\":%s,", doreset ? "false" : "true");
     doreset = 1;
+    if ( bit_read(task, S_ERROR) ) {
+        p = "故障";
+    } else {
+        p = "正常";
+    }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 系统状态
-            "\"system_status\":\"正常\",");
+            "\"system_status\":\"%s\",", p);
+    if ( bit_read(task, S_CHARGE_GROUP_ERR) ) {
+        p = "故障";
+    } else {
+        p = "正常";
+    }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 充电机状态
-            "\"charger_status\":\"正常\",");
+            "\"charger_status\":\"%s\",", p);
+    if ( bit_read(task, S_BAT_0_INSTITUDE) ) {
+        p = "故障";
+    } else {
+        p = "正常";
+    }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线绝缘状态
-            "\"bus0_institude\":\"正常\",");
+            "\"bus0_institude\":\"%s\",", p);
+    if ( bit_read(task, S_BAT_1_INSTITUDE) ) {
+        p = "故障";
+    } else {
+        p = "正常";
+    }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
-            "\"bus1_institude\":\"N/A\",");
+            "\"bus1_institude\":\"%s\",", p);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
             "\"bus0_V\":\"%.1f V\",", ((task->measure[0]->measure.VinKM0)&0x7FFF) / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
-            "\"bus1_V\":\"N/A\",");
+            "\"bus1_V\":\"%.1f\",", ((task->measure[0]->measure.VinKM1)&0x7FFF) / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电流
             "\"bus0_I\":\"%.1f A\",", ((task->measure[0]->measure.IoutBAT0)&0x7FFF) / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电流
-            "\"bus1_I\":\"N/A\",");
+            "\"bus1_I\":\"%.1f\",", ((task->measure[0]->measure.IoutBAT1)&0x7FFF) / 10.0f);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
             "\"card_sn\":\"%s\",", config_read("triger_card_sn"));
     config_write("triger_card_sn", "N/A");
