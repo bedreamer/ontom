@@ -778,9 +778,11 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
         memcpy(&me->chargers->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
         for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
             // 判断模块故障
-            param->buff.rx_buff[3] = param->buff.rx_buff[3] ^ param->buff.rx_buff[4];
-            param->buff.rx_buff[4] = param->buff.rx_buff[3] ^ param->buff.rx_buff[4];
-            param->buff.rx_buff[3] = param->buff.rx_buff[3] ^ param->buff.rx_buff[4];
+            if ( i % 2 == 0 ) {
+                param->buff.rx_buff[3 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
+                param->buff.rx_buff[4 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
+                param->buff.rx_buff[3 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
+            }
             if ( param->buff.rx_buff[i + 3] & 0x0F ) {
                 bit_set(task, S_CHARGE_M_1_ERR + i);
             } else {
