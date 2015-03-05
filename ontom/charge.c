@@ -442,6 +442,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     pthread_mutex_init(&task->wait_lck, NULL);
     pthread_mutex_init(&task->err_list_lck, NULL);
 
+    memset(task->single, 1, sizeof(task->single));
+
     while ( 1 ) {
         // 清除无效的作业
         job_detach_wait(task);
