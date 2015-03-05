@@ -1610,7 +1610,7 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 
         memcpy(me->chargers->chargers.charge_module_v, &param->buff.rx_buff[3], 91 * 2);
         do {
-            int i;
+            int i, j;
 
             for ( i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
                 me->chargers->chargers.charge_module_v[i] =
@@ -1619,6 +1619,10 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
                         b2l(me->chargers->chargers.charge_module_v[i]);
                 me->chargers->chargers.charge_module_t[i] =
                         b2l(me->chargers->chargers.charge_module_v[i]);
+                for ( j = 0; j < 3; j ++ ) {
+                    me->chargers->chargers.charge_module_sn[i][j] =
+                            b2l(me->chargers->chargers.charge_module_v[i][j]);
+                }
             }
         } while (0);
         break;
