@@ -1607,6 +1607,8 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
             log_printf(INF, "UART: "GRN("协议转换盒通信恢复."));
         }
         bit_clr(task, S_CONVERT_BOX_COMM_DOWN);
+
+        memcpy(me->chargers->chargers.charge_module_v, &param->buff.rx_buff[3], 91 * 2);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
