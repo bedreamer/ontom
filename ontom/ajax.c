@@ -1065,7 +1065,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
                     "{\"result\":\"error\"}]}");
         } else {
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                    "{\"history\":\"ok\"}]}");
+                    "{\"result\":\"ok\"}]}");
             task->err_seq_id_next = 0;
         }
 
