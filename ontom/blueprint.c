@@ -1594,8 +1594,8 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     case BP_EVT_TX_FRAME_REQUEST:
         buff[nr ++] = 0xFF;
         buff[nr ++] = 0x04;
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x03;
+        buff[nr ++] = 0xe8;
         buff[nr ++] = 0x00;
         buff[nr ++] = 0x5b;
         len = nr;
