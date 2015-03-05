@@ -1606,7 +1606,7 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         self->rx_param.need_bytes = 187;
         param->payload_size = nr;
 
-        self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
+        self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
@@ -1855,7 +1855,6 @@ ___fast_switch_2_rx:
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
                 }
-do_frame_check:
                 ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
                                           &thiz->rx_param);
                 switch ( ret ) {
@@ -1921,7 +1920,6 @@ do_frame_check:
                     log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
                                thiz->rx_param.need_bytes,
                                 thiz->rx_param.payload_size);
-                    goto do_frame_check;
                 } else {
                     log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
                                thiz->rx_param.need_bytes,
