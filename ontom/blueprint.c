@@ -1614,11 +1614,11 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 
             for ( i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
                 me->chargers->chargers.charge_module_v[i] =
-                        b2l(me->chargers->chargers.charge_module_v);
+                        b2l(me->chargers->chargers.charge_module_v[i]);
                 me->chargers->chargers.charge_module_i[i] =
-                        b2l(me->chargers->chargers.charge_module_v);
+                        b2l(me->chargers->chargers.charge_module_v[i]);
                 me->chargers->chargers.charge_module_t[i] =
-                        b2l(me->chargers->chargers.charge_module_v);
+                        b2l(me->chargers->chargers.charge_module_v[i]);
             }
         } while (0);
         break;
