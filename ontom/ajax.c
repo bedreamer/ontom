@@ -1037,6 +1037,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
     int ret = ERR_OK;
     int lf = 0, nr = 12, n;
     char sql[256] = {0}, *errmsg, buff[32];
+    thiz->ct = "application/json";
 
     mg_get_var(thiz->xml_conn, "p", buff, 8);
     n = atoi(buff);
@@ -1048,11 +1049,33 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
     if ( n > 0 ) {
         nr = n;
     }
+    mg_get_var(thiz->xml_conn, "clean", buff, 8);
+    if ( 0 =strcmp("true", buff) ) {
+        // 清除历史故障
+        sprintf(sql, "delete from errors");
+        ret = sqlite3_exec(task->database, sql, NULL, NULL, &errmsg);
+        if ( ret ) {
+            log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+            ret = ERR_ERR;
+        }
+
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"history\":[");
+        if ( ret ) {
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                    "{\"result\":\"error\"}]}");
+        } else {
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                    "{\"history\":\"ok\"}]}");
+            task->err_seq_id_next = 0;
+        }
+
+        ret = ERR_OK;
+        return ret;
+    }
 
     sprintf(sql,
             "select errors.*,errordefine.comment from errors,errordefine "
             "where errors.error_id=errordefine.dec_val limit %d,%d", lf, nr);
-    thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"history\":[");
     ret = sqlite3_exec(task->database, sql, sql_history_result, thiz, &errmsg);
     if ( ret ) {
