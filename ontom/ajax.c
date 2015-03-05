@@ -1050,7 +1050,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
         nr = n;
     }
     mg_get_var(thiz->xml_conn, "clean", buff, 8);
-    if ( 0 =strcmp("true", buff) ) {
+    if ( 0 == strcmp("true", buff) ) {
         // 清除历史故障
         sprintf(sql, "delete from errors");
         ret = sqlite3_exec(task->database, sql, NULL, NULL, &errmsg);
