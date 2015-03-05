@@ -1093,7 +1093,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
                 "{\"V\":\"%.1f V\","
                  "\"I\":\"%.1f A\","
                  "\"T\":\"%.1f ℃\","
-                 "\"N\":\"\%d%d%d%d%d%d\""
+                 "\"N\":\"\%d%d%d%d%d%d\","
                  "\"S\":\"%s\","
                  "\"OF\":\"%s\"},",
                 b2l(task->chargers[0]->chargers.charge_module_v[n])/10.0f,
