@@ -1624,6 +1624,10 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
                             b2l(me->chargers->chargers.charge_module_sn[i][j]);
                 }
             }
+            for ( i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE / 2; i ++ ) {
+                me->chargers->chargers.charge_module_status[i] =
+                        b2l(me->chargers->chargers.charge_module_status[i]);
+            }
         } while (0);
         break;
     // 串口发送数据请求
