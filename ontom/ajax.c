@@ -1067,6 +1067,33 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "{\"result\":\"ok\"}]}");
             task->err_seq_id_next = 0;
+
+            do {
+                struct error_history *te;
+                struct list_head *head;
+                pthread_mutex_lock(&task->err_list_lck);
+                if ( task->err_head != NULL ) {
+                    head = task->err_head;
+                    do {
+                        te = list_load(struct error_history, error_me, head);
+                        char sql[256];
+
+                        te->error_seqid = task->err_seq_id_next ++;
+                        sprintf(sql,
+                                "INSERT INTO errors VALUES('%d','%d','%s','%s','ERROR')",
+                                te->error_seqid,
+                                te->error_id,
+                                te->error_begin,
+                                te->error_recover);
+                        ret = sqlite3_exec(task->database, sql, sql_current_error_result, thiz, &errmsg);
+                        if ( ret ) {
+                            log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+                        }
+                        head = head->next;
+                    } while ( head != task->err_head );
+                }
+                pthread_mutex_unlock (&task->err_list_lck);
+            } while (0);
         }
 
         ret = ERR_OK;
