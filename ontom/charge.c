@@ -543,14 +543,21 @@ __panic:
 
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz)
 {
-    int ei;
+    int ei, n = 0;
 
-    for ( ei = S_ERROR; ei < S_END; ei ++ ) {
+    for ( ei = S_ERROR + 1; ei < S_END; ei ++ ) {
         if ( bit_read(tsk, ei) ) {
             error_history_begin(thiz, ei, "N/A");
+            n ++;
         } else {
             error_history_recover(thiz, ei);
         }
+    }
+
+    if ( n ) {
+        bit_set(task, S_ERROR);
+    } else {
+        bit_clr(task, S_ERROR);
     }
     return;
 }
