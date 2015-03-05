@@ -1855,6 +1855,7 @@ ___fast_switch_2_rx:
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
                 }
+do_frame_check:
                 ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
                                           &thiz->rx_param);
                 switch ( ret ) {
@@ -1920,6 +1921,7 @@ ___fast_switch_2_rx:
                     log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
                                thiz->rx_param.need_bytes,
                                 thiz->rx_param.payload_size);
+                    goto do_frame_check;
                 } else {
                     log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
                                thiz->rx_param.need_bytes,
