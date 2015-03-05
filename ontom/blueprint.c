@@ -1626,9 +1626,11 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
