@@ -686,6 +686,9 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
         memcpy(&me->chargers->chargers, &param->buff.rx_buff[3], 100);
         if ( me->chargers->chargers.charger_status!= 0) {
             log_printf(WRN, "UART: 充电机组故障.");
+            bit_set(task, S_CHARGE_GROUP_ERR);
+        } else {
+            bit_clr(task, S_CHARGE_GROUP_ERR);
         }
         break;
     // 串口发送数据请求
@@ -743,7 +746,7 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
 int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR;
+    int ret = ERR_ERR, i;
     char buff[8];
 
     switch (evt) {
@@ -773,6 +776,14 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要50-100)恢复"));
         }
         memcpy(&me->chargers->chargers.charge_module_status, &param->buff.rx_buff[3], 100);
+        for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+            // 判断模块故障
+            if ( param->buff.rx_buff[i + 3] & 0x0F ) {
+                bit_set(task, S_CHARGE_M_1_ERR + i);
+            } else {
+                bit_clr(task, S_CHARGE_M_1_ERR + i);
+            }
+        }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
