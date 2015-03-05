@@ -1849,6 +1849,10 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
 int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
+    static int mode = 0;
+    char buff[32];
+    int nr = 0, len;
+
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1858,9 +1862,39 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( mode == 0 ) {
+            mode = 1;
+        } else {
+            mode = 0;
+        }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        buff[nr ++] = 0x01;
+        buff[nr ++] = 0x04;
+        if ( 0 == mode ) {
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 49;
+            self->rx_param.need_bytes = 49 * 2 + 4;
+        } else {
+            buff[nr ++] = 0x04;
+            buff[nr ++] = 0x19;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 42;
+            self->rx_param.need_bytes = 42 * 2 + 4;
+        }
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
+        ret = ERR_OK;
+        log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -1872,6 +1906,11 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        if ( mode == 0 ) {
+            mode = 1;
+        } else {
+            mode = 0;
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -1879,6 +1918,11 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         break;
     // 帧校验失败
     case BP_EVT_FRAME_CHECK_ERROR:
+        if ( mode == 0 ) {
+            mode = 1;
+        } else {
+            mode = 0;
+        }
         break;
     default:
         log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);

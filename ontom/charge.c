@@ -284,6 +284,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
         task->chargers[0] = (struct charger_struct *)malloc(sizeof(struct charger_struct));
         task->measure[0] = (struct measure_struct *)malloc(sizeof(struct measure_struct));
+        task->sys_type = SYSTEM_YITISHI;
 
         do {
             struct bp_user u = {0};
