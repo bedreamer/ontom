@@ -1621,7 +1621,7 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
                         b2l(me->chargers->chargers.charge_module_v[i]);
                 for ( j = 0; j < 3; j ++ ) {
                     me->chargers->chargers.charge_module_sn[i][j] =
-                            b2l(me->chargers->chargers.charge_module_v[i][j]);
+                            b2l(me->chargers->chargers.charge_module_sn[i][j]);
                 }
             }
         } while (0);
