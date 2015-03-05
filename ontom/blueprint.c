@@ -1603,6 +1603,10 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+            log_printf(INF, "UART: "GRN("协议转换盒通信恢复."));
+        }
+        bit_clr(task, S_CONVERT_BOX_COMM_DOWN);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -1636,6 +1640,16 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        if ( self->master->died < self->master->died_line ) {
+            //self->master->died ++;
+        } else {
+            //self->master->died ++;
+            if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+            }
+            log_printf(ERR, "UART: "RED("协议转换盒通信中断, 请排查故障,(%d)"), self->master->died);
+            bit_set(task, S_CONVERT_BOX_COMM_DOWN);
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
