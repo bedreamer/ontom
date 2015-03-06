@@ -1581,6 +1581,7 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 {
     char buff[32];
     int nr = 0, len;
+    int i, j;
 
     int ret = ERR_ERR;
     switch (evt) {
@@ -1612,7 +1613,6 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 
         memcpy(me->chargers->chargers.charge_module_v, &param->buff.rx_buff[3], 91 * 2);
         do {
-            int i, j;
 
             for ( i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
                 me->chargers->chargers.charge_module_v[i] =
@@ -1631,6 +1631,20 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
                         b2l(me->chargers->chargers.charge_module_status[i]);
             }
         } while (0);
+
+        for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+            // 判断模块故障
+            if ( i % 2 == 0 ) {
+                param->buff.rx_buff[3 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
+                param->buff.rx_buff[4 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
+                param->buff.rx_buff[3 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
+            }
+            if ( param->buff.rx_buff[i + 3] & 0x0F ) {
+                bit_set(task, S_CHARGE_M_1_ERR + i);
+            } else {
+                bit_clr(task, S_CHARGE_M_1_ERR + i);
+            }
+        }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
