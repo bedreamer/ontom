@@ -1738,8 +1738,8 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = (unsigned short)((10 * (task->running_V))) & 0xFF;
         buff[nr ++] = (unsigned short)((10 * (task->running_I))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->running_I))) & 0xFF;
-        buff[nr ++] = task->modules_nr >> 8;
         buff[nr ++] = task->modules_nr & 0xFF;
+        buff[nr ++] = task->modules_nr >> 8;
         buff[nr ++] = task->charge_stat >> 8;
         buff[nr ++] = task->charge_stat & 0xFF;
 
