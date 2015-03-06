@@ -1634,7 +1634,7 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 
         for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
             // 判断模块故障
-            if ( param->buff.rx_buff[i + 3] & 0x0F ) {
+            if ( param->buff.rx_buff[i + 100] & 0x0F ) {
                 bit_set(task, S_CHARGE_M_1_ERR + i);
             } else {
                 bit_clr(task, S_CHARGE_M_1_ERR + i);
