@@ -35,6 +35,9 @@ ____reinit:
         sleep(2);
 
         if ( 0 == initok ) {
+            while ( 1 ) {
+                sleep(2);
+            }
             goto ____reinit;
             continue;
         }
