@@ -1161,7 +1161,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
         mg_get_var(thiz->xml_conn, "sn", buff, 8);
         n = atoi(buff);
         if ( n >= 0 && n < CONFIG_SUPPORT_CHARGE_MODULE) {
-            __bit_clr(&task->modules_on_off, n);
+            __bit_set(&task->modules_on_off, n);
             bit_set(task, CMD_MODULE_OFF);
         }
     }
