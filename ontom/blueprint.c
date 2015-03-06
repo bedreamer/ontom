@@ -309,11 +309,12 @@ static inline void __dump_uart_hex(char *hex, int len, unsigned int lv)
 
     while ( i < len) {
         if ( j ++ < 20 )
-            l += sprintf(&buff[l], "%02X ", hex[i++]);
+            l += sprintf(&buff[l], "%02X ", hex[i]);
         else {
             j = 0;
-            l += sprintf(&buff[l], "%02X\n", hex[i++]);
+            l += sprintf(&buff[l], "%02X\n", hex[i]);
         }
+        i ++;
     }
 
     log_printf(lv, "UART:%d \n%s", len, buff);
