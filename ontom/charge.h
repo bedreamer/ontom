@@ -829,6 +829,26 @@ struct charge_task {
     unsigned int sys_rs485_dev_nr;
     /*通信用485串口设备文件名*/
     char sys_uart_name[CONFIG_SUPPORT_RS485_NR][128];
+
+    /*额定电流*/
+    double max_output_I;
+    /*输出限流*/
+    double limit_output_I;
+    /*电压上限值*/
+    double limit_max_V;
+    /*电压下限值*/
+    double limit_min_V;
+    /*工作电压值*/
+    double running_V;
+    /*当前电流值*/
+    double running_I;
+    /*模块个数*/
+    unsigned short modules_nr;
+    /*充电状态*/
+    unsigned short charge_stat;
+
+    /*模块开关机*/
+    unsigned short modules_on_off;
     //}}
 };
 

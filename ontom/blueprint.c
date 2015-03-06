@@ -1691,6 +1691,9 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
+    char buff[32];
+    int nr = 0, len;
+
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1703,9 +1706,45 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        buff[nr ++] = 0xFF;
+        buff[nr ++] = 0x10;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x09;
+        buff[nr ++] = 0x12;
+
+        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->running_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->running_V))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->running_I))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->running_I))) & 0xFF;
+        buff[nr ++] = task->modules_nr >> 8;
+        buff[nr ++] = task->modules_nr & 0xFF;
+        buff[nr ++] = task->charge_stat >> 8;
+        buff[nr ++] = task->charge_stat & 0xFF;
+
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        self->rx_param.need_bytes = 0;
+        param->payload_size = nr;
+
+        self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
+        ret = ERR_OK;
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
@@ -2069,12 +2108,7 @@ continue_to_send:
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
-#if 0
-                thiz->tx_seed.ttl = thiz->tx_param.payload_size +
-                        (thiz->tx_param.payload_size % 10 ? 2 : 1);
-#else
                 thiz->tx_seed.ttl = thiz->master->time_to_send;
-#endif
 
 #if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
                 Hachiko_resume( & thiz->tx_seed );
@@ -2102,6 +2136,7 @@ continue_to_send:
                     thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                     thiz->tx_param.payload_size = 0;
                     thiz->tx_param.cursor = 0;
+                    usleep(4 * 1000);
                 }
 #endif
             } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {

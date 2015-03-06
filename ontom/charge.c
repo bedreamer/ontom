@@ -121,7 +121,25 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
                 strcpy(task->sys_uart_name[0], "/dev/ttyO4");
                 strcpy(task->sys_uart_name[1], "/dev/ttyO5");
             }
-        } else {
+        } else if ( 0 == strcmp(text[1], "system_type") ) {
+            task->sys_type = SYSTEM_FENTISHI;
+            if ( 0 == strcmp(text[3], "分体式") ) {
+                task->sys_type = SYSTEM_FENTISHI;
+            } else if ( 0 == strcmp(text[3], "一体式") ) {
+                task->sys_type = SYSTEM_YITISHI;
+            } else ;
+        } else if( 0 == strcmp(text[1], "limit_output_I") ) {
+            task->limit_output_I = atof(text[3]);
+        } else if ( 0 == strcmp(text[1], "limit_max_V") ) {
+            task->limit_max_V = atof(text[3]);
+        } else if( 0 == strcmp(text[1], "limit_min_V") ) {
+            task->limit_min_V = atof(text[3]);
+        } else if ( 0 == strcmp(text[1], "running_V") ) {
+            task->running_V = atof(text[3]);
+        } else if( 0 == strcmp(text[1], "modules_nr") ) {
+            task->modules_nr = (unsigned short)atoi(text[3]);
+        } else if ( 0 == strcmp(text[1], "modules_on_off") ) {
+            task->modules_on_off = (unsigned short)atoi(text[3]);
         }
     }
 _done:
@@ -236,6 +254,16 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     log_printf(DBG_LV1, "ZUES: %s running...sizeof(struct charge_task)=%d",
             __FUNCTION__, sizeof(struct charge_task));
+    // 恢复默认配置
+    task->max_output_I = 10.0f; // 10.0A
+    task->limit_output_I = 0.0f;
+    task->limit_max_V = 750.0f;
+    task->limit_min_V = 400.0f;
+    task->running_V = 450.0f;
+    task->running_I = 0.0;
+    task->modules_nr = 14;
+    task->charge_stat = 0x0000; // 不充电
+    task->modules_on_off = 0x0000; // 全开机
 
     sprintf(sql, "SELECT * FROM configs");
     ret = sqlite3_exec(task->database, sql, sql_db_config_result, &done, &errmsg);
