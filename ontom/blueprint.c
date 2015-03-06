@@ -487,7 +487,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "UART: set uart to TX mode faile");
             break;
         }
-        log_printf(INF, "UART: switch to TX mode.");
+        //log_printf(INF, "UART: switch to TX mode.");
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
@@ -499,7 +499,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "UART: set uart to RX mode faile");
             break;
         }
-        log_printf(INF, "UART: switch to RX mode.");
+        //log_printf(INF, "UART: switch to RX mode.");
         break;
 
     // 串口接收到新数据
