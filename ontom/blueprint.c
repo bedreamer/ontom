@@ -1745,7 +1745,7 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
-        ret = ERR_OK;
+        //ret = ERR_OK;
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
