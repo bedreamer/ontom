@@ -1743,6 +1743,7 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = task->charge_stat >> 8;
         buff[nr ++] = task->charge_stat & 0xFF;
 
+        log_printf(INF, "ffasdfsdaf   %d", task->modules_nr);
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
