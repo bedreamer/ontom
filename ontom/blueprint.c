@@ -551,21 +551,23 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         /*
          * 采用帧发送均衡算法，该串口上的使用者帧率之和为10000
          */
-        i = self->sequce % self->users_nr;
-        log_printf(DBG_LV0, "下一个发送序列为: %d:%d", self->sequce, i);
-        hit = self->users[i];
+        do {
+            i = self->sequce % self->users_nr;
+            log_printf(DBG_LV0, "下一个发送序列为: %d:%d", self->sequce, i);
+            hit = self->users[i];
 
-        self->sequce ++;
-        if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
-            self->master = hit;
-            self->master->seed = 0;
-            ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
-            log_printf(DBG_LV1, "UART: ret: %d, load: %d, sent: %d",
-                       ret, param->payload_size, hit->sent_frames);
-        } else {
-            self->sequce --;
-            ret = ERR_ERR;
-        }
+            self->sequce ++;
+            if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
+                self->master = hit;
+                self->master->seed = 0;
+                ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
+                log_printf(DBG_LV1, "UART: BP_EVT_TX_FRAME_REQUEST ret: %d, load: %d, sent: %d",
+                           ret, param->payload_size, hit->sent_frames);
+            } else {
+                self->sequce --;
+                ret = ERR_ERR;
+            }
+        } while ( ret = ERR_ERR );
         break;
 #else
         param->attrib = BP_FRAME_UNSTABLE;
@@ -1993,16 +1995,7 @@ ___fast_switch_2_rx:
                 default:
                     break;
                 }
-#if 0
-                if ( thiz->rx_param.payload_size >= thiz->rx_param.need_bytes
-                     /*(size_t)(thiz->rx_param.buff.rx_buff[1] + 4)*/ ) {
-                    thiz->status = BP_UART_STAT_WR;
-                    Hachiko_pause(&thiz->rx_seed);
-                    log_printf(DBG_LV1, "UART: recv done.need: %d, fetched: %d",
-                               thiz->rx_param.need_bytes,
-                            thiz->rx_param.payload_size);
-                }
-#endif
+
                 usleep(2000);
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
