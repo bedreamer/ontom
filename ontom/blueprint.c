@@ -1388,20 +1388,20 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             bit_clr(task, F_GUN_1_OUTPUT_SWITCH_STATUS);
             len += sprintf(&infstr[len], "[1#枪输出"RED("分闸")"] ");
         }
-        if ( ((box->Flag_run1 & 0x20 | 0x40) >> 5) == 0 ) {
-            if ( ((me_pre->Flag_run1 & 0x20 | 0x40) >> 5) != 0 ) {
+        if ( ((box->Flag_run1 & (0x20 | 0x40)) >> 5) == 0 ) {
+            if ( ((me_pre->Flag_run1 & (0x20 | 0x40) >> 5) != 0 ) {
                 log_printf(INF, "采样盒: 1#枪断开连接");
                 need_echo ++;
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪未链接] ");
-        } else if (((box->Flag_run1 & 0x20 | 0x40) >> 5) == GUN_CONN_PROTECTED ) {
+        } else if (((box->Flag_run1 & (0x20 | 0x40) >> 5) == GUN_CONN_PROTECTED ) {
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪链接保护] ");
-        } else if ( ((box->Flag_run1 & 0x20 | 0x40) >> 5) == GUN_CONN_EXCEPTION ) {
+        } else if ( ((box->Flag_run1 & (0x20 | 0x40) >> 5) == GUN_CONN_EXCEPTION ) {
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
-        } else if ( ((box->Flag_run1 & 0x20 | 0x40) >> 5) == GUN_CONN_CONNECTIVE ) {
+        } else if ( ((box->Flag_run1 & (0x20 | 0x40) >> 5) == GUN_CONN_CONNECTIVE ) {
             if ( ((me_pre->Flag_run1 & 0x20 | 0x40) >> 5) != GUN_CONN_CONNECTIVE ) {
                 log_printf(INF, "采样盒: 1#枪连接完成.");
                 need_echo ++;
