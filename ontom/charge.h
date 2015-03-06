@@ -928,6 +928,10 @@ typedef enum {
     // 暂停当前充电作业
     CMD_JOB_MAN_PAUSE,
     // }}
+    //{{ 模块操作
+    CMD_MODULE_OFF,
+    CMD_MODULE_ON,
+    //}}
 
     // {{{ 故障标记
     // BMS通信故障
