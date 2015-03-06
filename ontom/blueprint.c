@@ -2121,12 +2121,12 @@ continue_to_send:
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
 #else
-                usleep(1000 * thiz->master->time_to_send);
-                thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
-                thiz->tx_param.payload_size = 0;
-                log_printf(DBG_LV0, "UART: packet send done.");
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
+                usleep(1000 * thiz->master->time_to_send);
+                log_printf(DBG_LV0, "UART: packet send done.");
+                thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
+                thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
                     thiz->status = BP_UART_STAT_RD;
                     if ( thiz->role == BP_UART_MASTER ) {
