@@ -1402,7 +1402,7 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪连接异常] ");
         } else if ( ((box->Flag_run1 & (0x20 | 0x40)) >> 5) == GUN_CONN_CONNECTIVE ) {
-            if ( ((me_pre->Flag_run1 & 0x20 | 0x40) >> 5) != GUN_CONN_CONNECTIVE ) {
+            if ( ((me_pre->Flag_run1 & (0x20 | 0x40)) >> 5) != GUN_CONN_CONNECTIVE ) {
                 log_printf(INF, "采样盒: 1#枪连接完成.");
                 need_echo ++;
             }
