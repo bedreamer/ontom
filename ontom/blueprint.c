@@ -1672,7 +1672,7 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
             log_printf(ERR, "UART: "RED("协议转换盒通信中断, 请排查故障,(%d)"), self->master->died);
             bit_set(task, S_CONVERT_BOX_COMM_DOWN);
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        log_printf(WRN, "UART: %s:%d get signal TIMEOUT", __FUNCTION__, evt);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
