@@ -1740,7 +1740,7 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         param->payload_size = nr;
 
         self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
-        ret = ERR_OK;
+        //ret = ERR_OK;
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
