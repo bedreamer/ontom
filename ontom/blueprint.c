@@ -1755,7 +1755,7 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
