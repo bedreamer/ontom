@@ -1177,7 +1177,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
                 task->chargers[0]->chargers.charge_module_sn[n][2]>>8,
                 task->chargers[0]->chargers.charge_module_sn[n][2]&0xFF,
                 (kn & 0xF) ? "故障":"正常" ,
-                (kn >> 4) ? "关机" : "开机"
+                (kn >> 4) ? "已关机" : "已开机"
                 );
     }
 
