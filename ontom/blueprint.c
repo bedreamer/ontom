@@ -1725,7 +1725,6 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = 0x64;
             buff[nr ++] = 0x00;
             buff[nr ++] = 0x01;
-            buff[nr ++] = 0x02;
             buff[nr ++] = task->modules_on_off >> 8;
             buff[nr ++] = task->modules_on_off & 0xFF;
             self->rx_param.need_bytes = 0;
@@ -1736,7 +1735,6 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = 0x65;
             buff[nr ++] = 0x00;
             buff[nr ++] = 0x01;
-            buff[nr ++] = 0x02;
             buff[nr ++] = task->modules_on_off >> 8;
             buff[nr ++] = task->modules_on_off & 0xFF;
             self->rx_param.need_bytes = 0;
