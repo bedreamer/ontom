@@ -1147,6 +1147,20 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
     int ret = ERR_OK;
     int lf = 0, nr = 12, n;
     unsigned short kn;
+    char buff[8];
+
+    mg_get_var(thiz->xml_conn, "op", buff, 8);
+    if ( 0 == strcmp(buff, "ON") ) {
+        mg_get_var(thiz->xml_conn, "sn", buff, 8);
+        n = atoi(buff);
+        if ( n >= 0 && n < CONFIG_SUPPORT_CHARGE_MODULE)
+            __bit_clr(&task->modules_on_off, n);
+    } else if ( 0 == strcmp(buff, "OFF") ) {
+        mg_get_var(thiz->xml_conn, "sn", buff, 8);
+        n = atoi(buff);
+        if ( n >= 0 && n < CONFIG_SUPPORT_CHARGE_MODULE)
+            __bit_clr(&task->modules_on_off, n);
+    }
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"modules\":[");
