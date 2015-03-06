@@ -1718,41 +1718,66 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        buff[nr ++] = 0xFF;
-        buff[nr ++] = 0x10;
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x09;
-        buff[nr ++] = 0x12;
+        if ( bit_read(task, CMD_MODULE_ON )) {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x06;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x64;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x01;
+            buff[nr ++] = 0x02;
+            buff[nr ++] = task->modules_on_off >> 8;
+            buff[nr ++] = task->modules_on_off & 0xFF;
+            self->rx_param.need_bytes = 0;
+        } else if ( bit_read(task, CMD_MODULE_OFF) ) {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x06;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x65;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x01;
+            buff[nr ++] = 0x02;
+            buff[nr ++] = task->modules_on_off >> 8;
+            buff[nr ++] = task->modules_on_off & 0xFF;
+            self->rx_param.need_bytes = 0;
+        } else {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x10;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x09;
+            buff[nr ++] = 0x12;
 
-        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->running_V))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->running_V))) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->running_I))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->running_I))) & 0xFF;
-        buff[nr ++] = task->modules_nr & 0xFF;
-        buff[nr ++] = task->modules_nr >> 8;
-        buff[nr ++] = task->charge_stat >> 8;
-        buff[nr ++] = task->charge_stat & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->running_V))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->running_V))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->running_I))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->running_I))) & 0xFF;
+            buff[nr ++] = task->modules_nr & 0xFF;
+            buff[nr ++] = task->modules_nr >> 8;
+            buff[nr ++] = task->charge_stat >> 8;
+            buff[nr ++] = task->charge_stat & 0xFF;
 
-        log_printf(INF, "ffasdfsdaf   %d", task->modules_nr);
+            log_printf(INF, "ffasdfsdaf   %d", task->modules_nr);
+            self->rx_param.need_bytes = 0;
+         }
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
 
         memcpy(param->buff.tx_buff, buff, nr);
-        self->rx_param.need_bytes = 0;
         param->payload_size = nr;
 
         self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
+
         ret = ERR_OK;
         break;
     // 串口发送确认
@@ -1762,6 +1787,11 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
         log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        if ( bit_read(task, CMD_MODULE_ON) ) {
+            bit_clr(task, CMD_MODULE_ON);
+        } else if ( bit_read(task, CMD_MODULE_OFF ) ) {
+            bit_clr(task, CMD_MODULE_OFF);
+        }
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
