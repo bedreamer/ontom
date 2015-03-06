@@ -313,7 +313,7 @@ static inline void __dump_uart_hex(char *hex, int len, unsigned int lv)
         //else {
             j = 0;
         //    l += sprintf(&buff[l], "%02X\n", hex[i]);
-        }
+       // }
         i ++;
     }
 
