@@ -1751,8 +1751,8 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
             buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
             buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->running_V))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->running_V))) & 0xFF;
+            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
+            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
             buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
             buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
             buff[nr ++] = (unsigned short)((10 * (task->running_I))) >> 8;
