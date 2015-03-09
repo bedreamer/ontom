@@ -1221,7 +1221,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
              task->modules_on_off - 1 == n &&
              ! (kn >> 4) ) {
             p = "正在关机";
-        }else if ( bit_read(task, CMD_MODULE_ON) &&
+        }  else if ( bit_read(task, CMD_MODULE_ON) &&
              task->modules_on_off - 1 == n &&
              (kn >> 4) ) {
             p = "正在开机";
@@ -1244,7 +1244,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
                 task->chargers[0]->chargers.charge_module_sn[n][2]>>8,
                 task->chargers[0]->chargers.charge_module_sn[n][2]&0xFF,
                 (kn & 0xF) ? "故障":"正常" ,
-                p ? p : (kn >> 4) ? "已关机" : "已开机"
+                *p ? p : (kn >> 4) ? "已关机" : "已开机"
                 );
     }
 
