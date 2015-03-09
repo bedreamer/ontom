@@ -1159,6 +1159,16 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     }
     freeifaddrs(ifaddr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"ver\":\"%d\",", VERSION);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"sys\":\"%s\",",
+            task->sys_type == SYSTEM_YITISHI ? "一体式":
+            task->sys_type == SYSTEM_FENTISHI ? "分体式" : "未知");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"gun_nr\":\"%d 把\",", task->sys_config_gun_nr);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"module_nr\":\"%d 个\",", task->modules_nr);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"section_nr\":\"%d 段\",", task->sys_charge_group_nr);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
