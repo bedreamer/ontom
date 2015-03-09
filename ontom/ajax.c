@@ -1169,6 +1169,8 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
             "\"module_nr\":\"%d 个\",", task->modules_nr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"section_nr\":\"%d 段\",", task->sys_charge_group_nr);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"auth_id\":\"%s\",", "ONAE-7655-7FD0-12EF-0999");
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
