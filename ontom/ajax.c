@@ -1170,7 +1170,6 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
                     ifa->ifa_name, host);
         }
-        ifAddrStruct=ifAddrStruct->ifa_next;
     }
     freeifaddrs(ifaddr);
 #endif
