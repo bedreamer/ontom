@@ -1633,13 +1633,16 @@ int uart4_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
             }
         } while (0);
 
-        for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+        for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++ ) {
             // 判断模块故障
             if ( param->buff.rx_buff[i + 87] & 0x0F ) {
                 bit_set(task, S_CHARGE_M_1_ERR + i);
             } else {
                 bit_clr(task, S_CHARGE_M_1_ERR + i);
             }
+        }
+        for (; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+            bit_clr(task, S_CHARGE_M_1_ERR + i);
         }
         break;
     // 串口发送数据请求
