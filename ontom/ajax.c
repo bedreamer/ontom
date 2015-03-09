@@ -1153,8 +1153,8 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     hent = gethostbyname(hname);
 
     for(i = 0; hent->h_addr_list[i]; i++) {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"eth%d\":\"%s\",",
-                i +1, inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])));
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
+                hname, inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])));
     }
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
