@@ -1149,16 +1149,15 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"about\":{");
 
-#if 0
+#if 1
     gethostname(hname, sizeof(hname));
-    hent = gethostbyname(hname);
+    hent = gethostbyname("localhost");
 
     for(i = 0; hent->h_addr_list[i]; i++) {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
                 hname, inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])));
     }
-#endif
-
+#else
     getifaddrs(&ifAddrStruct);
     while (ifAddrStruct!=NULL) {
         if (ifAddrStruct->ifa_addr->sa_family==AF_INET) { // check it is IP4
@@ -1171,6 +1170,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
         }
         ifAddrStruct=ifAddrStruct->ifa_next;
     }
+#endif
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
