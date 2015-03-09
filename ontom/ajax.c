@@ -1217,6 +1217,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
         } else {
             kn = kn & 0xFF;
         }
+        p = NULL;
         if ( bit_read(task, CMD_MODULE_OFF) &&
              task->modules_on_off - 1 == n &&
              ! (kn >> 4) ) {
