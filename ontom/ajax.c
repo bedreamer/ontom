@@ -1152,8 +1152,8 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     getifaddrs(&ifAddrStruct);
 
     while (ifAddrStruct!=NULL) {
-        if (ifAddrStruct->ifa_addr->sa_family==AF_INET) { // check it is IP4 is a valid IP4 Address
-            tmpAddrPtr=&((struct sockaddr_in *)ifAddrStruct->ifa_addr)->sin_addr;
+        if (ifAddrStruct->ifa_addr.sa_family==AF_INET) { // check it is IP4 is a valid IP4 Address
+            tmpAddrPtr=&((struct sockaddr_in *)ifAddrStruct->ifa_addr).sin_addr;
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
