@@ -1195,6 +1195,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
         n = atoi(buff);
         if ( n >= 0 && n < CONFIG_SUPPORT_CHARGE_MODULE) {
             task->modules_on_off =  n + 1;
+            task->modules_on_off &= ~0x7FFF;
             bit_set(task, CMD_MODULE_ON);
         }
     } else if ( 0 == strcmp(buff, "OFF") ) {
@@ -1202,6 +1203,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
         n = atoi(buff);
         if ( n >= 0 && n < CONFIG_SUPPORT_CHARGE_MODULE) {
             task->modules_on_off =  n + 1;
+            task->modules_on_off |= ~0x7FFF;
             bit_set(task, CMD_MODULE_OFF);
         }
     }
@@ -1218,9 +1220,16 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
             kn = kn & 0xFF;
         }
         p = NULL;
-        if (task->modules_on_off - 1 == n) {
-            p = "正在执行动作";
+        if (task->modules_on_off&0x7FFF - 1 == n &&
+                (task->modules_on_off & 0x8000) &&
+                !(kn>>4) ) {
+            p = "正在关机";
+        } else if (task->modules_on_off&0x7FFF - 1 == n &&
+                 !(task->modules_on_off & 0x8000) &&
+                 (kn>>4) ) {
+             p = "正在开机";
         }
+
 
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "{\"V\":\"%.1f V\","
