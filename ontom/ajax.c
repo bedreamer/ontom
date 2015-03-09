@@ -1220,11 +1220,11 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
             kn = kn & 0xFF;
         }
         p = NULL;
-        if (task->modules_on_off&0x7FFF - 1 == n &&
+        if ((task->modules_on_off&0x7FFF) - 1 == n &&
                 (task->modules_on_off & 0x8000) &&
                 !(kn>>4) ) {
             p = "正在关机";
-        } else if (task->modules_on_off&0x7FFF - 1 == n &&
+        } else if ((task->modules_on_off&0x7FFF) - 1 == n &&
                  !(task->modules_on_off & 0x8000) &&
                  (kn>>4) ) {
              p = "正在开机";
