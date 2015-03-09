@@ -1723,16 +1723,16 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = 0x06;
             buff[nr ++] = 0x00;
             buff[nr ++] = 0x64;
-            buff[nr ++] = task->modules_on_off&0x7FFF >> 8;
-            buff[nr ++] = task->modules_on_off&0x7FFF & 0xFF;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
             self->rx_param.need_bytes = 0;
         } else if ( bit_read(task, CMD_MODULE_OFF) ) {
             buff[nr ++] = 0xFF;
             buff[nr ++] = 0x06;
             buff[nr ++] = 0x00;
             buff[nr ++] = 0x65;
-            buff[nr ++] = task->modules_on_off&0x7FFF >> 8;
-            buff[nr ++] = task->modules_on_off&0x7FFF & 0xFF;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
             self->rx_param.need_bytes = 0;
         } else {
             buff[nr ++] = 0xFF;
