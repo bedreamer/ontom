@@ -1140,30 +1140,16 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
 int ajax_system_about_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    char hname[128];
-    struct hostent *hent;
-    int i;
     struct ifaddrs * ifa=NULL, *ifaddr = NULL;
-    void * tmpAddrPtr=NULL;
     char host[NI_MAXHOST];
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"about\":{");
 
-#if 0
-    gethostname(hname, sizeof(hname));
-    hent = gethostbyname("localhost");
-
-    for(i = 0; hent->h_addr_list[i]; i++) {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
-                hname, inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])));
-    }
-#else
     getifaddrs(&ifaddr);
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr == NULL)  continue;
-        if (ifa->ifa_addr->sa_family==AF_INET) { // check it is IP4
-            // is a valid IP4 Address
+        if (ifa->ifa_addr->sa_family==AF_INET) { // check it is IP4 is a valid IP4 Address
             getnameinfo(ifa->ifa_addr,
                         sizeof(struct sockaddr_in),
                         host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
@@ -1172,7 +1158,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
         }
     }
     freeifaddrs(ifaddr);
-#endif
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"ver\":\"%d\",", VERSION);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
