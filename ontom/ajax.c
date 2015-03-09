@@ -1143,9 +1143,11 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     char hname[128];
     struct hostent *hent;
     int i;
+    struct ifaddrs * ifAddrStruct=NULL;
+    void * tmpAddrPtr=NULL;
 
     thiz->ct = "application/json";
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"modules\":{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"about\":{");
 
 #if 0
     gethostname(hname, sizeof(hname));
@@ -1157,22 +1159,18 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     }
 #endif
 
-    struct ifaddrs * ifAddrStruct=NULL;
-        void * tmpAddrPtr=NULL;
-
-        getifaddrs(&ifAddrStruct);
-
-        while (ifAddrStruct!=NULL) {
-            if (ifAddrStruct->ifa_addr->sa_family==AF_INET) { // check it is IP4
-                // is a valid IP4 Address
-                tmpAddrPtr=&((struct sockaddr_in *)ifAddrStruct->ifa_addr)->sin_addr;
-                char addressBuffer[INET_ADDRSTRLEN];
-                inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-                thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
-                        ifAddrStruct->ifa_name, addressBuffer);
-            }
-            ifAddrStruct=ifAddrStruct->ifa_next;
+    getifaddrs(&ifAddrStruct);
+    while (ifAddrStruct!=NULL) {
+        if (ifAddrStruct->ifa_addr->sa_family==AF_INET) { // check it is IP4
+            // is a valid IP4 Address
+            tmpAddrPtr=&((struct sockaddr_in *)ifAddrStruct->ifa_addr)->sin_addr;
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
+                    ifAddrStruct->ifa_name, addressBuffer);
         }
+        ifAddrStruct=ifAddrStruct->ifa_next;
+    }
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
