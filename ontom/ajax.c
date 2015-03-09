@@ -1187,6 +1187,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
     int lf = 0, nr = 12, n;
     unsigned short kn;
     char buff[8];
+    char *p = NULL;
 
     mg_get_var(thiz->xml_conn, "op", buff, 8);
     if ( 0 == strcmp(buff, "ON") ) {
@@ -1215,6 +1216,15 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
             kn = kn >> 8;
         } else {
             kn = kn & 0xFF;
+        }
+        if ( bit_read(task, CMD_MODULE_OFF) &&
+             task->modules_on_off - 1 == n &&
+             ! (kn >> 4) ) {
+            p = "正在关机";
+        }else if ( bit_read(task, CMD_MODULE_ON) &&
+             task->modules_on_off - 1 == n &&
+             (kn >> 4) ) {
+            p = "正在开机";
         }
 
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
