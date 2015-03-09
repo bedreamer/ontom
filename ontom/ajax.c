@@ -1211,7 +1211,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"modules\":[");
 
-    for ( n = 0; n < CONFIG_SUPPORT_CHARGE_MODULE & n < task->modules_nr; n ++ ) {
+    for ( n = 0; n < CONFIG_SUPPORT_CHARGE_MODULE && n < task->modules_nr; n ++ ) {
 
         kn = b2l(task->chargers[0]->chargers.charge_module_status[n/2]);
         if ( n % 2 ) {
