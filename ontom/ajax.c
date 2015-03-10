@@ -1141,7 +1141,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     struct ifaddrs * ifa=NULL, *ifaddr = NULL;
-    char host[NI_MAXHOST];
+    char host[128];
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"about\":{");
