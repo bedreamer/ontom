@@ -1521,7 +1521,7 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
         buff[ nr ++ ] = 0xC3;
-        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 0xB4;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 16;
         buff[ nr ++ ] = cmd;
