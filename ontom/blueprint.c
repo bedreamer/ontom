@@ -1114,7 +1114,7 @@ int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     return ret;
 }
 
-int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, nr = 0, len = 0, errnr = 0;
@@ -1147,10 +1147,10 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
-        if ( bit_read(task, S_MEASURE_COMM_DOWN) ) {
+        if ( bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
             log_printf(INF, "UART: "GRN("综合采样盒通信恢复."));
         }
-        bit_clr(task, S_MEASURE_COMM_DOWN);
+        bit_clr(task, S_MEASURE_1_COMM_DOWN);
         self->master->died = 0;
 
         memcpy(&me->measure->measure_pre_copy, &me->measure->measure, sizeof(struct MDATA_ACK));
@@ -1521,7 +1521,7 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
         buff[ nr ++ ] = 0xC3;
-        buff[ nr ++ ] = 0xB4;
+        buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 16;
         buff[ nr ++ ] = cmd;
@@ -1555,11 +1555,11 @@ int uart4_simple_box_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             //self->master->died ++;
         } else {
             //self->master->died ++;
-            if ( ! bit_read(task, S_MEASURE_COMM_DOWN) ) {
+            if ( ! bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
             }
             log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
                                         " 已禁止充电(%d)."), self->master->died);
-            bit_set(task, S_MEASURE_COMM_DOWN);
+            bit_set(task, S_MEASURE_1_COMM_DOWN);
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
