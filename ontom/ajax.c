@@ -1261,17 +1261,46 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
+int sql_system_settings_result(void *param, int nr, char **text, char **name)
+{
+    struct ajax_xml_struct *thiz = (struct ajax_xml_struct *)param;
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"cat\":\"%s\","
+            "\"name\":\"%s\","
+            "\"key\":\"%s\","
+            "\"type\":\"%s\","
+            "\"rv_1_name\":\"%s\","
+            "\"rv_1_value\":\"%s\","
+            "\"rv_2_name\":\"%s\","
+            "\"rv_2_value\":\"%s\","
+            "\"default_value\":\"%s\","
+            "\"current_value\":\"%s\"},",
+            text[0], text[1], text[2], text[3], text[4],
+            text[5], text[6], text[7], text[8], text[9]
+            );
+    return 0;
+}
+
 int ajax_system_config_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     int lf = 0, nr = 12, n;
     unsigned short kn;
-    char buff[8];
+    char buff[8], sql[256];
     char *p = NULL;
+    char *errmsg = NULL;
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"configs\":[");
 
+    sprintf(sql, "SELECT * FROM settings");
+    ret = sqlite3_exec(task->database, sql, sql_system_settings_result, thiz, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+        ret = ERR_ERR;
+    }
+#if 0
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"cat\":\"system\","
             "\"name\":\"系统选型\","
@@ -1332,7 +1361,7 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz)
             "\"default_value\":1,"
             "\"current_value\":1},"
             );
-
+#endif
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
