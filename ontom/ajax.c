@@ -1272,6 +1272,7 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"configs\":[");
 
+    for (n = 0; n < 18; n ++ )
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"cat\":\"system\","
             "\"name\":\"系统选型\","
