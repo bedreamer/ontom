@@ -1272,7 +1272,6 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"configs\":[");
 
-    for (n = 0; n < 18; n ++ )
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"cat\":\"system\","
             "\"name\":\"系统选型\","
@@ -1282,6 +1281,30 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz)
             "\"rv_1_value\":0,"
             "\"rv_2_name\":\"分体式\","
             "\"rv_2_value\":1,"
+            "\"default_value\":1,"
+            "\"current_value\":1},"
+            );
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"cat\":\"system\","
+            "\"name\":\"充电枪个数\","
+            "\"key\":\"gun_count\","
+            "\"type\":\"radio\","
+            "\"rv_1_name\":\"两把\","
+            "\"rv_1_value\":2,"
+            "\"rv_2_name\":\"四把\","
+            "\"rv_2_value\":4,"
+            "\"default_value\":2,"
+            "\"current_value\":2},"
+            );
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"cat\":\"system\","
+            "\"name\":\"母线段数\","
+            "\"key\":\"bus_count\","
+            "\"type\":\"radio\","
+            "\"rv_1_name\":\"一段\","
+            "\"rv_1_value\":1,"
+            "\"rv_2_name\":\"两段\","
+            "\"rv_2_value\":2,"
             "\"default_value\":1,"
             "\"current_value\":1},"
             );
