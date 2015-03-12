@@ -1298,6 +1298,30 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz)
             );
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"cat\":\"system\","
+            "\"name\":\"母线过压(V)\","
+            "\"key\":\"bus_v_hi\","
+            "\"type\":\"text\","
+            "\"rv_1_name\":\"0\","
+            "\"rv_1_value\":0,"
+            "\"rv_2_name\":\"0\","
+            "\"rv_2_value\":0,"
+            "\"default_value\":\"751.0\","
+            "\"current_value\":\"751.0\"},"
+            );
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"cat\":\"system\","
+            "\"name\":\"母线欠压(V)\","
+            "\"key\":\"bus_v_lo\","
+            "\"type\":\"text\","
+            "\"rv_1_name\":\"0\","
+            "\"rv_1_value\":0,"
+            "\"rv_2_name\":\"0\","
+            "\"rv_2_value\":0,"
+            "\"default_value\":\"399.0\","
+            "\"current_value\":\"399.0\"},"
+            );
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"cat\":\"system\","
             "\"name\":\"母线段数\","
             "\"key\":\"bus_count\","
             "\"type\":\"radio\","
