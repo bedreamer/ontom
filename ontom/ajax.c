@@ -1276,6 +1276,7 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"cat\":\"system\","
             "\"name\":\"系统选型\","
+            "\"key\":\"system_type\","
             "\"type\":\"radio\","
             "\"rv_1_name\":\"一体式\","
             "\"rv_1_value\":0,"
