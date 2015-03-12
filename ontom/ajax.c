@@ -22,6 +22,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz);
 int ajax_system_about_proc(struct ajax_xml_struct *thiz);
 
 int ajax_module_query_proc(struct ajax_xml_struct *thiz);
+int ajax_system_config_proc(struct ajax_xml_struct *thiz);
 
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
@@ -51,7 +52,8 @@ struct xml_generator {
     {"/system/error.json",      ajax_system_error_proc},
     {"/system/history.json",    ajax_system_history_proc},
     {"/system/about.json",      ajax_system_about_proc},
-    {"/system/modules.json",      ajax_module_query_proc},
+    {"/system/modules.json",    ajax_module_query_proc},
+    {"/system/config.json",     ajax_system_config_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -1258,6 +1260,38 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
     return ret;
 }
+
+int ajax_system_config_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    int lf = 0, nr = 12, n;
+    unsigned short kn;
+    char buff[8];
+    char *p = NULL;
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"configs\":[");
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"cat\":\"system\","
+            "\"name\":\"系统选型\","
+            "\"type\":\"radio\","
+            "\"rv_1_name\":\"一体式\","
+            "\"rv_1_value\":0,"
+            "\"rv_2_name\":\"分体式\","
+            "\"rv_2_value\":1,"
+            "\"default_value\":1,"
+            "\"current_value\":1},"
+            );
+
+
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
+    return ret;
+}
+
 
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
 {
