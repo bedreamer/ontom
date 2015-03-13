@@ -1406,11 +1406,15 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
             memset(value, 0, sizeof(value));
             keylen = 0;
             vallen = 0;
+            keyok = 0;
+            valok = 0;
         } else if ( valok && ! keyok ) {
             memset(key, 0, sizeof(key));
             memset(value, 0, sizeof(value));
             keylen = 0;
             vallen = 0;
+            keyok = 0;
+            valok = 0;
         }
         p++;
     }
