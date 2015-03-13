@@ -1267,6 +1267,16 @@ int sql_system_settings_result(void *param, int nr, char **text, char **name)
 {
     struct ajax_xml_struct *thiz = (struct ajax_xml_struct *)param;
 
+    if ( 0 == strcmp(text[3], "options") ) {
+
+        char *p = text[4];
+        for ( ; *p; p ++ ) {
+            if ( *p == '@' ) *p = '\"';
+            if ( *p == '%' ) *p = '}';
+            if ( *p == '#' ) *p = '{';
+        }
+    }
+
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"cat\":\"%s\","
             "\"name\":\"%s\","
