@@ -1407,8 +1407,18 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
             if ( ret ) {
                 log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
                 ret = ERR_ERR;
+            } else {
+                if ( 0 == strcmp("module_count", key) ) {
+                    task->modules_nr = atoi(value);
+                } else if ( 0 == strcmp("system_type", key) ) {
+                    if ( atoi(value) == 0 ) {
+                        task->sys_type = SYSTEM_FENTISHI;
+                    } else {
+                        task->sys_type = SYSTEM_YITISHI;
+                    }
+                }
             }
-            log_printf(INF, "%s = %s", key, value);
+//            log_printf(INF, "%s = %s", key, value);
             memset(key, 0, sizeof(key));
             memset(value, 0, sizeof(value));
             keylen = 0;
