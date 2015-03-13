@@ -24,6 +24,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz);
 int ajax_module_query_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_options_proc(struct ajax_xml_struct *thiz);
+int ajax_system_config_save_proc(struct ajax_xml_struct *thiz);
 
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
@@ -55,7 +56,8 @@ struct xml_generator {
     {"/system/about.json",      ajax_system_about_proc},
     {"/system/modules.json",    ajax_module_query_proc},
     {"/system/config.json",     ajax_system_config_proc},
-    {"/system/options.json",     ajax_system_config_options_proc},
+    {"/system/options.json",    ajax_system_config_options_proc},
+    {"/system/save.json",       ajax_system_config_save_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -1359,6 +1361,68 @@ int ajax_system_config_options_proc(struct ajax_xml_struct *thiz)
 die:
     return ret;
 }
+
+int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    int lf = 0, nr = 12, n;
+    unsigned short kn;
+    char s[512], sql[256];
+    char *p = NULL;
+    char *errmsg = NULL;
+    char key[33], value[33];
+    int keyok = 0, valok = 0;
+    int keylen = 0, vallen = 0;
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"save\":[");
+    if ( ! mg_get_var(thiz->xml_conn, "s", s, 32) ) {
+        ret = ERR_ERR;
+        goto die;
+    }
+    p = & s[0];
+    memset(key, 0, sizeof(key));
+    memset(value, 0, sizeof(value));
+    while ( *p ) {
+
+        if ( *p == '=' ) {
+            keyok = 1;
+        } else if ( *p == ';' ) {
+            valok = 1;
+        } else {
+            if ( ! keyok ) {
+                if ( keylen < 32 )
+                    key[ keylen ++ ] = *p;
+            } else if ( !valok ) {
+                if ( vallen < 32 )
+                    val[ vallen ++ ] = *p;
+            } else;
+        }
+
+        if ( keyok && valok ) {
+            log_printf(INF, "%s = %s", key, value);
+            memset(key, 0, sizeof(key));
+            memset(value, 0, sizeof(value));
+            keylen = 0;
+            vallen = 0;
+        }
+    }
+#if 0
+    sprintf(sql, "SELECT * FROM settings_options where key='%s'", name);
+    ret = sqlite3_exec(task->database, sql, sql_system_settings_options_result, thiz, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+        ret = ERR_ERR;
+    }
+#endif
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
+die:
+    return ret;
+}
+
 
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
 {
