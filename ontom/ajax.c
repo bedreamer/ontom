@@ -1395,7 +1395,7 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
                     key[ keylen ++ ] = *p;
             } else if ( !valok ) {
                 if ( vallen < 32 )
-                    val[ vallen ++ ] = *p;
+                    value[ vallen ++ ] = *p;
             } else;
         }
 
