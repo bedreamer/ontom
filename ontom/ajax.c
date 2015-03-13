@@ -1412,6 +1412,7 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
             keylen = 0;
             vallen = 0;
         }
+        p++;
     }
 #if 0
     sprintf(sql, "SELECT * FROM settings_options where key='%s'", name);
