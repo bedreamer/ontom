@@ -1376,7 +1376,7 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"save\":[");
-    if ( ! mg_get_var(thiz->xml_conn, "s", s, 32) ) {
+    if ( ! mg_get_var(thiz->xml_conn, "s", s, 512) ) {
         ret = ERR_ERR;
         goto die;
     }
