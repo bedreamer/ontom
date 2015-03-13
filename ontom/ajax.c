@@ -1383,6 +1383,7 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
     p = & s[0];
     memset(key, 0, sizeof(key));
     memset(value, 0, sizeof(value));
+    log_printf(INF, "%s", s);
     while ( *p ) {
 
         if ( *p == '=' ) {
