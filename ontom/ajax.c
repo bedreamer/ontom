@@ -1271,9 +1271,9 @@ int sql_system_settings_result(void *param, int nr, char **text, char **name)
 
         char *p = text[4];
         for ( ; *p; p ++ ) {
-            if ( *p == '@' ) *p = '\"';
-            if ( *p == '%' ) *p = '}';
-            if ( *p == '#' ) *p = '{';
+            if ( *p == '\"' ) *p = '@';
+            if ( *p == '}' ) *p = '%';
+            if ( *p == '{' ) *p = '#';
         }
     }
 
