@@ -1402,7 +1402,7 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
 
         if ( keyok && valok ) {
             sprintf(sql, "UPDATE settings SET current_value='%s' WHERE key='%s'",
-                    value, name);
+                    value, key);
             ret = sqlite3_exec(task->database, sql, sql_system_settings_options_result, thiz, &errmsg);
             if ( ret ) {
                 log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
