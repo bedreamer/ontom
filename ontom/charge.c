@@ -464,7 +464,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
 
     // {{ 电表 读卡器
-    bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
+    struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
     if ( NULL == bp ) {
         ret = ERR_LOW_MEMORY;
         log_printf(ERR, "ZEUS: 分配系统内存失败");
