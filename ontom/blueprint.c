@@ -1754,12 +1754,12 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
             buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
             buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
-            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
+            buff[nr ++] = ((unsigned int)atoi(config_read("初始电压")) >> 8;
+            buff[nr ++] = ((unsigned int)atoi(config_read("初始电压")) & 0xFF;
             buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
             buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->running_I))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->running_I))) & 0xFF;
+            buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
+            buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
             buff[nr ++] = task->modules_nr >> 8;
             buff[nr ++] = task->modules_nr & 0xFF;
             buff[nr ++] = task->charge_stat >> 8;
@@ -1809,6 +1809,91 @@ int uart4_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     }
     return ret;
 }
+
+int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
 
 int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)

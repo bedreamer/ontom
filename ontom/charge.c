@@ -463,6 +463,63 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         exit(-1);
     }
 
+    // {{ 电表 读卡器
+    bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
+    if ( NULL == bp ) {
+        ret = ERR_LOW_MEMORY;
+        log_printf(ERR, "ZEUS: 分配系统内存失败");
+        goto __panic;
+    }
+    task->uarts[1] = bp;
+    memset(bp, 0, sizeof(struct bp_uart));
+    bp->bp_evt_handle = uart4_bp_evt_handle;
+    if ( ! task->sys_uart_name[1][0] ) {
+        log_printf(WRN, "ZEUS: 未配置电表/读卡器通信用RS485设备文件, 使用默认值.");
+        strcpy(task->sys_uart_name[1], "/dev/ttyO5");
+    }
+    strcpy(bp->dev_name, task->sys_uart_name[1]);
+    bp->dev_handle = -1;
+    bp->status = BP_UART_STAT_INVALID;
+    bp->hw_status = BP_UART_STAT_INVALID;
+    bp->role = BP_UART_MASTER;
+    bp->init_magic = 0;
+    bp->hw_port = SERIAL5_CTRL_PIN;
+
+    do {
+        struct bp_user u = {0};
+        u.frame_freq = 50 * 100;
+        u.seed = 0;
+        u.died_line = 3;
+        u.died_total = 0;
+        u.sent_frames = 0;
+        u.check_err_cnt = 0;
+        u.check_err_total = 0;
+        u.rcv_ok_cnt = 0;
+        u.swap_time_modify = 0;
+        u.swap_time_config_name = "core_kwh_meter_swap_time";
+        u.user_evt_handle = kwh_meter_read_evt_handle;
+        u.uart = bp;
+        u.chargers = task->chargers[0];
+        u.measure = task->measure[0];
+        ret = bp_user_bind(bp, &u); // 电表
+
+        u.frame_freq = 50 * 100;
+        u.seed = 0;
+        u.died_line = 3;
+        u.died_total = 0;
+        u.sent_frames = 0;
+        u.check_err_cnt = 0;
+        u.check_err_total = 0;
+        u.rcv_ok_cnt = 0;
+        u.swap_time_modify = 0;
+        u.swap_time_config_name = "core_card_reader_swap_time";
+        u.user_evt_handle = card_reader_handle;
+        u.uart = bp;
+        u.chargers = task->chargers[0];
+        u.measure = task->measure[0];
+        ret = bp_user_bind(bp, &u); // 读卡器
+    } while (0);
+
     task->commit_head = NULL;
     task->wait_head = NULL;
     task->wait_job_nr = 0;
