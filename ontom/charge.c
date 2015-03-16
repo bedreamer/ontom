@@ -519,6 +519,15 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.measure = task->measure[0];
         ret = bp_user_bind(bp, &u); // 读卡器
     } while (0);
+    // 串口通信线程
+    ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
+    if ( 0 != ret ) {
+        ret  = 0x1006;
+        log_printf(ERR,
+                   "UART framework start up.                       FAILE!!!!");
+        goto __panic;
+    }
+    log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
 
     task->commit_head = NULL;
     task->wait_head = NULL;
