@@ -388,7 +388,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.rcv_ok_cnt = 0;
                 u.swap_time_modify = 0;
                 u.swap_time_config_name = "convert_box_read";
-                u.user_evt_handle = uart4_convert_box_read_evt_handle;
+                u.user_evt_handle = ANC01_convert_box_read_evt_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
                 ret = bp_user_bind(bp, &u); // 读取转换盒信息
@@ -403,7 +403,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.rcv_ok_cnt = 0;
                 u.swap_time_modify = 0;
                 u.swap_time_config_name = "convert_box_write";
-                u.user_evt_handle = uart4_convert_box_write_evt_handle;
+                u.user_evt_handle = ANC01_convert_box_write_evt_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
                 ret = bp_user_bind(bp, &u); // 写转换盒信息
