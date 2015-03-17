@@ -25,6 +25,6 @@ static inline __log_printf(int l, const char * f)
 
 #define debug_track() __log_printf(__LINE__, __FILE__)
 
-#define log_printf(lv, fmt, ...) _log_printf(__LINE__, lv, fmt, __VA_ARGS__)
+#define log_printf(lv, fmt...) _log_printf(__LINE__, lv, fmt, __VA_ARGS__)
 
 #endif
