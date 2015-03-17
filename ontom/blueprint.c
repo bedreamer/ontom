@@ -456,8 +456,13 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             return ERR_UART_CONFIG_FAILE;
         }
 #else
-        set_speed(self->dev_handle, B9600);
-        set_other_attribute(self->dev_handle, 8, 1, 0);
+        if ( self->hw_port == SERIAL4_CTRL_PIN ) {
+            set_speed(self->dev_handle, B9600);
+            set_other_attribute(self->dev_handle, 8, 1, 0);
+        } else if ( self->hw_port == SERIAL5_CTRL_PIN ) {
+            set_speed(self->dev_handle, B2400);
+            set_other_attribute(self->dev_handle, 8, 1, 1);
+        }
 #endif
         self->status = BP_UART_STAT_WR;
         self->hw_status = BP_UART_STAT_INVALID;
@@ -2044,14 +2049,38 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
     return ret;
 }
 
+unsigned char check_sum(unsigned char *buff, size_t len) {
+    int i = 0;
+    unsigned char sum = 0;
+    while ( i < len ) {
+        sum = sum + buff[i];
+    }
+    return sum;
+}
 
-
+// 从电表读取电能数据
 int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
+    char buff[32];
+    int nr = 0;
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
@@ -2061,9 +2090,132 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0x68;
+
+        // 电表通信地址为 000000000001
+        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+
+        buff[ nr ++ ] = 0x68;
+        buff[ nr ++ ] = 0x11;
+        buff[ nr ++ ] = 0x04;
+        buff[ nr ++ ] = 0x00 + 0x33;
+        buff[ nr ++ ] = 0xFF + 0x33;
+        buff[ nr ++ ] = 0x00 + 0x33;
+        buff[ nr ++ ] = 0x00 + 0x33;
+
+        buff[ nr ++ ] = check_sum(&buff[4], nr - 4);
+        buff[ nr ++ ] = 0x16;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
+        self->rx_param.need_bytes = 36;
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        ret = ERR_OK;
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 从电表读取电压数据
+int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    char buff[32];
+    int nr = 0;
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0x68;
+
+        // 电表通信地址为 000000000001
+        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+
+        buff[ nr ++ ] = 0x68;
+        buff[ nr ++ ] = 0x11;
+        buff[ nr ++ ] = 0x04;
+        buff[ nr ++ ] = 0x00 + 0x33;
+        buff[ nr ++ ] = 0xFF + 0x33;
+        buff[ nr ++ ] = 0x01 + 0x33;
+        buff[ nr ++ ] = 0x02 + 0x33;
+
+        buff[ nr ++ ] = check_sum(&buff[4], nr - 4);
+        buff[ nr ++ ] = 0x16;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
+        self->rx_param.need_bytes = 22;
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:

@@ -285,6 +285,8 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                      struct bp_evt_param *param);
 int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
+int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
 int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
