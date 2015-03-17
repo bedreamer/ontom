@@ -27,7 +27,7 @@ PWD=pwd
 WORKDIR=$(shell pwd)
 Q=@
 #Q=
-CFLAGS=-c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
+CFLAGS=-c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT -std=C99
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
 CPFLAGS=-I./thirdpart/D8 -I./thirdpart/mongoose -I./thirdpart/sqlite -Wl,-O1
@@ -98,6 +98,9 @@ zeus:
 browser:
 	$(Q)$(MAKE) $(MAKEPARAM) -C browser all;
 
+watchdog:
+	$(Q)$(MAKE) $(MAKEPARAM) -C watchdog all;
+	
 clean:list-clean
 	$(Q)$(OMIT)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
 PHONY+=clean
