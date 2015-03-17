@@ -6,14 +6,14 @@ int log_printf(unsigned int level, const char *fmt, ...)
 	va_list ap;
     //char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
     const char *cfg;
-    char timestamp[20] = {0}, tid[16] = {0};
+    char timestamp[20] = {0}, btid[16] = {0};
     pthread_t tid;
 
     tid = pthread_self();
-    sprintf(tid, ".%lu", tid);
+    sprintf(btid, ".%lu", tid);
 	va_start(ap, fmt);
     __get_timestamp(timestamp);
-    strcat(timestamp, tid);
+    strcat(timestamp, btid);
 
 #if 0
     sprintf(".%d", line);
