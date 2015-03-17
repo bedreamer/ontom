@@ -2186,7 +2186,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                 vc += (param->buff.rx_buff[18] >> 4 ) * 10 + (param->buff.rx_buff[18] & 0x0F );
 
                 log_printf(INF, "UART: %.2fV  %.2fV  %.2f V",
-                           va / 100.0f, vb / 100.0f, vc / 100.0f);
+                           va / 10.0f, vb / 10.0f, vc / 10.0f);
                 ret = ERR_OK;
             }
         }
