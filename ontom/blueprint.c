@@ -2013,6 +2013,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         param->payload_size = nr;
         self->master->time_to_send = param->payload_size * 1000 / 960;
         self->rx_param.need_bytes = 0;
+        log_printf(INF, "UART: %s", __FUNCTION__);
         ret = ERR_OK;
         break;
     // 串口发送确认
