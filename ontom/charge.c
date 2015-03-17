@@ -425,6 +425,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.user_evt_handle = Increase_convert_box_write_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
+                    ret = bp_user_bind(bp, &u); // 写转换盒信息
 
                     for ( i = 0; i < task->modules_nr &&
                           i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
