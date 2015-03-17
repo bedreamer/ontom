@@ -308,6 +308,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         bp->role = BP_UART_MASTER;
         bp->init_magic = 0;
         bp->hw_port = SERIAL4_CTRL_PIN;
+        bp->users_nr = 0;
         bit_set(task, F_SYSTEM_CHARGE_ALLOW);
 
         task->chargers[0] = (struct charger_struct *)malloc(sizeof(struct charger_struct));
@@ -548,6 +549,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.uart = bp;
         u.chargers = task->chargers[0];
         u.measure = task->measure[0];
+        u.name = "电表";
         ret = bp_user_bind(bp, &u); // 电表
 
         u.frame_freq = 50 * 100;
@@ -564,6 +566,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.uart = bp;
         u.chargers = task->chargers[0];
         u.measure = task->measure[0];
+        u.name = "读卡器";
         ret = bp_user_bind(bp, &u); // 读卡器
     } while (0);
     // 串口通信线程
