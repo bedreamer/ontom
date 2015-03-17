@@ -170,6 +170,8 @@ struct bp_user {
     unsigned int swap_time_modify;
     // 配置项名称
     char * swap_time_config_name;
+    // 私有数据
+    void * _private;
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：

@@ -743,6 +743,16 @@ typedef enum {
     SYSTEM_YITISHI   // 一体式
 }SYSTEM_TYPE;
 
+// 模块类型
+typedef enum {
+    MODEL_INCREASE,
+    MODEL_AN10750,
+    MODEL_AN20750,
+    MODEL_AN30750,
+    MODEL_AN40750,
+    MODEL_UNKOWN
+}MODULE_MODEL;
+
 /*
  * 充电任务描述, 详细描述了系统的配置参数
  */
@@ -846,6 +856,8 @@ struct charge_task {
     unsigned short modules_nr;
     /*充电状态*/
     unsigned short charge_stat;
+    /*模块型号*/
+    MODULE_MODEL module_model;
 
     /*模块开关机*/
     unsigned short modules_on_off;

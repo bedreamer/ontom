@@ -378,35 +378,72 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.chargers = task->chargers[0];
                 ret = bp_user_bind(bp, &u); // 遥信2
             } else if ( task->sys_type == SYSTEM_YITISHI ) {
-                u.frame_freq = 50 * 100;
-                u.seed = 2000;
-                u.died_line = 5;
-                u.died_total = 0;
-                u.sent_frames = 0;
-                u.check_err_cnt = 0;
-                u.check_err_total = 0;
-                u.rcv_ok_cnt = 0;
-                u.swap_time_modify = 0;
-                u.swap_time_config_name = "convert_box_read";
-                u.user_evt_handle = ANC01_convert_box_read_evt_handle;
-                u.uart = bp;
-                u.chargers = task->chargers[0];
-                ret = bp_user_bind(bp, &u); // 读取转换盒信息
+                if ( task->module_model != MODEL_INCREASE ) {
+                    u.frame_freq = 50 * 100;
+                    u.seed = 2000;
+                    u.died_line = 5;
+                    u.died_total = 0;
+                    u.sent_frames = 0;
+                    u.check_err_cnt = 0;
+                    u.check_err_total = 0;
+                    u.rcv_ok_cnt = 0;
+                    u.swap_time_modify = 0;
+                    u.swap_time_config_name = "convert_box_read";
+                    u.user_evt_handle = ANC01_convert_box_read_evt_handle;
+                    u.uart = bp;
+                    u.chargers = task->chargers[0];
+                    ret = bp_user_bind(bp, &u); // 读取转换盒信息
 
-                u.frame_freq = 50 * 100;
-                u.seed = 3000;
-                u.died_line = 5;
-                u.died_total = 0;
-                u.sent_frames = 0;
-                u.check_err_cnt = 0;
-                u.check_err_total = 0;
-                u.rcv_ok_cnt = 0;
-                u.swap_time_modify = 0;
-                u.swap_time_config_name = "convert_box_write";
-                u.user_evt_handle = ANC01_convert_box_write_evt_handle;
-                u.uart = bp;
-                u.chargers = task->chargers[0];
-                ret = bp_user_bind(bp, &u); // 写转换盒信息
+                    u.frame_freq = 50 * 100;
+                    u.seed = 3000;
+                    u.died_line = 5;
+                    u.died_total = 0;
+                    u.sent_frames = 0;
+                    u.check_err_cnt = 0;
+                    u.check_err_total = 0;
+                    u.rcv_ok_cnt = 0;
+                    u.swap_time_modify = 0;
+                    u.swap_time_config_name = "convert_box_write";
+                    u.user_evt_handle = ANC01_convert_box_write_evt_handle;
+                    u.uart = bp;
+                    u.chargers = task->chargers[0];
+                    ret = bp_user_bind(bp, &u); // 写转换盒信息
+                } else {
+                    int i ;
+
+                    u.frame_freq = 50 * 100;
+                    u.seed = 3000;
+                    u.died_line = 5;
+                    u.died_total = 0;
+                    u.sent_frames = 0;
+                    u.check_err_cnt = 0;
+                    u.check_err_total = 0;
+                    u.rcv_ok_cnt = 0;
+                    u.swap_time_modify = 0;
+                    u.swap_time_config_name = NULL;
+                    u.user_evt_handle = Increase_convert_box_write_evt_handle;
+                    u.uart = bp;
+                    u.chargers = task->chargers[0];
+
+                    for ( i = 0; i < task->modules_nr &&
+                          i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
+                        u.frame_freq = 50 * 100;
+                        u.seed = 2000;
+                        u.died_line = 5;
+                        u.died_total = 0;
+                        u.sent_frames = 0;
+                        u.check_err_cnt = 0;
+                        u.check_err_total = 0;
+                        u.rcv_ok_cnt = 0;
+                        u.swap_time_modify = 0;
+                        u.swap_time_config_name = NULL;
+                        u.user_evt_handle = Increase_convert_box_read_evt_handle;
+                        u.uart = bp;
+                        u.chargers = task->chargers[0];
+                        u._private = (i + 1);
+                        ret = bp_user_bind(bp, &u); // 读模块信息
+                    }
+                }
             } else {
             }
         } while (0);
@@ -417,7 +454,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 char sql[128] = {0};
                 char *errmsg = NULL;
                 struct bp_user *self = bp->users[ i ];
-                if ( ! self ) continue;
+                if ( ! self || !self->swap_time_config_name ) continue;
                 sprintf(sql,
                         "SELECT config_value FROM configs "
                         "   WHERE config_name='%s' AND "
