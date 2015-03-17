@@ -378,6 +378,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.chargers = task->chargers[0];
                 ret = bp_user_bind(bp, &u); // 遥信2
             } else if ( task->sys_type == SYSTEM_YITISHI ) {
+                log_printf(INF, "ZEUS: 模块型号: %d", task->module_model);
                 if ( task->module_model != MODEL_INCREASE ) {
                     u.frame_freq = 50 * 100;
                     u.seed = 2000;
