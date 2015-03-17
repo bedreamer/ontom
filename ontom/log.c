@@ -7,13 +7,9 @@ int log_printf(unsigned int level, const char *fmt, ...)
     //char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
     const char *cfg;
     char timestamp[20] = {0}, btid[16] = {0};
-    pthread_t tid;
 
-    tid = pthread_self();
-    sprintf(btid, ".%lu", tid);
 	va_start(ap, fmt);
     __get_timestamp(timestamp);
-    strcat(timestamp, btid);
 
 #if 0
     sprintf(".%d", line);
