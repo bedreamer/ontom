@@ -2075,9 +2075,9 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         } else {
             unsigned char sum = check_sum(param->buff.rx_buff, param->need_bytes-2);
             unsigned char check = param->buff.rx_buff[ param->need_bytes - 2 ];
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
-                       crc, check);
-            if ( crc != check ) {
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %02X, gave: %02X",
+                       sum, check);
+            if ( sum != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
                 ret = ERR_OK;
@@ -2165,9 +2165,9 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         } else {
             unsigned char sum = check_sum(param->buff.rx_buff, param->need_bytes-2);
             unsigned char check = param->buff.rx_buff[ param->need_bytes - 2 ];
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
-                       crc, check);
-            if ( crc != check ) {
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %02X, gave: %02X",
+                       sum, check);
+            if ( sum != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
                 ret = ERR_OK;
