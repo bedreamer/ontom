@@ -2173,7 +2173,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                 int va, vb, vc, i;
 
                 for ( i = 0; i < 6; i ++ ) {
-                    param->buff.rx_buff[10 + i] += 0x33;
+                    param->buff.rx_buff[14 + i] -= 0x33;
                 }
 
                 va = (param->buff.rx_buff[14] >> 4 ) * 1000 + (param->buff.rx_buff[14] & 0x0F ) * 100;
