@@ -2054,7 +2054,7 @@ unsigned char check_sum(unsigned char *buff, size_t len) {
     int i = 0;
     unsigned char sum = 0;
     while ( i < len ) {
-        sum = sum + buff[i];
+        sum = sum + buff[i ++];
     }
     return sum;
 }
