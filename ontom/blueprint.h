@@ -172,6 +172,8 @@ struct bp_user {
     char * swap_time_config_name;
     // 私有数据
     void * _private;
+    // 名称
+    char * name;
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：

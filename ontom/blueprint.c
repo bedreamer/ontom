@@ -561,7 +561,8 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                 self->master = hit;
                 self->master->seed = 0;
                 ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
-                log_printf(DBG_LV1, "UART: BP_EVT_TX_FRAME_REQUEST ret: %d, load: %d, sent: %d",
+                log_printf(DBG_LV1, "UART: %s BP_EVT_TX_FRAME_REQUEST ret: %d, load: %d, sent: %d",
+                           self->master->name,
                            ret, param->payload_size, hit->sent_frames);
             } else {
                 self->sequce --;
@@ -1663,7 +1664,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 
         self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
         ret = ERR_OK;
-        log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -1931,7 +1932,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         self->master->time_to_send = param->payload_size * 1000 / 960;
         self->rx_param.need_bytes = 17;
         ret = ERR_OK;
-        log_printf(INF, "UART: %s", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -2013,7 +2014,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         param->payload_size = nr;
         self->master->time_to_send = param->payload_size * 1000 / 960;
         self->rx_param.need_bytes = 0;
-        log_printf(INF, "UART: %s", __FUNCTION__);
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         ret = ERR_OK;
         break;
     // 串口发送确认
