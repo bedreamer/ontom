@@ -1931,6 +1931,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         self->master->time_to_send = param->payload_size * 1000 / 960;
         self->rx_param.need_bytes = 17;
         ret = ERR_OK;
+        log_printf(INF, "UART: %s", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
