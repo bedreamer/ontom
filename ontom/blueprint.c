@@ -2173,17 +2173,17 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                 int va, vb, vc, i;
 
                 for ( i = 0; i < 6; i ++ ) {
-                    param->buff.rx_buff[14 + i] += 0x33;
+                    param->buff.rx_buff[10 + i] += 0x33;
                 }
 
-                va = (param->buff.rx_buff[19] >> 4 ) * 1000 + (param->buff.rx_buff[19] & 0x0F ) * 100;
-                va += (param->buff.rx_buff[18] >> 4 ) * 10 + (param->buff.rx_buff[18] & 0x0F );
+                va = (param->buff.rx_buff[14] >> 4 ) * 1000 + (param->buff.rx_buff[14] & 0x0F ) * 100;
+                va += (param->buff.rx_buff[13] >> 4 ) * 10 + (param->buff.rx_buff[13] & 0x0F );
 
-                vb = (param->buff.rx_buff[21] >> 4 ) * 1000 + (param->buff.rx_buff[21] & 0x0F ) * 100;
-                vb += (param->buff.rx_buff[20] >> 4 ) * 10 + (param->buff.rx_buff[20] & 0x0F );
+                vb = (param->buff.rx_buff[16] >> 4 ) * 1000 + (param->buff.rx_buff[16] & 0x0F ) * 100;
+                vb += (param->buff.rx_buff[15] >> 4 ) * 10 + (param->buff.rx_buff[15] & 0x0F );
 
-                vc = (param->buff.rx_buff[23] >> 4 ) * 1000 + (param->buff.rx_buff[23] & 0x0F ) * 100;
-                vc += (param->buff.rx_buff[22] >> 4 ) * 10 + (param->buff.rx_buff[22] & 0x0F );
+                vc = (param->buff.rx_buff[18] >> 4 ) * 1000 + (param->buff.rx_buff[18] & 0x0F ) * 100;
+                vc += (param->buff.rx_buff[17] >> 4 ) * 10 + (param->buff.rx_buff[17] & 0x0F );
 
                 log_printf(INF, "UART: %.2fV  %.2fV  %.2f V",
                            va / 100.0f, vb / 100.0f, vc / 100.0f);
