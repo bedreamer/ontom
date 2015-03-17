@@ -1989,7 +1989,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        buff[ nr ++ ] = 0xFF;
+       /* buff[ nr ++ ] = 0xFF;
         buff[ nr ++ ] = 0x10;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
@@ -2015,7 +2015,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         self->master->time_to_send = param->payload_size * 1000 / 960;
         self->rx_param.need_bytes = 0;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
-        ret = ERR_OK;
+        ret = ERR_OK;*/
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
