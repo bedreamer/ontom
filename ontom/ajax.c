@@ -713,7 +713,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 版本
-            "\"version\":\"V1.0\",");
+            "\"version\":\"V%d\",", VERSION);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 版本
             "\"doreset\":%s,", doreset ? "false" : "true");
     doreset = 1;
