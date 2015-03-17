@@ -2098,9 +2098,9 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         buff[ nr ++ ] = 0x68;
 
         // 电表通信地址为 000000000001
-        buff[ nr ++ ] = 0x01;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x31;
+        buff[ nr ++ ] = 0x17;
+        buff[ nr ++ ] = 0x08;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
@@ -2189,9 +2189,9 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         buff[ nr ++ ] = 0x68;
 
         // 电表通信地址为 000000000001
-        buff[ nr ++ ] = 0x01;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x31;
+        buff[ nr ++ ] = 0x17;
+        buff[ nr ++ ] = 0x08;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
