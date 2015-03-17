@@ -1924,8 +1924,8 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x06;
         len = nr;
-        //buff[ nr ++ ] = Increase_ModbusCRC(len, buff);
-        //buff[ nr ++ ] = Increase_ModbusCRC(len, buff) >> 8;
+        buff[ nr ++ ] = Increase_ModbusCRC(buff, len);
+        buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
@@ -2007,8 +2007,8 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x01;
         len = nr;
-        //buff[ nr ++ ] = Increase_ModbusCRC(len, buff);
-        //buff[ nr ++ ] = Increase_ModbusCRC(len, buff) >> 8;
+        buff[ nr ++ ] = Increase_ModbusCRC(buff, len);
+        buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
