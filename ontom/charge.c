@@ -330,6 +330,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.uart = bp;
             u.chargers = task->chargers[0];
             u.measure = task->measure[0];
+            u.name = "采样盒";
             ret = bp_user_bind(bp, &u); // 采样
 
             if ( task->sys_type == SYSTEM_FENTISHI ) {
@@ -346,6 +347,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.user_evt_handle = uart4_charger_config_evt_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
+                u.name = "充电屏监控(配置)";
                 ret = bp_user_bind(bp, &u); // 配置充电电压，电流
 
                 u.frame_freq = 50 * 100;
@@ -361,6 +363,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
+                u.name = "充电屏监控(遥信1)";
                 ret = bp_user_bind(bp, &u); // 遥信1
 
                 u.frame_freq = 50 * 100;
@@ -376,6 +379,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
+                u.name = "充电屏监控(遥信2)";
                 ret = bp_user_bind(bp, &u); // 遥信2
             } else if ( task->sys_type == SYSTEM_YITISHI ) {
                 log_printf(INF, "ZEUS: 模块型号: %d", task->module_model);
@@ -393,6 +397,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.user_evt_handle = ANC01_convert_box_read_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
+                    u.name = "协议转换盒(读)";
                     ret = bp_user_bind(bp, &u); // 读取转换盒信息
 
                     u.frame_freq = 50 * 100;
@@ -408,6 +413,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.user_evt_handle = ANC01_convert_box_write_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
+                    u.name = "协议转换盒(写)";
                     ret = bp_user_bind(bp, &u); // 写转换盒信息
                 } else {
                     int i ;
@@ -425,6 +431,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.user_evt_handle = Increase_convert_box_write_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
+                    u.name = "协议转换盒(写)";
                     ret = bp_user_bind(bp, &u); // 写转换盒信息
 
                     for ( i = 0; i < task->modules_nr &&
@@ -443,6 +450,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                         u.uart = bp;
                         u.chargers = task->chargers[0];
                         u._private = (i + 1);
+                        u.name = "模块";
                         ret = bp_user_bind(bp, &u); // 读模块信息
                     }
                 }
