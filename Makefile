@@ -25,8 +25,8 @@ MAKEPARAM=--no-print-directory
 OMIT=-
 PWD=pwd
 WORKDIR=$(shell pwd)
-Q=@
-#Q=
+#Q=@
+Q=
 CFLAGS=-c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT -std=c99
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
