@@ -2073,9 +2073,8 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         if ( param->payload_size < param->need_bytes ) {
             ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
         } else {
-            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
-            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
-                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            unsigned char sum = check_sum(param->buff.rx_buff, param->need_bytes-2);
+            unsigned char check = param->buff.rx_buff[ param->need_bytes - 2 ];
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
@@ -2164,9 +2163,8 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         if ( param->payload_size < param->need_bytes ) {
             ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
         } else {
-            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
-            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
-                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            unsigned char sum = check_sum(param->buff.rx_buff, param->need_bytes-2);
+            unsigned char check = param->buff.rx_buff[ param->need_bytes - 2 ];
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
