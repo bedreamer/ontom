@@ -242,12 +242,16 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
 
     if ( 0 == strcmp(text[0], "system_type") ) {
         task->sys_type = atoi(text[1]);
+        log_printf(INF, "ZEUS: 系统类型: %d", task->sys_type);
     } else if ( 0 == strcmp(text[0], "module_kind") ) {
         task->module_model = atoi(text[1]);
+        log_printf(INF, "ZEUS: 模块型号: %d", task->module_model);
     } else if ( 0 == strcmp(text[0], "module_count") ) {
         task->modules_nr = atoi(text[1]);
+        log_printf(INF, "ZEUS: 模块个数: %d", task->modules_nr);
     } else if ( 0 == strcmp(text[0], "kwh_price") ) {
         task->kwh_price = atof(text[1]);
+        log_printf(INF, "ZEUS: 单位电价: %.1f", task->kwh_price);
     }
     return 0;
 }
