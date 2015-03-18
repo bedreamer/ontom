@@ -869,7 +869,19 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                     thiz->job_status = JOB_DONE;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
-
+                double used_kwh = task->meter[0].kwh_zong - thiz->charge_begin_kwh_data;
+                if ( used_kwh * task->kwh_price >= thiz->charge_billing.set_money ) {
+                    thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                    thiz->charge_stop_timestamp = time(NULL);
+                    log_printf(INF,
+                               "ZEUS: 充电结束, 起始电量: %.2f KWH, "
+                               "终止电量: %.2f KWH, 充电电量: %.2f KWH",
+                               thiz->charge_begin_kwh_data,
+                               task->meter[0].kwh_zong,
+                               task->meter[0].kwh_zong -
+                                thiz->charge_begin_kwh_data);
+                    thiz->job_status = JOB_DONE;
+                }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
                 if ( time(NULL) - thiz->charge_begin_timestamp >=
                      thiz->charge_billing.option.set_time ) {

@@ -1556,7 +1556,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "},",
             status_string[job->job_status],
             job->job_url_commit_timestamp,
-            job->job_gun_sn,
+            job->job_gun_sn + 1,
             cmode_string[job->charge_mode],
             job->need_V,
             job->need_I,
