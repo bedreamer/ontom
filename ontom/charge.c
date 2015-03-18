@@ -831,6 +831,8 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             if (thiz->charge_billing.mode == BILLING_MODE_AS_CAP ) {
                 if ( task->meter[0].kwh_zong - thiz->charge_begin_kwh_data >=
                      thiz->charge_billing.option.set_kwh ) {
+                    thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                    thiz->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
                                "ZEUS: 充电结束, 起始电量: %.2f KWH, "
                                "终止电量: %.2f KWH, 充电电量: %.2f KWH",
@@ -838,8 +840,6 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                                task->meter[0].kwh_zong,
                                task->meter[0].kwh_zong -
                                 thiz->charge_begin_kwh_data);
-                    thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_stop_timestamp = time(NULL);
                     thiz->job_status = JOB_DONE;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
@@ -847,15 +847,15 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
                 if ( time(NULL) - thiz->charge_begin_timestamp >=
                      thiz->charge_billing.option.set_time ) {
-                    log_printf(INF,
-                               "ZEUS: 充电结束, 起始电量: %.2f KWH, "
-                               "终止电量: %.2f KWH, 充电电量: %.2f KWH",
-                               thiz->charge_begin_kwh_data,
-                               task->meter[0].kwh_zong,
-                               task->meter[0].kwh_zong -
-                                thiz->charge_begin_kwh_data);
                     thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     thiz->charge_stop_timestamp = time(NULL);
+                    log_printf(INF,
+                               "ZEUS: 充电结束, 起始时戳: %ld, "
+                               "终止时戳: %ld, 充电时长: %ld 秒",
+                               thiz->charge_begin_timestamp,
+                               thiz->charge_stop_timestamp,
+                               thiz->charge_stop_timestamp -
+                                thiz->charge_begin_timestamp);
                     thiz->job_status = JOB_DONE;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_FREE ) {
