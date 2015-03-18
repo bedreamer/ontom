@@ -866,6 +866,8 @@ struct charge_task {
     unsigned int sys_rs485_dev_nr;
     /*通信用485串口设备文件名*/
     char sys_uart_name[CONFIG_SUPPORT_RS485_NR][128];
+    // 每度电的价格
+    double kwh_price;
 
     // 以下适用于采样盒配置值
     double bus_1_v_hi;
