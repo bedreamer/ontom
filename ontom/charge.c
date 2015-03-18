@@ -796,7 +796,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
 
         thiz->job_status = JOB_WORKING;
         thiz->charge_begin_kwh_data = task->meter[0].kwh_zong;
-        thiz->charge_begin_timestamp = time();
+        thiz->charge_begin_timestamp = time(NULL);
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
     case JOB_WORKING:
@@ -839,13 +839,13 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                                task->meter[0].kwh_zong -
                                 thiz->charge_begin_kwh_data);
                     thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_stop_timestamp = time();
+                    thiz->charge_stop_timestamp = time(NULL);
                     thiz->job_status = JOB_DONE;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
 
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
-                if ( time() - thiz->charge_begin_timestamp >=
+                if ( time(NULL) - thiz->charge_begin_timestamp >=
                      thiz->charge_billing.option.set_time ) {
                     log_printf(INF,
                                "ZEUS: 充电结束, 起始电量: %.2f KWH, "
@@ -855,7 +855,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                                task->meter[0].kwh_zong -
                                 thiz->charge_begin_kwh_data);
                     thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_stop_timestamp = time();
+                    thiz->charge_stop_timestamp = time(NULL);
                     thiz->job_status = JOB_DONE;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_FREE ) {
