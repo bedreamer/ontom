@@ -2114,6 +2114,11 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
                 log_printf(INF, "UART: %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH",
                            hwh_zong / 100.0f, hwh_jian / 100.0f, hwh_feng / 100.0f
                            , hwh_ping / 100.0f, hwh_gu / 100.0f);
+                task->meter[0].kwh_zong = hwh_zong / 100.0f;
+                task->meter[0].hwh_jian = hwh_jian / 100.0f;
+                task->meter[0].hwh_feng = hwh_feng / 100.0f;
+                task->meter[0].hwh_ping = hwh_ping / 100.0f;
+                task->meter[0].hwh_gu = hwh_gu / 100.0f;
                 ret = ERR_OK;
             }
         }
@@ -2221,6 +2226,10 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
 
                 log_printf(INF, "UART: %.2fV  %.2fV  %.2f V",
                            va / 10.0f, vb / 10.0f, vc / 10.0f);
+
+                task->meter[0].Va = va / 10.0f;
+                task->meter[0].Vb = vb / 10.0f;
+                task->meter[0].Vc = vc / 10.0f;
                 ret = ERR_OK;
             }
         }

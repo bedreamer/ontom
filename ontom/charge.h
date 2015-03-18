@@ -611,6 +611,27 @@ struct charger_struct {
     struct charger_config_10h chargers;
 };
 
+// 电表数据
+struct meter_data {
+    // A 相电压
+    double Va;
+    // B 相电压
+    double Vb;
+    // C 相电压
+    double Vc;
+
+    // 正向总电能
+    double kwh_zong;
+    // 尖电能
+    double kwh_jian;
+    // 峰电能
+    double kwh_feng;
+    // 平电能
+    double kwh_ping;
+    // 谷电能
+    double kwh_gu;
+};
+
 // 提交命令
 typedef enum {
     // 创建任务
@@ -791,6 +812,8 @@ struct charge_task {
     struct measure_struct *measure[CONFIG_SUPPORT_SIMPLE_BOX_NR];
     // 充电机管理模块
     struct charger_struct *chargers[CONFIG_SUPPORT_CHARGE_GRP_NR];
+    // 电表电能
+    struct meter_data meter[CONFIG_SUPPORT_CHARGE_GRP_NR];
 
     // 系统信号, 最多支持64 * 8 种信号标记
     // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
