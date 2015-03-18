@@ -241,8 +241,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     if ( nr <= 0 ) return 0;
 
     if ( 0 == strcmp(text[0], "system_type") ) {
-    } else if ( 0 == strcmp(text[0], "module_kind") ) {
         task->sys_type = atoi(text[1]);
+    } else if ( 0 == strcmp(text[0], "module_kind") ) {
+        task->module_model = atoi(text[1]);
     } else if ( 0 == strcmp(text[0], "module_count") ) {
         task->modules_nr = atoi(text[1]);
     } else if ( 0 == strcmp(text[0], "kwh_price") ) {
