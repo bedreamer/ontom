@@ -235,6 +235,23 @@ void print_POST_configure()
     printf("-----------------------END---------------------------\n");
 }
 
+// 重新获得设置值
+int sql_db_settings_result(void *param, int nr, char **text, char **name)
+{
+    if ( nr <= 0 ) return 0;
+
+    if ( 0 == strcmp(text[0], "system_type") ) {
+    } else if ( 0 == strcmp(text[0], "module_kind") ) {
+        task->sys_type = atoi(text[1]);
+    } else if ( 0 == strcmp(text[0], "module_count") ) {
+        task->modules_nr = atoi(text[1]);
+    } else if ( 0 == strcmp(text[0], "kwh_price") ) {
+        task->kwh_price = atof(text[1]);
+    }
+    return 0;
+}
+
+
 #define true_express(i) (keyerr[i] == '1' || keyerr[i] == 't' || keyerr[i] =='T'|| keyerr[i] == 'y' || keyerr[i] == 'Y')
 #define false_express(i) (keyerr[i] == '0' || keyerr[i] == 'f' || keyerr[i] =='F'|| keyerr[i] == 'n' || keyerr[i] == 'N')
 /* 充电任务服务线程
@@ -267,6 +284,11 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     sprintf(sql, "SELECT * FROM configs");
     ret = sqlite3_exec(task->database, sql, sql_db_config_result, &done, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "TOM: SQL error: %s", errmsg);
+    }
+    sprintf(sql, "SELECT key,current_value FROM settings");
+    ret = sqlite3_exec(task->database, sql, sql_db_settings_result, &done, &errmsg);
     if ( ret ) {
         log_printf(ERR, "TOM: SQL error: %s", errmsg);
     }
