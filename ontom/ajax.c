@@ -1520,13 +1520,13 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     if ( job->job_status == JOB_WORKING ) {
         switch (job->charge_billing.mode) {
         case BILLING_MODE_AS_CAP:
-            ycdl = 100 * task->meter[0].kwh_zong - job->charge_begin_kwh_data /
+            ycdl = 100 * (task->meter[0].kwh_zong - job->charge_begin_kwh_data) /
                     job->charge_billing.option.set_kwh;
             break;
         case BILLING_MODE_AS_MONEY:
             break;
         case BILLING_MODE_AS_TIME:
-            ycdl = 100.0 * (time(NULL) - job->charge_begin_timestamp)*1.0f /
+            ycdl = 100.0 * ((time(NULL) - job->charge_begin_timestamp)*1.0f) /
                     job->charge_billing.option.set_time;
             break;
         default:
