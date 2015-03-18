@@ -933,7 +933,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
             log_printf(DBG_LV3, "错误的计费参数");
             goto reject;
         }
-        jc.as_time = atoi(b_time);
+        jc.as_time = atoi(b_time) * 60;
         if ( jc.as_time < 1 ) {
             log_printf(DBG_LV3, "错误的计费参数");
             goto reject;

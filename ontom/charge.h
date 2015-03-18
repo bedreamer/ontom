@@ -700,6 +700,10 @@ struct charge_job {
     time_t charge_implemention_timestamp;
     // BMS握手成功的时戳, 接收到第一次BRM的时刻
     time_t charge_bms_establish_timestamp;
+    // 开始充电时的电表度数
+    double charge_begin_kwh_data;
+    // 终止充电时的电表度数
+    double charge_exit_kwh_data;
     // 结构体引用计数
     unsigned int ref_nr;
 
@@ -862,6 +866,23 @@ struct charge_task {
     unsigned int sys_rs485_dev_nr;
     /*通信用485串口设备文件名*/
     char sys_uart_name[CONFIG_SUPPORT_RS485_NR][128];
+
+    // 以下适用于采样盒配置值
+    double bus_1_v_hi;
+    double bus_1_v_lo;
+    double bus_2_v_hi;
+    double bus_2_v_lo;
+    double bat_1_v_hi;
+    double bat_1_v_lo;
+    double bat_2_v_hi;
+    double bat_2_v_lo;
+    double bat_1_I_hi;
+    double bat_2_I_lo;
+    double bat_1_insti_ohm_v;
+    double bat_2_insti_ohm_v;
+    double bus1_bat1_check_v;
+    double bus2_bat2_check_v;
+    double bat1_bat2_check_I;
 
     /*额定电流*/
     double max_output_I;
