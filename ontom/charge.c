@@ -251,7 +251,6 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     return 0;
 }
 
-
 #define true_express(i) (keyerr[i] == '1' || keyerr[i] == 't' || keyerr[i] =='T'|| keyerr[i] == 'y' || keyerr[i] == 'Y')
 #define false_express(i) (keyerr[i] == '0' || keyerr[i] == 'f' || keyerr[i] =='F'|| keyerr[i] == 'n' || keyerr[i] == 'N')
 /* 充电任务服务线程
