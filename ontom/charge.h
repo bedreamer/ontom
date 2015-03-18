@@ -770,11 +770,11 @@ typedef enum {
 
 // 模块类型
 typedef enum {
-    MODEL_INCREASE = 0,
     MODEL_AN10750,
     MODEL_AN20750,
     MODEL_AN30750,
     MODEL_AN40750,
+    MODEL_INCREAS,
     MODEL_UNKOWN
 }MODULE_MODEL;
 
