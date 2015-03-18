@@ -1019,7 +1019,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
         thiz->charge_billing.option.set_money = need->as_money;
     }
     if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
-        thiz->charge_billing.set_time = need->as_time;
+        thiz->charge_billing.option.set_time = need->as_time;
     }
 
     thiz->charge_mode = need->charge_mode;
