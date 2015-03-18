@@ -1516,6 +1516,25 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     } else {
         sprintf(buff, "枪%d未连接", job->job_gun_sn);
     }
+    double ycdl = 0.0;
+    if ( job->job_status == JOB_WORKING ) {
+        switch (job->charge_billing.mode) {
+        case BILLING_MODE_AS_CAP:
+            ycdl = task->meter[0].kwh_zong - job->charge_begin_kwh_data /
+                    job->charge_billing.option.set_kwh;
+            break;
+        case BILLING_MODE_AS_MONEY:
+            break;
+        case BILLING_MODE_AS_TIME:
+            ycdl = (time(NULL) - job->charge_begin_timestamp)*1.0f /
+                    job->charge_billing.option.set_time;
+            break;
+        default:
+            break;
+        }
+    } else if ( job->job_status == JOB_DONE ) {
+        ycdl = 100.0;
+    } else ;
 
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
@@ -1532,7 +1551,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"cremain\":\"%.2f 元\"," // 余额
             "\"CV\":\"%.1f V\","       // 充电电压
             "\"CI\":\"%.1f A\","       // 充电电流
-            "\"ycdl\":\"%s %%\","       // 已充电量
+            "\"ycdl\":\"%.2f %%\","       // 已充电量
             "\"gun_stat\":\"%s\""       // 充电枪连接状态
             "},",
             status_string[job->job_status],
@@ -1549,7 +1568,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             0.00f,
             task->measure[0]->measure.VinKM0 / 10.0f,
             task->measure[0]->measure.IoutBAT0 / 10.0f,
-            "0",
+            ycdl,
             buff
             );
 }
