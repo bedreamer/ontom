@@ -1417,7 +1417,7 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
                 log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
                 ret = ERR_ERR;
             } else {
-                if ( 0 == strcmp("moudle_count", key) ) {
+                if ( 0 == strcmp("module_count", key) ) {
                     task->modules_nr = atoi(value);
                 } else if ( 0 == strcmp("system_type", key) ) {
                     if ( atoi(value) == 0 ) {
