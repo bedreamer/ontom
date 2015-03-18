@@ -1012,6 +1012,16 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     list_ini(thiz->job_node);
     thiz->job_url_commit_timestamp = need->url_commit_timestamp;
     thiz->charge_billing.mode = need->biling_mode;
+    if ( thiz->charge_billing.mode == BILLING_MODE_AS_CAP ) {
+       thiz->charge_billing.option.set_kwh = need->as_kwh;
+    }
+    if ( thiz->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
+        thiz->charge_billing.option.set_money = need->as_money;
+    }
+    if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
+        thiz->charge_billing.set_time = need->as_time;
+    }
+
     thiz->charge_mode = need->charge_mode;
     thiz->job_gun_sn = need->charge_gun;
     strcpy(thiz->card.triger_card_sn, need->card_sn);
