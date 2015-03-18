@@ -25,6 +25,7 @@ int ajax_module_query_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_options_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_save_proc(struct ajax_xml_struct *thiz);
+int ajax_system_detail_proc(struct ajax_xml_struct *thiz);
 
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
@@ -58,6 +59,7 @@ struct xml_generator {
     {"/system/config.json",     ajax_system_config_proc},
     {"/system/options.json",    ajax_system_config_options_proc},
     {"/system/save.json",       ajax_system_config_save_proc},
+    {"/system/detail.json",     ajax_system_detail_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -743,6 +745,13 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     } else {
         p = "正常";
     }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"Va\":\"%.1f V\",", task->meter[0].Va);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"Vb\":\"%.1f V\",", task->meter[0].Vb);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"Vc\":\"%.1f V\",", task->meter[0].Vc);
+
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
             "\"bus1_institude\":\"%s\",", p);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
@@ -1442,6 +1451,28 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
+die:
+    return ret;
+}
+
+int ajax_system_detail_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"VA\":\"%.1f V\",", task->meter[0].Va);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"VB\":\"%.1f V\",", task->meter[0].Vb);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"VC\":\"%.1f V\",", task->meter[0].Vc);
+
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
 die:
     return ret;
 }
