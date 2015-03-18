@@ -2080,6 +2080,40 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
             if ( sum != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
+                int hwh_zong, hwh_jian, hwh_feng, hwh_ping, hwh_gu, i;
+
+                for ( i = 0; i < 20; i ++ ) {
+                    param->buff.rx_buff[14 + i] -= 0x33;
+                }
+
+                hwh_zong = (param->buff.rx_buff[14] >> 4 ) * 10 + (param->buff.rx_buff[14] & 0x0F );
+                hwh_zong += (param->buff.rx_buff[15] >> 4 ) * 1000 + (param->buff.rx_buff[15] & 0x0F ) * 100;
+                hwh_zong += (param->buff.rx_buff[16] >> 4 ) * 100000 + (param->buff.rx_buff[16] & 0x0F ) * 10000;
+                hwh_zong += (param->buff.rx_buff[17] >> 4 ) * 10000000 + (param->buff.rx_buff[17] & 0x0F ) * 1000000;
+
+                hwh_jian = (param->buff.rx_buff[18] >> 4 ) * 10 + (param->buff.rx_buff[18] & 0x0F );
+                hwh_jian += (param->buff.rx_buff[19] >> 4 ) * 1000 + (param->buff.rx_buff[19] & 0x0F ) * 100;
+                hwh_jian += (param->buff.rx_buff[20] >> 4 ) * 100000 + (param->buff.rx_buff[20] & 0x0F ) * 10000;
+                hwh_jian += (param->buff.rx_buff[21] >> 4 ) * 10000000 + (param->buff.rx_buff[21] & 0x0F ) * 1000000;
+
+                hwh_feng = (param->buff.rx_buff[22] >> 4 ) * 10 + (param->buff.rx_buff[22] & 0x0F );
+                hwh_feng += (param->buff.rx_buff[23] >> 4 ) * 1000 + (param->buff.rx_buff[23] & 0x0F ) * 100;
+                hwh_feng += (param->buff.rx_buff[24] >> 4 ) * 100000 + (param->buff.rx_buff[24] & 0x0F ) * 10000;
+                hwh_feng += (param->buff.rx_buff[25] >> 4 ) * 10000000 + (param->buff.rx_buff[25] & 0x0F ) * 1000000;
+
+                hwh_ping = (param->buff.rx_buff[26] >> 4 ) * 10 + (param->buff.rx_buff[26] & 0x0F );
+                hwh_ping += (param->buff.rx_buff[27] >> 4 ) * 1000 + (param->buff.rx_buff[27] & 0x0F ) * 100;
+                hwh_ping += (param->buff.rx_buff[28] >> 4 ) * 100000 + (param->buff.rx_buff[28] & 0x0F ) * 10000;
+                hwh_ping += (param->buff.rx_buff[29] >> 4 ) * 10000000 + (param->buff.rx_buff[29] & 0x0F ) * 1000000;
+
+                hwh_gu = (param->buff.rx_buff[30] >> 4 ) * 10 + (param->buff.rx_buff[30] & 0x0F );
+                hwh_gu += (param->buff.rx_buff[31] >> 4 ) * 1000 + (param->buff.rx_buff[31] & 0x0F ) * 100;
+                hwh_gu += (param->buff.rx_buff[32] >> 4 ) * 100000 + (param->buff.rx_buff[32] & 0x0F ) * 10000;
+                hwh_gu += (param->buff.rx_buff[33] >> 4 ) * 10000000 + (param->buff.rx_buff[33] & 0x0F ) * 1000000;
+
+                log_printf(INF, "UART: %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH",
+                           hwh_zong / 100.0f, hwh_jian / 100.0f, hwh_feng / 100.0f
+                           , hwh_ping / 100.0f, hwh_gu / 100.0f);
                 ret = ERR_OK;
             }
         }
