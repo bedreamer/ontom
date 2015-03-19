@@ -755,6 +755,8 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
 {
     int ret;
     char buff[64] = {0};
+    char sql[256];
+    int start  = 0, end = 0;
 
     if ( thiz == NULL ) return;
 #if 0
@@ -821,8 +823,9 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         }
 
         thiz->job_status = JOB_WORKING;
-        thiz->charge_begin_kwh_data = task->meter[0].kwh_zong;
-        thiz->charge_begin_timestamp = time(NULL);
+        sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
+                thiz->job_status, thiz->job_url_commit_timestamp);
+        (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
     case JOB_WORKING:
@@ -847,12 +850,36 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             ret = __is_gun_phy_conn_ok(thiz);
             if ( ret  == GUN_SN0 ) {
                 bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+
+                if ( ! bit_read(tsk, CMD_GUN_1_OUTPUT_ON) ) {
+                    thiz->charge_begin_kwh_data = task->meter[0].kwh_zong;
+                    thiz->charge_begin_timestamp = time(NULL);
+                    start ++;
+                }
                 bit_set(tsk, CMD_GUN_1_OUTPUT_ON);
             }
             if ( ret  == GUN_SN1 ) {
                 bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
+
+                if ( ! bit_read(tsk, CMD_GUN_2_OUTPUT_ON) ) {
+                    thiz->charge_begin_kwh_data = task->meter[0].kwh_zong;
+                    thiz->charge_begin_timestamp = time(NULL);
+                    start ++;
+                }
                 bit_set(tsk, CMD_GUN_2_OUTPUT_ON);
             }
+
+            // 有新的充电状态变化
+            if ( start ) {
+                sprintf(sql, "INSERT INTO job_billing VALUES("
+                        "'%ld','%ld','0','0','%.2f','0.00','0.00','0.00'",
+                        thiz->job_url_commit_timestamp,
+                        thiz->charge_begin_timestamp,
+                        thiz->charge_begin_kwh_data,
+                        task->kwh_price);
+                (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+            }
+
             //{{ 在这做是否充完判定
             if (thiz->charge_billing.mode == BILLING_MODE_AS_CAP ) {
                 if ( task->meter[0].kwh_zong - thiz->charge_begin_kwh_data >=
@@ -867,6 +894,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                                task->meter[0].kwh_zong -
                                 thiz->charge_begin_kwh_data);
                     thiz->job_status = JOB_DONE;
+                    end ++;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
                 double used_kwh = task->meter[0].kwh_zong - thiz->charge_begin_kwh_data;
@@ -881,6 +909,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                                task->meter[0].kwh_zong -
                                 thiz->charge_begin_kwh_data);
                     thiz->job_status = JOB_DONE;
+                    end ++;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
                 if ( time(NULL) - thiz->charge_begin_timestamp >=
@@ -895,6 +924,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                                thiz->charge_stop_timestamp -
                                 thiz->charge_begin_timestamp);
                     thiz->job_status = JOB_DONE;
+                    end ++;
                 }
             } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_FREE ) {
 
@@ -903,6 +933,25 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             } else {
 
             }
+
+            // 充电作业发生状态变化
+            if ( end ) {
+                sprintf(sql,
+                        "UPDATE job_billing SET b_end_timestamp='%ld',"
+                        "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
+                        thiz->charge_stop_timestamp,
+                        thiz->charge_exit_kwh_data,
+                        thiz->job_url_commit_timestamp,
+                        thiz->charge_begin_timestamp);
+                (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+
+                sprintf(sql,
+                        "UPDATE jobs SET jos_status='%d' WHERE job_id='%ld'",
+                        thiz->job_status,
+                        thiz->job_url_commit_timestamp);
+                (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+            }
+
             //}}
             if ( bit_read(tsk, CMD_JOB_ABORT) ) {
                 bit_clr(tsk, CMD_JOB_ABORT);
