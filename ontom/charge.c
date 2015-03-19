@@ -1013,6 +1013,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         }
         break;
     case JOB_RESUMING:
+        thiz->job_status = JOB_WORKING;
         break;
     case JOB_ABORTING:
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
