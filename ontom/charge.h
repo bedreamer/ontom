@@ -177,6 +177,7 @@ struct MDATA_ACK {
     unsigned char yx_run2_rsv:4;
 
     unsigned char yx_run3_rsv;
+    unsigned char unused;
 
     unsigned short crc;
 #else
