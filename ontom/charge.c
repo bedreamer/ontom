@@ -872,7 +872,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             // 有新的充电状态变化
             if ( start ) {
                 sprintf(sql, "INSERT INTO job_billing VALUES("
-                        "'%ld','%ld','0','0','%.2f','0.00','0.00','0.00')",
+                        "'%ld','%ld','0','0','%.2f','0.00','0.00','%.2f')",
                         thiz->job_url_commit_timestamp,
                         thiz->charge_begin_timestamp,
                         thiz->charge_begin_kwh_data,
