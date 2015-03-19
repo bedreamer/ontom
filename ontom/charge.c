@@ -872,7 +872,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             // 有新的充电状态变化
             if ( start ) {
                 sprintf(sql, "INSERT INTO job_billing VALUES("
-                        "'%ld','%ld','0','0','%.2f','0.00','0.00','0.00'",
+                        "'%ld','%ld','0','0','%.2f','0.00','0.00','0.00')",
                         thiz->job_url_commit_timestamp,
                         thiz->charge_begin_timestamp,
                         thiz->charge_begin_kwh_data,
@@ -1178,10 +1178,10 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     sprintf(str_cmode, "auto");
     sprintf(str_bmode, "auto");
     if ( thiz->charge_mode == CHARGE_BV ) {
-        sprintf(str_cmode, "BV;%.1f V;%.1 A;",
+        sprintf(str_cmode, "BV;%.1f V;%.1f A;",
                 thiz->need_V, thiz->need_I);
     } else if ( thiz->charge_mode == CHARGE_BI ) {
-        sprintf(str_cmode, "BI;%.1f A;%.1 V;",
+        sprintf(str_cmode, "BI;%.1f A;%.1f V;",
                 thiz->need_I, thiz->need_V);
     }
 
