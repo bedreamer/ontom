@@ -1189,7 +1189,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
         sprintf(str_bmode, "AS_MONEY;%.1f 元;",
                 thiz->charge_billing.option.set_money);
     } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
-        sprintf(str_bmode, "AS_TIME;%.1f 秒;",
+        sprintf(str_bmode, "AS_TIME;%d 秒;",
                 thiz->charge_billing.option.set_time);
     } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_CAP ) {
         sprintf(str_bmode, "AS_CAP;%.1f 度;",
