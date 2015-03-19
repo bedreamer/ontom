@@ -999,13 +999,17 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                            thiz->status_befor_fault);
                 thiz->job_status = JOB_ABORTING;
             }
+            if ( bit_read(thiz, CMD_JOB_RESUME) ) {
+                bit_clr(thiz, CMD_JOB_RESUME);
+                thiz->job_status = JOB_RESUMING;
+                log_printf(INF, "ZEUS: 人工恢复作业(%X), 正在恢复",
+                           thiz->status_befor_fault);
+            }
         } else {
             if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
                 break;
             }
-            thiz->job_status = JOB_RESUMING;
-            log_printf(INF, "ZEUS: 人工恢复作业(%X), 正在恢复",
-                       thiz->status_befor_fault);
+
         }
         break;
     case JOB_RESUMING:
