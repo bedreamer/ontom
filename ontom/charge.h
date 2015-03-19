@@ -1171,6 +1171,7 @@ static inline unsigned short swap_hi_lo_bytes(unsigned short b)
 
 static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_job *thiz)
 {
+    return thiz->job_gun_sn;
     if ( thiz->job_gun_sn == GUN_SN0 ) {
         if ( bit_read(task, F_GUN_1_PHY_CONN_STATUS) ) {
             return GUN_SN0;
