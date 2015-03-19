@@ -1047,6 +1047,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
     }
     if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
+        bit_clr(thiz, CMD_JOB_MAN_PAUSE);
         thiz->status_befor_fault = JOB_WORKING;
         thiz->job_status = JOB_MAN_PAUSE;
         thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
