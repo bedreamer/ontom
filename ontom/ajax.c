@@ -1685,10 +1685,7 @@ int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
     } else {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
-        if ( j->job_status == JOB_ERR_PAUSE ||
-             j->job_status == JOB_MAN_PAUSE ) {
-                bit_set(j, CMD_JOB_RESUME);
-        }
+        bit_set(j, CMD_JOB_RESUME);
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
