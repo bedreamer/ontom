@@ -1540,7 +1540,7 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
 
-        memcpy(param->buff.tx_buff, buff, nr);ß
+        memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
 
         self->rx_param.need_bytes = 44;
