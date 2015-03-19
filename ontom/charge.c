@@ -1032,6 +1032,43 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         thiz = NULL;
         break;
     }
+
+    if ( bit_read(thiz, CMD_JOB_ABORT) ) {
+        bit_clr(thiz, CMD_JOB_ABORT);
+        thiz->status_befor_fault = JOB_WORKING;
+        thiz->job_status = JOB_ABORTING;
+        thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
+        thiz->charge_stop_timestamp = time(NULL);
+        end ++;
+        log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
+    }
+    if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
+        thiz->status_befor_fault = JOB_WORKING;
+        thiz->job_status = JOB_MAN_PAUSE;
+        thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
+        thiz->charge_stop_timestamp = time(NULL);
+        end ++;
+        log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
+    }
+
+    // 充电作业发生状态变化
+    if ( end ) {
+        sprintf(sql,
+                "UPDATE job_billing SET b_end_timestamp='%ld',"
+                "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
+                thiz->charge_stop_timestamp,
+                thiz->charge_exit_kwh_data,
+                thiz->job_url_commit_timestamp,
+                thiz->charge_begin_timestamp);
+        (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+
+        sprintf(sql,
+                "UPDATE jobs SET jos_status='%d' WHERE job_id='%ld'",
+                thiz->job_status,
+                thiz->job_url_commit_timestamp);
+        (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+    }
+
 }
 
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd)
