@@ -1018,6 +1018,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
 {
     struct charge_job* thiz = NULL;
     char sql[512] = {0};
+    char str_cmode[32], str_bmode[32];
     int ret, nr_gen = 0, s = 0, i;
     char *errmsg = NULL;
 
@@ -1125,16 +1126,34 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     }
     pthread_mutex_unlock (&task->wait_lck);
 
-    sprintf(sql, "INSERT INTO jobs VALUES("
-            "\'%ld\',\'%ld\',\'%s\',\'%ld\',\'%d\',"
-            "\'%d\',\'%s\',\'%s\',\'%s\',\'%s\',"
-            "\'%s\',\'%s\',\'%s\',\'%s\',\'%s\')",
-            thiz->job_url_commit_timestamp,
-            thiz->charge_begin_timestamp,
-            "SUCCESS", time(NULL), thiz->job_gun_sn,
+    sprintf(str_cmode, "auto");
+    sprintf(str_bmode, "auto");
+    if ( thiz->charge_mode == CHARGE_BV ) {
+        sprintf(str_cmode, "BV;%.1f V;%.1 A;",
+                thiz->need_V, thiz->need_I);
+    } else if ( thiz->charge_mode == CHARGE_BI ) {
+        sprintf(str_cmode, "BI;%.1f A;%.1 V;",
+                thiz->need_I, thiz->need_V);
+    }
 
-            "N/A", "N/A", "N/A", "N/A", "N/A",
-            "N/A", "N/A", "N/A", "N/A", "N/A"
+    if ( thiz->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
+        sprintf(str_bmode, "AS_MONEY;%.1f 元;",
+                thiz->charge_billing.option.set_money);
+    } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
+        sprintf(str_bmode, "AS_TIME;%.1f 秒;",
+                thiz->charge_billing.option.set_time);
+    } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_CAP ) {
+        sprintf(str_bmode, "AS_CAP;%.1f 度;",
+                thiz->charge_billing.option.set_kwh);
+    }
+    sprintf(sql, "INSERT INTO jobs VALUES("
+            "\'%ld\',\'%d\',\'%d\',\'%s\',\'%s\',\'%s\')",
+            thiz->job_url_commit_timestamp,
+            thiz->job_status,
+            thiz->job_gun_sn,
+            thiz->card.triger_card_sn,
+            str_cmode,
+            str_bmode
             );
     ret = sqlite3_exec(tsk->database, sql, NULL, NULL, &errmsg);
     if ( ret ) {
