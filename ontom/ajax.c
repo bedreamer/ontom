@@ -1510,11 +1510,11 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
     CHARGE_GUN_SN g = __is_gun_phy_conn_ok(job);
     char buff[16] = {0};
     if ( g == GUN_SN0 ) {
-        sprintf(buff, "枪%d正常", job->job_gun_sn + 1);
+        sprintf(buff, "正常");
     } else if ( g == GUN_SN1 ) {
-        sprintf(buff, "枪%d正常", job->job_gun_sn + 1);
+        sprintf(buff, "正常");
     } else {
-        sprintf(buff, "枪%d断开", job->job_gun_sn + 1);
+        sprintf(buff, "断开");
     }
     double ycdl = 0.0;
     if ( job->job_status == JOB_WORKING ) {
@@ -1629,11 +1629,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
     } else {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
-        if ( j->job_status == JOB_WORKING ||
-             j->job_status == JOB_ERR_PAUSE ||
-             j->job_status == JOB_MAN_PAUSE ) {
-                bit_set(j, CMD_JOB_ABORT);
-        }
+        bit_set(j, CMD_JOB_ABORT);
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
