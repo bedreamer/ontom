@@ -1530,20 +1530,20 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
         buff[ nr ++ ] = 0xC3;
-        buff[ nr ++ ] = 0xB4;
         buff[ nr ++ ] = 0x05;
-        buff[ nr ++ ] = 16;
-        buff[ nr ++ ] = cmd;
-        buff[ nr ++ ] = cmd;
-        nr += 14;
+        buff[ nr ++ ] = 0x03;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x11;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x14;
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
 
-        memcpy(param->buff.tx_buff, buff, nr);
+        memcpy(param->buff.tx_buff, buff, nr);ß
         param->payload_size = nr;
 
-        self->rx_param.need_bytes = sizeof(struct MDATA_ACK);
+        self->rx_param.need_bytes = 44;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
