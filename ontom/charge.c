@@ -992,19 +992,20 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
     case JOB_MAN_PAUSE:
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        if ( bit_read(thiz, CMD_JOB_ABORT) ) {
+            bit_clr(thiz, CMD_JOB_ABORT);
+            log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
+                       thiz->status_befor_fault);
+            thiz->job_status = JOB_ABORTING;
+        }
+        if ( bit_read(thiz, CMD_JOB_RESUME) ) {
+            bit_clr(thiz, CMD_JOB_RESUME);
+            thiz->job_status = JOB_RESUMING;
+            log_printf(INF, "ZEUS: 人工恢复作业(%X), 正在恢复",
+                       thiz->status_befor_fault);
+        }
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
-            if ( bit_read(thiz, CMD_JOB_ABORT) ) {
-                bit_clr(thiz, CMD_JOB_ABORT);
-                log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
-                           thiz->status_befor_fault);
-                thiz->job_status = JOB_ABORTING;
-            }
-            if ( bit_read(thiz, CMD_JOB_RESUME) ) {
-                bit_clr(thiz, CMD_JOB_RESUME);
-                thiz->job_status = JOB_RESUMING;
-                log_printf(INF, "ZEUS: 人工恢复作业(%X), 正在恢复",
-                           thiz->status_befor_fault);
-            }
+
         } else {
             if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
                 break;
