@@ -935,8 +935,8 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             }
 
             //}}
-            if ( bit_read(tsk, CMD_JOB_ABORT) ) {
-                bit_clr(tsk, CMD_JOB_ABORT);
+            if ( bit_read(thiz, CMD_JOB_ABORT) ) {
+                bit_clr(thiz, CMD_JOB_ABORT);
                 thiz->status_befor_fault = JOB_WORKING;
                 thiz->job_status = JOB_ABORTING;
                 thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
@@ -945,7 +945,7 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                 log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
                 break;
             }
-            if ( bit_read(tsk, CMD_JOB_MAN_PAUSE) ) {
+            if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
                 thiz->status_befor_fault = JOB_WORKING;
                 thiz->job_status = JOB_MAN_PAUSE;
                 thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
@@ -979,8 +979,8 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
-            if ( bit_read(tsk, CMD_JOB_ABORT) ) {
-                bit_clr(tsk, CMD_JOB_ABORT);
+            if ( bit_read(thiz, CMD_JOB_ABORT) ) {
+                bit_clr(thiz, CMD_JOB_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X)",
                            thiz->status_befor_fault);
                 thiz->job_status = JOB_ABORTING;
@@ -995,14 +995,14 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
-            if ( bit_read(tsk, CMD_JOB_ABORT) ) {
-                bit_clr(tsk, CMD_JOB_ABORT);
+            if ( bit_read(thiz, CMD_JOB_ABORT) ) {
+                bit_clr(thiz, CMD_JOB_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
                            thiz->status_befor_fault);
                 thiz->job_status = JOB_ABORTING;
             }
         } else {
-            if ( bit_read(tsk, CMD_JOB_MAN_PAUSE) ) {
+            if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
                 break;
             }
             thiz->job_status = JOB_RESUMING;

@@ -724,15 +724,19 @@ struct charge_job {
     // BMS 写线程ID
     pthread_t tid_write;
 
-    // 系统信号, 最多支持64 * 8 种信号标记
-    // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
-    // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
-    volatile unsigned char single[64];
-    // 系统前一次信号状态，用来做状态跳变比较
-    volatile unsigned char pre_single[64];
+    // 作业状态字
+    volatile unsigned char single[8];
 
     struct list_head job_node;
 };
+typedef enum {
+    // 暂停作业命令
+    CMD_JOB_MAN_PAUSE = 0x00,
+    // 恢复作业
+    CMD_JOB_RESUME = 0x01,
+    // 中止作业
+    CMD_JOB_ABORT
+}JOB_FLAGS;
 
 // 故障恢复原因
 typedef  enum {
@@ -982,9 +986,9 @@ typedef enum {
     // }}
     // {{ 充电作业操作命令
     // 中止当前充电作业
-    CMD_JOB_ABORT,
+    //CMD_JOB_ABORT,
     // 暂停当前充电作业
-    CMD_JOB_MAN_PAUSE,
+    //CMD_JOB_MAN_PAUSE,
     // }}
     //{{ 模块操作
     CMD_MODULE_OFF,

@@ -1632,7 +1632,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
         if ( j->job_status == JOB_WORKING ||
              j->job_status == JOB_ERR_PAUSE ||
              j->job_status == JOB_MAN_PAUSE ) {
-                j->job_status = JOB_ABORTING;
+                bit_set(j, CMD_JOB_ABORT);
         } else {
             j->job_status = JOB_DETACHING;
         }
@@ -1646,18 +1646,59 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
 int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
+    char id[16] = {0};
+    struct charge_job * j = NULL;
     thiz->ct = "application/json";
-    thiz->xml_len = 1;
-    thiz->iobuff[0] = 'P';
+
+    mg_get_var(thiz->xml_conn, "id", id, 16);
+    j = job_search(__atoh(id));
+
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"id\":\"%s\"", id);
+
+    if ( j == NULL ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\",");
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
+    } else {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
+        if ( j->job_status == JOB_WORKING ) {
+                bit_set(j, CMD_JOB_MAN_PAUSE);
+        }
+    }
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+
     return ret;
 }
 
 int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
+    char id[16] = {0};
+    struct charge_job * j = NULL;
     thiz->ct = "application/json";
-    thiz->xml_len = 1;
-    thiz->iobuff[0] = 'R';
+
+    mg_get_var(thiz->xml_conn, "id", id, 16);
+    j = job_search(__atoh(id));
+
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"id\":\"%s\"", id);
+
+    if ( j == NULL ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\",");
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
+    } else {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
+        if ( j->job_status == JOB_ERR_PAUSE ||
+             j->job_status == JOB_MAN_PAUSE ) {
+                bit_set(j, CMD_JOB_RESUME);
+        }
+    }
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+
     return ret;
 }
 
