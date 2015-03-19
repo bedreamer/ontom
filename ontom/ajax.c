@@ -1633,8 +1633,6 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
              j->job_status == JOB_ERR_PAUSE ||
              j->job_status == JOB_MAN_PAUSE ) {
                 bit_set(j, CMD_JOB_ABORT);
-        } else {
-            j->job_status = JOB_DETACHING;
         }
     }
 

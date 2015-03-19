@@ -943,7 +943,6 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                 thiz->charge_stop_timestamp = time(NULL);
                 end ++;
                 log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
-                break;
             }
             if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
                 thiz->status_befor_fault = JOB_WORKING;
@@ -952,7 +951,6 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                 thiz->charge_stop_timestamp = time(NULL);
                 end ++;
                 log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
-                break;
             }
 
             // 充电作业发生状态变化
