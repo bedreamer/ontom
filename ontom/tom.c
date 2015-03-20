@@ -233,7 +233,7 @@ int main()
     // 因此这里需要注意的是：
     // * 有两个配置文件是一种冗余设计
     // * 非必要的情况下，分别将系统配置和用户配置分开存储到两个文件中
-    config_initlize("ontom.cfg");
+    config_initlize("/usr/zeus/ontom.cfg");
     user_cfg = config_read("user_config_file");
     if ( user_cfg == NULL ) {
         log_printf(WRN, "not gave user config file,"

@@ -45,7 +45,7 @@
 //}}}}}}}}}}}}}
 
 // 默认数据库文件
-#define DEFAULT_DB  "ontom.db"
+#define DEFAULT_DB  "/usr/zeus/ontom.db"
 
 #ifndef bool
 	#define bool unsigned char
