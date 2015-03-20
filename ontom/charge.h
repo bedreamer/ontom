@@ -182,7 +182,7 @@ struct MDATA_ACK {
     unsigned short crc;
 #else
     // 数据包起始魔数
-    unsigned char magic[5];
+    unsigned char magic[4];
     // 地址
     unsigned char addr;
     // 载荷长度
@@ -265,6 +265,7 @@ struct MDATA_ACK {
     //BIT 3：充电枪2通信辅助电源合闸状态： 0 = 分； 1 = 合；
 
     unsigned char Flag_run3;   //当前运行状态字节3：保留 状态一共10字节
+    unsigned char unused;
 
     unsigned short crc;
 #endif
