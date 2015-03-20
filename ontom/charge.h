@@ -1231,6 +1231,14 @@ static inline unsigned int __atoh(const char *hex)
     return v;
 }
 #define atoh __atoh
+static inline double __bytes2double(unsigned short bytes)
+{
+    if ( 0x8000 & bytes ) {
+        return (bytes&0x7FFF)/(-10.0f);
+    }
+    return (bytes & 0x7FFF) / 10.0f;
+}
+
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
 void job_running(struct charge_task *, struct charge_job *);
 void job_running(struct charge_task *tsk, struct charge_job *thiz);

@@ -755,13 +755,13 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
             "\"bus1_institude\":\"%s\",", p);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
-            "\"bus0_V\":\"%.1f V\",", ((task->measure[0]->measure.VinKM0)&0x7FFF) / 10.0f);
+            "\"bus0_V\":\"%.1f V\",", __bytes2double(task->measure[0]->measure.VinKM0));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
-            "\"bus1_V\":\"%.1f\",", ((task->measure[0]->measure.VinKM1)&0x7FFF) / 10.0f);
+            "\"bus1_V\":\"%.1f\",", __bytes2double(task->measure[0]->measure.VinKM1));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电流
-            "\"bus0_I\":\"%.1f A\",", ((task->measure[0]->measure.IoutBAT0)&0x7FFF) / 10.0f);
+            "\"bus0_I\":\"%.1f A\",", __bytes2double(task->measure[0]->measure.IoutBAT0));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电流
-            "\"bus1_I\":\"%.1f\",", ((task->measure[0]->measure.IoutBAT1)&0x7FFF) / 10.0f);
+            "\"bus1_I\":\"%.1f\",", __bytes2double(task->measure[0]->measure.IoutBAT1));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
             "\"card_sn\":\"%s\",", config_read("triger_card_sn"));
     config_write("triger_card_sn", "N/A");
@@ -775,14 +775,6 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             "\"gun2\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
             "\"gun3\":\"N/A\",");
-
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
-            "\"data\":\"%08X;%06X;%04X;%04X;\",",
-            *(int *)task->measure[0]->measure.magic,
-            task->measure[0]->measure.addr|task->measure[0]->measure.op<<8|task->measure[0]->measure.len<<16,
-            task->measure[0]->measure.VinKM0,
-            task->measure[0]->measure.VinKM1);
-
 
     thiz->iobuff[--thiz->xml_len] = '\0';
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
