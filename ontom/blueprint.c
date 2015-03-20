@@ -1164,8 +1164,8 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
 
         // 字节序转置
         do {
-            int f = (int)(((struct MDATA_ACK *)0)->Ver);
-            int t = (int)(((struct MDATA_ACK *)0)->unused);
+            int f = (unsigned int)(&(((struct MDATA_ACK *)0)->Ver));
+            int t = (unsigned int)(&(((struct MDATA_ACK *)0)->unused));
             int j;
             for ( j = f; j < t; j = j + 2 ) {
                 param->buff.rx_buff[ j ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
