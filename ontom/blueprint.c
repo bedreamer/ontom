@@ -1162,6 +1162,18 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         bit_clr(task, S_MEASURE_1_COMM_DOWN);
         self->master->died = 0;
 
+        // 字节序转置
+        do {
+            int f = (int)(((struct MDATA_ACK *)0)->Ver);
+            int t = (int)(((struct MDATA_ACK *)0)->unused);
+            int j;
+            for ( j = f; j < t; j = j + 2 ) {
+                param->buff.rx_buff[ j ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
+                param->buff.rx_buff[ j + 1 ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
+                param->buff.rx_buff[ j ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
+            }
+        } while (0);
+
         memcpy(&me->measure->measure_pre_copy, &me->measure->measure, sizeof(struct MDATA_ACK));
         memcpy(&me->measure->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
 
