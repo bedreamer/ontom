@@ -777,9 +777,9 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             "\"gun3\":\"N/A\",");
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
-            "\"data\":\"%08X;%04X;%04X;%04X;\",",
+            "\"data\":\"%08X;%06X;%04X;%04X;\",",
             *(int *)task->measure[0]->measure.magic,
-            task->measure[0]->measure.addr|task->measure[0]->measure.len<<8,
+            task->measure[0]->measure.addr|task->measure[0]->measure.op<<8|task->measure[0]->measure.len,
             task->measure[0]->measure.VinKM0,
             task->measure[0]->measure.VinKM1);
 
