@@ -185,6 +185,8 @@ struct MDATA_ACK {
     unsigned char magic[4];
     // 地址
     unsigned char addr;
+    // 功能吗
+    unsigned char op;
     // 载荷长度
     unsigned char len;
 
