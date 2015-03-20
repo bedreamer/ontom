@@ -755,13 +755,13 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线绝缘状态
             "\"bus1_institude\":\"%s\",", p);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电压
-            "\"bus0_V\":\"%.1f V\",", __bytes2double(task->measure[0]->measure.VinKM0));
+            "\"bus0_V\":\"%.1f V\",", __bytes2double(b2l(task->measure[0]->measure.VinKM0)));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电压
-            "\"bus1_V\":\"%.1f\",", __bytes2double(task->measure[0]->measure.VinKM1));
+            "\"bus1_V\":\"%.1f\",", __bytes2double(b2l(task->measure[0]->measure.VinKM1)));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 一段母线电流
-            "\"bus0_I\":\"%.1f A\",", __bytes2double(task->measure[0]->measure.IoutBAT0));
+            "\"bus0_I\":\"%.1f A\",", __bytes2double(b2l(task->measure[0]->measure.IoutBAT0)));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 二段母线电流
-            "\"bus1_I\":\"%.1f\",", __bytes2double(task->measure[0]->measure.IoutBAT1));
+            "\"bus1_I\":\"%.1f\",", __bytes2double(b2l(task->measure[0]->measure.IoutBAT1)));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 当前刷卡序列号
             "\"card_sn\":\"%s\",", config_read("triger_card_sn"));
     config_write("triger_card_sn", "N/A");
