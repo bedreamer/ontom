@@ -2864,7 +2864,7 @@ ___fast_switch_2_rx:
             thiz->tx_param.payload_size = 0;
             thiz->tx_param.cursor = 0;
 
-            usleep(400 * 1000);
+            //usleep(400 * 1000);
 
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
