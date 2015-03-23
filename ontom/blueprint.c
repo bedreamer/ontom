@@ -2434,7 +2434,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             param->payload_size = nr;
             self->master->time_to_send = param->payload_size * 1000 / 960;
             self->rx_param.need_bytes = 32;
-            log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+            log_printf(DBG_LV3, "UART: %s:SEQ_FIND_CARD requested.", __FUNCTION__);
             ret = ERR_OK;
             break;
         case SEQ_SECTOR_RD_AUTH:
@@ -2464,7 +2464,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             param->payload_size = nr;
             self->master->time_to_send = param->payload_size * 1000 / 960;
             self->rx_param.need_bytes = 7;
-            log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+            log_printf(DBG_LV3, "UART: %s:SEQ_SECTOR_RD_AUTH requested.", __FUNCTION__);
             ret = ERR_OK;
             break;
         case SEQ_READ_PUBLIC_BLK:
@@ -2480,7 +2480,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             param->payload_size = nr;
             self->master->time_to_send = param->payload_size * 1000 / 960;
             self->rx_param.need_bytes = 23;
-            log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+            log_printf(DBG_LV3, "UART: %s:SEQ_READ_PUBLIC_BLK requested.", __FUNCTION__);
             ret = ERR_OK;
             break;
         case SEQ_WRITE_PUBLIC_BLK:
