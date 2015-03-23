@@ -344,6 +344,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
         do {
             struct bp_user u = {0};
+#if 0
             u.frame_freq = 50 * 100;
             u.seed = 0;
             u.died_line = 3;
@@ -360,7 +361,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.measure = task->measure[0];
             u.name = "采样盒";
             ret = bp_user_bind(bp, &u); // 采样
-
+#endif
             u.frame_freq = 50 * 100;
             u.seed = 0;
             u.died_line = 3;
@@ -377,7 +378,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.measure = task->measure[0];
             u.name = "读卡器";
             ret = bp_user_bind(bp, &u); // 读卡器
-
+#if 0
             u.frame_freq = 50 * 100;
             u.seed = 0;
             u.died_line = 3;
@@ -516,8 +517,10 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                         ret = bp_user_bind(bp, &u); // 读模块信息
                     }
                 }
+
             } else {
             }
+#endif
         } while (0);
         // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
         if ( task->database != NULL ) {
