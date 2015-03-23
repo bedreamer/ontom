@@ -2340,7 +2340,12 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             if ( param->buff.rx_buff[ param->payload_size - 2 ] ==
                  BCC_code(param->buff.rx_buff, param->payload_size - 1) ) {
                 return ERR_OK;
-            } else return ERR_FRAME_CHECK_ERR;
+            } else {
+                log_printf(DBG_LV2, "UART: SUM check result: need: %02X, gave: %02X",
+                           BCC_code(param->buff.rx_buff, param->payload_size - 1),
+                           param->buff.rx_buff[ param->payload_size - 2 ]);
+                return ERR_FRAME_CHECK_ERR;
+            }
         } else {
             return ERR_FRAME_CHECK_DATA_TOO_SHORT;
         }
@@ -2433,7 +2438,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             memcpy(param->buff.tx_buff, buff, nr);
             param->payload_size = nr;
             self->master->time_to_send = param->payload_size * 1000 / 960;
-            self->rx_param.need_bytes = 32;
+            self->rx_param.need_bytes = 15;
             log_printf(DBG_LV3, "UART: %s:SEQ_FIND_CARD requested.", __FUNCTION__);
             ret = ERR_OK;
             break;
