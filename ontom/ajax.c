@@ -20,6 +20,7 @@ int ajax_debug_bit_write(struct ajax_xml_struct *thiz);
 int ajax_system_error_proc(struct ajax_xml_struct *thiz);
 int ajax_system_history_proc(struct ajax_xml_struct *thiz);
 int ajax_system_about_proc(struct ajax_xml_struct *thiz);
+int ajax_card_init_proc(struct ajax_xml_struct *thiz);
 
 int ajax_module_query_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_proc(struct ajax_xml_struct *thiz);
@@ -60,6 +61,7 @@ struct xml_generator {
     {"/system/options.json",    ajax_system_config_options_proc},
     {"/system/save.json",       ajax_system_config_save_proc},
     {"/system/detail.json",     ajax_system_detail_proc},
+    {"/system/card.json",       ajax_card_init_proc,},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -1477,6 +1479,45 @@ int ajax_system_detail_proc(struct ajax_xml_struct *thiz)
 die:
     return ret;
 }
+
+int ajax_card_init_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    char money[16], passwd[16], op[16];
+
+    mg_get_var(thiz->xml_conn, "op", op, 16);
+    mg_get_var(thiz->xml_conn, "money", money, 16);
+    mg_get_var(thiz->xml_conn, "passwd", passwd, 16);
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+
+    if ( op[0] == '\0' ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                "\"id\":\"%s\",", "N/A");
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                "\"status\":\"%s\",", "N/A");
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                "\"money\":\"%s\",", "N/A");
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+                "\"passwd\":\"%s\",", "N/A");
+    } else {
+        if ( 0 == strcmp(op, "format") ) {
+        } else if ( 0 == strcmp(op, "set") ) {
+        } else;
+    }
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"result\":\"%s\",", "N/A");
+
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+die:
+    return ret;
+}
+
 
 
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
