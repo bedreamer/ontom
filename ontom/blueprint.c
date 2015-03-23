@@ -2318,7 +2318,7 @@ unsigned char BCC_code(unsigned char *da,size_t len) {
     unsigned char BCC = 0;
 
     for ( ; i < len; i ++ ) {
-        BCC ^= da;
+        BCC ^= da[i];
     }
     return ~BCC;
 }
