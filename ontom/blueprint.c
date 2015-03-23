@@ -2356,6 +2356,10 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_CARD_READER_COMM_DOWN) ) {
+            log_printf(INF, "读卡器通信恢复");
+            bit_clr(task, S_CARD_READER_COMM_DOWN);
+        }
         switch ( query_stat ) {
         case SEQ_FIND_CARD:
             if ( param->buff.rx_buff[0] <= 8 ) return ERR_OK;
@@ -2508,6 +2512,16 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
+        if ( self->master->died < self->master->died_line ) {
+            //self->master->died ++;
+        } else {
+            //self->master->died ++;
+            if ( ! bit_read(task, S_CARD_READER_COMM_DOWN) ) {
+            }
+            log_printf(ERR, "UART: "RED("读卡器通信中断, 请排查故障,(%d)"),
+                       self->master->died);
+            bit_set(task, S_CARD_READER_COMM_DOWN);
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         query_stat = SEQ_FIND_CARD;
         break;
