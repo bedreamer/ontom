@@ -2492,6 +2492,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
         break;
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
