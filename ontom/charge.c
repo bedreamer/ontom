@@ -360,6 +360,23 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.name = "采样盒";
             ret = bp_user_bind(bp, &u); // 采样
 
+            u.frame_freq = 50 * 100;
+            u.seed = 0;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 0;
+            u.swap_time_config_name = "core_card_reader_swap_time";
+            u.user_evt_handle = card_reader_handle;
+            u.uart = bp;
+            u.chargers = task->chargers[0];
+            u.measure = task->measure[0];
+            u.name = "读卡器";
+            ret = bp_user_bind(bp, &u); // 读卡器
+
             if ( task->sys_type == SYSTEM_FENTISHI ) {
                 u.frame_freq = 50 * 100;
                 u.seed = 1000;
@@ -594,24 +611,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.measure = task->measure[0];
         u.name = "电表(电压)";
         ret = bp_user_bind(bp, &u); // 电表
-
-
-        u.frame_freq = 50 * 100;
-        u.seed = 0;
-        u.died_line = 3;
-        u.died_total = 0;
-        u.sent_frames = 0;
-        u.check_err_cnt = 0;
-        u.check_err_total = 0;
-        u.rcv_ok_cnt = 0;
-        u.swap_time_modify = 0;
-        u.swap_time_config_name = "core_card_reader_swap_time";
-        u.user_evt_handle = card_reader_handle;
-        u.uart = bp;
-        u.chargers = task->chargers[0];
-        u.measure = task->measure[0];
-        u.name = "读卡器";
-        ret = bp_user_bind(bp, &u); // 读卡器
     } while (0);
     // 串口通信线程
     ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
