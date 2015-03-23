@@ -2711,8 +2711,6 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
             log_printf(DBG_LV3, "UART: %s:SEQ_READ_PUBLIC_BLK requested.", __FUNCTION__);
             ret = ERR_OK;
             break;
-        case SEQ_WRITE_PUBLIC_BLK:
-            break;
         default:
             query_stat = SEQ_FIND_CARD;
             break;
