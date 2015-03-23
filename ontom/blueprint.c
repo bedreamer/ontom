@@ -2382,6 +2382,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             } else {
                 // 认证失败
                 log_printf(WRN, "UART: 认证失败");
+                query_stat = SEQ_FIND_CARD;
             }
             break;
         case SEQ_READ_PUBLIC_BLK:
