@@ -42,45 +42,32 @@ typedef enum {
     GUN_UNDEFINE = 177
 }CHARGE_GUN_SN;
 
+
+#pragma pack(1)
 /* 卡信息
- * 三个阶段分别用三个缓冲区来存储卡号的目的是
- * 为了可以用某些特殊的卡，也就是万能卡号实现终止充电任务中的操作
- * 例如：
- *  使用卡号为 7667987878 的普通卡号触发了充电任务和确认充电
- *  可以使用   8888888888 的管理员卡进行终止充电操作
- *  另外，该冗余设计可以在UI 界面进行刷卡问询时，通过判定卡号是否一致
- *  来进行出错提示。
- *  需要注意的是：
- *    普通卡和管理员卡都可以触发充电任务，管理员卡触发的任务只能又管理员卡或密码终止
- *    普通卡触发的充电任务可以被当前普通卡，管理员卡或密码终止。
+
  */
 struct user_card {
     // 触发任务时的卡号
     char triger_card_sn[64];
-    // 触发充电任务时的刷卡时戳
-    time_t triger_timestamp;
-    // UI界面确认刷卡时戳
-    time_t triger_synced_timestamp;
-
-    // 确认充电时的卡号
-    char confirm_card_sn[64];
-    // 确认充电任务的刷卡时戳
-    time_t confirm_timestamp;
-    // UI界面确认刷卡时戳
-    time_t confirm_synced_timestamp;
-
-    // 终止充电时的卡号
-    char end_card_sn[64];
-    // 终止充电任务的刷卡时戳
-    time_t end_timestamp;
-    // UI界面确认刷卡时戳
-    time_t end_synced_timestamp;
-
-    // 卡私有信息
-    void *_private;
+    struct {
+        unsigned char id[16];
+        union {
+            unsigned char buff[16];
+            struct {
+                unsigned int magic;           /*奥能魔数 'ONPW', Only-Power 0x4F4E5057 */
+                unsigned int remain_sum:8;    /*余额校验位 */
+                unsigned int remain_money:24; /*余额， 范围 0.00 ~ 167772.15 */
+                unsigned int passwd_sum:8;    /*密码校验和 */
+                unsigned int passwd_code:24;  /*6 位BCD 码密码*/
+                unsigned short reserved;
+                unsigned char unuesed;
+                unsigned char sum;            /*校验和 */
+            }data;
+        }sector_0;
+    }card;
 };
 
-#pragma pack(1)
 /*
  * 综合采样盒通信数据定义
  */
@@ -799,6 +786,9 @@ struct charge_task {
     struct list_head *commit_head;
     // 作业任务提交列表锁
     pthread_mutex_t commit_lck;
+
+    // 刷卡数据临时存储区
+    struct user_card card;
 
     // 当前正在执行的充电任务
     struct charge_job *job[CONFIG_SUPPORT_CHARGE_JOBS];

@@ -2313,12 +2313,79 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     return ret;
 }
 
+unsigned char BCC_code(unsigned char *da,size_t len) {
+    int i  = 0;
+    unsigned char BCC = 0;
+
+    for ( ; i < len; i ++ ) {
+        BCC ^= da;
+    }
+    return ~BCC;
+}
+
+typedef enum {
+    // 寻卡模式
+    SEQ_FIND_CARD = 0,
+    // 读取公开数据区
+    SEQ_READ_PUBLIC_BLK,
+    // 写入公开数据区
+    SEQ_WRITE_PUBLIC_BLK,
+    // 读取私密数据区1
+    SEQ_READ_PRIVATE_BLK1,
+    // 读取私密数据区2
+    SEQ_READ_PRIVATE_BLK2,
+    // 读取私密数据区3
+    SEQ_READ_PRIVATE_BLK3,
+    // 读取私密数据区4
+    SEQ_READ_PRIVATE_BLK4,
+    // 读取私密数据区5
+    SEQ_READ_PRIVATE_BLK5,
+    // 读取私密数据区6
+    SEQ_READ_PRIVATE_BLK6,
+    // 读取私密数据区7
+    SEQ_READ_PRIVATE_BLK7,
+    SEQ_INVALID
+}QUERY_STAT;
+
+
 int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
+    static QUERY_STAT query_stat = SEQ_FIND_CARD;
+    char buff[64];
+    char ID[16], id_len = 0;
+    unsigned char public_buff[16];
+    int nr = 0;
+
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size >= param->buff.rx_buff[0] ) {
+            if ( param->buff.rx_buff[ param->payload_size - 2 ] ==
+                 BCC_code(param->buff.rx_buff, param->payload_size - 1) ) {
+                switch ( query_stat ) {
+                case SEQ_FIND_CARD:
+                    memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
+                    id_len = param->bu +ff.rx_buff[7];
+                    if ( 1 ) {
+                        query_stat = SEQ_FIND_CARD;
+                    } else {
+                        query_stat = SEQ_WRITE_PUBLIC_BLK;
+                    }
+                    break;
+                case SEQ_READ_PUBLIC_BLK:
+                    query_stat = SEQ_FIND_CARD;
+                    break;
+                case SEQ_WRITE_PUBLIC_BLK:
+                    break;
+                default:
+                    break;
+                }
+                return ERR_NEED_ECHO;
+            } else return ERR_FRAME_CHECK_ERR;
+        } else {
+            return ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        }
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
@@ -2328,6 +2395,31 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        switch ( query_stat ) {
+        case SEQ_FIND_CARD:
+            buff[ nr ++ ] = 0x07;
+            buff[ nr ++ ] = 0x01;
+            buff[ nr ++ ] = 0x48;
+            buff[ nr ++ ] = 0x01;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = BCC_code(buff, nr);
+            buff[ nr ++ ] = 0x03;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            self->rx_param.need_bytes = 32;
+            log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+            ret = ERR_OK;
+            break;
+        case SEQ_READ_PUBLIC_BLK:
+            break;
+        case SEQ_WRITE_PUBLIC_BLK:
+            break;
+        default:
+            query_stat = SEQ_FIND_CARD;
+            break;
+        }
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
