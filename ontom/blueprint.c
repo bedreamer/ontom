@@ -2390,12 +2390,12 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 } else {
                     int faile = 0;
                     if ( cd.card.sector_4.data.remain_sum !=
-                            check_sum(cd.card.sector_4.remain_money, 3) ) {
+                            check_sum(cd.card.sector_4.data.remain_money, 3) ) {
                         log_printf(WRN, "UART: 卡数据字段： 余额校验失败.");
                         faile ++;
                     }
                     if ( cd.card.sector_4.data.passwd_sum !=
-                                check_sum(cd.card.data.passwd_code, 3) ) {
+                                check_sum(cd.card.sector_4.data.passwd_code, 3) ) {
                         log_printf(WRN, "UART: 卡数据字段： 密码校验失败.");
                         faile ++;
                     }
