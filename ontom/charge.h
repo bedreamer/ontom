@@ -45,28 +45,56 @@ typedef enum {
 
 #pragma pack(1)
 /* 卡信息
-
  */
 struct user_card {
     // 触发任务时的卡号
     char triger_card_sn[64];
     struct {
         unsigned char id[16];
+        unsigned char sector_num;
         union {
             unsigned char buff[16];
             struct {
                 unsigned int magic;           /*奥能魔数 'ONPW', Only-Power 0x4F4E5057 */
-                unsigned int remain_sum:8;    /*余额校验位 */
-                unsigned int remain_money:24; /*余额， 范围 0.00 ~ 167772.15 */
-                unsigned int passwd_sum:8;    /*密码校验和 */
-                unsigned int passwd_code:24;  /*6 位BCD 码密码*/
+                unsigned char remain_money[3]; /*余额， 范围 0.00 ~ 167772.15 */
+                unsigned char remain_sum;    /*余额校验位 */
+                unsigned char passwd_code[3];  /*6 位BCD 码密码*/
+                unsigned char passwd_sum;    /*密码校验和 */
                 unsigned short reserved;
                 unsigned char unuesed;
                 unsigned char sum;            /*校验和 */
             }data;
-        }sector_0;
+        }sector_4;
     }card;
 };
+
+typedef enum {
+    // 寻卡模式
+    SEQ_FIND_CARD = 0,
+    // 读扇区密码认证
+    SEQ_SECTOR_RD_AUTH,
+    // 写扇区密码认证
+    SEQ_SECTOR_WR_AUTH,
+    // 读取公开数据区
+    SEQ_READ_PUBLIC_BLK,
+    // 写入公开数据区
+    SEQ_WRITE_PUBLIC_BLK,
+    // 读取私密数据区1
+    SEQ_READ_PRIVATE_BLK1,
+    // 读取私密数据区2
+    SEQ_READ_PRIVATE_BLK2,
+    // 读取私密数据区3
+    SEQ_READ_PRIVATE_BLK3,
+    // 读取私密数据区4
+    SEQ_READ_PRIVATE_BLK4,
+    // 读取私密数据区5
+    SEQ_READ_PRIVATE_BLK5,
+    // 读取私密数据区6
+    SEQ_READ_PRIVATE_BLK6,
+    // 读取私密数据区7
+    SEQ_READ_PRIVATE_BLK7,
+    SEQ_INVALID
+}QUERY_STAT;
 
 /*
  * 综合采样盒通信数据定义
@@ -773,6 +801,14 @@ typedef enum {
     MODEL_UNKOWN
 }MODULE_MODEL;
 
+// UI 界面
+typedef enum {
+    UI_PAGE_OTHER,
+    UI_PAGE_MAIN,
+    UI_PAGE_JOBS_POOL,
+    UI_PAGE_JOBS
+}UI_PAGE;
+
 /*
  * 充电任务描述, 详细描述了系统的配置参数
  */
@@ -789,6 +825,8 @@ struct charge_task {
 
     // 刷卡数据临时存储区
     struct user_card card;
+    // 当前界面显示的页面号
+    UI_PAGE uipage;
 
     // 当前正在执行的充电任务
     struct charge_job *job[CONFIG_SUPPORT_CHARGE_JOBS];
