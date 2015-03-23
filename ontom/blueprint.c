@@ -2638,8 +2638,6 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
             query_stat = SEQ_FIND_CARD;
             ret = ERR_OK;
             break;
-        case SEQ_WRITE_PUBLIC_BLK:
-            ret = ERR_OK;
             break;
         default:
             break;
