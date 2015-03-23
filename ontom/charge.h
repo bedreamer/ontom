@@ -1111,7 +1111,7 @@ typedef enum {
     S_MEASURE_1_COMM_DOWN,
     S_CONVERT_BOX_COMM_DOWN,
     S_MEASURE_2_COMM_DOWN,
-    system_reserve22,
+    S_CARD_READER_COMM_DOWN,
     system_reserve23,
     system_reserve24,
     system_reserve25,
