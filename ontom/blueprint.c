@@ -2611,7 +2611,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
 
                 memcpy(cd.card.sector_4.buff, param->buff.rx_buff, 16);
                 if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
-                    log_printf(WRN, "UART: 无法识别的卡.");
+                    log_printf(WRN, "UART: 无法识别的卡: %08X.", cd.card.sector_4.data.magic);
                 } else if ( cd.card.sector_4.data.sum !=
                             check_sum(param->buff.rx_buff, 15) ) {
                     log_printf(WRN, "UART: 卡数据损坏, 校验失败.");
@@ -2645,7 +2645,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        return ERR_ERR;
+        return ERR_ERR;c
         switch ( query_stat ) {
         case SEQ_FIND_CARD:
             buff[ nr ++ ] = 0x08;
