@@ -2731,7 +2731,7 @@ ___fast_switch_2_rx:
 
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 errno = 0;
-                tcflush(thiz->dev_handle, TCOFLUSH);
+                //tcflush(thiz->dev_handle, TCOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
                 thiz->rx_param.cursor = 0;
@@ -2840,7 +2840,7 @@ ___fast_switch_2_rx:
         if ( thiz->status == BP_UART_STAT_WR ) {
 
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
-                tcflush(thiz->dev_handle, TCIFLUSH);
+                //tcflush(thiz->dev_handle, TCIFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
