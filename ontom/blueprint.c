@@ -2396,7 +2396,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
                     log_printf(WRN, "UART: 无法识别的卡 %08X.", cd.card.sector_4.data.magic);
                 } else if ( cd.card.sector_4.data.sum !=
-                            check_sum(param->buff.rx_buff, 15) ) {
+                            check_sum(cd.card.sector_4.buff, 15) ) {
                     log_printf(WRN, "UART: 卡数据损坏, 校验失败.");
                 } else {
                     int faile = 0;
