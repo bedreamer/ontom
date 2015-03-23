@@ -2895,12 +2895,12 @@ ___fast_switch_2_rx:
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 errno = 0;
                 //tcflush(thiz->dev_handle, TCOFLUSH);
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
                 nr = 0;
-                memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
+                //memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
                 log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
