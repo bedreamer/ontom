@@ -2338,7 +2338,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
     case BP_EVT_FRAME_CHECK:
         if ( param->payload_size > 1 && param->payload_size >= param->buff.rx_buff[0] ) {
             if ( param->buff.rx_buff[ param->payload_size - 2 ] ==
-                 BCC_code(param->buff.rx_buff, param->payload_size - 1) ) {
+                 BCC_code(param->buff.rx_buff, param->payload_size - 2) ) {
                 return ERR_OK;
             } else {
                 log_printf(DBG_LV2, "UART: SUM check result: need: %02X, gave: %02X",
