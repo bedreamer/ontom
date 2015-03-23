@@ -2366,7 +2366,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 switch ( query_stat ) {
                 case SEQ_FIND_CARD:
                     memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
-                    id_len = param->bu +ff.rx_buff[7];
+                    id_len = param->buff.rx_buff[7];
                     if ( 1 ) {
                         query_stat = SEQ_FIND_CARD;
                     } else {
