@@ -2645,7 +2645,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        return ERR_ERR;c
+        return ERR_ERR;
         switch ( query_stat ) {
         case SEQ_FIND_CARD:
             buff[ nr ++ ] = 0x08;
