@@ -633,6 +633,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.name = "电表(电压)";
         ret = bp_user_bind(bp, &u); // 电表
     } while (0);
+#if 0
     // 串口通信线程
     ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
     if ( 0 != ret ) {
@@ -642,7 +643,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         goto __panic;
     }
     log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
-
+#endif
     task->commit_head = NULL;
     task->wait_head = NULL;
     task->wait_job_nr = 0;
