@@ -2366,7 +2366,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
             id_len = param->buff.rx_buff[7];
             if ( task->uipage == UI_PAGE_MAIN ) {
-                log_printf(INF, "UART: 寻到新卡，进行读扇区密码验证.");
+                log_printf(INF, "UART: 寻到新卡，进行读扇区密码验证(%02X%02X%02X%02X).",
+                            ID[3], ID[2], ID[1], ID[0]);
                 query_stat = SEQ_SECTOR_RD_AUTH;
             } else {
                 query_stat = SEQ_WRITE_PUBLIC_BLK;
