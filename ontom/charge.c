@@ -344,7 +344,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
         do {
             struct bp_user u = {0};
-#if 0
+#if 1
             u.frame_freq = 50 * 100;
             u.seed = 0;
             u.died_line = 3;
