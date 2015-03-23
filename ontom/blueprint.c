@@ -2336,7 +2336,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
-        if ( param->payload_size >= param->buff.rx_buff[0] ) {
+        if ( param->payload_size > 1 && param->payload_size >= param->buff.rx_buff[0] + 1 ) {
             if ( param->buff.rx_buff[ param->payload_size - 2 ] ==
                  BCC_code(param->buff.rx_buff, param->payload_size - 1) ) {
                 return ERR_OK;
