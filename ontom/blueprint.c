@@ -572,7 +572,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                            self->master->name,
                            ret, param->payload_size, hit->sent_frames);
             } else {
-                log_printf(WRN, "UART: 发生程序时许故障");
+                log_printf(WRN, "UART: 发生程序时序故障");
                 self->sequce --;
                 ret = ERR_ERR;
             }
@@ -3027,7 +3027,7 @@ ___fast_switch_2_rx:
             thiz->tx_param.payload_size = 0;
             thiz->tx_param.cursor = 0;
 
-            //usleep(400 * 1000);
+            usleep(400 * 1000);
 
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
