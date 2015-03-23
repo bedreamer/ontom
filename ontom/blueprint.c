@@ -2374,6 +2374,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 // 认证成功
                 log_printf(DBG, "UART: 认证成功");
                 query_stat = SEQ_READ_PUBLIC_BLK;
+                ret = ERR_NEED_ECHO;
             } else {
                 // 认证失败
                 log_printf(DBG, "UART: 认证失败");
