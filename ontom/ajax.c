@@ -1521,7 +1521,7 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
             task->op_card.card.sector_4.data.passwd_sum =
                     check_sum(task->op_card.card.sector_4.data.passwd_code, 3);
             task->op_card.card.sector_4.buff[15] =
-                    check_sum(task->op_card.card.sector_4.data.buff, 15);
+                    check_sum(task->op_card.card.sector_4.buff, 15);
 
             bit_set(task, CMD_CARD_SET);
         } else if ( 0 == strcmp(op, "set") ) {
