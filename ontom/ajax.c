@@ -1496,56 +1496,56 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"id\":\"%s\",", "N/A");
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                "\"status\":\"%s\",", task->op_card.sector_4.data.magic == 0x4F4E5057 ? "正常":"未格式化");
+                "\"status\":\"%s\",", task->op_card.card.sector_4.data.magic == 0x4F4E5057 ? "正常":"未格式化");
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                "\"money\":\"%.2f\",", task->op_card.sector_4.data.remain_money / 100.0f);
+                "\"money\":\"%.2f\",", task->op_card.card.sector_4.data.remain_money / 100.0f);
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"passwd\":\"%d%d%d%d%d%d\",",
-                task->op_card.sector_4.data.passwd_code[0] & 0x0F + '0',
-                (task->op_card.sector_4.data.passwd_code[0] >> 4) + '0',
-                task->op_card.sector_4.data.passwd_code[1] & 0x0F + '0',
-                (task->op_card.sector_4.data.passwd_code[1] >> 4) + '0',
-                task->op_card.sector_4.data.passwd_code[2] & 0x0F + '0',
-                (task->op_card.sector_4.data.passwd_code[3] >> 4) + '0',);
+                task->op_card.card.sector_4.data.passwd_code[0] & 0x0F + '0',
+                (task->op_card.card.sector_4.data.passwd_code[0] >> 4) + '0',
+                task->op_card.card.sector_4.data.passwd_code[1] & 0x0F + '0',
+                (task->op_card.card.sector_4.data.passwd_code[1] >> 4) + '0',
+                task->op_card.card.sector_4.data.passwd_code[2] & 0x0F + '0',
+                (task->op_card.card.sector_4.data.passwd_code[3] >> 4) + '0',);
     } else {
         if ( 0 == strcmp(op, "format") ) {
-            task->op_card.sector_4.data.magic = 0x4F4E5057;
-            task->op_card.sector_4.data.remain_money[0] = 0;
-            task->op_card.sector_4.data.remain_money[1] = 0;
-            task->op_card.sector_4.data.remain_money[2] = 0;
-            task->op_card.sector_4.data.remain_sum =
-                    check_sum(task->op_card.sector_4.data.remain_money, 3);
-            task->op_card.sector_4.data.passwd_code[0] = 0;
-            task->op_card.sector_4.data.passwd_code[1] = 0;
-            task->op_card.sector_4.data.passwd_code[2] = 0;
-            task->op_card.sector_4.data.passwd_sum =
-                    check_sum(task->op_card.sector_4.data.passwd_code, 3);
-            task->op_card.sector_4.data.buff[15] =
-                    check_sum(task->op_card.sector_4.data.buff, 15);
+            task->op_card.card.sector_4.data.magic = 0x4F4E5057;
+            task->op_card.card.sector_4.data.remain_money[0] = 0;
+            task->op_card.card.sector_4.data.remain_money[1] = 0;
+            task->op_card.card.sector_4.data.remain_money[2] = 0;
+            task->op_card.card.sector_4.data.remain_sum =
+                    check_sum(task->op_card.card.sector_4.data.remain_money, 3);
+            task->op_card.card.sector_4.data.passwd_code[0] = 0;
+            task->op_card.card.sector_4.data.passwd_code[1] = 0;
+            task->op_card.card.sector_4.data.passwd_code[2] = 0;
+            task->op_card.card.sector_4.data.passwd_sum =
+                    check_sum(task->op_card.card.sector_4.data.passwd_code, 3);
+            task->op_card.card.sector_4.data.buff[15] =
+                    check_sum(task->op_card.card.sector_4.data.buff, 15);
 
             bit_set(task, CMD_CARD_SET);
         } else if ( 0 == strcmp(op, "set") ) {
             unsigned int i_money = atof(money) * 100, i;
 
-            task->op_card.sector_4.data.magic = 0x4F4E5057;
-            task->op_card.sector_4.data.remain_money[0] = i_money&0xFF;
-            task->op_card.sector_4.data.remain_money[1] = (i_money>>8)&0xFF;
-            task->op_card.sector_4.data.remain_money[2] = (i_money>>16)&0xFF;
-            task->op_card.sector_4.data.remain_sum =
-                    check_sum(task->op_card.sector_4.data.remain_money, 3);
+            task->op_card.card.sector_4.data.magic = 0x4F4E5057;
+            task->op_card.card.sector_4.data.remain_money[0] = i_money&0xFF;
+            task->op_card.card.sector_4.data.remain_money[1] = (i_money>>8)&0xFF;
+            task->op_card.card.sector_4.data.remain_money[2] = (i_money>>16)&0xFF;
+            task->op_card.card.sector_4.data.remain_sum =
+                    check_sum(task->op_card.card.sector_4.data.remain_money, 3);
             for ( i = 0; i < 6; i ++ ) {
                 if ( passwd[ i ] > '9' || passwd[i] < '0') {
                     passwd[ i ] = 0;
                 }
                 passwd[ i ] -= '0';
             }
-            task->op_card.sector_4.data.passwd_code[0] = (passwd[1] << 4) | passwd[0];
-            task->op_card.sector_4.data.passwd_code[1] = (passwd[3] << 4) | passwd[2];
-            task->op_card.sector_4.data.passwd_code[2] = (passwd[5] << 4) | passwd[4];
-            task->op_card.sector_4.data.passwd_sum =
-                    check_sum(task->op_card.sector_4.data.passwd_code, 3);
-            task->op_card.sector_4.data.buff[15] =
-                    check_sum(task->op_card.sector_4.data.buff, 15);
+            task->op_card.card.sector_4.data.passwd_code[0] = (passwd[1] << 4) | passwd[0];
+            task->op_card.card.sector_4.data.passwd_code[1] = (passwd[3] << 4) | passwd[2];
+            task->op_card.card.sector_4.data.passwd_code[2] = (passwd[5] << 4) | passwd[4];
+            task->op_card.card.sector_4.data.passwd_sum =
+                    check_sum(task->op_card.card.sector_4.data.passwd_code, 3);
+            task->op_card.card.sector_4.data.buff[15] =
+                    check_sum(task->op_card.card.sector_4.data.buff, 15);
 
             bit_set(task, CMD_CARD_SET);
         } else;
