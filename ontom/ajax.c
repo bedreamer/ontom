@@ -771,6 +771,8 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             "\"card_remain\":\"%s\",", config_read("card_remaind_money"));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 如果刷卡了，当前卡内余额
             "\"card_status\":\"%s\",", config_read("card_status"));
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 如果刷卡了，当前卡内余额
+            "\"card_passwd\":\"%s\",", config_read("card_passwd"));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 1# 充电枪连接状态
             "\"gun0\":\"%s\",", bit_read(task, F_GUN_1_PHY_CONN_STATUS)?"已连接":"未连接");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 2# 充电枪连接状态

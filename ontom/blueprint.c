@@ -2424,6 +2424,14 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                         config_write("card_status", "NORMAL");
                         sprintf(buff, "%.2f", money / 100.0f);
                         config_write("card_remaind_money", buff);
+                        sprintf(buff, "%d%d%d%d%d%d",
+                                cd.card.sector_4.data.passwd_code[2]>>4,
+                                cd.card.sector_4.data.passwd_code[2]&0xF,
+                                cd.card.sector_4.data.passwd_code[1]>>4,
+                                cd.card.sector_4.data.passwd_code[1]&0xF,
+                                cd.card.sector_4.data.passwd_code[0]>>4,
+                                cd.card.sector_4.data.passwd_code[0]&0xF);
+                        config_write("card_passwd", buff);
                         sprintf(buff, "%02X%02X%02X%02X", ID[3], ID[2], ID[1], ID[0]);
                         config_write("triger_card_sn", buff);
                     }
