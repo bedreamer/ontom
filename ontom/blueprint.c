@@ -2284,7 +2284,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
-        self->master->time_to_send = param->payload_size * 1000 / 218;
+        self->master->time_to_send = (param->payload_size + 1) * 1000 / 218;
         self->rx_param.need_bytes = 22;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         ret = ERR_OK;
@@ -2355,7 +2355,6 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
-
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
