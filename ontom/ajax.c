@@ -822,10 +822,14 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     char b_kwh[8] = {0};
     char b_money[8] = {0};
     char b_time[8] = {0};
+    char c_remain[16] = {0};
+    char c_passwd[16] = {0};
 
     mg_get_var(thiz->xml_conn, "t", timestamp, 32);
     mg_get_var(thiz->xml_conn, "cid", cid, 32);
     mg_get_var(thiz->xml_conn, "gun", gun, 8);
+    mg_get_var(thiz->xml_conn, "remain", c_remain, 32);
+    mg_get_var(thiz->xml_conn, "passwd", c_passwd, 8);
 
     mg_get_var(thiz->xml_conn, "c_mode", c_mode, 16);
     if ( strlen(c_mode) ) {
@@ -840,6 +844,8 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
         mg_get_var(thiz->xml_conn, "b_time", b_time, 8);
     }
 
+    jc.card_remain = atof(c_remain);
+    strncpy(jc.card_passwd, c_passwd, 16);
     jc.url_commit_timestamp = atoll(timestamp);
     jc.ontom_commit_date_time = time(NULL);
     jc.biling_mode = BILLING_MODE_AS_AUTO;

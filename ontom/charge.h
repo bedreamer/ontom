@@ -87,6 +87,30 @@ static inline double __card_write_remain(struct user_card * c, double money) {
     return money;
 }
 
+static inline void __card_read_passwd(const struct user_card *c, char *passwd) {
+    sprintf(passwd, "%d%d%d%d%d%d",
+            c->card.sector_4.data.passwd_code[2]>>4,
+            c->card.sector_4.data.passwd_code[2]&0xF,
+            c->card.sector_4.data.passwd_code[1]>>4,
+            c->card.sector_4.data.passwd_code[1]&0xF,
+            c->card.sector_4.data.passwd_code[0]>>4,
+            c->card.sector_4.data.passwd_code[0]&0xF);
+}
+
+unsigned char chars2bcd(char h, char l) {
+    if ( h > '9' || h <'0' ) h = '0';
+    if ( l > '9' || l <'0' ) l = '0';
+    return (((h - '0')&0xF)<<4)|((l-'0')&0x0F);
+}
+
+static inline void __card_write_passwd(struct user_card * c, const char* passwd) {
+    c->card.sector_4.data.passwd_code[2] = chars2bcd(passwd[0], passwd[1]);
+    c->card.sector_4.data.passwd_code[1] = chars2bcd(passwd[2], passwd[3]);
+    c->card.sector_4.data.passwd_code[0] = chars2bcd(passwd[4], passwd[5]);
+    c->card.sector_4.data.passwd_sum =
+            check_sum(c->card.sector_4.data.passwd_code, 3);
+}
+
 typedef enum {
     // 寻卡模式
     SEQ_FIND_CARD = 0,
@@ -700,6 +724,8 @@ struct job_commit_data {
 
     //{{ 创建作业参数
     char card_sn[32];            // 所刷卡卡号
+    double card_remain;          // 卡内余额
+    char card_passwd[16];        // 卡片密码
     CHARGE_GUN_SN charge_gun;    // 充电枪选择
     CHARGE_MODE charge_mode;     // 选择自动或是手动
     double manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
