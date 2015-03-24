@@ -200,6 +200,11 @@ struct bp_user {
                            struct bp_evt_param *param);
 };
 
+typedef enum {
+    UART_MODE_NORMAL, // 普通模式
+    UART_MODE_SESSION // 会话模式
+}UART_MODE;
+
 // 串口上最多可以绑定16个适用对象
 #define MAX_BINDER    16
 /*
@@ -216,6 +221,8 @@ struct bp_uart {
     volatile BP_UART_STAT hw_status;
     // 作为485串口时的收发转换端口
     unsigned int hw_port;
+    // 串口工作模式
+    UART_MODE uart_mode;
 
     // 初始化标识
     unsigned int init_magic;
