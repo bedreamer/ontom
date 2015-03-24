@@ -1655,7 +1655,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             job->charge_billing.option.set_time,
             job->charge_billing.option.set_money,
             job->card.triger_card_sn,
-            0.00f,
+            __card_read_remain(&job->card),
             __bytes2double(b2l(task->measure[0]->measure.VinKM0 )),
             __bytes2double(b2l(task->measure[0]->measure.IoutBAT0)),
             ycdl,

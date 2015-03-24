@@ -67,6 +67,25 @@ struct user_card {
         }sector_4;
     }card;
 };
+static inline double __card_read_remain(const struct user_card *c) {
+    unsigned int imoney = 0;
+
+    imoney += c->card.sector_4.data.remain_money[0];
+    imoney += c->card.sector_4.data.remain_money[1] * 256;
+    imoney += c->card.sector_4.data.remain_money[2] * 256 * 256;
+
+    return imoney / 100.0f;
+}
+
+static inline double __card_write_remain(struct user_card * c, double money) {
+    unsigned int imoney = money * 100;
+    c->card.sector_4.data.remain_money[0] = imoney & 0xFF;
+    c->card.sector_4.data.remain_money[1] = (imoney >> 8) & 0xFF;
+    c->card.sector_4.data.remain_money[2] = (imoney >> 16) & 0xFF;
+    c->card.sector_4.data.remain_sum =
+            check_sum(c->card.sector_4.data.remain_money, 3);
+    return money;
+}
 
 typedef enum {
     // 寻卡模式
