@@ -1498,7 +1498,7 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"status\":\"%s\",", task->op_card.card.sector_4.data.magic == 0x4F4E5057 ? "正常":"未格式化");
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                "\"money\":\"%.2f\",", task->op_card.card.sector_4.data.remain_money / 100.0f);
+                "\"money\":\"%.2f\",", task->op_card.card.sector_4.data.remain_money[0] / 100.0f);
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"passwd\":\"%d%d%d%d%d%d\",",
                 task->op_card.card.sector_4.data.passwd_code[0] & 0x0F + '0',
@@ -1506,7 +1506,7 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
                 task->op_card.card.sector_4.data.passwd_code[1] & 0x0F + '0',
                 (task->op_card.card.sector_4.data.passwd_code[1] >> 4) + '0',
                 task->op_card.card.sector_4.data.passwd_code[2] & 0x0F + '0',
-                (task->op_card.card.sector_4.data.passwd_code[3] >> 4) + '0',);
+                (task->op_card.card.sector_4.data.passwd_code[3] >> 4) + '0');
     } else {
         if ( 0 == strcmp(op, "format") ) {
             task->op_card.card.sector_4.data.magic = 0x4F4E5057;
@@ -1520,7 +1520,7 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
             task->op_card.card.sector_4.data.passwd_code[2] = 0;
             task->op_card.card.sector_4.data.passwd_sum =
                     check_sum(task->op_card.card.sector_4.data.passwd_code, 3);
-            task->op_card.card.sector_4.data.buff[15] =
+            task->op_card.card.sector_4.buff[15] =
                     check_sum(task->op_card.card.sector_4.data.buff, 15);
 
             bit_set(task, CMD_CARD_SET);
@@ -1544,8 +1544,8 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
             task->op_card.card.sector_4.data.passwd_code[2] = (passwd[5] << 4) | passwd[4];
             task->op_card.card.sector_4.data.passwd_sum =
                     check_sum(task->op_card.card.sector_4.data.passwd_code, 3);
-            task->op_card.card.sector_4.data.buff[15] =
-                    check_sum(task->op_card.card.sector_4.data.buff, 15);
+            task->op_card.card.sector_4.buff[15] =
+                    check_sum(task->op_card.card.sector_4.buff, 15);
 
             bit_set(task, CMD_CARD_SET);
         } else;
