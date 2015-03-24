@@ -2926,6 +2926,7 @@ ___fast_switch_2_rx:
                 }
                 ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
                                           &thiz->rx_param);
+                thiz->uart_mode = UART_MODE_NORMAL;
                 switch ( ret ) {
                 // 数据接收，校验完成, 完成数据接收过程，停止接收
                 case ERR_OK:
@@ -2936,6 +2937,7 @@ ___fast_switch_2_rx:
                     ret = thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
                                                           &thiz->rx_param);
                     if ( (unsigned)ret == ERR_NEED_ECHO ) {
+                        thiz->uart_mode = UART_MODE_SESSION;
                         thiz->continues_nr ++;
                         if ( thiz->continues_nr < 5 ) {
                             thiz->sequce --;
@@ -3030,7 +3032,9 @@ ___fast_switch_2_rx:
             thiz->tx_param.payload_size = 0;
             thiz->tx_param.cursor = 0;
 
-            usleep(400 * 1000);
+            if ( thiz->uart_mode == UART_MODE_NORMAL ) {
+                usleep(50 * 1000);
+            }
 
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
                                       &thiz->tx_param);
