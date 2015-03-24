@@ -564,7 +564,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             hit = self->users[i];
 
             self->sequce ++;
-            if ( 1 || self->master != hit || (self->master == hit && self->continues_nr) ) {
+            if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
                 self->master = hit;
                 self->master->seed = 0;
                 ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
