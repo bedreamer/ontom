@@ -2480,6 +2480,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             memcpy(param->buff.tx_buff, buff, nr);
             param->payload_size = nr;
             self->master->time_to_send = param->payload_size * 1000 / 960;
+            self->master->time_to_send = 5;
             self->rx_param.need_bytes = 7;
             log_printf(DBG_LV3, "UART: %s:SEQ_SECTOR_RD_AUTH requested.", __FUNCTION__);
             ret = ERR_OK;
