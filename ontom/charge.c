@@ -378,7 +378,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.measure = task->measure[0];
             u.name = "读卡器";
             ret = bp_user_bind(bp, &u); // 读卡器
-#if 0
+#if 1
             u.frame_freq = 50 * 100;
             u.seed = 0;
             u.died_line = 3;
@@ -633,7 +633,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.name = "电表(电压)";
         ret = bp_user_bind(bp, &u); // 电表
     } while (0);
-#if 0
+#if 1
     // 串口通信线程
     ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
     if ( 0 != ret ) {

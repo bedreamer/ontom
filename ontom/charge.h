@@ -825,6 +825,8 @@ struct charge_task {
 
     // 刷卡数据临时存储区
     struct user_card card;
+    // 刷卡数据临时存储区
+    struct user_card op_card;
     // 当前界面显示的页面号
     UI_PAGE uipage;
 
@@ -1023,9 +1025,13 @@ typedef enum {
     //CMD_JOB_MAN_PAUSE,
     // }}
     //{{ 模块操作
-    CMD_MODULE_OFF,
     CMD_MODULE_ON,
     //}}
+
+    // {{卡操作
+    CMD_CARD_FORMAT,
+    CMD_CARD_SET,
+    // }}
 
     // {{{ 故障标记
     // BMS通信故障
