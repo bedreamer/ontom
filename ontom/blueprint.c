@@ -2971,7 +2971,7 @@ ___fast_switch_2_rx:
                     break;
                 }
 
-                usleep(2000);
+                usleep(500);
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
@@ -3092,7 +3092,8 @@ continue_to_send:
                 __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
                 usleep(1000 * thiz->master->time_to_send);
-                log_printf(DBG_LV0, "UART: packet send done.");
+                log_printf(DBG, "UART: packet send done. sleep: %d us",
+                           1000 * thiz->master->time_to_send);
 
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
