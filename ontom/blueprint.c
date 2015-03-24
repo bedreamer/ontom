@@ -3096,7 +3096,7 @@ continue_to_send:
                 __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
                 usleep(1000 * thiz->master->time_to_send);
-                log_printf(DBG, "UART: packet send done. sleep: %d us",
+                log_printf(DBG_LV0, "UART: packet send done. sleep: %d us",
                            1000 * thiz->master->time_to_send);
 
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
