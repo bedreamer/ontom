@@ -2420,6 +2420,12 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                         money &= 0x00FFFFFF;
                         log_printf(INF, GRN("UART: 刷卡完成[卡号: %02X%02X%02X%02X, 余额: %.2f]"),
                                    ID[3], ID[2], ID[1], ID[0], money / 100.0f);
+                        char buff[32];
+                        config_write("card_status", "NORMAL");
+                        sprintf(buff, "%.2f", money / 100.0f);
+                        config_write("card_remaind_money", buff);
+                        sprintf(buff, "%02X%02X%02X%02X", ID[3], ID[2], ID[1], ID[0]);
+                        config_write("triger_card_sn", buff);
                     }
                 }
             }
