@@ -86,6 +86,10 @@ CONFIG_DOMAIN_BEGIN
 {"settle_card_sn",              C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
    // 卡内余额
 {"card_remaind_money",          C_FLOAT,    no,     C_VALID,    .cuv.f=0.0f,    {"0.0"}},
+   // 卡密码
+{"card_passwd",                 C_STRING,   no,     C_VALID,    .cuv.i=0,       {"000000"}},
+   // 卡状态
+{"card_status",                 C_STRING,   no,     C_VALID,    .cuv.i=0,       {"NORMAL"}},
 // 用户配置数据
    // 超级卡序列号
 {"super_card_sn",               C_STRING,  yes,     C_INVALID,  .cuv.i=0,       {"N/A"}},
