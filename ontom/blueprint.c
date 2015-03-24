@@ -1349,7 +1349,7 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         }
 
         if ( errnr ) {
-            log_printf(DBG_LV4, "Fault: "RED("%s"), errstr);
+            log_printf(DBG_LV3, "Fault: "RED("%s"), errstr);
         }
         // 输入状态，遥信
         len = 0;
@@ -2126,7 +2126,7 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
                 hwh_gu += (param->buff.rx_buff[32] >> 4 ) * 100000 + (param->buff.rx_buff[32] & 0x0F ) * 10000;
                 hwh_gu += (param->buff.rx_buff[33] >> 4 ) * 10000000 + (param->buff.rx_buff[33] & 0x0F ) * 1000000;
 
-                log_printf(DBG_LV4, "UART: %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH",
+                log_printf(DBG_LV3, "UART: %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH",
                            hwh_zong / 100.0f, hwh_jian / 100.0f, hwh_feng / 100.0f
                            , hwh_ping / 100.0f, hwh_gu / 100.0f);
                 task->meter[0].kwh_zong = hwh_zong / 100.0f;
@@ -2239,7 +2239,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                 vc = (param->buff.rx_buff[19] >> 4 ) * 1000 + (param->buff.rx_buff[19] & 0x0F ) * 100;
                 vc += (param->buff.rx_buff[18] >> 4 ) * 10 + (param->buff.rx_buff[18] & 0x0F );
 
-                log_printf(DBG_LV4, "UART: %.2fV  %.2fV  %.2f V",
+                log_printf(DBG_LV3, "UART: %.2fV  %.2fV  %.2f V",
                            va / 10.0f, vb / 10.0f, vc / 10.0f);
 
                 task->meter[0].Va = va / 10.0f;
