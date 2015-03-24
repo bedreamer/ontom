@@ -1349,7 +1349,7 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         }
 
         if ( errnr ) {
-            log_printf(ERR, "Fault: "RED("%s"), errstr);
+            log_printf(DBG_LV4, "Fault: "RED("%s"), errstr);
         }
         // 输入状态，遥信
         len = 0;
