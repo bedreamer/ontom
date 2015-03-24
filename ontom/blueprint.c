@@ -1779,6 +1779,9 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
             buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
             buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+            if ( task->modules_nr == 0 ) {
+                task->modules_nr = 1;
+            }
             buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
             buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
             buff[nr ++] = task->modules_nr >> 8;
