@@ -1026,6 +1026,7 @@ typedef enum {
     // }}
     //{{ 模块操作
     CMD_MODULE_ON,
+    CMD_MODULE_OFF,
     //}}
 
     // {{卡操作
