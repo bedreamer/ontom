@@ -1556,7 +1556,7 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         param->payload_size = nr;
 
         self->rx_param.need_bytes = 49;
-        self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
+        self->master->time_to_send = (param->payload_size + 1) * 1000 / 960 + self->master->swap_time_modify;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
