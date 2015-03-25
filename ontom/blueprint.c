@@ -1626,6 +1626,159 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     return ret;
 }
 
+int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    char buff[8];
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        buff[0] = 0x01;
+        buff[1] = 0x04;
+        buff[2] = buff[3] = 0x00;
+        buff[4] = 0x00;
+        buff[5] = 0x06;
+        buff[6] = 0x70;
+        buff[7] = 0x08;
+
+        self->rx_param.need_bytes = 17;
+
+        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+        param->payload_size = sizeof(buff);
+        self->master->time_to_send = param->payload_size * 1000 / 960;
+        ret = ERR_ERR;
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+int uart4_simple_box_correct_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    char buff[8];
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        buff[0] = 0x01;
+        buff[1] = 0x04;
+        buff[2] = buff[3] = 0x00;
+        buff[4] = 0x00;
+        buff[5] = 0x06;
+        buff[6] = 0x70;
+        buff[7] = 0x08;
+
+        self->rx_param.need_bytes = 17;
+
+        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+        param->payload_size = sizeof(buff);
+        self->master->time_to_send = param->payload_size * 1000 / 960;
+        ret = ERR_ERR;
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+
 // 一体机直接读取转换盒通信
 int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)

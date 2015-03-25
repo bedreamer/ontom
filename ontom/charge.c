@@ -269,9 +269,29 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     char sql[256];
     char buff[32] = {0};
-
     int ret, done = 0;
     char *errmsg;
+    const struct {
+        char *id;
+        int (*user_evt_handle)(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                               struct bp_evt_param *param);
+    }plugins[] = {
+        {"00000001", uart4_simple_box_1_evt_handle},
+        {"00000002", card_reader_handle},
+        {"00000003", card_init_handle},
+        {"00000004", uart4_charger_config_evt_handle},
+        {"00000005", uart4_charger_yaoce_0_49_handle},
+        {"00000006", uart4_charger_yaoce_50_100_handle},
+        {"00000007", ANC01_convert_box_read_evt_handle},
+        {"00000008", ANC01_convert_box_write_evt_handle},
+        {"00000009", Increase_convert_box_write_evt_handle},
+        {"0000000A", Increase_convert_box_read_evt_handle},
+        {"0000000B", kwh_meter_read_evt_handle},
+        {"0000000C", voltage_meter_read_evt_handle},
+        {"0000000D", uart4_simple_box_correct_evt_handle},
+        {"0000000E", uart4_simple_box_write_evt_handle},
+        {NULL, NULL}
+    };
 
     log_printf(DBG_LV1, "ZUES: %s running...sizeof(struct charge_task)=%d",
             __FUNCTION__, sizeof(struct charge_task));
