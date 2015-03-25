@@ -580,11 +580,18 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                     self->hw_bps = self->master->hw_bps;
                 }
                 if ( self->master->hw_other != self->hw_other ) {
+                    self->hw_other = self->master->hw_other;
                     set_other_attribute(self->dev_handle,
                                         self->hw_other>>16,
                                         self->hw_other & 0xFF,
                                         (self->hw_other >> 8)&0xFF);
-                    self->hw_other = self->master->hw_other;
+
+                    log_printf(INF, "%s %d,%d%C%d\n",
+                               self->dev_name,
+                               self->hw_bps,
+                               self->hw_other>>16,
+                               (self->hw_other >> 8)&0xFF,
+                               self->hw_other & 0xFF);
                 }
 
 
