@@ -1131,6 +1131,8 @@ void dump_commit_struct (struct job_commit_data *need)
     printf("\tcharge_mode:%x\n", need->charge_mode);
     printf("\tmanual_set_charge_volatage:%f\n", need->manual_set_charge_volatage);
     printf("\tmanual_set_charge_current:%f\n", need->manual_set_charge_current);
+    printf("\tmanual_set_charge_volatage:%s\n", need->card_passwd);
+    printf("\tmanual_set_charge_current:%.2f\n", need->card_remain);
 }
 
 struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *need)
