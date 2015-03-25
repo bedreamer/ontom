@@ -1164,7 +1164,7 @@ typedef enum {
     S_CONVERT_BOX_COMM_DOWN,
     S_MEASURE_2_COMM_DOWN,
     S_CARD_READER_COMM_DOWN,
-    system_reserve23,
+    S_KWH_METER_COMM_DOWN,
     system_reserve24,
     system_reserve25,
     system_reserve26,

@@ -2143,6 +2143,11 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_KWH_METER_COMM_DOWN) ) {
+            log_printf(ERR, "UART: "RED("电表通信恢复(%d)"), self->master->died);
+        }
+        self->master->died = 0;
+        bit_clr(task, S_KWH_METER_COMM_DOWN);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -2189,7 +2194,16 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        //self->master->died ++;
+        if ( self->master->died < self->master->died_line ) {
+            self->master->died ++;
+        } else {
+            //self->master->died ++;
+            if ( ! bit_read(task, S_KWH_METER_COMM_DOWN) ) {
+            }
+            log_printf(ERR, "UART: "RED("电表通信中断, 请排查故障,(%d)"),
+                       self->master->died);
+            bit_set(task, S_KWH_METER_COMM_DOWN);
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -2825,7 +2839,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     }
 
     while ( 1 ) {
-        usleep(10000);
+        usleep(5000);
         if ( thiz == NULL ) continue;
         if ( thiz->bp_evt_handle == NULL ) continue;
         if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
