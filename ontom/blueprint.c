@@ -405,7 +405,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->continues_nr = 0;
 
         ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_HOLD,
-                     500, HACHIKO_PAUSE, (void*)self);
+                     200, HACHIKO_PAUSE, (void*)self);
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart reciever's timer faile.");
         }
@@ -586,7 +586,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                                         self->hw_other & 0xFF,
                                         (self->hw_other >> 8)&0xFF);
 
-                    log_printf(INF, "%s: %d %d,'%C',%d",
+                    log_printf(DBG_LV3, "%s: %d %d,'%C',%d",
                                self->dev_name,
                                self->hw_bps,
                                self->hw_other>>16,
@@ -2173,7 +2173,7 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
         if ( bit_read(task, S_KWH_METER_COMM_DOWN) ) {
-            log_printf(ERR, "UART: "RED("电表通信恢复(%d)"), self->master->died);
+            log_printf(INF, "UART: "GRN("电表通信恢复(%d)"), self->master->died);
         }
         self->master->died = 0;
         bit_clr(task, S_KWH_METER_COMM_DOWN);
