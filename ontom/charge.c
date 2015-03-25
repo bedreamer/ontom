@@ -336,6 +336,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         bp->init_magic = 0;
         bp->hw_port = SERIAL4_CTRL_PIN;
         bp->users_nr = 0;
+        bp->hw_bps = 9600;
+        bp->hw_other = MAKE_UART_CFG(8, 'N', 1);
         bit_set(task, F_SYSTEM_CHARGE_ALLOW);
 
         task->chargers[0] = (struct charger_struct *)malloc(sizeof(struct charger_struct));
@@ -360,6 +362,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.chargers = task->chargers[0];
             u.measure = task->measure[0];
             u.name = "采样盒";
+            u.hw_bps = 9600;
+            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
             ret = bp_user_bind(bp, &u); // 采样
 #endif
             u.frame_freq = 50 * 100;
@@ -377,6 +381,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.chargers = task->chargers[0];
             u.measure = task->measure[0];
             u.name = "读卡器";
+            u.hw_bps = 9600;
+            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
             ret = bp_user_bind(bp, &u); // 读卡器
 #if 1
             u.frame_freq = 50 * 100;
@@ -394,6 +400,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.chargers = task->chargers[0];
             u.measure = task->measure[0];
             u.name = "卡操作";
+            u.hw_bps = 9600;
+            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
             ret = bp_user_bind(bp, &u); // 卡片初始化
 
             if ( task->sys_type == SYSTEM_FENTISHI ) {
@@ -411,6 +419,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.uart = bp;
                 u.chargers = task->chargers[0];
                 u.name = "充电屏监控(配置)";
+                u.hw_bps = 9600;
+                u.hw_other = MAKE_UART_CFG(8, 'N', 1);
                 ret = bp_user_bind(bp, &u); // 配置充电电压，电流
 
                 u.frame_freq = 50 * 100;
@@ -427,6 +437,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.uart = bp;
                 u.chargers = task->chargers[0];
                 u.name = "充电屏监控(遥信1)";
+                u.hw_bps = 9600;
+                u.hw_other = MAKE_UART_CFG(8, 'N', 1);
                 ret = bp_user_bind(bp, &u); // 遥信1
 
                 u.frame_freq = 50 * 100;
@@ -443,6 +455,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.uart = bp;
                 u.chargers = task->chargers[0];
                 u.name = "充电屏监控(遥信2)";
+                u.hw_bps = 9600;
+                u.hw_other = MAKE_UART_CFG(8, 'N', 1);
                 ret = bp_user_bind(bp, &u); // 遥信2
             } else if ( task->sys_type == SYSTEM_YITISHI ) {
                 log_printf(INF, "ZEUS: 模块型号: %d", task->module_model);
@@ -461,6 +475,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.uart = bp;
                     u.chargers = task->chargers[0];
                     u.name = "协议转换盒(读)";
+                    u.hw_bps = 9600;
+                    u.hw_other = MAKE_UART_CFG(8, 'N', 1);
                     ret = bp_user_bind(bp, &u); // 读取转换盒信息
 
                     u.frame_freq = 50 * 100;
@@ -477,6 +493,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.uart = bp;
                     u.chargers = task->chargers[0];
                     u.name = "协议转换盒(写)";
+                    u.hw_bps = 9600;
+                    u.hw_other = MAKE_UART_CFG(8, 'N', 1);
                     ret = bp_user_bind(bp, &u); // 写转换盒信息
                 } else {
                     int i ;
@@ -495,6 +513,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.uart = bp;
                     u.chargers = task->chargers[0];
                     u.name = "协议转换盒(写)";
+                    u.hw_bps = 9600;
+                    u.hw_other = MAKE_UART_CFG(8, 'E', 1);
                     ret = bp_user_bind(bp, &u); // 写转换盒信息
 
                     for ( i = 0; i < task->modules_nr &&
@@ -514,6 +534,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                         u.chargers = task->chargers[0];
                         u._private = (i + 1);
                         u.name = "模块";
+                        u.hw_bps = 9600;
+                        u.hw_other = MAKE_UART_CFG(8, 'E', 1);
                         ret = bp_user_bind(bp, &u); // 读模块信息
                     }
                 }
@@ -596,6 +618,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     bp->role = BP_UART_MASTER;
     bp->init_magic = 0;
     bp->hw_port = SERIAL5_CTRL_PIN;
+    bp->hw_bps = 2400;
+    bp->hw_other = MAKE_UART_CFG(8, 'N', 1);
 
     do {
         struct bp_user u = {0};
@@ -614,6 +638,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.chargers = task->chargers[0];
         u.measure = task->measure[0];
         u.name = "电表(电能)";
+        u.hw_bps = 2400;
+        u.hw_other = MAKE_UART_CFG(8, 'N', 1);
         ret = bp_user_bind(bp, &u); // 电表
 
         u.frame_freq = 50 * 100;
@@ -631,6 +657,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.chargers = task->chargers[0];
         u.measure = task->measure[0];
         u.name = "电表(电压)";
+        u.hw_bps = 2400;
+        u.hw_other = MAKE_UART_CFG(8, 'N', 1);
         ret = bp_user_bind(bp, &u); // 电表
     } while (0);
 #if 1

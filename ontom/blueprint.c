@@ -137,8 +137,6 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
 
     switch (parity)
     {
-        case 'n':
-        case 'N':
             options.c_cflag &= ~PARENB;   /* Clear parity enable */
             options.c_iflag &= ~INPCK;     /* Enable parity checking */
             break;
@@ -157,9 +155,8 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
             options.c_cflag &= ~PARODD;
             options.c_iflag |= INPCK;      /* Disnable parity checking */
             break;
-
-        case 'S':
-        case 's':  /*as no parity*/
+        case 'n':
+        case 'N':
         case 0:
             options.c_cflag &= ~PARENB;
             options.c_cflag &= ~CSTOPB;
@@ -458,11 +455,11 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 #else
         if ( self->hw_port == SERIAL4_CTRL_PIN ) {
             set_speed(self->dev_handle, 9600);
-            set_other_attribute(self->dev_handle, 8, 1, 0);
+            set_other_attribute(self->dev_handle, 8, 1, 'N');
             log_printf(INF, "UART: %s 9600,8,1,N", self->dev_name);
         } else if ( self->hw_port == SERIAL5_CTRL_PIN ) {
             set_speed(self->dev_handle, 2400);
-            set_other_attribute(self->dev_handle, 8, 1, 1);
+            set_other_attribute(self->dev_handle, 8, 1, 'O');
             log_printf(INF, "UART: %s 2400,8,1,O", self->dev_name);
         }
 #endif
@@ -567,6 +564,31 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             if ( self->master != hit || (self->master == hit && self->continues_nr) ) {
                 self->master = hit;
                 self->master->seed = 0;
+                /*鄙视下面的代码*/
+
+
+                /*
+                 *  从没见过在同一个485总线上使用不同的通信配置，这个做法是为了在这个框架里
+                 *  兼容英可瑞的整流模块转换单元.
+                 * PS：
+                 *  我就操蛋了，妈的！换个毛整流模块啊，英可瑞的模块转换盒采用的是9600,8,E,1的
+                 *  通信模式，非要在这里做个兼容，整个串口通信框架被玩的像傻叉一样！！
+                 *  FUCK!  FUCK!
+                 */
+                if ( self->master->hw_bps != self->hw_bps ) {
+                    set_speed(self->dev_handle, self->master->hw_bps);
+                    self->hw_bps = self->master->hw_bps;
+                }
+                if ( self->master->hw_other != self->hw_other ) {
+                    set_other_attribute(self->dev_handle,
+                                        self->hw_other>>16,
+                                        self->hw_other & 0xFF,
+                                        (self->hw_other >> 8)&0xFF);
+                    self->hw_other = self->master->hw_other;
+                }
+
+
+                /* 鄙视上面的代码 */
                 ret = hit->user_evt_handle(self, self->master, BP_EVT_TX_FRAME_REQUEST, param);
                 log_printf(DBG_LV1, "UART: %s BP_EVT_TX_FRAME_REQUEST ret: %d, load: %d, sent: %d",
                            self->master->name,

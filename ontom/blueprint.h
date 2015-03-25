@@ -145,6 +145,14 @@ struct bp_user {
     // 累计超时丢帧数
     unsigned int died_total;
 
+    // {{ 需要串口配置数据
+    unsigned int hw_bps;
+    unsigned int hw_other;
+    //  bit[0:7]:   停止位
+    //  bit[8:15]:  校验位
+    //  bit[16:23]: 数据位
+    // }}
+#define MAKE_UART_CFG(d, c, s) ((((d&0xFF) <<16) | ((c&0xFF) << 8) | s&0xFF)&0x00FFFFFF)
     // 对应的作业
     struct charge_job *job;
     // 对应的充电机管理单元
@@ -223,6 +231,13 @@ struct bp_uart {
     unsigned int hw_port;
     // 串口工作模式
     UART_MODE uart_mode;
+    // {{ 当前串口配置数据
+    unsigned int hw_bps;
+    unsigned int hw_other;
+    //  bit[0:7]:   停止位
+    //  bit[8:15]:  校验位
+    //  bit[16:23]: 数据位
+    // }}
 
     // 初始化标识
     unsigned int init_magic;
