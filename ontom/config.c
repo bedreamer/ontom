@@ -729,7 +729,7 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
                                   head->config_value);
         } else if ( C_BOOL == head->config_type ) {
             output_len += sprintf(&thiz->iobuff[output_len],
-                                  "{\"n\":\"%s\",\"t\":\"%s\",\"v\":%s},",
+                                  "{\"n\":\"%s\",\"t\":\"%s\",\"v\":\"%s\"},",
                                   head->config_name,
                                   value_type[(unsigned int)(head->config_type)],
                     (head->config_value[0] == 't' || head->config_value[0] == 'T') ?"true":"false");
