@@ -586,7 +586,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                                         self->hw_other & 0xFF,
                                         (self->hw_other >> 8)&0xFF);
 
-                    log_printf(INF, "%s %d,%d%C%d\n",
+                    log_printf(INF, "%s: %d %d,'%C',%d",
                                self->dev_name,
                                self->hw_bps,
                                self->hw_other>>16,
