@@ -1969,7 +1969,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         if ( self->master->died < self->master->died_line ) {
-            //self->master->died ++;
+            self->master->died ++;
         } else {
             //self->master->died ++;
             if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
