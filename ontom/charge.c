@@ -619,7 +619,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     bp->init_magic = 0;
     bp->hw_port = SERIAL5_CTRL_PIN;
     bp->hw_bps = 2400;
-    bp->hw_other = MAKE_UART_CFG(8, 'N', 1);
+    bp->hw_other = MAKE_UART_CFG(8, 'O', 1);
 
     do {
         struct bp_user u = {0};
@@ -639,7 +639,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.measure = task->measure[0];
         u.name = "电表(电能)";
         u.hw_bps = 2400;
-        u.hw_other = MAKE_UART_CFG(8, 'N', 1);
+        u.hw_other = MAKE_UART_CFG(8, 'O', 1);
         ret = bp_user_bind(bp, &u); // 电表
 
         u.frame_freq = 50 * 100;
@@ -658,7 +658,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.measure = task->measure[0];
         u.name = "电表(电压)";
         u.hw_bps = 2400;
-        u.hw_other = MAKE_UART_CFG(8, 'N', 1);
+        u.hw_other = MAKE_UART_CFG(8, 'O', 1);
         ret = bp_user_bind(bp, &u); // 电表
     } while (0);
 #if 1
