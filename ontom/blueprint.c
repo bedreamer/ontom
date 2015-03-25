@@ -1947,8 +1947,8 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x06;
         len = nr;
-        buff[ nr ++ ] = Increase_ModbusCRC(buff, len);
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
+        buff[ nr ++ ] = Increase_ModbusCRC(buff, len);
 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
