@@ -721,7 +721,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     if ( 0 == strcmp(page_id, "id_mainpage") ) {
         task->uipage = UI_PAGE_MAIN;
     } else if (  0 == strcmp(page_id, "id_job_working") ) {
-        if ( 0 == strcmp(job_id, "N/A") ) {
+        if ( 0 != strcmp(job_id, "N/A") ) {
             task->ui_job_id = __atoh(job_id);
             if ( task->uipage != UI_PAGE_JOBS ) {
                 log_printf(INF, "AJAX: UI界面在任务详情页面");
