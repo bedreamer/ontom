@@ -2597,7 +2597,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             if ( param->buff.rx_buff[2] == 0x00 ) {
                 // 认证成功
                 log_printf(INF, "UART: 读认证成功");
-                query_stat = SEQ_SECTOR_RD_AUTH;
+                query_stat = SEQ_READ_PUBLIC_BLK;
                 ret = ERR_NEED_ECHO;
             } else {
                 // 认证失败
