@@ -2762,10 +2762,10 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 int i = 0;
                 // 调试每次扣1.5
                 __card_write_remain(&job->card, __card_read_remain(&job->card) - 1.5f);
-                job->card.sector_4.data.sum =
-                        check_sum(job->card.sector_4.data.buff, 15);
+                job->card.card.sector_4.data.sum =
+                        check_sum(job->card.card.sector_4.data.buff, 15);
                 for ( i = 0; i < 16; i ++ ) {
-                    buff[ nr ++ ] = job->card.sector_4.buff[i];
+                    buff[ nr ++ ] = job->card.card.sector_4.buff[i];
                 }
             } while (0);
 
