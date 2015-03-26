@@ -3381,9 +3381,14 @@ continue_to_send:
 #else
                 __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
-                usleep(1000 * thiz->master->time_to_send);
-                log_printf(DBG_LV0, "UART: packet send done. sleep: %d us",
-                           1000 * thiz->master->time_to_send);
+
+                do {
+                    unsigned int tts = 0;
+
+                    tts = (unsigned int)(thiz->tx_param.payload_size * (double)( 1000 / ( thiz->hw_bps / 10 ) ));
+                    usleep(tts);
+                    log_printf(DBG_LV3, "UART: packet send done. sleep: %d us", tts);
+                } while (0);
 
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
