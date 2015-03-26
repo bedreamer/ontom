@@ -764,6 +764,8 @@ struct charge_job {
     time_t charge_implemention_timestamp;
     // BMS握手成功的时戳, 接收到第一次BRM的时刻
     time_t charge_bms_establish_timestamp;
+    // 作业创建的时间戳
+    time_t charge_job_create_timestamp;
     // 开始充电时的电表度数
     double charge_begin_kwh_data;
     // 终止充电时的电表度数
