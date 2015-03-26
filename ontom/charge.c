@@ -375,7 +375,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.check_err_cnt = 0;
             u.check_err_total = 0;
             u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 0;
+            u.swap_time_modify = 500;
             u.swap_time_config_name = "core_simple_box_swap_time";
             u.user_evt_handle = uart4_simple_box_1_evt_handle;
             u.uart = bp;
