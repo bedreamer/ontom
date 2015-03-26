@@ -1485,7 +1485,9 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
+    exit(0);
 die:
+
     return ret;
 }
 
