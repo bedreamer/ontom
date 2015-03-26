@@ -1747,8 +1747,13 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\",");
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
     } else {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
-        bit_set(j, CMD_JOB_ABORT);
+        if ( j->job_url_commit_timestamp + 10 > time(NULL) ) {
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\"");
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"作业保护\"");
+        } else {
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
+            bit_set(j, CMD_JOB_ABORT);
+        }
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
