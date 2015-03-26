@@ -2660,6 +2660,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                             if ( job == NULL ) {
                                 log_printf(WRN, "无效的刷卡.");
                             } else {
+                                log_printf(INF, "任务中止，开始扣费。");
                                 query_stat = SEQ_SECTOR_WR_AUTH;
                                 ret = ERR_NEED_ECHO;
                             }
