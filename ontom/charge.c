@@ -384,7 +384,26 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.name = "采样盒";
             u.hw_bps = 9600;
             u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-            ret = bp_user_bind(bp, &u); // 采样
+            ret = bp_user_bind(bp, &u); // 采样读
+
+            u.frame_freq = 50 * 100;
+            u.seed = 0;
+            u.died_line = 3;
+            u.died_total = 0;
+            u.sent_frames = 0;
+            u.check_err_cnt = 0;
+            u.check_err_total = 0;
+            u.rcv_ok_cnt = 0;
+            u.swap_time_modify = 500;
+            u.swap_time_config_name = "core_simple_box_swap_time";
+            u.user_evt_handle = uart4_simple_box_write_evt_handle;
+            u.uart = bp;
+            u.chargers = task->chargers[0];
+            u.measure = task->measure[0];
+            u.name = "采样盒";
+            u.hw_bps = 9600;
+            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
+            ret = bp_user_bind(bp, &u); // 采样写
 #endif
             u.frame_freq = 50 * 100;
             u.seed = 0;
