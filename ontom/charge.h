@@ -974,7 +974,7 @@ struct charge_task {
     double bat_2_v_hi;
     double bat_2_v_lo;
     double bat_1_I_hi;
-    double bat_2_I_lo;
+    double bat_2_I_hi;
     double bat_1_insti_ohm_v;
     double bat_2_insti_ohm_v;
     double bus1_bat1_check_v;
