@@ -1601,7 +1601,7 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
     int ret = ERR_ERR;
     char buff[64];
     char cmd;
-    int nr = 0, len = 0;
+    int nr = 0, len = 0, len_i= 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1671,6 +1671,7 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 13;
+        buff[ nr ++ ] = 26;
         buff[ nr ++ ] = cmd;
         buff[ nr ++ ] = cmd;
         buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10) >>8;
