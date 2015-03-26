@@ -1330,7 +1330,7 @@ static inline double __bytes2double(unsigned short bytes)
 }
 
 static inline unsigned short double2short(double df, unsigned int acc) {
-    return  (unsigned short)(dff * acc * 1.0f);
+    return  (unsigned short)(df * acc * 1.0f);
 }
 
 static inline double bytes2double(unsigned char h, unsigned l, unsigned int acc) {
