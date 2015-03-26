@@ -1747,7 +1747,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\",");
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
     } else {
-        if ( j->charge_job_create_timestamp + 10 < time(NULL) ) {
+        if ( j->charge_job_create_timestamp + 10 > time(NULL) ) {
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"REJECTED\"");
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"作业保护\"");
         } else {
