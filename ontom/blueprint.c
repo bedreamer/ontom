@@ -3386,7 +3386,7 @@ continue_to_send:
                 do {
                     int tts = 0;
                     tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
-                    usleep(tts + thiz->master->swap_time_modify);
+                    usleep(tts + thiz->master->swap_time_modify + 50);
                     log_printf(DBG_LV1, "UART: packet send done. sleep: %d:%d us",
                                tts, thiz->master->swap_time_modify);
                 } while (0);
