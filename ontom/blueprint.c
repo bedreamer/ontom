@@ -2575,23 +2575,10 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             if ( param->buff.rx_buff[0] <= 8 ) return ERR_OK;
             memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
             id_len = param->buff.rx_buff[7];
-            if ( task->uipage == UI_PAGE_MAIN ) {
-                log_printf(INF, "UART: 寻到新卡，进行读扇区密码验证(%02X%02X%02X%02X).",
-                            ID[3], ID[2], ID[1], ID[0]);
-                query_stat = SEQ_SECTOR_RD_AUTH;
-                ret = ERR_NEED_ECHO;
-            } else if ( task->uipage == UI_PAGE_JOBS ) {
-                job = job_search(task->ui_job_id);
-                if ( job == NULL ) {
-                    ret = ERR_OK;
-                } else {
-                    query_stat = SEQ_WRITE_PUBLIC_BLK;
-                    ret = ERR_NEED_ECHO;
-                }
-            } else {
-                // do nothing
-                ret = ERR_OK;
-            }
+            log_printf(INF, "UART: 寻到卡，ID:(%02X%02X%02X%02X).",
+                        ID[3], ID[2], ID[1], ID[0]);
+            query_stat = SEQ_SECTOR_RD_AUTH;
+            ret = ERR_NEED_ECHO;
             break;
         case SEQ_SECTOR_RD_AUTH:
             if ( param->buff.rx_buff[2] == 0x00 ) {
@@ -2621,9 +2608,13 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             if ( param->buff.rx_buff[2] != 0 ) {
                 log_printf(WRN, "UART: 读卡器读取数据区失败, 错误码: %d",
                            param->buff.rx_buff[2]);
+                query_stat = SEQ_FIND_CARD;
+                ret = ERR_OK;
             } else {
                 struct user_card cd;
 
+                query_stat = SEQ_FIND_CARD;
+                ret = ERR_OK;
                 memcpy(cd.card.sector_4.buff, &param->buff.rx_buff[4], 16);
                 if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
                     log_printf(WRN, "UART: 无法识别的卡 %08X.", cd.card.sector_4.data.magic);
@@ -2663,11 +2654,19 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                         config_write("card_passwd", buff);
                         sprintf(buff, "%02X%02X%02X%02X", ID[3], ID[2], ID[1], ID[0]);
                         config_write("triger_card_sn", buff);
+
+                        if ( task->uipage == UI_PAGE_JOBS ) {
+                            job = job_search(task->ui_job_id);
+                            if ( job == NULL ) {
+                                log_printf(WRN, "无效的刷卡.");
+                            } else {
+                                query_stat = SEQ_SECTOR_WR_AUTH;
+                                ret = ERR_NEED_ECHO;
+                            }
+                        }
                     }
                 }
             }
-            query_stat = SEQ_FIND_CARD;
-            ret = ERR_OK;
             break;
         case SEQ_WRITE_PUBLIC_BLK:
             log_printf(INF, "UART: 刷卡扣费成功");
