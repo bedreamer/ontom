@@ -405,6 +405,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.hw_other = MAKE_UART_CFG(8, 'N', 1);
             ret = bp_user_bind(bp, &u); // 读卡器
 #if 1
+#if 0
             u.frame_freq = 50 * 100;
             u.seed = 0;
             u.died_line = 3;
@@ -423,7 +424,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.hw_bps = 9600;
             u.hw_other = MAKE_UART_CFG(8, 'N', 1);
             ret = bp_user_bind(bp, &u); // 卡片初始化
-
+#endif
             if ( task->sys_type == SYSTEM_FENTISHI ) {
                 u.frame_freq = 50 * 100;
                 u.seed = 1000;
