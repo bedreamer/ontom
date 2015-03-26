@@ -1600,7 +1600,7 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
     int ret = ERR_ERR;
     char buff[32];
     char cmd;
-    int nr = 0;
+    int nr = 0, len = 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
