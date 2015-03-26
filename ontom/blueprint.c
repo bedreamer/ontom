@@ -666,6 +666,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         log_printf(DBG_LV1, "UART: not all data fetched yet.");
         if ( self->master && self->master->user_evt_handle ) {
+            __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
             ret = self->master->user_evt_handle(self, self->master, BP_EVT_RX_FRAME_TIMEOUT, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_RX_FRAME_TIMEOUT")" without signal procedure.");
