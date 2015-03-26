@@ -1235,9 +1235,9 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     strcpy(thiz->card.triger_card_sn, need->card_sn);
     __card_write_passwd(&thiz->card, need->card_passwd);
     __card_write_remain(&thiz->card, need->card_remain);
-    thiz->card.sector_4.data.magic = 0x4F4E5057;
-    thiz->card.sector_4.data.reserved = 0;
-    thiz->card.sector_4.data.unuesed = 0;
+    thiz->card.card.sector_4.data.magic = 0x4F4E5057;
+    thiz->card.card.sector_4.data.reserved = 0;
+    thiz->card.card.sector_4.data.unuesed = 0;
 
     if ( thiz->charge_mode != CHARGE_AUTO ) {
         thiz->need_I = need->manual_set_charge_current;
