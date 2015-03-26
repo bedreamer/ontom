@@ -2664,6 +2664,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                                 query_stat = SEQ_SECTOR_WR_AUTH;
                                 ret = ERR_NEED_ECHO;
                             }
+                        } else {
+                            log_printf(INF, "fasdfafdsfasdfasdfasfasdfsad");
                         }
                     }
                 }
