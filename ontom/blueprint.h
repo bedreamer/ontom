@@ -175,7 +175,7 @@ struct bp_user {
     unsigned int time_to_send;
 
     // 转换为发送状态的时间修正
-    unsigned int swap_time_modify;
+    int swap_time_modify;
     // 配置项名称
     char * swap_time_config_name;
     // 私有数据
