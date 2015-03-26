@@ -3387,7 +3387,7 @@ continue_to_send:
 
                     tts = (unsigned int)(thiz->tx_param.payload_size * (double)( 1000 / ( thiz->hw_bps / 10 ) ));
                     usleep(tts);
-                    log_printf(DBG_LV3, "UART: packet send done. sleep: %d us", tts);
+                    log_printf(INF, "UART: packet send done. sleep: %d us", tts);
                 } while (0);
 
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
