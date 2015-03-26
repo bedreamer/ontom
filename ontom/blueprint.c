@@ -2663,7 +2663,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                                 log_printf(WRN, "无效的刷卡.");
                             } else {
                                 if ( 0 == strcmp(job->card.triger_card_sn, buff) ) {
-                                    if ( j->charge_job_create_timestamp + 10 < time(NULL) ) {
+                                    if ( job->charge_job_create_timestamp + 10 < time(NULL) ) {
                                         log_printf(INF, "UART: 刷卡太快，作业保护.");
                                     } else {
                                         log_printf(INF, "任务中止，开始扣费。");
