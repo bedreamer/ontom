@@ -652,7 +652,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.check_err_cnt = 0;
         u.check_err_total = 0;
         u.rcv_ok_cnt = 0;
-        u.swap_time_modify = 0;
+        u.swap_time_modify = 1000;
         u.swap_time_config_name = "core_kwh_meter_swap_time";
         u.user_evt_handle = kwh_meter_read_evt_handle;
         u.uart = bp;
@@ -671,7 +671,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.check_err_cnt = 0;
         u.check_err_total = 0;
         u.rcv_ok_cnt = 0;
-        u.swap_time_modify = 0;
+        u.swap_time_modify = 1000;
         u.swap_time_config_name = "core_voltage_meter_swap_time";
         u.user_evt_handle = voltage_meter_read_evt_handle;
         u.uart = bp;
