@@ -768,6 +768,14 @@ struct charge_job {
     double charge_begin_kwh_data;
     // 终止充电时的电表度数
     double charge_exit_kwh_data;
+
+    // 已经消耗的电能
+    double charged_kwh;
+    // 已经充电的时间长度，按秒计
+    unsigned int charged_seconds;
+    // 已经消费的数额, 按元记，精确到分
+    double charged_money;
+
     // 结构体引用计数
     unsigned int ref_nr;
 
@@ -874,6 +882,8 @@ struct charge_task {
     struct user_card op_card;
     // 当前界面显示的页面号
     UI_PAGE uipage;
+    // 当处于作业详情页刷卡时的当前作业ID
+    unsigned int ui_job_id;
 
     // 当前正在执行的充电任务
     struct charge_job *job[CONFIG_SUPPORT_CHARGE_JOBS];
@@ -1317,6 +1327,14 @@ static inline double __bytes2double(unsigned short bytes)
         return (bytes&0x7FFF)/(-10.0f);
     }
     return (bytes & 0x7FFF) / 10.0f;
+}
+
+static inline unsigned short double2short(double df, unsigned int acc) {
+    return  (unsigned short)(dff * acc * 1.0f);
+}
+
+static inline double bytes2double(unsigned char h, unsigned l, unsigned int acc) {
+    return (h * 256 + l) / (1.0f * acc);
 }
 
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);

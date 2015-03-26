@@ -1535,38 +1535,6 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
 
-        if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
-            cmd |= GUN1_ASSIT_PWN_ON;
-            cmd &= ~GUN2_ASSIT_PWN_ON;
-        } else {
-            cmd &= ~GUN1_ASSIT_PWN_ON;
-        }
-        if ( bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
-            cmd |= GUN2_ASSIT_PWN_ON;
-            cmd &= ~GUN1_ASSIT_PWN_ON;
-        } else {
-            cmd &= ~GUN2_ASSIT_PWN_ON;
-        }
-        if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
-            cmd |= GUN1_OUTPUT_ON;
-            cmd &= ~GUN2_OUTPUT_ON;
-        } else {
-            cmd &= ~GUN1_OUTPUT_ON;
-        }
-        if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
-            cmd |= GUN2_OUTPUT_ON;
-            cmd &= ~GUN1_OUTPUT_ON;
-        } else {
-            cmd &= ~GUN2_OUTPUT_ON;
-        }
-
-
-        if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
-            cmd |= DC_SWITCH_ON;
-        } else {
-            cmd &= ~DC_SWITCH_ON;
-        }
-
         buff[ nr ++ ] = 0xF0;
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
@@ -1658,20 +1626,61 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        buff[0] = 0x01;
-        buff[1] = 0x04;
-        buff[2] = buff[3] = 0x00;
-        buff[4] = 0x00;
-        buff[5] = 0x06;
-        buff[6] = 0x70;
-        buff[7] = 0x08;
 
-        self->rx_param.need_bytes = 17;
+        if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
+            cmd |= GUN1_ASSIT_PWN_ON;
+            cmd &= ~GUN2_ASSIT_PWN_ON;
+        } else {
+            cmd &= ~GUN1_ASSIT_PWN_ON;
+        }
+        if ( bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
+            cmd |= GUN2_ASSIT_PWN_ON;
+            cmd &= ~GUN1_ASSIT_PWN_ON;
+        } else {
+            cmd &= ~GUN2_ASSIT_PWN_ON;
+        }
+        if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
+            cmd |= GUN1_OUTPUT_ON;
+            cmd &= ~GUN2_OUTPUT_ON;
+        } else {
+            cmd &= ~GUN1_OUTPUT_ON;
+        }
+        if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
+            cmd |= GUN2_OUTPUT_ON;
+            cmd &= ~GUN1_OUTPUT_ON;
+        } else {
+            cmd &= ~GUN2_OUTPUT_ON;
+        }
 
-        memcpy(param->buff.tx_buff, buff, sizeof(buff));
-        param->payload_size = sizeof(buff);
-        self->master->time_to_send = param->payload_size * 1000 / 960;
-        ret = ERR_ERR;
+
+        if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
+            cmd |= DC_SWITCH_ON;
+        } else {
+            cmd &= ~DC_SWITCH_ON;
+        }
+
+        buff[ nr ++ ] = 0xF0;
+        buff[ nr ++ ] = 0xE1;
+        buff[ nr ++ ] = 0xD2;
+        buff[ nr ++ ] = 0xC3;
+        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 0x10;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 13;
+        buff[ nr ++ ] = cmd;
+        buff[ nr ++ ] = cmd;
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->rx_param.need_bytes = 49;
+        self->master->time_to_send = (param->payload_size + 1) * 1000 / 960 + self->master->swap_time_modify;
+        ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
@@ -2526,6 +2535,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                      struct bp_evt_param *param)
 {
     static QUERY_STAT query_stat = SEQ_FIND_CARD;
+    static struct charge_job *job = NULL;
     static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
     int ret = ERR_ERR;
@@ -2567,20 +2577,41 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 log_printf(INF, "UART: 寻到新卡，进行读扇区密码验证(%02X%02X%02X%02X).",
                             ID[3], ID[2], ID[1], ID[0]);
                 query_stat = SEQ_SECTOR_RD_AUTH;
+                ret = ERR_NEED_ECHO;
+            } else if ( task->uipage == UI_PAGE_JOBS ) {
+                job = job_search(task->ui_job_id);
+                if ( job == NULL ) {
+                    ret = ERR_OK;
+                } else {
+                    query_stat = SEQ_WRITE_PUBLIC_BLK;
+                    ret = ERR_NEED_ECHO;
+                }
             } else {
-                query_stat = SEQ_WRITE_PUBLIC_BLK;
+                // do nothing
+                ret = ERR_OK;
             }
-            ret = ERR_NEED_ECHO;
             break;
         case SEQ_SECTOR_RD_AUTH:
             if ( param->buff.rx_buff[2] == 0x00 ) {
                 // 认证成功
-                log_printf(INF, "UART: 认证成功");
-                query_stat = SEQ_READ_PUBLIC_BLK;
+                log_printf(INF, "UART: 读认证成功");
+                query_stat = SEQ_WRITE_PUBLIC_BLK;
                 ret = ERR_NEED_ECHO;
             } else {
                 // 认证失败
-                log_printf(WRN, "UART: 认证失败");
+                log_printf(WRN, "UART: 读认证失败");
+                query_stat = SEQ_FIND_CARD;
+            }
+            break;
+        case SEQ_SECTOR_WR_AUTH:
+            if ( param->buff.rx_buff[2] == 0x00 ) {
+                // 认证成功
+                log_printf(INF, "UART: 写认证成功");
+                query_stat = SEQ_WRITE_PUBLIC_BLK;
+                ret = ERR_NEED_ECHO;
+            } else {
+                // 认证失败
+                log_printf(WRN, "UART: 写认证失败, 扣费失败!");
                 query_stat = SEQ_FIND_CARD;
             }
             break;
@@ -2637,6 +2668,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             ret = ERR_OK;
             break;
         case SEQ_WRITE_PUBLIC_BLK:
+            log_printf(INF, "UART: 刷卡扣费成功");
+            query_stat = SEQ_FIND_CARD;
             ret = ERR_OK;
             break;
         default:
@@ -2663,6 +2696,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             log_printf(DBG_LV3, "UART: %s:SEQ_FIND_CARD requested.", __FUNCTION__);
             ret = ERR_OK;
             break;
+        case SEQ_SECTOR_WR_AUTH:
         case SEQ_SECTOR_RD_AUTH:
             buff[ nr ++ ] = 0x12;
             buff[ nr ++ ] = 0x02;
@@ -2710,7 +2744,37 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             ret = ERR_OK;
             break;
         case SEQ_WRITE_PUBLIC_BLK:
-            break;
+
+            if ( job == NULL ) {
+                log_printf(WRN, "UART: 读卡器时序错乱.");
+                query_stat = SEQ_FIND_CARD;
+                return ERR_ERR;
+            }
+            buff[ nr ++ ] = 0x17;
+            buff[ nr ++ ] = 0x02;
+            buff[ nr ++ ] = 0x48;
+            buff[ nr ++ ] = 0x11;
+            buff[ nr ++ ] = 0x04; // 写第4扇区
+
+            do {
+                int i = 0;
+                // 调试每次扣1.5
+                __card_write_remain(&job->card, __card_read_remain(&job->card) - 1.5f);
+                job->card.sector_4.data.sum =
+                        check_sum(job->card.sector_4.data.buff, 15);
+                for ( i = 0; i < 16; i ++ ) {
+                    buff[ nr ++ ] = job->card.sector_4.buff[i];
+                }
+            } while (0);
+
+            buff[ nr ++ ] = BCC_code(buff, nr);
+            buff[ nr ++ ] = 0x03;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            self->rx_param.need_bytes = 6;
+            log_printf(DBG_LV3, "UART: %s:SEQ_WRITE_PUBLIC_BLK requested.", __FUNCTION__);            break;
         default:
             query_stat = SEQ_FIND_CARD;
             break;
@@ -2800,7 +2864,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
             if ( task->uipage == UI_PAGE_MAIN ) {
                 log_printf(INF, "UART: 寻到新卡，进行读扇区密码验证.");
                 query_stat = SEQ_SECTOR_RD_AUTH;
-            } else {
+            } else if ( task->uipage == UI_PAGE_JOBS ) {
                 query_stat = SEQ_WRITE_PUBLIC_BLK;
             }
             ret = ERR_NEED_ECHO;

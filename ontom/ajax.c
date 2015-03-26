@@ -713,6 +713,24 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     static int doreset = 0;
     char *p;
     thiz->ct = "application/json";
+    char page_id[64], job_id[64];
+
+    mg_get_var(thiz->xml_conn, "p", page_id, 64);
+    mg_get_var(thiz->xml_conn, "j", job_id, 64);
+
+    if ( 0 == strcmp(page_id, "id_mainpage") ) {
+        task->uipage = UI_PAGE_MAIN;
+    } else if (  0 == strcmp(page_id, "id_job_working") ) {
+        if ( 0 == strcmp(job_id, "N/A") ) {
+            task->ui_job_id = __atoh(job_id);
+            task->uipage = UI_PAGE_JOBS;
+        } else {
+            task->uipage = UI_PAGE_OTHER;
+        }
+    } else {
+        task->uipage = UI_PAGE_OTHER;
+    }
+
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{");
