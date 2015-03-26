@@ -3314,7 +3314,11 @@ ___fast_switch_2_rx:
             thiz->tx_param.cursor = 0;
 
             if ( thiz->uart_mode == UART_MODE_NORMAL ) {
-                usleep(120 * 1000);
+                if ( thiz->hw_bps == 2400 ) {
+                    usleep(1500 * 1000);
+                } else {
+                    usleep(120 * 1000);
+                }
             }
 
             ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
