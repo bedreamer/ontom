@@ -3270,7 +3270,7 @@ ___fast_switch_2_rx:
                                thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
                             thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
                             load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
-                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, DBG_LV3);
+                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
                 }
                 if ( thiz->rx_param.payload_size == 0 ) {
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
