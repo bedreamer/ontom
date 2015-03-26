@@ -3383,10 +3383,11 @@ continue_to_send:
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
 
                 do {
-                    unsigned int tts = 0;
-                    tts = (unsigned int)(thiz->tx_param.payload_size *__usperbyte(thiz));
-                    usleep(tts);
-                    log_printf(INF, "UART: packet send done. sleep: %d us", tts);
+                    int tts = 0;
+                    tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
+                    usleep(tts + thiz->master->swap_time_modify);
+                    log_printf(INF, "UART: packet send done. sleep: %d:%d us",
+                               tts, thiz->master->swap_time_modify);
                 } while (0);
 
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
