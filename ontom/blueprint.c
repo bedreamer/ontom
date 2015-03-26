@@ -3386,7 +3386,7 @@ continue_to_send:
                     unsigned int tts = 0;
 
                     tts = (unsigned int)(thiz->tx_param.payload_size * (double)( 1000 / ( thiz->hw_bps / 10 ) ));
-                    usleep(tts);
+                    usleep(tts * 1000);
                     log_printf(INF, "UART: packet send done. sleep: %d us", tts);
                 } while (0);
 
