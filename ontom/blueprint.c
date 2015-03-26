@@ -1599,7 +1599,7 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    char buff[32];
+    char buff[64];
     char cmd;
     int nr = 0, len = 0;
 
@@ -1655,7 +1655,6 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
             cmd &= ~GUN2_OUTPUT_ON;
         }
 
-
         if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
             cmd |= DC_SWITCH_ON;
         } else {
@@ -1674,6 +1673,30 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
         buff[ nr ++ ] = 13;
         buff[ nr ++ ] = cmd;
         buff[ nr ++ ] = cmd;
+        buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10);
+        buff[ nr ++ ] = double2short(task->bus_1_v_lo, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bus_1_v_lo, 10);
+        buff[ nr ++ ] = double2short(task->bus_2_v_hi, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bus_2_v_hi, 10);
+        buff[ nr ++ ] = double2short(task->bus_2_v_lo, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bus_2_v_lo, 10);
+        buff[ nr ++ ] = double2short(task->bat_1_v_hi, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_1_v_hi, 10);
+        buff[ nr ++ ] = double2short(task->bat_1_v_lo, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_1_v_lo, 10);
+        buff[ nr ++ ] = double2short(task->bat_2_v_hi, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_2_v_hi, 10);
+        buff[ nr ++ ] = double2short(task->bat_2_v_lo, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_2_v_lo, 10);
+        buff[ nr ++ ] = double2short(task->bat_1_I_hi, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_1_I_hi, 10);
+        buff[ nr ++ ] = double2short(task->bat_2_I_hi, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_2_I_hi, 10);
+        buff[ nr ++ ] = double2short(task->bat_1_insti_ohm_v, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_1_insti_ohm_v, 10);
+        buff[ nr ++ ] = double2short(task->bat_2_insti_ohm_v, 10) >>8;
+        buff[ nr ++ ] = double2short(task->bat_2_insti_ohm_v, 10);
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
@@ -1681,7 +1704,7 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
 
-        self->rx_param.need_bytes = 49;
+        self->rx_param.need_bytes = 12;
         self->master->time_to_send = (param->payload_size + 1) * 1000 / 960 + self->master->swap_time_modify;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
