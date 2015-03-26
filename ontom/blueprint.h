@@ -271,6 +271,18 @@ struct bp_uart {
     // 当前使用者
     struct bp_user *master;
 };
+
+static inline double __usperbyte(const struct bp_uart *bp) {
+    double bitsperbyte = 10.0;
+
+    if ( ( bp->hw_other & 0x00FF00 ) >> 8 == 'E' ||
+         ( bp->hw_other & 0x00FF00 ) >> 8 == 'O' ) {
+        bitsperbyte += 1.0f;
+    }
+
+    return 1000000.0 * bitsperbyte / bp->hw_bps;
+}
+
 static inline int bp_user_bind(struct bp_uart *bp, struct bp_user *u) {
     if ( !bp || !u ) return ERR_WRONG_PARAM;
     if ( bp->users_nr >= MAX_BINDER ) return ERR_WRONG_PARAM;
