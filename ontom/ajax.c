@@ -1733,7 +1733,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     char id[16] = {0};
     struct charge_job * j = NULL;
     thiz->ct = "application/json";
-
+#if 0
     mg_get_var(thiz->xml_conn, "id", id, 16);
     j = job_search(__atoh(id));
 
@@ -1750,7 +1750,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
-
+#endif
     return ret;
 }
 
