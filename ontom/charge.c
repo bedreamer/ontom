@@ -1337,6 +1337,8 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
 
     dump_commit_struct(need);
 
+    thiz->charge_job_create_timestamp = time(NULL);
+
     log_printf(INF, "ZEUS: 作业创建完成(%p:%d:%ld).",
                thiz, task->wait_job_nr, thiz->job_url_commit_timestamp);
     return thiz;
