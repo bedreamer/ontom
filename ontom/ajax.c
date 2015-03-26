@@ -1753,6 +1753,9 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
         } else {
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
             bit_set(j, CMD_JOB_ABORT);
+            log_printf(INF, "UART: 作业运行时间: %ld - %ld = %ld",
+                       time(NULL), j->charge_job_create_timestamp,
+                       time(NULL) - j->charge_job_create_timestamp);
         }
     }
 
