@@ -1899,8 +1899,6 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         memcpy(param->buff.tx_buff, buff, nr);
         self->rx_param.need_bytes = 187;
         param->payload_size = nr;
-
-        self->master->swap_time_modify = -500;
         self->master->time_to_send = (param->payload_size + 0) * 1000 / 960 /*+ self->master->swap_time_modify*/;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
@@ -3428,6 +3426,7 @@ continue_to_send:
                     thiz->status = BP_UART_STAT_RD;
                     if ( thiz->role == BP_UART_MASTER ) {
                         // 主动设备，需要进行接收超时判定
+                        thiz->rx_seed.ttl = 500;
                         Hachiko_resume(&thiz->rx_seed);
                     }
                     goto ___fast_switch_2_rx;
