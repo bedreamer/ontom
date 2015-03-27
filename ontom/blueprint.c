@@ -1900,7 +1900,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         self->rx_param.need_bytes = 187;
         param->payload_size = nr;
 
-        //self->master->swap_time_modify = 800;
+        self->master->swap_time_modify = 800;
         self->master->time_to_send = (param->payload_size + 0) * 1000 / 960 /*+ self->master->swap_time_modify*/;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
@@ -1917,17 +1917,6 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        if ( evt == BP_EVT_RX_BYTE_TIMEOUT ) {
-            self->master->swap_time_modify += 50;
-            if ( self->master->swap_time_modify >= 2000 ) {
-                self->master->swap_time_modify = 2000;
-            }
-        } else {
-            self->master->swap_time_modify -= 50;
-            if ( self->master->swap_time_modify <= -2000 ) {
-                self->master->swap_time_modify = -2000;
-            }
-        }
         if ( self->master->died < self->master->died_line ) {
             //self->master->died ++;
         } else {
