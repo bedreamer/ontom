@@ -1917,13 +1917,26 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
+        if ( evt == BP_EVT_RX_BYTE_TIMEOUT ) {
+            self->master->swap_time_modify += 10;
+            if ( self->master->swap_time_modify >= 2000 ) {
+                self->master->swap_time_modify = 2000;
+            }
+        } else {
+            self->master->swap_time_modify -= 10;
+            if ( self->master->swap_time_modify <= -2000 ) {
+                self->master->swap_time_modify = -2000;
+            }
+        }
         if ( self->master->died < self->master->died_line ) {
             //self->master->died ++;
         } else {
             //self->master->died ++;
             if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
             }
-            log_printf(ERR, "UART: "RED("协议转换盒通信中断, 请排查故障,(%d)"), self->master->died);
+            log_printf(ERR, "UART: "RED("协议转换盒通信中断, 请排查故障,(%d:%d)"),
+                       self->master->died,
+                       self->master->swap_time_modify);
             bit_set(task, S_CONVERT_BOX_COMM_DOWN);
         }
         log_printf(WRN, "UART: %s:%d get signal TIMEOUT", __FUNCTION__, evt);
