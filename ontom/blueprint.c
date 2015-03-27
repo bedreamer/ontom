@@ -1918,12 +1918,12 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         if ( evt == BP_EVT_RX_BYTE_TIMEOUT ) {
-            self->master->swap_time_modify += 1;
+            self->master->swap_time_modify += 50;
             if ( self->master->swap_time_modify >= 2000 ) {
                 self->master->swap_time_modify = 2000;
             }
         } else {
-            self->master->swap_time_modify -= 1;
+            self->master->swap_time_modify -= 50;
             if ( self->master->swap_time_modify <= -2000 ) {
                 self->master->swap_time_modify = -2000;
             }
