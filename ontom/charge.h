@@ -306,6 +306,8 @@ struct MDATA_ACK {
     //BIT2：充电1路输出跳闸状态位；0 = 无故障，1 = 跳闸；
     //BIT3：充电2路输出跳闸状态位；0 = 无故障，1 = 跳闸；
     //BIT4：防雷器状态位；0 = 无故障，1 = 防雷器故障；
+    //BIT5：交流输入跳闸；0 = 无故障，1 = 跳闸；
+    //BIT6：急停状态位；0 = 无故障，1 = 急停；
     //剩余bit保留
 
     unsigned char Flag_prtc7;   //充电断开类保护状态字节5：（异步状态）保留
@@ -1070,10 +1072,14 @@ typedef enum {
     CMD_GUN_1_ASSIT_PWN_ON,
     // 1#枪输出开关打开
     CMD_GUN_1_OUTPUT_ON,
+    // 1#枪电子锁锁闭
+    CMD_GUN_1_LOCK_ON,
     // 2#枪辅助电源打开
     CMD_GUN_2_ASSIT_PWN_ON,
     // 2#枪输出开关打开
     CMD_GUN_2_OUTPUT_ON,
+    // 2#枪电子锁锁闭
+    CMD_GUN_2_LOCK_ON,
     // }}
     // {{ 充电作业操作命令
     // 中止当前充电作业

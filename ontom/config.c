@@ -62,12 +62,6 @@ CONFIG_DOMAIN_BEGIN
 {"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5000"}},
 {"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"300"}},
 
-// 系统参数不应该出现在配置文件中, 仅供程序内部使用, 不公开
-{"thread_xml_server_id",        C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
-{"thread_bms_write_service",    C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
-{"thread_bms_read_service",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
-{"thread_uart_server_id",       C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
-{"thread_config_server_id",     C_INT,      no,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 // 定时器分辨率
 {"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"10000000"}},
 // 线程栈大小，单位KB

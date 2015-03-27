@@ -840,26 +840,16 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
     return;
 }
 
-void job_running(struct charge_task *tsk, struct charge_job *thiz)
+void job_running(struct charge_task *tsk, struct charge_job *job)
 {
     int ret;
     char buff[64] = {0};
     char sql[256];
     int start  = 0, end = 0;
 
-    if ( thiz == NULL ) return;
-#if 0
-    thiz->charge_bms_establish_timestamp -= 10;
+    if ( job == NULL ) return;
 
-    if ( thiz->charge_bms_establish_timestamp <= 1000 ) {
-        tsk->job[ thiz->job_gun_sn ] = NULL;
-        log_printf(WRN, GRN("ZEUS: %ld 作业执行完成 (%d) "),
-                   thiz->job_url_commit_timestamp,
-                   tsk->wait_job_nr);
-        return;
-    }
-#endif
-    switch ( thiz->job_status ) {
+    switch ( job->job_status ) {
     case JOB_IDLE:
     case JOB_SETTING:
         break;
@@ -867,19 +857,19 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        thiz->job_status = JOB_STANDBY;
+        job->job_status = JOB_STANDBY;
         break;
     case JOB_STANDBY:
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        ret = __is_gun_phy_conn_ok(thiz);
+        ret = __is_gun_phy_conn_ok(job);
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
         }
 
         // 充电模式为自动充电，需要和BMS通信，此时才需要将辅助电源合闸
-        if ( thiz->charge_mode == CHARGE_AUTO ) {
+        if ( job->charge_mode == CHARGE_AUTO ) {
             if ( ret == GUN_SN0 ) {
                 if ( ! bit_read(tsk, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
                     if ( !bit_read(tsk, S_ASSIT_PWN_ERR) ) {
@@ -905,24 +895,24 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         }
 
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
-            thiz->job_status = JOB_ERR_PAUSE;
+            job->job_status = JOB_ERR_PAUSE;
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(%X)",
-                       thiz->job_status);
+                       job->job_status);
             break;
         }
 
-        thiz->job_status = JOB_WORKING;
+        job->job_status = JOB_WORKING;
         sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
-                thiz->job_status, thiz->job_url_commit_timestamp);
+                job->job_status, job->job_url_commit_timestamp);
         (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
     case JOB_WORKING:
-        if ( thiz->charge_mode != CHARGE_AUTO ) {
-            sprintf(buff, "%d", (unsigned int)(thiz->need_V * 10.0f) );
+        if ( job->charge_mode != CHARGE_AUTO ) {
+            sprintf(buff, "%d", (unsigned int)(job->need_V * 10.0f) );
             config_write("需求电压", buff);
             config_write("初始电压", buff);
-            sprintf(buff, "%d", (unsigned int)(thiz->need_I * 10.0f) );
+            sprintf(buff, "%d", (unsigned int)(job->need_I * 10.0f) );
             config_write("需求电流", buff);
         }
 
@@ -930,19 +920,19 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
             bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
             bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-            thiz->status_befor_fault = JOB_WORKING;
-            thiz->job_status = JOB_ERR_PAUSE;
+            job->status_befor_fault = JOB_WORKING;
+            job->job_status = JOB_ERR_PAUSE;
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(JOB_WORKING)");
             break;
         } else {
             bit_set(tsk, CMD_DC_OUTPUT_SWITCH_ON);
-            ret = __is_gun_phy_conn_ok(thiz);
+            ret = __is_gun_phy_conn_ok(job);
             if ( ret  == GUN_SN0 ) {
                 bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
 
                 if ( ! bit_read(tsk, CMD_GUN_1_OUTPUT_ON) ) {
-                    thiz->charge_begin_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_begin_timestamp = time(NULL);
+                    job->charge_begin_kwh_data = task->meter[0].kwh_zong;
+                    job->charge_begin_timestamp = time(NULL);
                     start ++;
                 }
                 bit_set(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -951,8 +941,8 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                 bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
 
                 if ( ! bit_read(tsk, CMD_GUN_2_OUTPUT_ON) ) {
-                    thiz->charge_begin_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_begin_timestamp = time(NULL);
+                    job->charge_begin_kwh_data = task->meter[0].kwh_zong;
+                    job->charge_begin_timestamp = time(NULL);
                     start ++;
                 }
                 bit_set(tsk, CMD_GUN_2_OUTPUT_ON);
@@ -962,82 +952,82 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
             if ( start ) {
                 sprintf(sql, "INSERT INTO job_billing VALUES("
                         "'%ld','%ld','0','0','%.2f','0.00','0.00','%.2f')",
-                        thiz->job_url_commit_timestamp,
-                        thiz->charge_begin_timestamp,
-                        thiz->charge_begin_kwh_data,
+                        job->job_url_commit_timestamp,
+                        job->charge_begin_timestamp,
+                        job->charge_begin_kwh_data,
                         task->kwh_price);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
             }
 
             //{{ 在这做是否充完判定
-            if (thiz->charge_billing.mode == BILLING_MODE_AS_CAP ) {
-                if ( task->meter[0].kwh_zong - thiz->charge_begin_kwh_data >=
-                     thiz->charge_billing.option.set_kwh ) {
-                    thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_stop_timestamp = time(NULL);
+            if (job->charge_billing.mode == BILLING_MODE_AS_CAP ) {
+                if ( task->meter[0].kwh_zong - job->charge_begin_kwh_data >=
+                     job->charge_billing.option.set_kwh ) {
+                    job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                    job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
                                "ZEUS: 充电结束, 起始电量: %.2f KWH, "
                                "终止电量: %.2f KWH, 充电电量: %.2f KWH",
-                               thiz->charge_begin_kwh_data,
+                               job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
                                task->meter[0].kwh_zong -
-                                thiz->charge_begin_kwh_data);
-                    thiz->job_status = JOB_DONE;
+                                job->charge_begin_kwh_data);
+                    job->job_status = JOB_DONE;
                     end ++;
                 }
-            } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
-                double used_kwh = task->meter[0].kwh_zong - thiz->charge_begin_kwh_data;
-                if ( used_kwh * task->kwh_price >= thiz->charge_billing.option.set_money ) {
-                    thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_stop_timestamp = time(NULL);
+            } else if ( job->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
+                double used_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
+                if ( used_kwh * task->kwh_price >= job->charge_billing.option.set_money ) {
+                    job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                    job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
                                "ZEUS: 充电结束, 起始电量: %.2f KWH, "
                                "终止电量: %.2f KWH, 充电电量: %.2f KWH",
-                               thiz->charge_begin_kwh_data,
+                               job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
                                task->meter[0].kwh_zong -
-                                thiz->charge_begin_kwh_data);
-                    thiz->job_status = JOB_DONE;
+                                job->charge_begin_kwh_data);
+                    job->job_status = JOB_DONE;
                     end ++;
                 }
-            } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_TIME ) {
-                if ( time(NULL) - thiz->charge_begin_timestamp >=
-                     thiz->charge_billing.option.set_time ) {
-                    thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                    thiz->charge_stop_timestamp = time(NULL);
+            } else if ( job->charge_billing.mode == BILLING_MODE_AS_TIME ) {
+                if ( time(NULL) - job->charge_begin_timestamp >=
+                     job->charge_billing.option.set_time ) {
+                    job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                    job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
                                "ZEUS: 充电结束, 起始时戳: %ld, "
                                "终止时戳: %ld, 充电时长: %ld 秒",
-                               thiz->charge_begin_timestamp,
-                               thiz->charge_stop_timestamp,
-                               thiz->charge_stop_timestamp -
-                                thiz->charge_begin_timestamp);
-                    thiz->job_status = JOB_DONE;
+                               job->charge_begin_timestamp,
+                               job->charge_stop_timestamp,
+                               job->charge_stop_timestamp -
+                                job->charge_begin_timestamp);
+                    job->job_status = JOB_DONE;
                     end ++;
                 }
-            } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_FREE ) {
+            } else if ( job->charge_billing.mode == BILLING_MODE_AS_FREE ) {
 
-            } else if ( thiz->charge_billing.mode == BILLING_MODE_AS_AUTO ) {
+            } else if ( job->charge_billing.mode == BILLING_MODE_AS_AUTO ) {
 
             } else {
 
             }
 
             //}}
-            if ( bit_read(thiz, CMD_JOB_ABORT) ) {
-                bit_clr(thiz, CMD_JOB_ABORT);
-                thiz->status_befor_fault = JOB_WORKING;
-                thiz->job_status = JOB_ABORTING;
-                thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                thiz->charge_stop_timestamp = time(NULL);
+            if ( bit_read(job, CMD_JOB_ABORT) ) {
+                bit_clr(job, CMD_JOB_ABORT);
+                job->status_befor_fault = JOB_WORKING;
+                job->job_status = JOB_ABORTING;
+                job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                job->charge_stop_timestamp = time(NULL);
                 end ++;
                 log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
             }
-            if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
-                thiz->status_befor_fault = JOB_WORKING;
-                thiz->job_status = JOB_MAN_PAUSE;
-                thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                thiz->charge_stop_timestamp = time(NULL);
+            if ( bit_read(job, CMD_JOB_MAN_PAUSE) ) {
+                job->status_befor_fault = JOB_WORKING;
+                job->job_status = JOB_MAN_PAUSE;
+                job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                job->charge_stop_timestamp = time(NULL);
                 end ++;
                 log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
             }
@@ -1047,16 +1037,16 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
                 sprintf(sql,
                         "UPDATE job_billing SET b_end_timestamp='%ld',"
                         "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
-                        thiz->charge_stop_timestamp,
-                        thiz->charge_exit_kwh_data,
-                        thiz->job_url_commit_timestamp,
-                        thiz->charge_begin_timestamp);
+                        job->charge_stop_timestamp,
+                        job->charge_exit_kwh_data,
+                        job->job_url_commit_timestamp,
+                        job->charge_begin_timestamp);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
 
                 sprintf(sql,
                         "UPDATE jobs SET jos_status='%d' WHERE job_id='%ld'",
-                        thiz->job_status,
-                        thiz->job_url_commit_timestamp);
+                        job->job_status,
+                        job->job_url_commit_timestamp);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
             }
 
@@ -1066,49 +1056,49 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
-            if ( bit_read(thiz, CMD_JOB_ABORT) ) {
-                bit_clr(thiz, CMD_JOB_ABORT);
+            if ( bit_read(job, CMD_JOB_ABORT) ) {
+                bit_clr(job, CMD_JOB_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X)",
-                           thiz->status_befor_fault);
-                thiz->job_status = JOB_ABORTING;
+                           job->status_befor_fault);
+                job->job_status = JOB_ABORTING;
             }
         } else {
-            thiz->job_status = JOB_RESUMING;
+            job->job_status = JOB_RESUMING;
             log_printf(INF, "ZEUS: 故障消除, 充电作业继续进行(%X)",
-                       thiz->status_befor_fault);
+                       job->status_befor_fault);
         }
         break;
     case JOB_MAN_PAUSE:
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        if ( bit_read(thiz, CMD_JOB_ABORT) ) {
-            bit_clr(thiz, CMD_JOB_ABORT);
+        if ( bit_read(job, CMD_JOB_ABORT) ) {
+            bit_clr(job, CMD_JOB_ABORT);
             log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
-                       thiz->status_befor_fault);
-            thiz->job_status = JOB_ABORTING;
+                       job->status_befor_fault);
+            job->job_status = JOB_ABORTING;
         }
-        if ( bit_read(thiz, CMD_JOB_RESUME) ) {
-            bit_clr(thiz, CMD_JOB_RESUME);
-            thiz->job_status = JOB_RESUMING;
+        if ( bit_read(job, CMD_JOB_RESUME) ) {
+            bit_clr(job, CMD_JOB_RESUME);
+            job->job_status = JOB_RESUMING;
             log_printf(INF, "ZEUS: 人工恢复作业(%X), 正在恢复",
-                       thiz->status_befor_fault);
+                       job->status_befor_fault);
         }
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
 
         } else {
-            if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
+            if ( bit_read(job, CMD_JOB_MAN_PAUSE) ) {
                 break;
             }
 
         }
         break;
     case JOB_RESUMING:
-        thiz->job_status = JOB_WORKING;
+        job->job_status = JOB_WORKING;
         break;
     case JOB_ABORTING:
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        thiz->job_status = JOB_DETACHING;
+        job->job_status = JOB_DETACHING;
         break;
     case JOB_DONE:
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -1119,30 +1109,30 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_DETACHING:
-        if ( thiz->job_status > JOB_WORKING ){
+        if ( job->job_status > JOB_WORKING ){
             bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
             bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
             bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         }
-        thiz = NULL;
+        job = NULL;
         break;
     }
 
-    if ( bit_read(thiz, CMD_JOB_ABORT) ) {
-        bit_clr(thiz, CMD_JOB_ABORT);
-        thiz->status_befor_fault = JOB_WORKING;
-        thiz->job_status = JOB_ABORTING;
-        thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-        thiz->charge_stop_timestamp = time(NULL);
+    if ( bit_read(job, CMD_JOB_ABORT) ) {
+        bit_clr(job, CMD_JOB_ABORT);
+        job->status_befor_fault = JOB_WORKING;
+        job->job_status = JOB_ABORTING;
+        job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+        job->charge_stop_timestamp = time(NULL);
         end ++;
         log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
     }
-    if ( bit_read(thiz, CMD_JOB_MAN_PAUSE) ) {
-        bit_clr(thiz, CMD_JOB_MAN_PAUSE);
-        thiz->status_befor_fault = JOB_WORKING;
-        thiz->job_status = JOB_MAN_PAUSE;
-        thiz->charge_exit_kwh_data = task->meter[0].kwh_zong;
-        thiz->charge_stop_timestamp = time(NULL);
+    if ( bit_read(job, CMD_JOB_MAN_PAUSE) ) {
+        bit_clr(job, CMD_JOB_MAN_PAUSE);
+        job->status_befor_fault = JOB_WORKING;
+        job->job_status = JOB_MAN_PAUSE;
+        job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+        job->charge_stop_timestamp = time(NULL);
         end ++;
         log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
     }
@@ -1152,16 +1142,16 @@ void job_running(struct charge_task *tsk, struct charge_job *thiz)
         sprintf(sql,
                 "UPDATE job_billing SET b_end_timestamp='%ld',"
                 "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
-                thiz->charge_stop_timestamp,
-                thiz->charge_exit_kwh_data,
-                thiz->job_url_commit_timestamp,
-                thiz->charge_begin_timestamp);
+                job->charge_stop_timestamp,
+                job->charge_exit_kwh_data,
+                job->job_url_commit_timestamp,
+                job->charge_begin_timestamp);
         (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
 
         sprintf(sql,
                 "UPDATE jobs SET jos_status='%d' WHERE job_id='%ld'",
-                thiz->job_status,
-                thiz->job_url_commit_timestamp);
+                job->job_status,
+                job->job_url_commit_timestamp);
         (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     }
 

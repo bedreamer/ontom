@@ -795,9 +795,13 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 如果刷卡了，当前卡内余额
             "\"card_passwd\":\"%s\",", config_read("card_passwd"));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 1# 充电枪连接状态
-            "\"gun0\":\"%s\",", bit_read(task, F_GUN_1_PHY_CONN_STATUS)?"已连接":"未连接");
+            "\"gun0\":\"%s\",",
+            bit_read(task, F_GUN_1_PHY_CONN_STATUS)?
+                bit_read(task, CMD_GUN_1_OUTPUT_ON) ? "在充":"已连接":"未连接");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 2# 充电枪连接状态
-            "\"gun1\":\"%s\",", bit_read(task, F_GUN_2_PHY_CONN_STATUS)?"已连接":"未连接");
+            "\"gun1\":\"%s\",",
+            bit_read(task, F_GUN_2_PHY_CONN_STATUS)?
+                bit_read(task, CMD_GUN_2_OUTPUT_ON) ? "在充":"已连接":"未连接");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 3# 充电枪连接状态
             "\"gun2\":\"N/A\",");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
