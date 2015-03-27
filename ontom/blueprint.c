@@ -1900,7 +1900,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         self->rx_param.need_bytes = 187;
         param->payload_size = nr;
 
-        self->master->swap_time_modify = 500 - 500;
+        self->master->swap_time_modify = 500;
         self->master->time_to_send = (param->payload_size + 0) * 1000 / 960 /*+ self->master->swap_time_modify*/;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
