@@ -147,30 +147,6 @@ _done:
     return 0;
 }
 
-// 从数据库初始化
-int sql_init_uart_result(void *param, int nr, char **text, char **name)
-{
-    struct bp_user *self = (struct bp_user *)(param);
-
-    if (  nr <= 0 ) {
-        return 0;
-    }
-    do {
-        int len = atoi(text[0]);
-        if ( len >= 0 ) {
-            log_printf(DBG_LV1, "UART: database init %s = %d",
-                       self->swap_time_config_name,
-                       len);
-            self->swap_time_modify = len;
-        } else {
-            log_printf(WRN, "UART: dabase init exception %s = %d",
-                       self->swap_time_config_name,
-                       len);
-        }
-    } while (0);
-    return 0;
-}
-
 // 获取下一个查询的数据集个数
 int sql_query_result_conter(void *param, int nr, char **text, char **name)
 {
@@ -371,12 +347,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
+            u.ttw = 100;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
             u.rcv_ok_cnt = 0;
             u.swap_time_modify = 500;
-            u.swap_time_config_name = "core_simple_box_swap_time";
             u.user_evt_handle = uart4_simple_box_1_evt_handle;
             u.uart = bp;
             u.chargers = task->chargers[0];
@@ -390,13 +366,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
+            u.ttw = 100;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
             u.rcv_ok_cnt = 0;
             u.swap_time_modify = 500;
-            u.swap_time_config_name = "core_simple_box_swap_time";
-            u.user_evt_handle = uart4_simple_box_write_evt_handle;
             u.uart = bp;
             u.chargers = task->chargers[0];
             u.measure = task->measure[0];
@@ -409,12 +384,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
+            u.ttw = 100;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
             u.rcv_ok_cnt = 0;
             u.swap_time_modify = 0;
-            u.swap_time_config_name = "core_card_reader_swap_time";
             u.user_evt_handle = card_reader_handle;
             u.uart = bp;
             u.chargers = task->chargers[0];
@@ -429,6 +404,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
+            u.ttw = 100;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
@@ -449,12 +425,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.seed = 1000;
                 u.died_line = 5;
                 u.died_total = 0;
+                u.ttw = 100;
                 u.sent_frames = 0;
                 u.check_err_cnt = 0;
                 u.check_err_total = 0;
                 u.rcv_ok_cnt = 0;
                 u.swap_time_modify = 0;
-                u.swap_time_config_name = "core_charger_config";
                 u.user_evt_handle = uart4_charger_config_evt_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
@@ -467,12 +443,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.seed = 2000;
                 u.died_line = 10;
                 u.died_total = 0;
+                u.ttw = 100;
                 u.sent_frames = 0;
                 u.check_err_cnt = 0;
                 u.check_err_total = 0;
                 u.rcv_ok_cnt = 0;
                 u.swap_time_modify = 0;
-                u.swap_time_config_name = "core_charger_yaoce_0_49";
                 u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
@@ -485,12 +461,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.seed = 3000;
                 u.died_line = 10;
                 u.died_total = 0;
+                u.ttw = 100;
                 u.sent_frames = 0;
                 u.check_err_cnt = 0;
                 u.check_err_total = 0;
                 u.rcv_ok_cnt = 0;
                 u.swap_time_modify = 0;
-                u.swap_time_config_name = "core_charger_yaoce_50_100";
                 u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
                 u.uart = bp;
                 u.chargers = task->chargers[0];
@@ -505,12 +481,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.seed = 2000;
                     u.died_line = 5;
                     u.died_total = 0;
+                    u.ttw = 500;
                     u.sent_frames = 0;
                     u.check_err_cnt = 0;
                     u.check_err_total = 0;
                     u.rcv_ok_cnt = 0;
                     u.swap_time_modify = 0;
-                    u.swap_time_config_name = "convert_box_read";
                     u.user_evt_handle = ANC01_convert_box_read_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
@@ -523,12 +499,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.seed = 3000;
                     u.died_line = 5;
                     u.died_total = 0;
+                    u.ttw = 100;
                     u.sent_frames = 0;
                     u.check_err_cnt = 0;
                     u.check_err_total = 0;
                     u.rcv_ok_cnt = 0;
                     u.swap_time_modify = 0;
-                    u.swap_time_config_name = "convert_box_write";
                     u.user_evt_handle = ANC01_convert_box_write_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
@@ -543,12 +519,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.seed = 3000;
                     u.died_line = 5;
                     u.died_total = 0;
+                    u.ttw = 100;
                     u.sent_frames = 0;
                     u.check_err_cnt = 0;
                     u.check_err_total = 0;
                     u.rcv_ok_cnt = 0;
                     u.swap_time_modify = 0;
-                    u.swap_time_config_name = NULL;
                     u.user_evt_handle = Increase_convert_box_write_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
@@ -563,12 +539,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                         u.seed = 2000;
                         u.died_line = 5;
                         u.died_total = 0;
+                        u.ttw = 100;
                         u.sent_frames = 0;
                         u.check_err_cnt = 0;
                         u.check_err_total = 0;
                         u.rcv_ok_cnt = 0;
                         u.swap_time_modify = 0;
-                        u.swap_time_config_name = NULL;
                         u.user_evt_handle = Increase_convert_box_read_evt_handle;
                         u.uart = bp;
                         u.chargers = task->chargers[0];
@@ -584,25 +560,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             }
 #endif
         } while (0);
-        // 从数据库中读取默认的配置数据用于初始化串口收发转换所需的调整量
-        if ( task->database != NULL ) {
-            unsigned int i;
-            for ( i = 0; i < bp->users_nr; i ++ ) {
-                char sql[128] = {0};
-                char *errmsg = NULL;
-                struct bp_user *self = bp->users[ i ];
-                if ( ! self || !self->swap_time_config_name ) continue;
-                sprintf(sql,
-                        "SELECT config_value FROM configs "
-                        "   WHERE config_name='%s' AND "
-                        "         config_attrib='core'",
-                        self->swap_time_config_name);
-                ret = sqlite3_exec(task->database, sql, sql_init_uart_result, self, &errmsg);
-                if ( ret ) {
-                    log_printf(ERR, "UART: SQL error msg: %s", errmsg);
-                }
-            }
-        }
+
         // 串口通信线程
         ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
         if ( 0 != ret ) {
@@ -613,28 +571,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         }
         log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
         // }}
-    }
-
-    /* 方案3：
-     *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采一段母线，两把枪可同时充电
-     */
-    else if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 2   &&
-         task->sys_config_gun_nr == 4 ) {
-    }
-
-    /* 方案2：
-     *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采两段母线，两把枪可同时充电
-     */
-    else if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 1   &&
-         task->sys_config_gun_nr == 4 ) {
-    }
-    else {
-        log_printf(ERR, "ZEUS: 系统模型无法识别，系统恢复默认模型");
-        exit(-1);
     }
 
     // {{ 电表 读卡器
@@ -672,7 +608,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.check_err_total = 0;
         u.rcv_ok_cnt = 0;
         u.swap_time_modify = 1000;
-        u.swap_time_config_name = "core_kwh_meter_swap_time";
         u.user_evt_handle = kwh_meter_read_evt_handle;
         u.uart = bp;
         u.chargers = task->chargers[0];
@@ -691,7 +626,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.check_err_total = 0;
         u.rcv_ok_cnt = 0;
         u.swap_time_modify = 1000;
-        u.swap_time_config_name = "core_voltage_meter_swap_time";
         u.user_evt_handle = voltage_meter_read_evt_handle;
         u.uart = bp;
         u.chargers = task->chargers[0];
@@ -712,6 +646,30 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
     log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
 #endif
+
+    /* 方案3：
+     *   两组充电机， 一个采样盒，4把枪
+     *   一个采样盒采一段母线，两把枪可同时充电
+     */
+    else if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 2   &&
+         task->sys_config_gun_nr == 4 ) {
+    }
+
+    /* 方案2：
+     *   两组充电机， 一个采样盒，4把枪
+     *   一个采样盒采两段母线，两把枪可同时充电
+     */
+    else if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 1   &&
+         task->sys_config_gun_nr == 4 ) {
+    }
+    else {
+        log_printf(ERR, "ZEUS: 系统模型无法识别，系统恢复默认模型");
+        exit(-1);
+    }
+
+
     task->commit_head = NULL;
     task->wait_head = NULL;
     task->wait_job_nr = 0;
@@ -1203,17 +1161,19 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
 
     log_printf(INF, "开始创建作业");
 
-    sprintf(sql,
-            "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
-            "WHERE bms_can_pack_generator.bms_can_status='ENABLE' AND "
-            "symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage");
-    ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_gen, &errmsg);
-    if ( ret ) {
-        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
-    }
-    if ( nr_gen <= 0 ) {
-        log_printf(ERR, "ZEUS: DATA LOST, job aborted!!");
-        // 中止作业
+    if ( need->charge_mode == CHARGE_AUTO ) {
+        sprintf(sql,
+                "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
+                "WHERE bms_can_pack_generator.bms_can_status='ENABLE' AND "
+                "symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage");
+        ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_gen, &errmsg);
+        if ( ret ) {
+            log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
+        }
+        if ( nr_gen <= 0 ) {
+            log_printf(ERR, "ZEUS: DATA LOST, job aborted!!");
+            // 中止作业
+        }
     }
 
     s = sizeof(struct charge_job);

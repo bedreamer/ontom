@@ -1355,7 +1355,7 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"configs\":[");
 
-    sprintf(sql, "SELECT * FROM settings");
+    sprintf(sql, "SELECT * FROM settings WHERE disable=TRUE");
     ret = sqlite3_exec(task->database, sql, sql_system_settings_result, thiz, &errmsg);
     if ( ret ) {
         log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);

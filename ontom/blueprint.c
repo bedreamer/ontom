@@ -3426,7 +3426,7 @@ continue_to_send:
                     thiz->status = BP_UART_STAT_RD;
                     if ( thiz->role == BP_UART_MASTER ) {
                         // 主动设备，需要进行接收超时判定
-                        thiz->rx_seed.ttl = 500;
+                        thiz->rx_seed.ttl = thiz->master->ttw;
                         Hachiko_resume(&thiz->rx_seed);
                     }
                     goto ___fast_switch_2_rx;

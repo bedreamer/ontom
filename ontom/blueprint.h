@@ -144,6 +144,8 @@ struct bp_user {
     unsigned int died;
     // 累计超时丢帧数
     unsigned int died_total;
+    // 超时等待时长 毫秒
+    unsigned int ttw;
 
     // {{ 需要串口配置数据
     unsigned int hw_bps;
@@ -176,8 +178,6 @@ struct bp_user {
 
     // 转换为发送状态的时间修正
     int swap_time_modify;
-    // 配置项名称
-    char * swap_time_config_name;
     // 私有数据
     void * _private;
     // 名称
