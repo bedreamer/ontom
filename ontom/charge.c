@@ -571,7 +571,28 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         }
         log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
         // }}
+    }    /* 方案3：
+     *   两组充电机， 一个采样盒，4把枪
+     *   一个采样盒采一段母线，两把枪可同时充电
+     */
+    else if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 2   &&
+         task->sys_config_gun_nr == 4 ) {
     }
+
+    /* 方案2：
+     *   两组充电机， 一个采样盒，4把枪
+     *   一个采样盒采两段母线，两把枪可同时充电
+     */
+    else if ( task->sys_charge_group_nr == 2 &&
+         task->sys_simple_box_nr == 1   &&
+         task->sys_config_gun_nr == 4 ) {
+    }
+    else {
+        log_printf(ERR, "ZEUS: 系统模型无法识别，系统恢复默认模型");
+        exit(-1);
+    }
+
 
     // {{ 电表 读卡器
     struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
@@ -647,27 +668,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
 #endif
 
-    /* 方案3：
-     *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采一段母线，两把枪可同时充电
-     */
-    else if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 2   &&
-         task->sys_config_gun_nr == 4 ) {
-    }
-
-    /* 方案2：
-     *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采两段母线，两把枪可同时充电
-     */
-    else if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 1   &&
-         task->sys_config_gun_nr == 4 ) {
-    }
-    else {
-        log_printf(ERR, "ZEUS: 系统模型无法识别，系统恢复默认模型");
-        exit(-1);
-    }
 
 
     task->commit_head = NULL;
