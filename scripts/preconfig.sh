@@ -6,7 +6,7 @@ SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type
 MODULE=`$SQLITE3 $DB SELECT current_value FROM settings WHERE key='module_kind'`
 
 # 根据系统选型配置是否有充电屏监控通信模组
-if [ $SYSTYPE == 0 ]; then
+if [ $SYSTYPE -eq 0 ]; then
 	# 一体式
 	echo "系统配置: 一体式充电机"
 	echo "关闭充电屏配置功能...."
@@ -33,7 +33,7 @@ fi
 MODULE=`$SQLITE3 $DB SELECT current_value FROM settings WHERE key='module_kind'`
 
 # 根据模块型号选择要使用的串口模组
-if [ $MODULE == 0 ];then
+if [ $MODULE -eq 0 ];then
 	# AN10750 模块
 	echo "系统采用AN10750模块，选择奥能协议转换盒.."
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000007'"
@@ -43,7 +43,7 @@ if [ $MODULE == 0 ];then
 	echo "   关闭     英瑞克模块协议转换盒模组"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='00000009'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='0000000A'"
-elif [ $MODULE == 4];then
+elif [ $MODULE -eq 4];then
 	# 英瑞克 EVR400-7500
 	echo "系统采用英瑞克 EVR400-7500模块，选择协议转换盒.."
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000009'"
