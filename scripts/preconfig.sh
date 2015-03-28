@@ -2,7 +2,7 @@
 SQLITE3=sqlite3
 DB=ontom.db
 
-SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type'"`
+SYSTYPE=`$SQLITE3 $DB SELECT current_value FROM settings WHERE key='system_type'`
 MODULE=`$SQLITE3 $DB SELECT current_value FROM settings WHERE key='module_kind'`
 
 # 根据系统选型配置是否有充电屏监控通信模组
