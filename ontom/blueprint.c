@@ -137,29 +137,25 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
 
     switch (parity)
     {
-            options.c_cflag &= ~PARENB;   /* Clear parity enable */
-            options.c_iflag &= ~INPCK;     /* Enable parity checking */
-            break;
-
         case 'o':
         case 'O':
         case 1:
-            options.c_cflag |= (PARODD | PARENB);
-            options.c_iflag |= INPCK;             /* Disnable parity checking */
+            options.c_cflag |= PARENB;     /* Enable parity */
+            options.c_cflag &= ~PARODD;
+            options.c_iflag |= INPCK;      /* Disnable parity checking */
             break;
 
         case 'e':
         case 'E':
         case 2:
-            options.c_cflag |= PARENB;     /* Enable parity */
-            options.c_cflag &= ~PARODD;
-            options.c_iflag |= INPCK;      /* Disnable parity checking */
+            options.c_cflag |= (PARODD | PARENB);
+            options.c_iflag |= INPCK;             /* Disnable parity checking */
             break;
         case 'n':
         case 'N':
         case 0:
-            options.c_cflag &= ~PARENB;
-            options.c_cflag &= ~CSTOPB;
+            options.c_cflag &= ~PARENB;   /* Clear parity enable */
+            options.c_iflag &= ~INPCK;     /* Enable parity checking */
             break;
 
         default:
