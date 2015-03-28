@@ -14,7 +14,7 @@ MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'
 if [ $SYSTYPE -eq 0 ]; then
 	# 一体式
 	echo "系统配置: 一体式充电机"
-	echo "    关闭充电屏配置功能...."
+	echo "    关闭     充电屏配置功能...."
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000004'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000005'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000006'"
@@ -22,7 +22,7 @@ else
 	# 分体式
 	# 目前只支持公司自产模块的分体式充电桩
 	echo "系统配置: 分体式充电机"
-	echo "    打开充电屏配置功能...."
+	echo "    打开     充电屏配置功能...."
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000004'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000005'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000006'"
