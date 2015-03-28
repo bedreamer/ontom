@@ -486,7 +486,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.check_err_cnt = 0;
                     u.check_err_total = 0;
                     u.rcv_ok_cnt = 0;
-                    u.swap_time_modify = -500;
+                    u.swap_time_modify = -400;
                     u.user_evt_handle = ANC01_convert_box_read_evt_handle;
                     u.uart = bp;
                     u.chargers = task->chargers[0];
