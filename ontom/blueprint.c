@@ -2142,6 +2142,20 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = Increase_ModbusCRC(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
@@ -2152,6 +2166,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
             log_printf(INF, "UART: "GRN("协议转换盒通信恢复."));
         }
         bit_clr(task, S_CONVERT_BOX_COMM_DOWN);
+        self->master->died = 0;
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
