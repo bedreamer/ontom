@@ -2134,8 +2134,8 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
                     param->buff.rx_buff[ param->need_bytes - 2] << 8;
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
-            __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
             if ( crc != check ) {
+                __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
                 ret = ERR_OK;
