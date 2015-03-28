@@ -1,62 +1,62 @@
-#!/bin/sh
+ï»¿#!/bin/sh
 SQLITE3=sqlite3
 DB=ontom.db
 
 SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type'"`
 MODULE=`$SQLITE3 $DB SELECT current_value FROM settings WHERE key='module_kind'`
 
-# ¸ù¾İÏµÍ³Ñ¡ĞÍÅäÖÃÊÇ·ñÓĞ³äµçÆÁ¼à¿ØÍ¨ĞÅÄ£×é
+# æ ¹æ®ç³»ç»Ÿé€‰å‹é…ç½®æ˜¯å¦æœ‰å……ç”µå±ç›‘æ§é€šä¿¡æ¨¡ç»„
 if [ $SYSTYPE -eq 0 ]; then
-	# Ò»ÌåÊ½
-	echo "ÏµÍ³ÅäÖÃ: Ò»ÌåÊ½³äµç»ú"
-	echo "¹Ø±Õ³äµçÆÁÅäÖÃ¹¦ÄÜ...."
+	# ä¸€ä½“å¼
+	echo "ç³»ç»Ÿé…ç½®: ä¸€ä½“å¼å……ç”µæœº"
+	echo "å…³é—­å……ç”µå±é…ç½®åŠŸèƒ½...."
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='00000004'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='00000005'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='00000006'"
 else
-	# ·ÖÌåÊ½
-	# Ä¿Ç°Ö»Ö§³Ö¹«Ë¾×Ô²úÄ£¿éµÄ·ÖÌåÊ½³äµç×®
-	echo "ÏµÍ³ÅäÖÃ: ·ÖÌåÊ½³äµç»ú"
-	echo "´ò¿ª³äµçÆÁÅäÖÃ¹¦ÄÜ...."
+	# åˆ†ä½“å¼
+	# ç›®å‰åªæ”¯æŒå…¬å¸è‡ªäº§æ¨¡å—çš„åˆ†ä½“å¼å……ç”µæ¡©
+	echo "ç³»ç»Ÿé…ç½®: åˆ†ä½“å¼å……ç”µæœº"
+	echo "æ‰“å¼€å……ç”µå±é…ç½®åŠŸèƒ½...."
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000004'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000005'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000006'"
 
-	# Ä£¿é½ö½öÖ§³ÖAN10750
-	echo "ÏµÍ³Ç¿ÖÆÑ¡ÔñÄ£¿é: AN10750"
+	# æ¨¡å—ä»…ä»…æ”¯æŒAN10750
+	echo "ç³»ç»Ÿå¼ºåˆ¶é€‰æ‹©æ¨¡å—: AN10750"
 	$SQLITE3 $DB "UPDATE settings set current_value='0' where key='module_kind'"
 	
-	echo "·ÖÌåÊ½ÏµÍ³Ô¤ÅäÖÃÍê³É."
+	echo "åˆ†ä½“å¼ç³»ç»Ÿé¢„é…ç½®å®Œæˆ."
 fi
 
-# ÔÙ´ÎÑ¡ÔñÏµÍ³ÖĞÅäÖÃµÄÄ£¿éĞÍºÅ
+# å†æ¬¡é€‰æ‹©ç³»ç»Ÿä¸­é…ç½®çš„æ¨¡å—å‹å·
 MODULE=`$SQLITE3 $DB SELECT current_value FROM settings WHERE key='module_kind'`
 
-# ¸ù¾İÄ£¿éĞÍºÅÑ¡ÔñÒªÊ¹ÓÃµÄ´®¿ÚÄ£×é
+# æ ¹æ®æ¨¡å—å‹å·é€‰æ‹©è¦ä½¿ç”¨çš„ä¸²å£æ¨¡ç»„
 if [ $MODULE -eq 0 ];then
-	# AN10750 Ä£¿é
-	echo "ÏµÍ³²ÉÓÃAN10750Ä£¿é£¬Ñ¡Ôñ°ÂÄÜĞ­Òé×ª»»ºĞ.."
+	# AN10750 æ¨¡å—
+	echo "ç³»ç»Ÿé‡‡ç”¨AN10750æ¨¡å—ï¼Œé€‰æ‹©å¥¥èƒ½åè®®è½¬æ¢ç›’.."
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000007'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000008'"
 	
-	echo "¹Ø±Õ³åÍ»µÄ´®¿ÚÄ£×é..."
-	echo "   ¹Ø±Õ     Ó¢Èğ¿ËÄ£¿éĞ­Òé×ª»»ºĞÄ£×é"
+	echo "å…³é—­å†²çªçš„ä¸²å£æ¨¡ç»„..."
+	echo "   å…³é—­     è‹±ç‘å…‹æ¨¡å—åè®®è½¬æ¢ç›’æ¨¡ç»„"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='00000009'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='0000000A'"
 elif [ $MODULE -eq 4];then
-	# Ó¢Èğ¿Ë EVR400-7500
-	echo "ÏµÍ³²ÉÓÃÓ¢Èğ¿Ë EVR400-7500Ä£¿é£¬Ñ¡ÔñĞ­Òé×ª»»ºĞ.."
+	# è‹±ç‘å…‹ EVR400-7500
+	echo "ç³»ç»Ÿé‡‡ç”¨è‹±ç‘å…‹ EVR400-7500æ¨¡å—ï¼Œé€‰æ‹©åè®®è½¬æ¢ç›’.."
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='00000009'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='false' where id='0000000A'"
 	
-	echo "¹Ø±Õ³åÍ»µÄ´®¿ÚÄ£×é..."
-	echo "   ¹Ø±Õ     °ÂÄÜĞ­Òé×ª»»ºĞÄ£×é"
+	echo "å…³é—­å†²çªçš„ä¸²å£æ¨¡ç»„..."
+	echo "   å…³é—­     å¥¥èƒ½åè®®è½¬æ¢ç›’æ¨¡ç»„"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='00000007'"
 	$SQLITE3 $DB "UPDATE RS485_config set disable='true' where id='00000008'"
 else;
-	echo "Ô¤ÅäÖÃÏµÍ³³öÎÊÌâÁË"
+	echo "é¢„é…ç½®ç³»ç»Ÿå‡ºé—®é¢˜äº†"
 	exit 1;
 fi
 
-echo "ÏµÍ³Ô¤ÅäÖÃÍê³É..."
+echo "ç³»ç»Ÿé¢„é…ç½®å®Œæˆ..."
 exit 0;
