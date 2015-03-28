@@ -347,7 +347,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
-            u.ttw = 100;
+            u.ttw = 500;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
@@ -366,7 +366,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
-            u.ttw = 100;
+            u.ttw = 500;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
@@ -384,7 +384,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
-            u.ttw = 100;
+            u.ttw = 500;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
@@ -404,7 +404,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             u.seed = 0;
             u.died_line = 3;
             u.died_total = 0;
-            u.ttw = 100;
+            u.ttw = 500;
             u.sent_frames = 0;
             u.check_err_cnt = 0;
             u.check_err_total = 0;
@@ -425,7 +425,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.seed = 1000;
                 u.died_line = 5;
                 u.died_total = 0;
-                u.ttw = 100;
+                u.ttw = 500;
                 u.sent_frames = 0;
                 u.check_err_cnt = 0;
                 u.check_err_total = 0;
@@ -443,7 +443,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.seed = 2000;
                 u.died_line = 10;
                 u.died_total = 0;
-                u.ttw = 100;
+                u.ttw = 500;
                 u.sent_frames = 0;
                 u.check_err_cnt = 0;
                 u.check_err_total = 0;
@@ -461,7 +461,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 u.seed = 3000;
                 u.died_line = 10;
                 u.died_total = 0;
-                u.ttw = 100;
+                u.ttw = 500;
                 u.sent_frames = 0;
                 u.check_err_cnt = 0;
                 u.check_err_total = 0;
@@ -481,7 +481,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.seed = 2000;
                     u.died_line = 5;
                     u.died_total = 0;
-                    u.ttw = 500;
+                    u.ttw = 800;
                     u.sent_frames = 0;
                     u.check_err_cnt = 0;
                     u.check_err_total = 0;
@@ -499,7 +499,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.seed = 3000;
                     u.died_line = 5;
                     u.died_total = 0;
-                    u.ttw = 100;
+                    u.ttw = 500;
                     u.sent_frames = 0;
                     u.check_err_cnt = 0;
                     u.check_err_total = 0;
@@ -519,7 +519,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                     u.seed = 3000;
                     u.died_line = 5;
                     u.died_total = 0;
-                    u.ttw = 100;
+                    u.ttw = 500;
                     u.sent_frames = 0;
                     u.check_err_cnt = 0;
                     u.check_err_total = 0;
@@ -539,7 +539,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                         u.seed = 2000;
                         u.died_line = 5;
                         u.died_total = 0;
-                        u.ttw = 100;
+                        u.ttw = 500;
                         u.sent_frames = 0;
                         u.check_err_cnt = 0;
                         u.check_err_total = 0;
@@ -624,7 +624,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.seed = 0;
         u.died_line = 3;
         u.died_total = 0;
-        u.ttw = 100;
+        u.ttw = 500;
         u.sent_frames = 0;
         u.check_err_cnt = 0;
         u.check_err_total = 0;
@@ -643,7 +643,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.seed = 0;
         u.died_line = 3;
         u.died_total = 0;
-        u.ttw = 100;
+        u.ttw = 500;
         u.sent_frames = 0;
         u.check_err_cnt = 0;
         u.check_err_total = 0;
