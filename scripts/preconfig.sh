@@ -63,5 +63,15 @@ else
 	exit 1;
 fi
 
+echo "默认配置项..."
+echo "    打开     奥能-综合采样盒"
+$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000001'"
+$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000E'"
+echo "    打开     周立功-7816读卡器"
+$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000002'"
+echo "    打开     华立-三相电能表"
+$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000B'"
+$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000C'"
+
 echo "系统预配置完成..."
 exit 0;
