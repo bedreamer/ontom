@@ -1,5 +1,5 @@
 #!/bin/sh
-SQLITE3
+SQLITE3=sqlite3
 DB=ontom.dh
 
 SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type'"`
