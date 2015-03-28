@@ -2145,7 +2145,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         if ( param->payload_size < param->need_bytes ) {
             ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
         } else {
-            unsigned short crc = Increase_ModbusCRC(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short crc = Increase_ModbusCRC(param->buff.rx_buff, param->need_bytes-2);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
