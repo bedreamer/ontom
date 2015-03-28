@@ -118,8 +118,6 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
         return -1;
     }
 
-    options.c_cflag &= ~CSIZE;
-
     switch (databits)
     {
         case 7:
@@ -142,20 +140,17 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
         case 1:
             options.c_cflag |= PARENB;     /* Enable parity */
             options.c_cflag &= ~PARODD;
-            options.c_iflag |= INPCK;      /* Disnable parity checking */
             break;
 
         case 'e':
         case 'E':
         case 2:
             options.c_cflag |= (PARODD | PARENB);
-            options.c_iflag |= INPCK;             /* Disnable parity checking */
             break;
         case 'n':
         case 'N':
         case 0:
             options.c_cflag &= ~PARENB;   /* Clear parity enable */
-            options.c_iflag &= ~INPCK;     /* Enable parity checking */
             break;
 
         default:
@@ -178,28 +173,17 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
             return -1;
     }
 
-    /* Set input parity option */
-    if (parity != 'n' | parity != 'N' | parity != 0  )
-        options.c_iflag |= INPCK;
-
-    //options.c_cflag   |= CRTSCTS;
-    options.c_iflag &=~(IXON | IXOFF | IXANY);
-    options.c_iflag &=~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    //options.c_lflag |= ISIG;
-
-    tcflush(fd,TCIOFLUSH);
+    options.c_iflag = 0;
     options.c_oflag = 0;
-    //options.c_lflag = 0;
-    options.c_cc[VTIME] = 15; 						// delay 15 seconds
+    options.c_lflag = 0;
     options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
 
-if (tcsetattr(fd,TCSANOW,&options) != 0)
-    {
+    if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
         return -1;
     }
 
+    tcflush(fd,TCIOFLUSH);
     return 0;
 }
 
