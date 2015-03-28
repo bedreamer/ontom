@@ -2109,9 +2109,9 @@ unsigned short Increase_ModbusCRC(unsigned char * pData, unsigned char len)
         byCRCLo = Increase_gabyCRCLo[byIdx];
     }
 
-    crc = byCRCHi;
+    crc = byCRCLo;
     crc <<= 8;
-    crc += byCRCLo;
+    crc += byCRCHi;
     return crc;
 }
 
