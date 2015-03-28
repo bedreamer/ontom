@@ -2679,7 +2679,6 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                                 cd.card.sector_4.data.passwd_code[0]&0xF);
                         config_write("card_passwd", buff);
                         sprintf(buff, "%02X%02X%02X%02X", ID[3], ID[2], ID[1], ID[0]);
-                        config_write("triger_card_sn", buff);
 
                         if ( task->uipage == UI_PAGE_JOBS ) {
                             job = job_search(task->ui_job_id);
@@ -2689,14 +2688,17 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                                 if ( 0 == strcmp(job->card.triger_card_sn, buff) ) {
                                     if ( job->charge_job_create_timestamp + 10 > time(NULL) ) {
                                         log_printf(INF, "UART: 刷卡太快，作业保护.");
+                                        return ERR_OK;
                                     } else {
                                         log_printf(INF, "任务中止，开始扣费。");
                                         query_stat = SEQ_SECTOR_WR_AUTH;
                                         ret = ERR_NEED_ECHO;
                                     }
                                 }
+                                config_write("triger_card_sn", buff);
                             }
                         } else {
+                            config_write("triger_card_sn", buff);
                             //log_printf(INF, "fasdfafdsfasdfasdfasfasdfsad");
                         }
                     }
