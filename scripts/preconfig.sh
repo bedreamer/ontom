@@ -2,6 +2,11 @@
 SQLITE3=sqlite3
 DB=ontom.db
 
+if [ $# -eq 1 ];then
+	echo "使用数据库 $1"
+	DB=$1
+fi
+
 SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type'"`
 MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'"`
 
