@@ -179,7 +179,7 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
     }
 
     /* Set input parity option */
-    if (parity != 'n')
+    if (parity != 'n' | parity != 'N' | parity != 0  )
         options.c_iflag |= INPCK;
 
     //options.c_cflag   |= CRTSCTS;
@@ -188,7 +188,7 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
     options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
     //options.c_lflag |= ISIG;
 
-    tcflush(fd,TCIFLUSH);
+    tcflush(fd,TCIOFLUSH);
     options.c_oflag = 0;
     //options.c_lflag = 0;
     options.c_cc[VTIME] = 15; 						// delay 15 seconds
@@ -3288,7 +3288,7 @@ ___fast_switch_2_rx:
                       thiz->rx_seed.remain );
             if ( ! thiz->rx_seed.remain ) {
                 if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
-                    log_printf(INF, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
+                    log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
                                thiz->rx_param.need_bytes,
                                 thiz->rx_param.payload_size);
                 } else {
