@@ -49,7 +49,7 @@ if [ $MODULE -eq 0 ];then
 	echo "    关闭     英瑞克模块协议转换盒模组"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000009'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='0000000A'"
-else if [ $MODULE -eq 4];then
+elif [ $MODULE -eq 4 ];then
 	# 英瑞克 EVR400-7500
 	echo "系统采用英瑞克 EVR400-7500模块，选择协议转换盒.."
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000009'"
