@@ -2109,9 +2109,9 @@ unsigned short Increase_ModbusCRC(unsigned char * pData, unsigned char len)
         byCRCLo = Increase_gabyCRCLo[byIdx];
     }
 
-    crc = byCRCLo;
+    crc = byCRCHi;
     crc <<= 8;
-    crc += byCRCHi;
+    crc += byCRCLo;
     return crc;
 }
 
@@ -2130,8 +2130,8 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
             ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
         } else {
             unsigned short crc = Increase_ModbusCRC(param->buff.rx_buff, param->need_bytes-2);
-            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
-                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 1 ] |
+                    param->buff.rx_buff[ param->need_bytes - 2] << 8;
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
