@@ -40,7 +40,8 @@ MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'
 # 根据模块型号选择要使用的串口模组
 if [ $MODULE -eq 0 ];then
 	# AN10750 模块
-	echo "系统采用AN10750模块，选择奥能协议转换盒.."
+	echo "系统采用AN10750模块"
+	echo "    打开     奥能协议转换盒.."
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000007'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000008'"
 	
