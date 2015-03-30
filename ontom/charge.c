@@ -316,7 +316,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
 
     log_printf(WRN, "ZEUS: 绑定串口模组[%16s.%16s] <==>  %s.", text[1], bp->dev_name);
 
-    ret = bp_user_bind(bp, &u); // 采样读
+    bp_user_bind(bp, &u); // 采样读
     return 0;
 }
 
