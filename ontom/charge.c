@@ -260,7 +260,6 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
     int i = 0;
     struct charge_task *t = (struct charge_task *)param;
     int d, p, s, rs485;
-    struct binder_proc *binder;
 
     if ( nr <= 0 ) return 0;
     // "id, name, private, RS485, bps, parity, datalen, stop_bit, frame_freq, "
@@ -309,10 +308,10 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
 
     if ( text[0][0] == 'M' ) {
         // 整流模块
-        for (i = 0; i < task->modules_nr; i ++ ) {
+        for (i = 0; i < t->modules_nr; i ++ ) {
             u._private = i + 1;
             log_printf(INF, "ZEUS: 绑定串口模组(模块)[ %s.%s:%d ] <==>  %s.",
-                       text[0], text[1], bp->dev_name, i +1);
+                       text[0], text[1], i +1, bp->dev_name);
             bp_user_bind(bp, &u);
         }
     } else {
