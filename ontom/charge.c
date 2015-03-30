@@ -271,6 +271,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         if ( 0 != strcmp(plugins[i].id, text[0]) ) continue;
         log_printf(INF, "%s %p", plugins[i].id, plugins[i].user_evt_handle);
         u.user_evt_handle = plugins[i].user_evt_handle;
+        break;
     }
     if ( u.user_evt_handle == NULL ) {
         log_printf(WRN, "ZEUS: 不能绑定串口模组， 名称为%s 类为%s的模组找到.", text[1], text[0]);
@@ -310,7 +311,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
     log_printf(INF, "ZEUS: 绑定串口模组[ %s.%s ] <==>  %s.",
                text[0], text[1], bp->dev_name);
 
-    bp_user_bind(bp, &u); // 采样读
+    bp_user_bind(bp, &u);
     return 0;
 }
 
