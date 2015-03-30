@@ -248,7 +248,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000007", ANC01_convert_box_read_evt_handle},
         {"00000008", ANC01_convert_box_write_evt_handle},
         {"00000009", Increase_convert_box_write_evt_handle},
-        {"0000000A", Increase_convert_box_read_evt_handle},
+        {"M000000A", Increase_convert_box_read_evt_handle},
         {"0000000B", kwh_meter_read_evt_handle},
         {"0000000C", voltage_meter_read_evt_handle},
         {"0000000D", uart4_simple_box_correct_evt_handle},
@@ -304,10 +304,22 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         return 0;
     }
 
+
     u.chargers = t->chargers[0];
     u.measure = t->measure[0];
-    log_printf(INF, "ZEUS: 绑定串口模组[ %s.%s ] <==>  %s.",
-               text[0], text[1], bp->dev_name);
+
+    if ( text[0][0] == 'M' ) {
+        // 整流模块
+        for (i = 0; i < task->modules_nr; i ++ ) {
+            u._private = i + 1;
+            log_printf(INF, "ZEUS: 绑定串口模组(模块)[ %s.%s:%d ] <==>  %s.",
+                       text[0], text[1], bp->dev_name, i +1);
+            bp_user_bind(bp, &u);
+        }
+    } else {
+        log_printf(INF, "ZEUS: 绑定串口模组[ %s.%s ] <==>  %s.",
+                   text[0], text[1], bp->dev_name);
+    }
 
     bp_user_bind(bp, &u);
     return 0;
