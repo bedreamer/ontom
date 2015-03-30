@@ -293,7 +293,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         }
     }
     if ( bp == NULL ) {
-        log_printf(WRN, "ZEUS: 不能绑定串口模组[%s]到串口%d.", text[1]， rs485);
+        log_printf(WRN, "ZEUS: 不能绑定串口模组[%s]到串口%d.", text[1], rs485);
         return 0;
     }
 
@@ -303,7 +303,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         u.user_evt_handle = plugins[i].user_evt_handle;
     }
     if ( u.user_evt_handle == NULL ) {
-        log_printf(WRN, "ZEUS: 不能绑定串口模组， 名称为%s 类为%s的模组找到.", text[1]， text[0]);
+        log_printf(WRN, "ZEUS: 不能绑定串口模组， 名称为%s 类为%s的模组找到.", text[1], text[0]);
         return 0;
     }
 
@@ -314,7 +314,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
     u.measure = t->measure[0];
     u.user_evt_handle = uart4_simple_box_1_evt_handle;
 
-    log_printf(WRN, "ZEUS: 绑定串口模组[%16s.%16s] <==>  %s.", text[1]， bp->dev_name);
+    log_printf(WRN, "ZEUS: 绑定串口模组[%16s.%16s] <==>  %s.", text[1], bp->dev_name);
 
     ret = bp_user_bind(bp, &u); // 采样读
     return 0;
