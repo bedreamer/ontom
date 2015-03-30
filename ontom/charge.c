@@ -406,7 +406,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         bit_set(task, F_SYSTEM_CHARGE_ALLOW);
 
         task->chargers[0] = (struct charger_struct *)malloc(sizeof(struct charger_struct));
+        memset(task->chargers[0], sizeof(struct charger_struct));
         task->measure[0] = (struct measure_struct *)malloc(sizeof(struct measure_struct));
+        memset(task->measure[0], sizeof(struct measure_struct));
         task->sys_type = SYSTEM_YITISHI;
     }
 
