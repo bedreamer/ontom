@@ -306,8 +306,6 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
 
     u.chargers = t->chargers[0];
     u.measure = t->measure[0];
-    u.user_evt_handle = uart4_simple_box_1_evt_handle;
-
     log_printf(INF, "ZEUS: 绑定串口模组[ %s.%s ] <==>  %s.",
                text[0], text[1], bp->dev_name);
 
