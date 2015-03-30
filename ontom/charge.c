@@ -480,6 +480,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     pthread_mutex_init(&task->wait_lck, NULL);
     pthread_mutex_init(&task->err_list_lck, NULL);
 
+    do {sleep(1);} while (1);
     //memset(task->single, 255, sizeof(task->single));
 
     while ( 1 ) {
