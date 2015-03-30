@@ -233,7 +233,7 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
 }
 
 // 添加串口使用模组
-int sql_rs485_result(void *param, int nr, char *text, char **name) {
+int sql_rs485_result(void *param, int nr, char **text, char **name) {
     const struct binder_proc {
         char *id;
         int (*user_evt_handle)(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
