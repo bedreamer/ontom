@@ -22,11 +22,13 @@ else
 	# 分体式
 	# 目前只支持公司自产模块的分体式充电桩
 	echo "系统配置: 分体式充电机"
-	echo "    打开     充电屏配置功能...."
+	echo "    打开     充电屏配置功能"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000004'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000005'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000006'"
-
+	echo "    关闭     奥能协议转换盒"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000007'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000008'"
 	# 模块仅仅支持AN10750
 	echo "系统强制选择模块: AN10750"
 	$SQLITE3 $DB "UPDATE settings set current_value='0' where key='module_kind'"
@@ -41,7 +43,7 @@ MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'
 if [ $MODULE -eq 0 ];then
 	# AN10750 模块
 	echo "系统采用AN10750模块"
-	echo "    打开     奥能协议转换盒.."
+	echo "    打开     奥能协议转换盒"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000007'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000008'"
 	echo "关闭冲突的串口模组..."
@@ -50,7 +52,7 @@ if [ $MODULE -eq 0 ];then
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='M000000A'"
 elif [ $MODULE -eq 4 ];then
 	# 英瑞克 EVR400-7500
-	echo "系统采用英瑞克 EVR400-7500模块，选择协议转换盒.."
+	echo "系统采用英瑞克 EVR400-7500模块，选择协议转换盒"
 	echo "    打开     英瑞克模块协议转换盒模组"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000009'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='M000000A'"
