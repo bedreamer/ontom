@@ -442,6 +442,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     if ( ret ) {
         log_printf(ERR, "TOM: SQL error: %s", errmsg);
     }
+    log_printf(INF, "ZEUS: 绑定串口模组完成");
+
+
 
 #if 1
     // 串口通信线程
