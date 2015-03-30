@@ -265,23 +265,28 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
     if ( nr <= 0 ) return 0;
     // "id, name, private, RS485, bps, parity, datalen, stop_bit, frame_freq, "
     // "died_line, swap2rx_time, ttw"
-    u.frame_freq = atoi(text[8]);
-    u.seed = 0;
-    u.died_line = atoi(text[9]);
-    u.died_total = 0;
-    u.ttw = atoi(text[11]);
-    u.sent_frames = 0;
-    u.check_err_cnt = 0;
-    u.check_err_total = 0;
-    u.rcv_ok_cnt = 0;
-    u.swap_time_modify = atoi(text[10]);
-    strncpy(u.name, text[1], 32);
-    u.hw_bps = atoi(text[4]);
+    memset(&u, 0, sizeof(struct bp_user));
 
+    for ( i = 0; plugins[i].id != NULL; i ++ ) {
+        if ( 0 != strcmp(plugins[i].id, text[0]) ) continue;
+        u.user_evt_handle = plugins[i].user_evt_handle;
+    }
+    if ( u.user_evt_handle == NULL ) {
+        log_printf(WRN, "ZEUS: 不能绑定串口模组， 名称为%s 类为%s的模组找到.", text[1], text[0]);
+        return 0;
+    }
+    strncpy(u.name, text[1], 32);
+    u._private = atoi(text[2]);
+    rs485 = atoi(text[3]);
+    u.hw_bps = atoi(text[4]);
     d = atoi(text[6]);
     p = text[5][0];
     s = atoi(text[7]);
-    rs485 = atoi(text[3]);
+    u.hw_other = MAKE_UART_CFG(d, p, s);
+    u.frame_freq = atoi(text[8]);
+    u.died_line = atoi(text[9]);
+    u.swap_time_modify = atoi(text[10]);
+    u.ttw = atoi(text[11]);
 
     for ( i = 0; i < 2; i ++ ) {
         if ( rs485 == 4 && t->uarts[i]->hw_port == SERIAL4_CTRL_PIN ) {
@@ -296,19 +301,6 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         log_printf(WRN, "ZEUS: 不能绑定串口模组[%s]到串口%d.", text[1], rs485);
         return 0;
     }
-
-    u.user_evt_handle = NULL;
-    for ( i = 0; plugins[i].id != NULL; i ++ ) {
-        if ( 0 != strcmp(plugins[i].id, text[0]) ) continue;
-        u.user_evt_handle = plugins[i].user_evt_handle;
-    }
-    if ( u.user_evt_handle == NULL ) {
-        log_printf(WRN, "ZEUS: 不能绑定串口模组， 名称为%s 类为%s的模组找到.", text[1], text[0]);
-        return 0;
-    }
-
-    u.hw_other = MAKE_UART_CFG(d, p, s);
-    u._private = atoi(text[2]);
 
     u.chargers = t->chargers[0];
     u.measure = t->measure[0];
