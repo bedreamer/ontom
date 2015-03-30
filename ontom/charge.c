@@ -459,7 +459,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     }
 #endif
 
-    do {sleep(1);} while (1);
     task->commit_head = NULL;
     task->wait_head = NULL;
     task->wait_job_nr = 0;
