@@ -176,6 +176,8 @@ int main()
     //act.sa_sigaction=sig_dbg_interrupt;
     //sigaction(SIGSEGV,&act,NULL);
 
+    memset(task, 0, sizeof(struct charge_task));
+
     log_printf(DBG_LV1, "TOM: 系统准备启动...");
     ret = sqlite3_open(DEFAULT_DB, &task->database);
     if ( ret != SQLITE_OK ) {
