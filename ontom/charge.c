@@ -306,8 +306,8 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
     u.measure = t->measure[0];
     u.user_evt_handle = uart4_simple_box_1_evt_handle;
 
-    log_printf(INF, "ZEUS: 绑定串口模组[ %-32s.%-12s ] <==>  %s.",
-               text[1], text[0], bp->dev_name);
+    log_printf(INF, "ZEUS: 绑定串口模组[ %-10s.%-32s ] <==>  %s.",
+               text[0], text[1], bp->dev_name);
 
     bp_user_bind(bp, &u); // 采样读
     return 0;
