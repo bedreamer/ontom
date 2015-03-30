@@ -269,7 +269,6 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
 
     for ( i = 0; plugins[i].id != NULL; i ++ ) {
         if ( 0 != strcmp(plugins[i].id, text[0]) ) continue;
-        log_printf(INF, "%s %p", plugins[i].id, plugins[i].user_evt_handle);
         u.user_evt_handle = plugins[i].user_evt_handle;
         break;
     }
