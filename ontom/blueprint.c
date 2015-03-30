@@ -3110,9 +3110,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     fd_set rfds;
     struct timeval tv ;
 
-    log_printf(INF, "UART %s framework start up@%p.              DONE(%ld).",
+    log_printf(INF, "UART %s framework start up.              DONE(%ld).",
                thiz->dev_name,
-               uart4_bp_evt_handle,
                (unsigned int)pthread_self());
 
     if ( done == NULL ) done = &mydone;
@@ -3136,9 +3135,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 log_printf(ERR, "UART: open UART faile, thread panic.....");
                 continue;
             }
-
-            thiz->bp_evt_handle = uart4_bp_evt_handle;
-
             // 初始化数据结构, 设定串口的初始状态
             // 串口的初始状态决定了串口的工作模式
             thiz->bp_evt_handle(thiz, BP_EVT_INIT, NULL);

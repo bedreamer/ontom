@@ -455,10 +455,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                    "UART framework start up.                       FAILE!!!!");
         goto __panic;
     }
-    log_printf(INF, "UART %s framework start up.              DONE(%ld).",
-               task->uarts[0]->dev_name,
-               task->tid);
-
     // 串口通信线程
     ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)&task->uarts[1]);
     if ( 0 != ret ) {
@@ -467,9 +463,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                    "UART framework start up.                       FAILE!!!!");
         goto __panic;
     }
-    log_printf(INF, "UART %s framework start up.              DONE(%ld).",
-               task->uarts[1]->dev_name,
-               task->tid);
 #endif
 
     do {sleep(1);} while (1);
