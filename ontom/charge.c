@@ -232,22 +232,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     return 0;
 }
 
-#define true_express(i) (keyerr[i] == '1' || keyerr[i] == 't' || keyerr[i] =='T'|| keyerr[i] == 'y' || keyerr[i] == 'Y')
-#define false_express(i) (keyerr[i] == '0' || keyerr[i] == 'f' || keyerr[i] =='F'|| keyerr[i] == 'n' || keyerr[i] == 'N')
-/* 充电任务服务线程
- * 充电状态的转换触发条件都由UI转发过来，这样做的目的是为了保证触发唯一和触发条件的同步。
- *
- * 1. 触发信号的采集过程由服务器完成；
- * 2. 将该信号传递（同步）给浏览器，浏览器确认后向服务器；
- * 3. 发送状态转换触发条件，完成状态转换。
- */
-void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
-{
-    char sql[256];
-    char buff[32] = {0};
-    int ret, done = 0;
-    char *errmsg;
-    const struct {
+// 添加串口使用模组
+int sql_rs485_result(void *param, int nr, char *text, char **name) {
+    const struct binder_proc {
         char *id;
         int (*user_evt_handle)(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                                struct bp_evt_param *param);
@@ -268,6 +255,86 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         {"0000000E", uart4_simple_box_write_evt_handle},
         {NULL, NULL}
     };
+    struct bp_user u;
+    struct bp_uart *bp = NULL;
+    int i = 0;
+    struct charge_task *t = (struct charge_task *)param;
+    int d, p, s, rs485;
+    struct binder_proc *binder;
+
+    if ( nr <= 0 ) return 0;
+    // "id, name, private, RS485, bps, parity, datalen, stop_bit, frame_freq, "
+    // "died_line, swap2rx_time, ttw"
+    u.frame_freq = atoi(text[8]);
+    u.seed = 0;
+    u.died_line = atoi(text[9]);
+    u.died_total = 0;
+    u.ttw = atoi(text[11]);
+    u.sent_frames = 0;
+    u.check_err_cnt = 0;
+    u.check_err_total = 0;
+    u.rcv_ok_cnt = 0;
+    u.swap_time_modify = atoi(text[10]);
+    strncpy(u.name, text[1], 32);
+    u.hw_bps = atoi(text[4]);
+
+    d = atoi(text[6]);
+    p = text[5][0];
+    s = atoi(text[7]);
+    rs485 = atoi(text[3]);
+
+    for ( i = 0; i < 2; i ++ ) {
+        if ( rs485 == 4 && t->uarts[i]->hw_port == SERIAL4_CTRL_PIN ) {
+            u.uart = t->uarts[i];
+            bp = t->uarts[i];
+        } else if ( rs485 ==5 && t->uarts[i]->hw_port == SERIAL5_CTRL_PIN) {
+            u.uart = t->uarts[i];
+            bp = t->uarts[i];
+        }
+    }
+    if ( bp == NULL ) {
+        log_printf(WRN, "ZEUS: 不能绑定串口模组[%s]到串口%d.", text[1]， rs485);
+        return 0;
+    }
+
+    u.user_evt_handle = NULL;
+    for ( i = 0; plugins[i].id != NULL; i ++ ) {
+        if ( 0 != strcmp(plugins[i].id, text[0]) ) continue;
+        u.user_evt_handle = plugins[i].user_evt_handle;
+    }
+    if ( u.user_evt_handle == NULL ) {
+        log_printf(WRN, "ZEUS: 不能绑定串口模组， 名称为%s 类为%s的模组找到.", text[1]， text[0]);
+        return 0;
+    }
+
+    u.hw_other = MAKE_UART_CFG(d, p, s);
+    u._private = atoi(text[2]);
+
+    u.chargers = t->chargers[0];
+    u.measure = t->measure[0];
+    u.user_evt_handle = uart4_simple_box_1_evt_handle;
+
+    log_printf(WRN, "ZEUS: 绑定串口模组[%16s.%16s] <==>  %s.", text[1]， bp->dev_name);
+
+    ret = bp_user_bind(bp, &u); // 采样读
+    return 0;
+}
+
+#define true_express(i) (keyerr[i] == '1' || keyerr[i] == 't' || keyerr[i] =='T'|| keyerr[i] == 'y' || keyerr[i] == 'Y')
+#define false_express(i) (keyerr[i] == '0' || keyerr[i] == 'f' || keyerr[i] =='F'|| keyerr[i] == 'n' || keyerr[i] == 'N')
+/* 充电任务服务线程
+ * 充电状态的转换触发条件都由UI转发过来，这样做的目的是为了保证触发唯一和触发条件的同步。
+ *
+ * 1. 触发信号的采集过程由服务器完成；
+ * 2. 将该信号传递（同步）给浏览器，浏览器确认后向服务器；
+ * 3. 发送状态转换触发条件，完成状态转换。
+ */
+void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
+{
+    char sql[256];
+    char buff[32] = {0};
+    int ret, done = 0;
+    char *errmsg;
 
     log_printf(DBG_LV1, "ZUES: %s running...sizeof(struct charge_task)=%d",
             __FUNCTION__, sizeof(struct charge_task));
@@ -561,38 +628,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 #endif
         } while (0);
 
-        // 串口通信线程
-        ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
-        if ( 0 != ret ) {
-            ret  = 0x1006;
-            log_printf(ERR,
-                       "UART framework start up.                       FAILE!!!!");
-            goto __panic;
-        }
-        log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
+
         // }}
-    }    /* 方案3：
-     *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采一段母线，两把枪可同时充电
-     */
-    else if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 2   &&
-         task->sys_config_gun_nr == 4 ) {
     }
-
-    /* 方案2：
-     *   两组充电机， 一个采样盒，4把枪
-     *   一个采样盒采两段母线，两把枪可同时充电
-     */
-    else if ( task->sys_charge_group_nr == 2 &&
-         task->sys_simple_box_nr == 1   &&
-         task->sys_config_gun_nr == 4 ) {
-    }
-    else {
-        log_printf(ERR, "ZEUS: 系统模型无法识别，系统恢复默认模型");
-        exit(-1);
-    }
-
 
     // {{ 电表 读卡器
     struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
@@ -658,19 +696,43 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         u.hw_other = MAKE_UART_CFG(8, 'O', 1);
         ret = bp_user_bind(bp, &u); // 电表
     } while (0);
+
+    sprintf(sql,
+            "SELECT "
+            "id, name, private, RS485, bps, parity, datalen, stop_bit, frame_freq, "
+            "died_line, swap2rx_time, ttw"
+            " FROM RS485_config WHERE disabled='false' AND class='normal'"
+            );
+    ret = sqlite3_exec(task->database, sql, sql_rs485_result, task, &errmsg);
+    if ( ret ) {
+        log_printf(ERR, "TOM: SQL error: %s", errmsg);
+    }
+
 #if 1
     // 串口通信线程
-    ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)bp);
+    ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)&task->uarts[0]);
     if ( 0 != ret ) {
         ret  = 0x1006;
         log_printf(ERR,
                    "UART framework start up.                       FAILE!!!!");
         goto __panic;
     }
-    log_printf(DBG_LV1, "UART framework start up.              DONE(%ld).", task->tid);
+    log_printf(DBG_LV1, "UART %s framework start up.              DONE(%ld).",
+               task->uarts[0]->dev_name,
+               task->tid);
+
+    // 串口通信线程
+    ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)&task->uarts[1]);
+    if ( 0 != ret ) {
+        ret  = 0x1006;
+        log_printf(ERR,
+                   "UART framework start up.                       FAILE!!!!");
+        goto __panic;
+    }
+    log_printf(DBG_LV1, "UART %s framework start up.              DONE(%ld).",
+               task->uarts[1]->dev_name,
+               task->tid);
 #endif
-
-
 
     task->commit_head = NULL;
     task->wait_head = NULL;

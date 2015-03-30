@@ -181,7 +181,7 @@ struct bp_user {
     // 私有数据
     void * _private;
     // 名称
-    char * name;
+    char name[32];
 
     // 使用者事件通知响应函数
     // 可接受的事件包括：
