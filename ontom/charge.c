@@ -455,7 +455,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                    "UART framework start up.                       FAILE!!!!");
         goto __panic;
     }
-    log_printf(DBG_LV1, "UART %s framework start up.              DONE(%ld).",
+    log_printf(INF, "UART %s framework start up.              DONE(%ld).",
                task->uarts[0]->dev_name,
                task->tid);
 
@@ -467,7 +467,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                    "UART framework start up.                       FAILE!!!!");
         goto __panic;
     }
-    log_printf(DBG_LV1, "UART %s framework start up.              DONE(%ld).",
+    log_printf(INF, "UART %s framework start up.              DONE(%ld).",
                task->uarts[1]->dev_name,
                task->tid);
 #endif
