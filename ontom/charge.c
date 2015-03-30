@@ -377,7 +377,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     if ( task->sys_charge_group_nr == 1 &&
          task->sys_simple_box_nr == 1   &&
          task->sys_config_gun_nr == 2 ) {
-        // {{ 采样盒 充电机
         struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
         if ( NULL == bp ) {
             ret = ERR_LOW_MEMORY;
@@ -406,296 +405,32 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         task->chargers[0] = (struct charger_struct *)malloc(sizeof(struct charger_struct));
         task->measure[0] = (struct measure_struct *)malloc(sizeof(struct measure_struct));
         task->sys_type = SYSTEM_YITISHI;
-
-        do {
-            struct bp_user u = {0};
-#if 1
-            u.frame_freq = 50 * 100;
-            u.seed = 0;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.ttw = 500;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 500;
-            u.user_evt_handle = uart4_simple_box_1_evt_handle;
-            u.uart = bp;
-            u.chargers = task->chargers[0];
-            u.measure = task->measure[0];
-            u.name = "采样盒";
-            u.hw_bps = 9600;
-            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-            ret = bp_user_bind(bp, &u); // 采样读
-
-            u.frame_freq = 50 * 100;
-            u.seed = 0;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.ttw = 500;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 500;
-            u.uart = bp;
-            u.chargers = task->chargers[0];
-            u.measure = task->measure[0];
-            u.name = "采样盒";
-            u.hw_bps = 9600;
-            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-            ret = bp_user_bind(bp, &u); // 采样写
-#endif
-            u.frame_freq = 50 * 100;
-            u.seed = 0;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.ttw = 500;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 0;
-            u.user_evt_handle = card_reader_handle;
-            u.uart = bp;
-            u.chargers = task->chargers[0];
-            u.measure = task->measure[0];
-            u.name = "读卡器";
-            u.hw_bps = 9600;
-            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-            ret = bp_user_bind(bp, &u); // 读卡器
-#if 1
-#if 0
-            u.frame_freq = 50 * 100;
-            u.seed = 0;
-            u.died_line = 3;
-            u.died_total = 0;
-            u.ttw = 500;
-            u.sent_frames = 0;
-            u.check_err_cnt = 0;
-            u.check_err_total = 0;
-            u.rcv_ok_cnt = 0;
-            u.swap_time_modify = 0;
-            u.swap_time_config_name = "core_card_reader_swap_time";
-            u.user_evt_handle = card_init_handle;
-            u.uart = bp;
-            u.chargers = task->chargers[0];
-            u.measure = task->measure[0];
-            u.name = "卡操作";
-            u.hw_bps = 9600;
-            u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-            ret = bp_user_bind(bp, &u); // 卡片初始化
-#endif
-            if ( task->sys_type == SYSTEM_FENTISHI ) {
-                u.frame_freq = 50 * 100;
-                u.seed = 1000;
-                u.died_line = 5;
-                u.died_total = 0;
-                u.ttw = 500;
-                u.sent_frames = 0;
-                u.check_err_cnt = 0;
-                u.check_err_total = 0;
-                u.rcv_ok_cnt = 0;
-                u.swap_time_modify = 0;
-                u.user_evt_handle = uart4_charger_config_evt_handle;
-                u.uart = bp;
-                u.chargers = task->chargers[0];
-                u.name = "充电屏监控(配置)";
-                u.hw_bps = 9600;
-                u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-                ret = bp_user_bind(bp, &u); // 配置充电电压，电流
-
-                u.frame_freq = 50 * 100;
-                u.seed = 2000;
-                u.died_line = 10;
-                u.died_total = 0;
-                u.ttw = 500;
-                u.sent_frames = 0;
-                u.check_err_cnt = 0;
-                u.check_err_total = 0;
-                u.rcv_ok_cnt = 0;
-                u.swap_time_modify = 0;
-                u.user_evt_handle = uart4_charger_yaoce_0_49_handle;
-                u.uart = bp;
-                u.chargers = task->chargers[0];
-                u.name = "充电屏监控(遥信1)";
-                u.hw_bps = 9600;
-                u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-                ret = bp_user_bind(bp, &u); // 遥信1
-
-                u.frame_freq = 50 * 100;
-                u.seed = 3000;
-                u.died_line = 10;
-                u.died_total = 0;
-                u.ttw = 500;
-                u.sent_frames = 0;
-                u.check_err_cnt = 0;
-                u.check_err_total = 0;
-                u.rcv_ok_cnt = 0;
-                u.swap_time_modify = 0;
-                u.user_evt_handle = uart4_charger_yaoce_50_100_handle;
-                u.uart = bp;
-                u.chargers = task->chargers[0];
-                u.name = "充电屏监控(遥信2)";
-                u.hw_bps = 9600;
-                u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-                ret = bp_user_bind(bp, &u); // 遥信2
-            } else if ( task->sys_type == SYSTEM_YITISHI ) {
-                log_printf(INF, "ZEUS: 模块型号: %d", task->module_model);
-                if ( task->module_model != MODEL_INCREASE ) {
-                    u.frame_freq = 50 * 100;
-                    u.seed = 2000;
-                    u.died_line = 5;
-                    u.died_total = 0;
-                    u.ttw = 800;
-                    u.sent_frames = 0;
-                    u.check_err_cnt = 0;
-                    u.check_err_total = 0;
-                    u.rcv_ok_cnt = 0;
-                    u.swap_time_modify = -400;
-                    u.user_evt_handle = ANC01_convert_box_read_evt_handle;
-                    u.uart = bp;
-                    u.chargers = task->chargers[0];
-                    u.name = "协议转换盒(读)";
-                    u.hw_bps = 9600;
-                    u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-                    ret = bp_user_bind(bp, &u); // 读取转换盒信息
-
-                    u.frame_freq = 50 * 100;
-                    u.seed = 3000;
-                    u.died_line = 5;
-                    u.died_total = 0;
-                    u.ttw = 500;
-                    u.sent_frames = 0;
-                    u.check_err_cnt = 0;
-                    u.check_err_total = 0;
-                    u.rcv_ok_cnt = 0;
-                    u.swap_time_modify = 0;
-                    u.user_evt_handle = ANC01_convert_box_write_evt_handle;
-                    u.uart = bp;
-                    u.chargers = task->chargers[0];
-                    u.name = "协议转换盒(写)";
-                    u.hw_bps = 9600;
-                    u.hw_other = MAKE_UART_CFG(8, 'N', 1);
-                    ret = bp_user_bind(bp, &u); // 写转换盒信息
-                } else {
-                    int i ;
-
-                    u.frame_freq = 50 * 100;
-                    u.seed = 3000;
-                    u.died_line = 5;
-                    u.died_total = 0;
-                    u.ttw = 100;
-                    u.sent_frames = 0;
-                    u.check_err_cnt = 0;
-                    u.check_err_total = 0;
-                    u.rcv_ok_cnt = 0;
-                    u.swap_time_modify = 0;
-                    u.user_evt_handle = Increase_convert_box_write_evt_handle;
-                    u.uart = bp;
-                    u.chargers = task->chargers[0];
-                    u.name = "协议转换盒(写)";
-                    u.hw_bps = 9600;
-                    u.hw_other = MAKE_UART_CFG(8, 'E', 1);
-                    ret = bp_user_bind(bp, &u); // 写转换盒信息
-
-                    for ( i = 0; i < task->modules_nr &&
-                          i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
-                        u.frame_freq = 50 * 100;
-                        u.seed = 2000;
-                        u.died_line = 5;
-                        u.died_total = 0;
-                        u.ttw = 100;
-                        u.sent_frames = 0;
-                        u.check_err_cnt = 0;
-                        u.check_err_total = 0;
-                        u.rcv_ok_cnt = 0;
-                        u.swap_time_modify = -800;
-                        u.user_evt_handle = Increase_convert_box_read_evt_handle;
-                        u.uart = bp;
-                        u.chargers = task->chargers[0];
-                        u._private = (i + 1);
-                        u.name = "模块";
-                        u.hw_bps = 9600;
-                        u.hw_other = MAKE_UART_CFG(8, 'E', 1);
-                        ret = bp_user_bind(bp, &u); // 读模块信息
-                    }
-                }
-
-            } else {
-            }
-#endif
-        } while (0);
-
-
-        // }}
     }
-
-    // {{ 电表 读卡器
-    struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
-    if ( NULL == bp ) {
-        ret = ERR_LOW_MEMORY;
-        log_printf(ERR, "ZEUS: 分配系统内存失败");
-        goto __panic;
-    }
-    task->uarts[1] = bp;
-    memset(bp, 0, sizeof(struct bp_uart));
-    bp->bp_evt_handle = uart4_bp_evt_handle;
-    if ( ! task->sys_uart_name[1][0] ) {
-        log_printf(WRN, "ZEUS: 未配置电表/读卡器通信用RS485设备文件, 使用默认值.");
-        strcpy(task->sys_uart_name[1], "/dev/ttyO5");
-    }
-    strcpy(bp->dev_name, task->sys_uart_name[1]);
-    bp->dev_handle = -1;
-    bp->status = BP_UART_STAT_INVALID;
-    bp->hw_status = BP_UART_STAT_INVALID;
-    bp->role = BP_UART_MASTER;
-    bp->init_magic = 0;
-    bp->hw_port = SERIAL5_CTRL_PIN;
-    bp->hw_bps = 2400;
-    bp->hw_other = MAKE_UART_CFG(8, 'O', 1);
 
     do {
-        struct bp_user u = {0};
-        u.frame_freq = 50 * 100;
-        u.seed = 0;
-        u.died_line = 3;
-        u.died_total = 0;
-        u.ttw = 500;
-        u.sent_frames = 0;
-        u.check_err_cnt = 0;
-        u.check_err_total = 0;
-        u.rcv_ok_cnt = 0;
-        u.swap_time_modify = 1000;
-        u.user_evt_handle = kwh_meter_read_evt_handle;
-        u.uart = bp;
-        u.chargers = task->chargers[0];
-        u.measure = task->measure[0];
-        u.name = "电表(电能)";
-        u.hw_bps = 2400;
-        u.hw_other = MAKE_UART_CFG(8, 'O', 1);
-        ret = bp_user_bind(bp, &u); // 电表
-
-        u.frame_freq = 50 * 100;
-        u.seed = 0;
-        u.died_line = 3;
-        u.died_total = 0;
-        u.ttw = 500;
-        u.sent_frames = 0;
-        u.check_err_cnt = 0;
-        u.check_err_total = 0;
-        u.rcv_ok_cnt = 0;
-        u.swap_time_modify = 1000;
-        u.user_evt_handle = voltage_meter_read_evt_handle;
-        u.uart = bp;
-        u.chargers = task->chargers[0];
-        u.measure = task->measure[0];
-        u.name = "电表(电压)";
-        u.hw_bps = 2400;
-        u.hw_other = MAKE_UART_CFG(8, 'O', 1);
-        ret = bp_user_bind(bp, &u); // 电表
-    } while (0);
+        struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
+        if ( NULL == bp ) {
+            ret = ERR_LOW_MEMORY;
+            log_printf(ERR, "ZEUS: 分配系统内存失败");
+            goto __panic;
+        }
+        task->uarts[1] = bp;
+        memset(bp, 0, sizeof(struct bp_uart));
+        bp->bp_evt_handle = uart4_bp_evt_handle;
+        if ( ! task->sys_uart_name[1][0] ) {
+            log_printf(WRN, "ZEUS: 未配置电表/读卡器通信用RS485设备文件, 使用默认值.");
+            strcpy(task->sys_uart_name[1], "/dev/ttyO5");
+        }
+        strcpy(bp->dev_name, task->sys_uart_name[1]);
+        bp->dev_handle = -1;
+        bp->status = BP_UART_STAT_INVALID;
+        bp->hw_status = BP_UART_STAT_INVALID;
+        bp->role = BP_UART_MASTER;
+        bp->init_magic = 0;
+        bp->hw_port = SERIAL5_CTRL_PIN;
+        bp->hw_bps = 2400;
+        bp->hw_other = MAKE_UART_CFG(8, 'O', 1);
+    } while ( 0 );
 
     sprintf(sql,
             "SELECT "
