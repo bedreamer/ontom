@@ -2381,12 +2381,12 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         */
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[1], task->meter[0].addr[0]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[3], task->meter[0].addr[2]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[5], task->meter[0].addr[4]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[7], task->meter[0].addr[6]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[9], task->meter[0].addr[8]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[11], task->meter[0].addr[10]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[10], task->meter[0].addr[11]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[8], task->meter[0].addr[9]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[6], task->meter[0].addr[7]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[4], task->meter[0].addr[5]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[2], task->meter[0].addr[3]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[0], task->meter[0].addr[1]);
 
 
         buff[ nr ++ ] = 0x68;
@@ -2510,12 +2510,12 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         */
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[11], task->meter[0].addr[10]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[9], task->meter[0].addr[8]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[7], task->meter[0].addr[6]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[5], task->meter[0].addr[4]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[3], task->meter[0].addr[2]);
-        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[1], task->meter[0].addr[0]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[10], task->meter[0].addr[11]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[8], task->meter[0].addr[9]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[6], task->meter[0].addr[7]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[4], task->meter[0].addr[5]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[2], task->meter[0].addr[3]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[0], task->meter[0].addr[1]);
 
         buff[ nr ++ ] = 0x68;
         buff[ nr ++ ] = 0x11;
