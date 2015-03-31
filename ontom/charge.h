@@ -678,7 +678,7 @@ struct charger_struct {
 // 电表数据
 struct meter_data {
     // 地址
-    unsigned char addr[12];
+    unsigned char addr[13];
     // A 相电压
     double Va;
     // B 相电压
@@ -1007,6 +1007,15 @@ struct charge_task {
     /*模块开关机*/
     unsigned short modules_on_off;
     //}}
+
+    // {{ 电压电流校准参数
+    double bus1_correct_V;
+    double bus1_read_V;
+    double bus2_correct_V;
+    double bus2_read_V;
+    double bus_correct_I;
+    double bus_read_I;
+    // }}
 };
 
 /* 系统信号定义
@@ -1093,6 +1102,15 @@ typedef enum {
     CMD_MODULE_ON,
     CMD_MODULE_OFF,
     //}}
+
+    // {{ 采样盒校准
+    // 校准母线1电压
+    CMD_JIAOZHUN_BUS1_V,
+    // 校准母线2电压
+    CMD_JIAOZHUN_BUS2_V,
+    // 校准电池电流
+    CMD_JIAOZHUN_BAT_I,
+    // }}
 
     // {{卡操作
     CMD_CARD_FORMAT,
