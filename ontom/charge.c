@@ -255,7 +255,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"M000000A", Increase_convert_box_read_evt_handle},
         {"0000000B", kwh_meter_read_evt_handle},
         {"0000000C", voltage_meter_read_evt_handle},
-        {"0000000D", uart4_simple_box_correct_evt_handle},
+        {"C000000D", uart4_simple_box_correct_evt_handle},
         {"0000000E", uart4_simple_box_write_evt_handle},
         {NULL, NULL}
     };
