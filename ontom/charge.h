@@ -967,6 +967,8 @@ struct charge_task {
     char sys_uart_name[CONFIG_SUPPORT_RS485_NR][128];
     // 每度电的价格
     double kwh_price;
+    // 系统模式模式
+    char sys_work_mode[32];
 
     // 以下适用于采样盒配置值
     double bus_1_v_hi;

@@ -232,6 +232,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
         memcpy(task->meter[0].addr, text[1], 12);
         task->meter[0].addr[12] = '\0';
         log_printf(INF, "ZEUS: 电表地址: %s", task->meter[0].addr);
+    } else if ( 0 == strcmp(text[0], "work_mode") ) {
+        strncpy(task->sys_work_mode, text[1], 32);
+        log_printf(INF, "ZEUS: 工作模式: %s", text[1]);
     }
     return 0;
 }
@@ -449,7 +452,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             "SELECT "
             "id, name, private, RS485, bps, parity, datalen, stop_bit, frame_freq, "
             "died_line, swap2rx_time, ttw"
-            " FROM RS485_config WHERE disabled='false' AND class='normal'"
+            " FROM RS485_config WHERE disabled='false' AND class='%s'",
+            task->sys_work_mode
             );
     ret = sqlite3_exec(task->database, sql, sql_rs485_result, task, &errmsg);
     if ( ret ) {
