@@ -1750,15 +1750,24 @@ int uart4_simple_box_correct_evt_handle(struct bp_uart *self, struct bp_user *me
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        buff[0] = 0x01;
-        buff[1] = 0x04;
-        buff[2] = buff[3] = 0x00;
-        buff[4] = 0x00;
-        buff[5] = 0x06;
-        buff[6] = 0x70;
-        buff[7] = 0x08;
-
-        self->rx_param.need_bytes = 17;
+        buff[ nr ++ ] = 0xF0;
+        buff[ nr ++ ] = 0xE1;
+        buff[ nr ++ ] = 0xD2;
+        buff[ nr ++ ] = 0xC3;
+        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 0x10;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 13;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 3;
+        buff[ nr ++ ] = 6;
+        buff[ nr ++ ] = double2short(task->bat1_correct_V, 10) >> 8;
+        buff[ nr ++ ] = double2short(task->bat1_correct_V, 10) & 0xFF;
+        buff[ nr ++ ] = double2short(task->bat2_correct_V, 10) >> 8;
+        buff[ nr ++ ] = double2short(task->bat2_correct_V, 10) & 0xFF;
+        buff[ nr ++ ] = double2short(task->bat_correct_I, 10) >> 8;
+        buff[ nr ++ ] = double2short(task->bat_correct_I, 10) & 0xFF;
+        self->rx_param.need_bytes = 12;
 
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
