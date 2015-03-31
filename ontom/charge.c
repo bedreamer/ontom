@@ -228,6 +228,10 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "kwh_price") ) {
         task->kwh_price = atof(text[1]);
         log_printf(INF, "ZEUS: 单位电价: %.1f", task->kwh_price);
+    } else if ( 0 == strcmp(text[0], "kwh_meter_addr") ) {
+        memcpy(task->meter[0].addr, text[1], 12);
+        task->meter[0].addr[12] = '\0';
+        log_printf(INF, "ZEUS: 电表地址: %s", task->meter[0].addr);
     }
     return 0;
 }

@@ -677,6 +677,8 @@ struct charger_struct {
 
 // 电表数据
 struct meter_data {
+    // 地址
+    unsigned char addr[12];
     // A 相电压
     double Va;
     // B 相电压
