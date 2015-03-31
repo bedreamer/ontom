@@ -1133,7 +1133,7 @@ int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     return ret;
 }
 
-int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, nr = 0, len = 0, errnr = 0;
@@ -1575,7 +1575,7 @@ int uart4_simple_box_1_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     return ret;
 }
 
-int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
@@ -1718,7 +1718,7 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
     return ret;
 }
 
-int uart4_simple_box_correct_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, nr  = 0;
@@ -1772,8 +1772,14 @@ int uart4_simple_box_correct_evt_handle(struct bp_uart *self, struct bp_user *me
         memcpy(param->buff.tx_buff, buff, sizeof(buff));
         param->payload_size = sizeof(buff);
         self->master->time_to_send = param->payload_size * 1000 / 960;
-        ret = ERR_ERR;
-        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
+             bit_read(task, CMD_JIAOZHUN_BUS2_V) ||
+             bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+            log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+            ret = ERR_OK;
+        } else {
+            ret = ERR_ERR;
+        }
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -1803,6 +1809,208 @@ int uart4_simple_box_correct_evt_handle(struct bp_uart *self, struct bp_user *me
     return ret;
 }
 
+int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR, nr  = 0;
+    char buff[8];
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+        buff[ nr ++ ] = 0xF0;
+        buff[ nr ++ ] = 0xE1;
+        buff[ nr ++ ] = 0xD2;
+        buff[ nr ++ ] = 0xC3;
+        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 0x10;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 13;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 3;
+        buff[ nr ++ ] = 6;
+        buff[ nr ++ ] = double2short(task->bus1_correct_V, 10) >> 8;
+        buff[ nr ++ ] = double2short(task->bus1_correct_V, 10) & 0xFF;
+        buff[ nr ++ ] = double2short(task->bus2_correct_V, 10) >> 8;
+        buff[ nr ++ ] = double2short(task->bus2_correct_V, 10) & 0xFF;
+        buff[ nr ++ ] = double2short(task->bus_correct_I, 10) >> 8;
+        buff[ nr ++ ] = double2short(task->bus_correct_I, 10) & 0xFF;
+        self->rx_param.need_bytes = 12;
+
+        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+        param->payload_size = sizeof(buff);
+        self->master->time_to_send = param->payload_size * 1000 / 960;
+        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
+             bit_read(task, CMD_JIAOZHUN_BUS2_V) ||
+             bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+            log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+            ret = ERR_OK;
+        } else {
+            ret = ERR_ERR;
+        }
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 采样盒校准输出参考电压
+int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    char buff[32];
+    int nr = 0, len;
+
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        ret = ERR_OK;
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        if ( bit_read(task, CMD_MODULE_ON )) {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x06;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x64;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
+            self->rx_param.need_bytes = 0;
+        } else if ( bit_read(task, CMD_MODULE_OFF) ) {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x06;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x65;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
+            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
+            self->rx_param.need_bytes = 0;
+        } else {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x10;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x09;
+            buff[nr ++] = 0x12;
+
+            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
+            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
+            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+            if ( task->modules_nr == 0 ) {
+                task->modules_nr = 1;
+            }
+            buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
+            buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
+            buff[nr ++] = task->modules_nr >> 8;
+            buff[nr ++] = task->modules_nr & 0xFF;
+            buff[nr ++] = task->charge_stat >> 8;
+            buff[nr ++] = task->charge_stat & 0xFF;
+
+            self->rx_param.need_bytes = 0;
+         }
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
+
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        if ( bit_read(task, CMD_MODULE_ON) ) {
+            bit_clr(task, CMD_MODULE_ON);
+        } else if ( bit_read(task, CMD_MODULE_OFF ) ) {
+            bit_clr(task, CMD_MODULE_OFF);
+        }
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
 
 // 一体机直接读取转换盒通信
 int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
@@ -1929,6 +2137,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     }
     return ret;
 }
+
 
 // 配置转换盒数据
 int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
@@ -2123,7 +2332,6 @@ unsigned short Increase_ModbusCRC(unsigned char * pData, unsigned char len)
     crc += byCRCLo;
     return crc;
 }
-
 
 // 英可瑞模块协议转换盒读取
 int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
@@ -2571,6 +2779,125 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     return ret;
 }
 
+// 电能表安装过程.
+int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    char buff[32];
+    int nr = 0;
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned char sum = check_sum(param->buff.rx_buff, param->need_bytes-2);
+            unsigned char check = param->buff.rx_buff[ param->need_bytes - 2 ];
+            log_printf(DBG_LV2, "UART: SUM check result: need: %02X, gave: %02X",
+                       sum, check);
+            if ( sum != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                int va, vb, vc, i;
+
+                for ( i = 0; i < 6; i ++ ) {
+                    param->buff.rx_buff[14 + i] -= 0x33;
+                }
+
+                va = (param->buff.rx_buff[15] >> 4 ) * 1000 + (param->buff.rx_buff[15] & 0x0F ) * 100;
+                va += (param->buff.rx_buff[14] >> 4 ) * 10 + (param->buff.rx_buff[14] & 0x0F );
+
+                vb = (param->buff.rx_buff[17] >> 4 ) * 1000 + (param->buff.rx_buff[17] & 0x0F ) * 100;
+                vb += (param->buff.rx_buff[16] >> 4 ) * 10 + (param->buff.rx_buff[16] & 0x0F );
+
+                vc = (param->buff.rx_buff[19] >> 4 ) * 1000 + (param->buff.rx_buff[19] & 0x0F ) * 100;
+                vc += (param->buff.rx_buff[18] >> 4 ) * 10 + (param->buff.rx_buff[18] & 0x0F );
+
+                log_printf(DBG_LV3, "UART: %.2fV  %.2fV  %.2f V",
+                           va / 10.0f, vb / 10.0f, vc / 10.0f);
+
+                task->meter[0].Va = va / 10.0f;
+                task->meter[0].Vb = vb / 10.0f;
+                task->meter[0].Vc = vc / 10.0f;
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0x68;
+
+        // 电表通信地址为 000000000001
+        /*
+        buff[ nr ++ ] = 0x31;
+        buff[ nr ++ ] = 0x17;
+        buff[ nr ++ ] = 0x08;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        */
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[10], task->meter[0].addr[11]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[8], task->meter[0].addr[9]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[6], task->meter[0].addr[7]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[4], task->meter[0].addr[5]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[2], task->meter[0].addr[3]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[0], task->meter[0].addr[1]);
+
+        buff[ nr ++ ] = 0x68;
+        buff[ nr ++ ] = 0x11;
+        buff[ nr ++ ] = 0x04;
+        buff[ nr ++ ] = 0x00 + 0x33;
+        buff[ nr ++ ] = 0xFF + 0x33;
+        buff[ nr ++ ] = 0x01 + 0x33;
+        buff[ nr ++ ] = 0x02 + 0x33;
+
+        buff[ nr ++ ] = check_sum(&buff[4], nr - 4);
+        buff[ nr ++ ] = 0x16;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+        self->master->time_to_send = (param->payload_size + 1) * 1000 / 218;
+        self->rx_param.need_bytes = 22;
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
 unsigned char BCC_code(unsigned char *da,size_t len) {
     int i  = 0;
     unsigned char BCC = 0;
@@ -2882,6 +3209,209 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
 
 // 卡片初始化
 int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    static QUERY_STAT query_stat = SEQ_FIND_CARD;
+    static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+    int ret = ERR_ERR;
+    char buff[64];
+    unsigned char public_buff[16];
+    int nr = 0;
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size > 1 && param->payload_size >= param->buff.rx_buff[0] ) {
+            if ( param->buff.rx_buff[ param->payload_size - 2 ] ==
+                 BCC_code(param->buff.rx_buff, param->payload_size - 2) ) {
+                return ERR_OK;
+            } else {
+                log_printf(DBG_LV2, "UART: SUM check result: need: %02X, gave: %02X",
+                           BCC_code(param->buff.rx_buff, param->payload_size - 1),
+                           param->buff.rx_buff[ param->payload_size - 2 ]);
+                return ERR_FRAME_CHECK_ERR;
+            }
+        } else {
+            return ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_CARD_READER_COMM_DOWN) ) {
+            log_printf(INF, "读卡器通信恢复");
+            bit_clr(task, S_CARD_READER_COMM_DOWN);
+        }
+        switch ( query_stat ) {
+        case SEQ_FIND_CARD:
+            if ( param->buff.rx_buff[0] <= 8 ) return ERR_OK;
+            memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
+            id_len = param->buff.rx_buff[7];
+            if ( task->uipage == UI_PAGE_MAIN ) {
+                log_printf(INF, "UART: 寻到新卡，进行读扇区密码验证.");
+                query_stat = SEQ_SECTOR_RD_AUTH;
+            } else if ( task->uipage == UI_PAGE_JOBS ) {
+                query_stat = SEQ_WRITE_PUBLIC_BLK;
+            }
+            ret = ERR_NEED_ECHO;
+            break;
+        case SEQ_SECTOR_WR_AUTH:
+            if ( param->buff.rx_buff[2] == 0x00 ) {
+                // 认证成功
+                log_printf(INF, "UART: 认证成功");
+                query_stat = SEQ_READ_PUBLIC_BLK;
+                ret = ERR_NEED_ECHO;
+            } else {
+                // 认证失败
+                log_printf(WRN, "UART: 认证失败");
+                query_stat = SEQ_FIND_CARD;
+            }
+            break;
+        case SEQ_WRITE_PUBLIC_BLK:
+            if ( param->buff.rx_buff[2] != 0 ) {
+                log_printf(WRN, "UART: 读卡器读取数据区失败, 错误码: %d",
+                           param->buff.rx_buff[2]);
+            } else {
+                struct user_card cd;
+
+                memcpy(cd.card.sector_4.buff, param->buff.rx_buff, 16);
+                if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
+                    log_printf(WRN, "UART: 无法识别的卡: %08X.", cd.card.sector_4.data.magic);
+                } else if ( cd.card.sector_4.data.sum !=
+                            check_sum(param->buff.rx_buff, 15) ) {
+                    log_printf(WRN, "UART: 卡数据损坏, 校验失败.");
+                } else {
+                    int faile = 0;
+                    if ( cd.card.sector_4.data.remain_sum !=
+                            check_sum(cd.card.sector_4.data.remain_money, 3) ) {
+                        log_printf(WRN, "UART: 卡数据字段： 余额校验失败.");
+                        faile ++;
+                    }
+                    if ( cd.card.sector_4.data.passwd_sum !=
+                                check_sum(cd.card.sector_4.data.passwd_code, 3) ) {
+                        log_printf(WRN, "UART: 卡数据字段： 密码校验失败.");
+                        faile ++;
+                    }
+
+                    if ( ! faile ) {
+                        log_printf(INF, "UART: 刷卡完成[卡号: %02X%02X%02X%02X, 余额: %d]",
+                                   ID[0], ID[1], ID[2], ID[3],
+                                cd.card.sector_4.data.remain_money);
+                    }
+                }
+            }
+            query_stat = SEQ_FIND_CARD;
+            ret = ERR_OK;
+            break;
+            break;
+        default:
+            break;
+        }
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        return ERR_ERR;
+        switch ( query_stat ) {
+        case SEQ_FIND_CARD:
+            buff[ nr ++ ] = 0x08;
+            buff[ nr ++ ] = 0x02;
+            buff[ nr ++ ] = 0x4D;
+            buff[ nr ++ ] = 0x02;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x26;
+            buff[ nr ++ ] = BCC_code(buff, nr);
+            buff[ nr ++ ] = 0x03;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            self->rx_param.need_bytes = 15;
+            log_printf(DBG_LV3, "UART: %s:SEQ_FIND_CARD requested.", __FUNCTION__);
+            ret = ERR_OK;
+            break;
+        case SEQ_SECTOR_RD_AUTH:
+            buff[ nr ++ ] = 0x12;
+            buff[ nr ++ ] = 0x02;
+            buff[ nr ++ ] = 0x46;
+            buff[ nr ++ ] = 0x0C;  // 6字节密钥
+            buff[ nr ++ ] = 0x60;  // 密钥A
+            buff[ nr ++ ] = ID[0];
+            buff[ nr ++ ] = ID[1];
+            buff[ nr ++ ] = ID[2];
+            buff[ nr ++ ] = ID[3];
+
+            buff[ nr ++ ] = def_passwd[0];
+            buff[ nr ++ ] = def_passwd[1];
+            buff[ nr ++ ] = def_passwd[2];
+            buff[ nr ++ ] = def_passwd[3];
+            buff[ nr ++ ] = def_passwd[4];
+            buff[ nr ++ ] = def_passwd[5];
+
+            buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
+
+            buff[ nr ++ ] = BCC_code(buff, nr);
+            buff[ nr ++ ] = 0x03;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            self->rx_param.need_bytes = 7;
+            log_printf(DBG_LV3, "UART: %s:SEQ_SECTOR_RD_AUTH requested.", __FUNCTION__);
+            ret = ERR_OK;
+            break;
+        case SEQ_READ_PUBLIC_BLK:
+            buff[ nr ++ ] = 0x07;
+            buff[ nr ++ ] = 0x02;
+            buff[ nr ++ ] = 0x47;
+            buff[ nr ++ ] = 0x01;
+            buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
+            buff[ nr ++ ] = BCC_code(buff, nr);
+            buff[ nr ++ ] = 0x03;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            self->rx_param.need_bytes = 23;
+            log_printf(DBG_LV3, "UART: %s:SEQ_READ_PUBLIC_BLK requested.", __FUNCTION__);
+            ret = ERR_OK;
+            break;
+        default:
+            query_stat = SEQ_FIND_CARD;
+            break;
+        }
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        query_stat = SEQ_FIND_CARD;
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 读卡器安装
+int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     static QUERY_STAT query_stat = SEQ_FIND_CARD;

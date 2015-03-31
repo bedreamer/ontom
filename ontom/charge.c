@@ -246,6 +246,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000001", uart4_simple_box_1_evt_handle},
         {"00000002", card_reader_handle},
         {"00000003", card_init_handle},
+        {"I000000F", card_install_handle},
         {"00000004", uart4_charger_config_evt_handle},
         {"00000005", uart4_charger_yaoce_0_49_handle},
         {"00000006", uart4_charger_yaoce_50_100_handle},
@@ -255,8 +256,11 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"M000000A", Increase_convert_box_read_evt_handle},
         {"0000000B", kwh_meter_read_evt_handle},
         {"0000000C", voltage_meter_read_evt_handle},
-        {"C000000D", uart4_simple_box_correct_evt_handle},
-        {"0000000E", uart4_simple_box_write_evt_handle},
+        {"I0000010", kwh_meter_install_evt_handle},
+        {"C000000D", simple_box_correct_write_evt_handle},
+        {"0000000E", simple_box_write_evt_handle},
+        {"C0000012", simple_box_correct_read_evt_handle},
+        {"C0000011", simple_box_correct_refer_V_evt_handle},
         {NULL, NULL}
     };
     struct bp_user u;
