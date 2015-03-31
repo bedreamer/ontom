@@ -6,7 +6,8 @@ if [ $# -eq 1 ];then
 	echo "使用数据库 $1"
 	DB=$1
 fi
-
+$SQLITE3 $DB "UPDATE RS485_config SET disabled='false' where disabled=0"
+$SQLITE3 $DB "UPDATE RS485_config SET disabled='true' where disabled=1"
 SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type'"`
 MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'"`
 
