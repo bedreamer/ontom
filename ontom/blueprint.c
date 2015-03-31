@@ -1809,11 +1809,17 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
     return ret;
 }
 
+// 读取校正时的数据
 int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR, nr  = 0;
-    char buff[8];
+    int ret = ERR_ERR, nr = 0, len = 0, errnr = 0;
+    char buff[32] = {0};
+    struct MDATA_ACK *box, *me_pre;
+    char errstr[1024] = {0};
+    char infstr[1024] = {0};
+    char cmd = 0;
+    int need_echo = 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1837,40 +1843,50 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
+            log_printf(INF, "UART: "GRN("综合采样盒通信恢复."));
+        }
+        bit_clr(task, S_MEASURE_1_COMM_DOWN);
+        self->master->died = 0;
+
+        // 字节序转置
+        do {
+            int f = (unsigned int)(&(((struct MDATA_ACK *)0)->Ver));
+            int t = (unsigned int)(&(((struct MDATA_ACK *)0)->unused));
+            int j;
+            for ( j = f; j < t; j = j + 2 ) {
+                param->buff.rx_buff[ j ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
+                param->buff.rx_buff[ j + 1 ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
+                param->buff.rx_buff[ j ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
+            }
+        } while (0);
+
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
+
         buff[ nr ++ ] = 0xF0;
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
         buff[ nr ++ ] = 0xC3;
         buff[ nr ++ ] = 0x05;
-        buff[ nr ++ ] = 0x10;
+        buff[ nr ++ ] = 0x03;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 13;
+        buff[ nr ++ ] = 0x11;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 3;
-        buff[ nr ++ ] = 6;
-        buff[ nr ++ ] = double2short(task->bus1_correct_V, 10) >> 8;
-        buff[ nr ++ ] = double2short(task->bus1_correct_V, 10) & 0xFF;
-        buff[ nr ++ ] = double2short(task->bus2_correct_V, 10) >> 8;
-        buff[ nr ++ ] = double2short(task->bus2_correct_V, 10) & 0xFF;
-        buff[ nr ++ ] = double2short(task->bus_correct_I, 10) >> 8;
-        buff[ nr ++ ] = double2short(task->bus_correct_I, 10) & 0xFF;
-        self->rx_param.need_bytes = 12;
+        buff[ nr ++ ] = 0x03;
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
 
-        memcpy(param->buff.tx_buff, buff, sizeof(buff));
-        param->payload_size = sizeof(buff);
-        self->master->time_to_send = param->payload_size * 1000 / 960;
-        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
-             bit_read(task, CMD_JIAOZHUN_BUS2_V) ||
-             bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
-            log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
-            ret = ERR_OK;
-        } else {
-            ret = ERR_ERR;
-        }
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->rx_param.need_bytes = 20;
+        self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
+        ret = ERR_OK;
+        log_printf(DBG_LV3, "UART: %s sent.", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -1884,7 +1900,16 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        //self->master->died ++;
+        if ( self->master->died < self->master->died_line ) {
+            //self->master->died ++;
+        } else {
+            //self->master->died ++;
+            if ( ! bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
+            }
+            log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
+                                        " 已禁止充电(%d)."), self->master->died);
+            bit_set(task, S_MEASURE_1_COMM_DOWN);
+        }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
@@ -1920,55 +1945,48 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        if ( bit_read(task, CMD_MODULE_ON )) {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x06;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x64;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
-            self->rx_param.need_bytes = 0;
-        } else if ( bit_read(task, CMD_MODULE_OFF) ) {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x06;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x65;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
-            self->rx_param.need_bytes = 0;
+        buff[nr ++] = 0xFF;
+        buff[nr ++] = 0x10;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x09;
+        buff[nr ++] = 0x12;
+
+        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ) {
+            buff[nr ++] = double2short(task->bus1_correct_V, 10) >> 8;
+            buff[nr ++] = double2short(task->bus1_correct_V, 10) & 0xFF;
+            buff[nr ++] = double2short(task->bus1_correct_V, 10) >> 8;
+            buff[nr ++] = double2short(task->bus1_correct_V, 10) & 0xFF;
+        } else if ( bit_read(task, CMD_JIAOZHUN_BUS2_V) ) {
+            buff[nr ++] = double2short(task->bus2_correct_V, 10) >> 8;
+            buff[nr ++] = double2short(task->bus2_correct_V, 10) & 0xFF;
+            buff[nr ++] = double2short(task->bus2_correct_V, 10) >> 8;
+            buff[nr ++] = double2short(task->bus2_correct_V, 10) & 0xFF;
+        }
+
+        if ( bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+            buff[nr ++] = double2short(task->bus_correct_I, 10) >> 8;
+            buff[nr ++] = double2short(task->bus_correct_I, 10) & 0xFF;
         } else {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x10;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x09;
-            buff[nr ++] = 0x12;
+            buff[nr ++] = 0;
+            buff[nr ++] = 0;
+        }
+        buff[nr ++] = task->modules_nr >> 8;
+        buff[nr ++] = task->modules_nr & 0xFF;
+        buff[nr ++] = task->charge_stat >> 8;
+        buff[nr ++] = task->charge_stat & 0xFF;
 
-            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
-            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
-            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-            if ( task->modules_nr == 0 ) {
-                task->modules_nr = 1;
-            }
-            buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
-            buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
-            buff[nr ++] = task->modules_nr >> 8;
-            buff[nr ++] = task->modules_nr & 0xFF;
-            buff[nr ++] = task->charge_stat >> 8;
-            buff[nr ++] = task->charge_stat & 0xFF;
+        self->rx_param.need_bytes = 0;
 
-            self->rx_param.need_bytes = 0;
-         }
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
