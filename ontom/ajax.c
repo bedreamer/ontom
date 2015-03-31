@@ -21,7 +21,7 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz);
 int ajax_system_history_proc(struct ajax_xml_struct *thiz);
 int ajax_system_about_proc(struct ajax_xml_struct *thiz);
 int ajax_card_init_proc(struct ajax_xml_struct *thiz);
-
+int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz);
 int ajax_module_query_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_options_proc(struct ajax_xml_struct *thiz);
@@ -62,6 +62,7 @@ struct xml_generator {
     {"/system/save.json",       ajax_system_config_save_proc},
     {"/system/detail.json",     ajax_system_detail_proc},
     {"/system/card.json",       ajax_card_init_proc,},
+    {"/system/jiaozhun.json",   ajax_jiaozhun_proc,},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -1599,7 +1600,61 @@ die:
     return ret;
 }
 
+int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+    unsigned char p[16], op[16];
 
+    mg_get_var(thiz->xml_conn, "op", op, 16);
+    mg_get_var(thiz->xml_conn, "p", p, 16);
+
+    if ( 0 == strcmp(op, "V1") ) {
+        bit_clr(task, CMD_JIAOZHUN_BAT_I);
+        bit_clr(task, CMD_JIAOZHUN_BUS2_V);
+        task->bus1_correct_V = atof(p);
+        task->bus2_correct_V = 0;
+        task->bus_correct_I = 0;
+        bit_set(task, CMD_JIAOZHUN_BUS1_V);
+    } else if ( 0 == strcmp(op, "V2") ) {
+        bit_clr(task, CMD_JIAOZHUN_BAT_I);
+        bit_clr(task, CMD_JIAOZHUN_BUS1_V);
+        task->bus2_correct_V = atof(p);
+        task->bus1_correct_V = 0;
+        task->bus_correct_I = 0;
+        bit_set(task, CMD_JIAOZHUN_BUS2_V);
+    } else if ( 0 == strcmp(op, "I") ) {
+        bit_clr(task, CMD_JIAOZHUN_BUS1_V);
+        bit_clr(task, CMD_JIAOZHUN_BUS2_V);
+        task->bus_correct_I = atof(p);
+        task->bus2_correct_V = 0;
+        task->bus1_correct_V = 0;
+        bit_set(task, CMD_JIAOZHUN_BAT_I);
+    } else if ( 0 == strcmp(op, "done") ) {
+        bit_clr(task, CMD_JIAOZHUN_BUS1_V);
+        bit_clr(task, CMD_JIAOZHUN_BUS2_V);
+        bit_clr(task, CMD_JIAOZHUN_BAT_I);
+    }
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"V1\":\"%.1f\",",
+            task->bus1_read_V);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"V2\":\"%.1f\",",
+            task->bus2_read_V);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"I\":\"%.1f\",",
+            task->bus_read_I);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"SCS\":\"%s\",",
+            bit_read(task, S_MEASURE_1_COMM_DOWN)?"ERR":"OK");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"CCS\":\"%s\",",
+            bit_read(task, S_CONVERT_BOX_COMM_DOWN)?"ERR":"OK");
+
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+die:
+    return ret;
+}
 
 void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
 {

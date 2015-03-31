@@ -1860,6 +1860,10 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
                 param->buff.rx_buff[ j ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
             }
         } while (0);
+        memcpy(&me->measure->measure_pre_copy, &me->measure->measure, sizeof(struct MDATA_ACK));
+        task->bus1_read_V = __bytes2double(b2l(task->measure[0]->measure.VinKM0));
+        task->bus2_read_V = __bytes2double(b2l(task->measure[0]->measure.VinKM1));
+        task->bus_read_I = __bytes2double(b2l(task->measure[0]->measure.IoutBAT0));
 
         break;
     // 串口发送数据请求
@@ -2005,17 +2009,11 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
         log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
-        if ( bit_read(task, CMD_MODULE_ON) ) {
-            bit_clr(task, CMD_MODULE_ON);
-        } else if ( bit_read(task, CMD_MODULE_OFF ) ) {
-            bit_clr(task, CMD_MODULE_OFF);
-        }
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
