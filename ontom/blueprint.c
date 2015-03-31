@@ -1721,7 +1721,7 @@ int uart4_simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, 
 int uart4_simple_box_correct_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR;
+    int ret = ERR_ERR, nr  = 0;
     char buff[8];
 
     switch (evt) {
