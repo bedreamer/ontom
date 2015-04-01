@@ -63,7 +63,7 @@ CONFIG_DOMAIN_BEGIN
 {"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"300"}},
 
 // 定时器分辨率
-{"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"10000000"}},
+{"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"1000000"}},
 // 线程栈大小，单位KB
 {"thread_stack_size",           C_INT,      no,     C_VALID,    .cuv.i=0,       {"1024"}},
 {"debug_lvA",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
