@@ -1887,7 +1887,7 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
 
-        self->rx_param.need_bytes = 20;
+        self->rx_param.need_bytes = 15;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
 
         if ( bit_read(task, CMD_JIAOZHUN_BAT_I) ||
