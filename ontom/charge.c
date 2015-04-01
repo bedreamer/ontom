@@ -485,6 +485,18 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         }
     }
 #endif
+    task->bus_1_v_hi = 750.1;
+    task->bus_1_v_lo = 240.0;
+    task->bus_2_v_hi = 750.1;
+    task->bus_2_v_lo = 240.0;
+    task->bat_1_v_hi = 750.1;
+    task->bat_1_v_lo = 240.0;
+    task->bat_2_v_hi = 750.1;
+    task->bat_2_v_lo = 240.0;
+    task->bat_1_I_hi = 750.1;
+    task->bat_2_I_hi = 240.0;
+    task->bat_1_insti_ohm_v = 100.0;
+    task->bat_2_insti_ohm_v = 100.0;
 
     task->commit_head = NULL;
     task->wait_head = NULL;
