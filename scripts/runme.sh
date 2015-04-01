@@ -9,13 +9,13 @@ while [ true ]; do
 	kill -9 `pidof browser`
 	kill -9 `pidof zeus`
 	workmode=`sqlite3 /usr/zeus/ontom.db "SELECT current_value FROM settings WHERE key='work_mode'"`
-	if [ workmode == "normal" ]; then
+	if [ $workmode == "normal" ]; then
 		echo "启动到主页面"
 		browser -qws "http://127.0.0.1:8080/" &
-	elif [ workmode == "correct" ]; then
+	elif [ $workmode == "correct" ]; then
 		echo "启动到校准页面"
 		browser -qws "http://127.0.0.1:8080/jiaozhun.html" &
-	elif [ workmode == "install" ]; then
+	elif [ $workmode == "install" ]; then
 		echo "启动到安装配置页面"
 		browser -qws "http://127.0.0.1:8080/settings.html" &
 	else
