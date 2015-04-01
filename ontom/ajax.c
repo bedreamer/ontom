@@ -808,6 +808,25 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
             "\"gun3\":\"N/A\",");
 
+    // {{ 开关状态
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"zdcrd\":\"%s\",", task->measure[0]->measure.Flag_prtc6&0x01?"熔断":"正常");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"zdctrip\":\"%s\",", task->measure[0]->measure.Flag_prtc6&0x02?"跳闸":"正常");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"dc1trip\":\"%s\",", task->measure[0]->measure.Flag_prtc6&0x04?"跳闸":"正常");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"dc2trip\":\"%s\",", task->measure[0]->measure.Flag_prtc6&0x08?"跳闸":"正常");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"actrip\":\"%s\",", task->measure[0]->measure.Flag_prtc6&0x20?"跳闸":"正常");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"flq\":\"%s\",", task->measure[0]->measure.Flag_prtc6&0x10?"故障":"正常");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"halt\":\"%s\",", task->measure[0]->measure.Flag_prtc6&0x40?"急停":"正常");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"aczt\":\"%s\",", task->measure[0]->measure.Flag_run1&0x01?"合闸":"分闸");
+    // }}
+
     thiz->iobuff[--thiz->xml_len] = '\0';
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "}");
