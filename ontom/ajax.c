@@ -1738,7 +1738,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"id\":\"%08X\","       // 作业ID，序号
             "\"port\":\"%ld#\","     // 充电端口
             "\"cmode\":\"%s\","      // 充电模式
-            "\"LV\":\"%.1f V\","       // 充电限压
+            "\"LV\":\"%.1f V\","     // 充电限压
             "\"LI\":\"%.1f A\","     // 充电限流
             "\"bmode\":\"%s\","      // 计费方式
             "\"hwk\":\"%.1f KW.H\"," // 电量
@@ -1759,7 +1759,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             job->need_I,
             bmode_string[job->charge_billing.mode],
             job->charge_billing.option.set_kwh,
-            job->charge_billing.option.set_time,
+            job->charge_billing.option.set_time / 60,
             job->charge_billing.option.set_money,
             job->card.triger_card_sn,
             __card_read_remain(&job->card),
