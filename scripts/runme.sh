@@ -7,7 +7,8 @@ echo "开始启动主程序..."
 
 while [ true ]; do
 	kill -9 `pidof browser`
-	mode=`sqlite3 ontom.db "SELECT current_value FROM settings WHERE key='work_mode'"`
+	kill -9 `pidof zeus`
+	mode=`sqlite3 /usr/zeus/ontom.db "SELECT current_value FROM settings WHERE key='work_mode'"`
 	if [ mode -eq "normal" ]; then
 		browser -qws "http://127.0.0.1:8080/" &
 	elif [ mode -eq "correct" ]; then
