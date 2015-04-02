@@ -1753,7 +1753,7 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
             ret = ERR_OK;
             task->bus2_correct_V = 199999.9;
             task->bus1_correct_V = 199999.9;
-            task->bus_correct_I >= 199999.9;
+            task->bus_correct_I = 199999.9;
             }
         break;
     // 串口发送数据请求
