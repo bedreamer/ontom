@@ -1978,7 +1978,7 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
             buff[nr ++] = double2short(task->bus1_correct_V, 1) & 0xFF;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) & 0xFF;
-        } else if ( task->bus1_correct_V > 0 ) {
+        } else if ( task->bus2_correct_V > 0 ) {
             buff[nr ++] = double2short(task->bus2_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus2_correct_V, 1) & 0xFF;
             buff[nr ++] = double2short(task->bus2_correct_V, 1) >> 8;
