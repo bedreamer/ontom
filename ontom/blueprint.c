@@ -1761,12 +1761,12 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 3;
         buff[ nr ++ ] = 6;
-        buff[ nr ++ ] = double2short(task->bus1_correct_V, 10) >> 8;
-        buff[ nr ++ ] = double2short(task->bus1_correct_V, 10) & 0xFF;
-        buff[ nr ++ ] = double2short(task->bus2_correct_V, 10) >> 8;
-        buff[ nr ++ ] = double2short(task->bus2_correct_V, 10) & 0xFF;
-        buff[ nr ++ ] = double2short(task->bus_correct_I, 10) >> 8;
-        buff[ nr ++ ] = double2short(task->bus_correct_I, 10) & 0xFF;
+        buff[ nr ++ ] = double2short(task->bus1_correct_V, 1) >> 8;
+        buff[ nr ++ ] = double2short(task->bus1_correct_V, 1) & 0xFF;
+        buff[ nr ++ ] = double2short(task->bus2_correct_V, 1) >> 8;
+        buff[ nr ++ ] = double2short(task->bus2_correct_V, 1) & 0xFF;
+        buff[ nr ++ ] = double2short(task->bus_correct_I, 1) >> 8;
+        buff[ nr ++ ] = double2short(task->bus_correct_I, 1) & 0xFF;
         self->rx_param.need_bytes = 12;
 
         len = nr;
