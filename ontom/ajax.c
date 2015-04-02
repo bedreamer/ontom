@@ -1649,9 +1649,9 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
         task->bus1_correct_V = 0;
         bit_set(task, CMD_JIAOZHUN_BAT_I);
     } else if ( 0 == strcmp(op, "done") ) {
-        bit_clr(task, CMD_JIAOZHUN_BUS1_V);
-        bit_clr(task, CMD_JIAOZHUN_BUS2_V);
-        bit_clr(task, CMD_JIAOZHUN_BAT_I);
+        bit_set(task, CMD_JIAOZHUN_BUS1_V);
+        bit_set(task, CMD_JIAOZHUN_BUS2_V);
+        bit_set(task, CMD_JIAOZHUN_BAT_I);
         task->bus2_correct_V = 0;
         task->bus1_correct_V = 0;
         task->bus_correct_I = 0;
@@ -1687,6 +1687,12 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
             bit_read(task, S_MEASURE_1_COMM_DOWN)?"ERR":"OK");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"CCS\":\"%s\",",
             bit_read(task, S_CONVERT_BOX_COMM_DOWN)?"ERR":"OK");
+
+    if ( task->bus2_correct_V >= 99999.9 &&
+         task->bus1_correct_V >= 99999.9 &&
+         task->bus_correct_I  >= 99999.9 && ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"saved\":\"yes\",",);
+    }
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
