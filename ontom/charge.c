@@ -257,8 +257,8 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000004", uart4_charger_config_evt_handle},
         {"00000005", uart4_charger_yaoce_0_49_handle},
         {"00000006", uart4_charger_yaoce_50_100_handle},
-        {"00000007", ANC01_convert_box_read_evt_handle},
-        {"00000008", ANC01_convert_box_write_evt_handle},
+        {"00000007", ANC01_convert_box_write_evt_handle},
+        {"00000008", ANC01_convert_box_read_evt_handle},
         {"00000009", Increase_convert_box_write_evt_handle},
         {"M000000A", Increase_convert_box_read_evt_handle},
         {"0000000B", kwh_meter_read_evt_handle},
@@ -452,7 +452,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             "SELECT "
             "id, name, private, RS485, bps, parity, datalen, stop_bit, frame_freq, "
             "died_line, swap2rx_time, ttw"
-            " FROM RS485_config WHERE disabled='false' AND class='%s'",
+            " FROM RS485_config WHERE disabled='false' AND class='%s' order by id",
             task->sys_work_mode
             );
     ret = sqlite3_exec(task->database, sql, sql_rs485_result, task, &errmsg);
