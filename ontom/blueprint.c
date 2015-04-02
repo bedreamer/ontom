@@ -3909,12 +3909,14 @@ ___fast_switch_2_rx:
             do {
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
+                /*
                 if ( !FD_ISSET(thiz->dev_handle, &rfds ) ) {
                     usleep(2000);
                     continue;
                 }
                 FD_ZERO(&rfds);
                 FD_SET(thiz->dev_handle, &rfds);
+                */
                 rd = read(thiz->dev_handle,
                           &thiz->rx_param.buff.rx_buff[cursor], 32);
                 if ( rd > 0 ) {
