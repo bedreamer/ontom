@@ -1652,6 +1652,27 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
         bit_clr(task, CMD_JIAOZHUN_BUS1_V);
         bit_clr(task, CMD_JIAOZHUN_BUS2_V);
         bit_clr(task, CMD_JIAOZHUN_BAT_I);
+        task->bus2_correct_V = 0;
+        task->bus1_correct_V = 0;
+        task->bus_correct_I = 0;
+    } else if ( 0 == strcmp(op, "CV1") ) {
+        bit_clr(task, CMD_JIAOZHUN_BAT_I);
+        bit_clr(task, CMD_JIAOZHUN_BUS1_V);
+        bit_clr(task, CMD_JIAOZHUN_BUS2_V);
+        task->bus2_correct_V = atof(p);
+        task->bus1_correct_V = 0;
+        task->bus_correct_I = 0;
+    } else if ( 0 == strcmp(op, "CV2") ) {
+        bit_clr(task, CMD_JIAOZHUN_BAT_I);
+        bit_clr(task, CMD_JIAOZHUN_BUS1_V);
+        bit_clr(task, CMD_JIAOZHUN_BUS2_V);
+        task->bus2_correct_V = atof(p);
+        task->bus1_correct_V = 0;
+        task->bus_correct_I = 0;
+    } else {
+        task->bus2_correct_V = 0;
+        task->bus1_correct_V = 0;
+        task->bus_correct_I = 0;
     }
 
     thiz->ct = "application/json";

@@ -1980,19 +1980,19 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
         buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ) {
+        if ( task->bus1_correct_V > 0 ) {
             buff[nr ++] = double2short(task->bus1_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) & 0xFF;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) & 0xFF;
-        } else if ( bit_read(task, CMD_JIAOZHUN_BUS2_V) ) {
+        } else if ( task->bus1_correct_V > 0 ) {
             buff[nr ++] = double2short(task->bus2_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus2_correct_V, 1) & 0xFF;
             buff[nr ++] = double2short(task->bus2_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus2_correct_V, 1) & 0xFF;
         }
 
-        if ( bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+        if ( task->bus_correct_I > 0 ) {
             buff[nr ++] = double2short(task->bus_correct_I, 10) >> 8;
             buff[nr ++] = double2short(task->bus_correct_I, 10) & 0xFF;
         } else {
