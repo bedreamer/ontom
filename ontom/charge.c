@@ -257,8 +257,10 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000004", uart4_charger_config_evt_handle},
         {"00000005", uart4_charger_yaoce_0_49_handle},
         {"00000006", uart4_charger_yaoce_50_100_handle},
+        // {{ 这个顺序不要调换，为了规避读卡器导致的模块转换盒通信中断问题。
         {"00000007", ANC01_convert_box_write_evt_handle},
         {"00000008", ANC01_convert_box_read_evt_handle},
+        // }}
         {"00000009", Increase_convert_box_write_evt_handle},
         {"M000000A", Increase_convert_box_read_evt_handle},
         {"0000000B", kwh_meter_read_evt_handle},
