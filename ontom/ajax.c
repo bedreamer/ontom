@@ -1631,7 +1631,7 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
 
     if ( task->bus2_correct_V >= 99999.9 &&
          task->bus1_correct_V >= 99999.9 &&
-         task->bus_correct_I  >= 99999.9 && ) {
+         task->bus_correct_I  >= 99999.9 ) {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"saved\":\"yes\",",);
     }
 
