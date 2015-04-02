@@ -1865,7 +1865,10 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
                 param->buff.rx_buff[ j ] = param->buff.rx_buff[ j ] ^ param->buff.rx_buff[ j + 1];
             }
         } while (0);
+
         memcpy(&me->measure->measure_pre_copy, &me->measure->measure, sizeof(struct MDATA_ACK));
+        memcpy(&me->measure->measure, param->buff.rx_buff, sizeof(struct MDATA_ACK));
+
         task->bus1_read_V = __bytes2double(b2l(task->measure[0]->measure.VinKM0));
         task->bus2_read_V = __bytes2double(b2l(task->measure[0]->measure.VinKM1));
         task->bus_read_I = __bytes2double(b2l(task->measure[0]->measure.IoutBAT0));
@@ -1884,7 +1887,7 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x11;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x03;
+        buff[ nr ++ ] = 0x14;
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
@@ -1892,9 +1895,9 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
 
-        self->rx_param.need_bytes = 15;
+        self->rx_param.need_bytes = 49;
         self->master->time_to_send = param->payload_size * 1000 / 960 + self->master->swap_time_modify;
-
+        ret = ERR_OK;
         if ( bit_read(task, CMD_JIAOZHUN_BAT_I) ||
              bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
              bit_read(task, CMD_JIAOZHUN_BUS2_V) ) {
