@@ -1746,44 +1746,95 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) &&
+             bit_read(task, CMD_JIAOZHUN_BUS2_V) &&
+             bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+            log_printf(INF, "UART: 校准数据已保存.");
+            ret = ERR_OK;
+            task->bus2_correct_V = 199999.9;
+            task->bus1_correct_V = 199999.9;
+            task->bus_correct_I >= 199999.9;
+            }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        buff[ nr ++ ] = 0xF0;
-        buff[ nr ++ ] = 0xE1;
-        buff[ nr ++ ] = 0xD2;
-        buff[ nr ++ ] = 0xC3;
-        buff[ nr ++ ] = 0x05;
-        buff[ nr ++ ] = 0x10;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 13;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 3;
-        buff[ nr ++ ] = 6;
-        buff[ nr ++ ] = double2short(task->bus1_correct_V, 1) >> 8;
-        buff[ nr ++ ] = double2short(task->bus1_correct_V, 1) & 0xFF;
-        buff[ nr ++ ] = double2short(task->bus2_correct_V, 1) >> 8;
-        buff[ nr ++ ] = double2short(task->bus2_correct_V, 1) & 0xFF;
-        buff[ nr ++ ] = double2short(task->bus_correct_I, 1) >> 8;
-        buff[ nr ++ ] = double2short(task->bus_correct_I, 1) & 0xFF;
-        self->rx_param.need_bytes = 12;
-
-        len = nr;
-        buff[ nr ++ ] = load_crc(len, buff);
-        buff[ nr ++ ] = load_crc(len, buff) >> 8;
-
-        memcpy(param->buff.tx_buff, buff, nr);
-        param->payload_size = nr;
-
-        self->master->time_to_send = param->payload_size * 1000 / 960;
-        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
-             bit_read(task, CMD_JIAOZHUN_BUS2_V) ||
+        if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) &&
+             bit_read(task, CMD_JIAOZHUN_BUS2_V) &&
              bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+            buff[ nr ++ ] = 0xF0;
+            buff[ nr ++ ] = 0xE1;
+            buff[ nr ++ ] = 0xD2;
+            buff[ nr ++ ] = 0xC3;
+            buff[ nr ++ ] = 0x05;
+            buff[ nr ++ ] = 0x10;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 13;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 3;
+            buff[ nr ++ ] = 6;
+            buff[ nr ++ ] = 0;
+            buff[ nr ++ ] = 0;
+            buff[ nr ++ ] = 0;
+            buff[ nr ++ ] = 0;
+            buff[ nr ++ ] = 0;
+            buff[ nr ++ ] = 0;
+            self->rx_param.need_bytes = 12;
+
+            len = nr;
+            buff[ nr ++ ] = load_crc(len, buff);
+            buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
+                 bit_read(task, CMD_JIAOZHUN_BUS2_V) ||
+                 bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+                log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+                ret = ERR_OK;
+            } else {
+                ret = ERR_ERR;
+            }
             log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
             ret = ERR_OK;
         } else {
-            ret = ERR_ERR;
+            buff[ nr ++ ] = 0xF0;
+            buff[ nr ++ ] = 0xE1;
+            buff[ nr ++ ] = 0xD2;
+            buff[ nr ++ ] = 0xC3;
+            buff[ nr ++ ] = 0x05;
+            buff[ nr ++ ] = 0x10;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 13;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 3;
+            buff[ nr ++ ] = 6;
+            buff[ nr ++ ] = double2short(task->bus1_correct_V, 1) >> 8;
+            buff[ nr ++ ] = double2short(task->bus1_correct_V, 1) & 0xFF;
+            buff[ nr ++ ] = double2short(task->bus2_correct_V, 1) >> 8;
+            buff[ nr ++ ] = double2short(task->bus2_correct_V, 1) & 0xFF;
+            buff[ nr ++ ] = double2short(task->bus_correct_I, 1) >> 8;
+            buff[ nr ++ ] = double2short(task->bus_correct_I, 1) & 0xFF;
+            self->rx_param.need_bytes = 12;
+
+            len = nr;
+            buff[ nr ++ ] = load_crc(len, buff);
+            buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
+                 bit_read(task, CMD_JIAOZHUN_BUS2_V) ||
+                 bit_read(task, CMD_JIAOZHUN_BAT_I) ) {
+                log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+                ret = ERR_OK;
+            } else {
+                ret = ERR_ERR;
+            }
         }
         break;
     // 串口发送确认
