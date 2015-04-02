@@ -2042,8 +2042,8 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
         }
 
         if ( task->bus_correct_I > 0 && task->bus_correct_I <= 999.9 ) {
-            buff[nr ++] = double2short(task->bus_correct_I) >> 8;
-            buff[nr ++] = double2short(task->bus_correct_I) & 0xFF;
+            buff[nr ++] = double2short(task->bus_correct_I, 1) >> 8;
+            buff[nr ++] = double2short(task->bus_correct_I, 1) & 0xFF;
         } else {
             buff[nr ++] = 0;
             buff[nr ++] = 0;
