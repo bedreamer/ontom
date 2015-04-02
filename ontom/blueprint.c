@@ -1721,8 +1721,8 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
 int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR, nr  = 0;
-    char buff[8];
+    int ret = ERR_ERR, nr  = 0, len;
+    char buff[32];
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1769,8 +1769,13 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
         buff[ nr ++ ] = double2short(task->bus_correct_I, 10) & 0xFF;
         self->rx_param.need_bytes = 12;
 
-        memcpy(param->buff.tx_buff, buff, sizeof(buff));
-        param->payload_size = sizeof(buff);
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
         self->master->time_to_send = param->payload_size * 1000 / 960;
         if ( bit_read(task, CMD_JIAOZHUN_BUS1_V) ||
              bit_read(task, CMD_JIAOZHUN_BUS2_V) ||
