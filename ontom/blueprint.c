@@ -2024,12 +2024,12 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
         buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-        if ( task->bus1_correct_V > 0 && task->bus1_correct_V <= 999.9 ) {
+        if ( task->bus1_correct_V > 0 && task->bus1_correct_V <= 9999.9 ) {
             buff[nr ++] = double2short(task->bus1_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) & 0xFF;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus1_correct_V, 1) & 0xFF;
-        } else if ( task->bus2_correct_V > 0 && task->bus2_correct_V <= 999.9 ) {
+        } else if ( task->bus2_correct_V > 0 && task->bus2_correct_V <= 9999.9 ) {
             buff[nr ++] = double2short(task->bus2_correct_V, 1) >> 8;
             buff[nr ++] = double2short(task->bus2_correct_V, 1) & 0xFF;
             buff[nr ++] = double2short(task->bus2_correct_V, 1) >> 8;
@@ -2042,8 +2042,8 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
         }
 
         if ( task->bus_correct_I > 0 && task->bus_correct_I <= 999.9 ) {
-            buff[nr ++] = double2short(task->bus_correct_I, 10) >> 8;
-            buff[nr ++] = double2short(task->bus_correct_I, 10) & 0xFF;
+            buff[nr ++] = double2short(task->bus_correct_I) >> 8;
+            buff[nr ++] = double2short(task->bus_correct_I) & 0xFF;
         } else {
             buff[nr ++] = 0;
             buff[nr ++] = 0;
