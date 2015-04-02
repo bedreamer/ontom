@@ -1626,6 +1626,14 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
 
     mg_get_var(thiz->xml_conn, "op", op, 16);
     mg_get_var(thiz->xml_conn, "p", p, 16);
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+
+    if ( task->bus2_correct_V >= 99999.9 &&
+         task->bus1_correct_V >= 99999.9 &&
+         task->bus_correct_I  >= 99999.9 && ) {
+        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"saved\":\"yes\",",);
+    }
 
     if ( 0 == strcmp(op, "V1") ) {
         bit_clr(task, CMD_JIAOZHUN_BAT_I);
@@ -1675,8 +1683,7 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
         task->bus_correct_I = 0;
     }
 
-    thiz->ct = "application/json";
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"V1\":\"%.1f\",",
             task->bus1_read_V);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"V2\":\"%.1f\",",
@@ -1687,12 +1694,6 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
             bit_read(task, S_MEASURE_1_COMM_DOWN)?"ERR":"OK");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"CCS\":\"%s\",",
             bit_read(task, S_CONVERT_BOX_COMM_DOWN)?"ERR":"OK");
-
-    if ( task->bus2_correct_V >= 99999.9 &&
-         task->bus1_correct_V >= 99999.9 &&
-         task->bus_correct_I  >= 99999.9 && ) {
-        thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"saved\":\"yes\",",);
-    }
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
