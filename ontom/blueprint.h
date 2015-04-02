@@ -338,6 +338,8 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
                      struct bp_evt_param *param);
 int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
+int uart_sniffer_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
 int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 void * thread_uart_service(void *arg) ___THREAD_ENTRY___;

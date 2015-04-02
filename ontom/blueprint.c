@@ -3693,6 +3693,57 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
     return ret;
 }
 
+int uart_sniffer_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    {
+        static QUERY_STAT query_stat = SEQ_FIND_CARD;
+        static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+        int ret = ERR_ERR;
+        char buff[64];
+        unsigned char public_buff[16];
+        int nr = 0;
+
+        switch (evt) {
+        case BP_EVT_FRAME_CHECK:
+        // 串口接收到新数据
+        case BP_EVT_RX_DATA:
+            break;
+        // 串口收到完整的数据帧
+        case BP_EVT_RX_FRAME:
+            break;
+        // 串口发送数据请求
+        case BP_EVT_TX_FRAME_REQUEST:
+            return ERR_ERR;
+            break;
+        // 串口发送确认
+        case BP_EVT_TX_FRAME_CONFIRM:
+            ret = ERR_OK;
+            break;
+        // 串口数据发送完成事件
+        case BP_EVT_TX_FRAME_DONE:
+            break;
+        // 串口接收单个字节超时，出现在接收帧的第一个字节
+        case BP_EVT_RX_BYTE_TIMEOUT:
+        // 串口接收帧超时, 接受的数据不完整
+        case BP_EVT_RX_FRAME_TIMEOUT:
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+            break;
+        // 串口IO错误
+        case BP_EVT_IO_ERROR:
+            break;
+        // 帧校验失败
+        case BP_EVT_FRAME_CHECK_ERROR:
+            break;
+        default:
+            log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+            break;
+        }
+        return ret;
+    }
+}
+
 int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {

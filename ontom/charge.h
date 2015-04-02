@@ -1320,13 +1320,16 @@ static inline void __get_timestamp(char *outstring)
     struct tm *p;
     timep = time(NULL);
     p =localtime(&timep);
-    sprintf(outstring, "%04d-%02d-%02d %02d:%02d:%02d",
+    struct timeval t_start;
+    gettimeofday(&t_start, NULL);
+    sprintf(outstring, "%04d-%02d-%02d %02d:%02d:%02d.%d",
             p->tm_year + 1900,
             p->tm_mon + 1,
             p->tm_mday,
             p->tm_hour,
             p->tm_min,
-            p->tm_sec);
+            p->tm_sec,
+            t_start.tv_usec / 1000);
 }
 
 static inline unsigned int __atoh(const char *hex)
