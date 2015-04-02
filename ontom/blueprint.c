@@ -4107,6 +4107,7 @@ continue_to_send:
                                tts, thiz->master->swap_time_modify);
                 } while (0);
 
+                tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 thiz->tx_param.payload_size = 0;
