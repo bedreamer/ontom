@@ -1641,6 +1641,12 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             cmd &= ~DC_SWITCH_ON;
         }
 
+        if ( bit_read(task, F_CHARGE_LED) ) {
+            cmd |= 0x80;
+        } else {
+            cmd &= ~0x80;
+        }
+
         buff[ nr ++ ] = 0xF0;
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
