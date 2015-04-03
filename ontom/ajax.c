@@ -900,7 +900,7 @@ int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"id\":\"%08X\",", jc.url_commit_timestamp);
+            "{\"id\":\"%08X\",", (unsigned int)jc.url_commit_timestamp);
 
     if ( strlen(gun) <= 0 ) {
         log_printf(DBG_LV3, "充电枪编号错误");
@@ -1070,7 +1070,7 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
     struct error_history *te;
     struct list_head *head;
     char errname[32];
-    char sql[256], *errmsg;
+    char *errmsg;
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
@@ -1258,7 +1258,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
 int ajax_module_query_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    int lf = 0, nr = 12, n;
+    int n;
     unsigned short kn;
     char buff[8];
     char *p = NULL;
@@ -1367,10 +1367,7 @@ int sql_system_settings_result(void *param, int nr, char **text, char **name)
 int ajax_system_config_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    int lf = 0, nr = 12, n;
-    unsigned short kn;
-    char buff[8], sql[256];
-    char *p = NULL;
+    char sql[256];
     char *errmsg = NULL;
 
     thiz->ct = "application/json";
@@ -1402,8 +1399,6 @@ int sql_system_settings_options_result(void *param, int nr, char **text, char **
 int ajax_system_config_options_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    int lf = 0, nr = 12, n;
-    unsigned short kn;
     char name[32], sql[256];
     char *p = NULL;
     char *errmsg = NULL;
@@ -1433,8 +1428,6 @@ die:
 int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    int lf = 0, nr = 12, n;
-    unsigned short kn;
     char s[512], sql[256];
     char *p = NULL;
     char *errmsg = NULL;
@@ -1564,6 +1557,7 @@ int ajax_system_do_active(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+    return ret;
 }
 
 
