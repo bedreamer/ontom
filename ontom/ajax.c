@@ -1400,7 +1400,6 @@ int ajax_system_config_options_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     char name[32], sql[256];
-    char *p = NULL;
     char *errmsg = NULL;
 
     thiz->ct = "application/json";
@@ -1458,7 +1457,7 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
             } else if ( !valok ) {
                 if ( vallen < 32 )
                     value[ vallen ++ ] = *p;
-            } else;
+            } else {};
         }
 
         if ( keyok && valok ) {
@@ -1564,7 +1563,7 @@ int ajax_system_do_active(struct ajax_xml_struct *thiz)
 int ajax_card_init_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    unsigned char money[16], passwd[16], op[16];
+    char money[16], passwd[16], op[16];
 
     mg_get_var(thiz->xml_conn, "op", op, 16);
     mg_get_var(thiz->xml_conn, "money", money, 16);
@@ -1582,11 +1581,11 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
                 "\"money\":\"%.2f\",", task->op_card.card.sector_4.data.remain_money[0] / 100.0f);
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                 "\"passwd\":\"%d%d%d%d%d%d\",",
-                task->op_card.card.sector_4.data.passwd_code[0] & 0x0F + '0',
+                (task->op_card.card.sector_4.data.passwd_code[0] & 0x0F) + '0',
                 (task->op_card.card.sector_4.data.passwd_code[0] >> 4) + '0',
-                task->op_card.card.sector_4.data.passwd_code[1] & 0x0F + '0',
+                (task->op_card.card.sector_4.data.passwd_code[1] & 0x0F) + '0',
                 (task->op_card.card.sector_4.data.passwd_code[1] >> 4) + '0',
-                task->op_card.card.sector_4.data.passwd_code[2] & 0x0F + '0',
+                (task->op_card.card.sector_4.data.passwd_code[2] & 0x0F) + '0',
                 (task->op_card.card.sector_4.data.passwd_code[3] >> 4) + '0');
     } else {
         if ( 0 == strcmp(op, "format") ) {
