@@ -935,8 +935,8 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
                    atof(config_read("需求电流"))/10.0f);
 
         // CRC
-        buff[nr ++] = load_crc(s, (char*)buff);
-        buff[nr ++] = load_crc(s, (char*)buff) >> 8;
+        buff[nr ++] = load_crc(s, buff);
+        buff[nr ++] = load_crc(s, buff) >> 8;
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
         ret = ERR_OK;
