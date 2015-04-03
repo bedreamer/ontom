@@ -1526,7 +1526,7 @@ int ajax_system_detail_proc(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
-die:
+
     return ret;
 }
 
@@ -1628,7 +1628,9 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
                     check_sum(task->op_card.card.sector_4.buff, 15);
 
             bit_set(task, CMD_CARD_SET);
-        } else;
+        } else {
+
+        }
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
@@ -1638,14 +1640,13 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
-die:
     return ret;
 }
 
 int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    unsigned char p[16], op[16];
+    char p[16], op[16];
 
     mg_get_var(thiz->xml_conn, "op", op, 16);
     mg_get_var(thiz->xml_conn, "p", p, 16);
