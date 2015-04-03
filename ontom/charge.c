@@ -625,6 +625,7 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
     } else {
         bit_clr(task, S_ERROR);
     }
+
     return;
 }
 
@@ -633,9 +634,70 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
     int ret;
     char buff[64] = {0};
     char sql[256];
-    int start  = 0, end = 0;
+    int start  = 0, end = 0, fault = 0;
 
     if ( job == NULL ) return;
+
+    if ( job->job_gun_sn == GUN_SN0 ) {
+        if ( bit_read(task, S_BAT_0_SHORT) ) {
+            fault ++;
+        }
+        if ( bit_read(task, S_BAT_0_REVERT) ) {
+            fault ++;
+        }
+        if ( bit_read(task, S_BAT_0_INSTITUDE) ) {
+            fault ++;
+        }
+        if ( bit_read(task, S_DC_OUTPUT_0_TRIP) ) {
+            fault ++;
+        }
+
+        // 1路输出跳闸
+        if ( task->measure[0]->measure.Flag_prtc6 & 0x04 ) {
+            fault ++;
+        }
+    } else if ( job->job_gun_sn == GUN_SN1 ) {
+        if ( bit_read(task, S_BAT_1_SHORT) ) {
+            fault ++;
+        }
+        if ( bit_read(task, S_BAT_1_REVERT) ) {
+            fault ++;
+        }
+        if ( bit_read(task, S_BAT_1_INSTITUDE) ) {
+            fault ++;
+        }
+        if ( bit_read(task, S_DC_OUTPUT_1_TRIP) ) {
+            fault ++;
+        }
+
+        // 2路输出跳闸
+        if ( task->measure[0]->measure.Flag_prtc6 & 0x08 ) {
+            fault ++;
+        }
+    }
+
+    // 交流输出跳闸
+    if ( bit_read(task, S_AC_SWITCH_TRIP) ) {
+        fault ++;
+    }
+    // 直流总输出熔断器熔断
+    if ( task->measure[0]->measure.Flag_prtc6 & 0x01 ) {
+        fault ++;
+    }
+    // 直流总输出跳闸
+    if ( task->measure[0]->measure.Flag_prtc6 & 0x01 ) {
+        fault ++;
+    }
+    // 急停
+    if ( task->measure[0]->measure.Flag_prtc6 & 0x40 ) {
+        fault ++;
+    }
+
+    if ( fault ) {
+        bit_clr(task, F_SYSTEM_CHARGE_ALLOW);
+    } else {
+        bit_set(task, F_SYSTEM_CHARGE_ALLOW);
+    }
 
     switch ( job->job_status ) {
     case JOB_IDLE:
@@ -656,6 +718,16 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         ret = __is_gun_phy_conn_ok(job);
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
+        }
+
+        // 连接完成 立即锁闭电子锁
+        if ( job->job_gun_sn == GUN_SN0 ) {
+            bit_set(tsk, CMD_GUN_1_LOCK_ON);
+            log_printf(INF, "ZEUS: 电子锁闭合");
+        }
+        if ( job->job_gun_sn == GUN_SN1 ) {
+            bit_set(tsk, CMD_GUN_2_LOCK_ON);
+            log_printf(INF, "ZEUS: 电子锁闭合");
         }
 
         // 充电模式为自动充电，需要和BMS通信，此时才需要将辅助电源合闸
@@ -689,16 +761,6 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(%X)",
                        job->job_status);
             break;
-        }
-
-        // 连接完成 立即锁闭电子锁
-        if ( job->job_gun_sn == GUN_SN0 ) {
-            bit_set(tsk, CMD_GUN_1_LOCK_ON);
-            log_printf(INF, "ZEUS: 电子锁闭合");
-        }
-        if ( job->job_gun_sn == GUN_SN1 ) {
-            bit_set(tsk, CMD_GUN_2_LOCK_ON);
-            log_printf(INF, "ZEUS: 电子锁闭合");
         }
 
         job->job_status = JOB_WORKING;
