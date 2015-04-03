@@ -1284,7 +1284,7 @@ static inline void calc_crc16(unsigned short *crc, unsigned short  crcbuf)
 }
 
 //多字节CRC16计算
-static inline unsigned short load_crc(unsigned short cnt, char *dat)
+static inline unsigned short load_crc(unsigned short cnt, unsigned char *dat)
 {
      unsigned short i;
      unsigned short crc=0xffff;
