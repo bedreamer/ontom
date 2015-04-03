@@ -27,6 +27,7 @@ int ajax_system_config_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_options_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_save_proc(struct ajax_xml_struct *thiz);
 int ajax_system_detail_proc(struct ajax_xml_struct *thiz);
+int ajax_system_do_active(struct ajax_xml_struct *thiz);
 
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
@@ -1536,6 +1537,29 @@ int ajax_system_detail_proc(struct ajax_xml_struct *thiz)
 die:
     return ret;
 }
+
+int ajax_system_do_active(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"VA\":\"%.1f V\",", task->meter[0].Va);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"VB\":\"%.1f V\",", task->meter[0].Vb);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"VC\":\"%.1f V\",", task->meter[0].Vc);
+
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+die:
+    return ret;
+}
+
 
 int ajax_card_init_proc(struct ajax_xml_struct *thiz)
 {

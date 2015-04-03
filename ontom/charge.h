@@ -1018,6 +1018,9 @@ struct charge_task {
     double bus_correct_I;
     double bus_read_I;
     // }}
+
+    // 授权序号, BCD 码
+    unsigned char bcd_auth_code[16];
 };
 
 /* 系统信号定义
@@ -1057,6 +1060,8 @@ typedef enum {
     F_CARDING_CONFIRM,
     // 充电结束刷卡完成
     F_CARDING_SETTLE,
+    // 充电指示灯
+    F_CHARGE_LED,
 
     // 系统人为条件可以充电
     F_MANUAL_CHARGE_ALLOW, // 人为禁止充电

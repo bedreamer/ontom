@@ -646,11 +646,13 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         job->job_status = JOB_STANDBY;
+        bit_clr(tsk, F_CHARGE_LED);
         break;
     case JOB_STANDBY:
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        bit_clr(tsk, F_CHARGE_LED);
         ret = __is_gun_phy_conn_ok(job);
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
@@ -689,6 +691,16 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
+        // 连接完成 立即锁闭电子锁
+        if ( job->job_gun_sn == GUN_SN0 ) {
+            bit_set(tsk, CMD_GUN_1_LOCK_ON);
+            log_printf(INF, "ZEUS: 电子锁闭合");
+        }
+        if ( job->job_gun_sn == GUN_SN1 ) {
+            bit_set(tsk, CMD_GUN_2_LOCK_ON);
+            log_printf(INF, "ZEUS: 电子锁闭合");
+        }
+
         job->job_status = JOB_WORKING;
         sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
                 job->job_status, job->job_url_commit_timestamp);
@@ -696,6 +708,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
         break;
     case JOB_WORKING:
+        bit_set(tsk, F_CHARGE_LED);
+
         if ( job->charge_mode != CHARGE_AUTO ) {
             sprintf(buff, "%d", (unsigned int)(job->need_V * 10.0f) );
             config_write("需求电压", buff);
@@ -841,6 +855,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_ERR_PAUSE:
+        bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
@@ -857,6 +872,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_MAN_PAUSE:
+        bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         if ( bit_read(job, CMD_JOB_ABORT) ) {
@@ -881,23 +897,36 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_RESUMING:
+        bit_clr(tsk, F_CHARGE_LED);
         job->job_status = JOB_WORKING;
         break;
     case JOB_ABORTING:
+        bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         job->job_status = JOB_DETACHING;
         break;
     case JOB_DONE:
+        bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_EXITTING:
+        bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_DETACHING:
-        if ( job->job_status > JOB_WORKING ){
+        bit_clr(tsk, F_CHARGE_LED);
+        if ( job->job_gun_sn == GUN_SN0 ) {
+            bit_clr(tsk, CMD_GUN_1_LOCK_ON);
+            log_printf(INF, "ZEUS: 电子锁已经断开，等待充电枪拔出.");
+        }
+        if ( job->job_gun_sn == GUN_SN1 ) {
+            bit_clr(tsk, CMD_GUN_2_LOCK_ON);
+            log_printf(INF, "ZEUS: 电子锁已经断开，等待充电枪拔出.");
+        }
+        if ( job->job_status >= JOB_WORKING ){
             bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
             bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
             bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
