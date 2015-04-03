@@ -1357,7 +1357,7 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
         } else {
             bit_clr(task, S_FLQ_ERROR);
         }
-        if ( box.Flag_prtc6 & 0x20 ) {
+        if ( box->Flag_prtc6 & 0x20 ) {
             len += sprintf(&errstr[len], "[%d: 交流输入跳闸] ", ++errnr);
             bit_set(task, S_AC_SWITCH_TRIP);
         } else {
