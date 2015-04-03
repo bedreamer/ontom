@@ -1357,13 +1357,13 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
         } else {
             bit_clr(task, S_FLQ_ERROR);
         }
-        if ( bot.Flag_prtc6 & 0x20 ) {
+        if ( box.Flag_prtc6 & 0x20 ) {
             len += sprintf(&errstr[len], "[%d: 交流输入跳闸] ", ++errnr);
             bit_set(task, S_AC_SWITCH_TRIP);
         } else {
             bit_clr(task, S_AC_SWITCH_TRIP);
         }
-        if ( bot.Flag_prtc6 & 0x40 ) {
+        if ( box->Flag_prtc6 & 0x40 ) {
             len += sprintf(&errstr[len], "[%d: 急停] ", ++errnr);
             bit_set(task, S_HALT);
         } else {
