@@ -2466,7 +2466,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        buff[ nr ++ ] = (unsigned char)(me->_private);
+        buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
         buff[ nr ++ ] = 0x03;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
@@ -2594,7 +2594,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
 }
 
 unsigned char check_sum(unsigned char *buff, size_t len) {
-    int i = 0;
+    unsigned int i = 0;
     unsigned char sum = 0;
     while ( i < len ) {
         sum = sum + buff[i ++];
@@ -2704,7 +2704,7 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         buff[ nr ++ ] = 0x11;
         buff[ nr ++ ] = 0x04;
         buff[ nr ++ ] = 0x00 + 0x33;
-        buff[ nr ++ ] = 0xFF + 0x33;
+        buff[ nr ++ ] = (unsigned char)(0xFF + 0x33);
         buff[ nr ++ ] = 0x00 + 0x33;
         buff[ nr ++ ] = 0x00 + 0x33;
 
@@ -3104,7 +3104,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                     }
 
                     if ( ! faile ) {
-                        unsigned int money = *(unsigned int *)cd.card.sector_4.data.remain_money;
+                        unsigned int money = *(unsigned int *)(void*)cd.card.sector_4.data.remain_money;
                         money &= 0x00FFFFFF;
                         log_printf(INF, GRN("UART: 刷卡完成[卡号: %02X%02X%02X%02X, 余额: %.2f]"),
                                    ID[3], ID[2], ID[1], ID[0], money / 100.0f);
@@ -3600,7 +3600,6 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
             }
             query_stat = SEQ_FIND_CARD;
             ret = ERR_OK;
-            break;
             break;
         default:
             break;
