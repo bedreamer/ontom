@@ -3011,7 +3011,6 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
 
     int ret = ERR_ERR;
     unsigned char buff[64];
-    unsigned char public_buff[16];
     int nr = 0;
 
     switch (evt) {
