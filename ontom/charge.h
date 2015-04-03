@@ -1021,6 +1021,8 @@ struct charge_task {
 
     // 授权序号, BCD 码
     unsigned char bcd_auth_code[16];
+    // 网卡MAC  地址
+    unsigned char mac_addr[32];
 };
 
 /* 系统信号定义
@@ -1191,8 +1193,8 @@ typedef enum {
     system_reserve7,
     system_reserve8,
     system_reserve9,
-    system_reserve10,
-    system_reserve11,
+    S_AC_SWITCH_TRIP,
+    S_HALT,
     system_reserve12,
     system_reserve13,
     system_reserve14,

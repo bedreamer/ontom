@@ -1541,23 +1541,29 @@ die:
 int ajax_system_do_active(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
+    struct ifaddrs * ifa=NULL, *ifaddr = NULL;
+    char host[128];
 
     thiz->ct = "application/json";
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"active\":{");
 
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"VA\":\"%.1f V\",", task->meter[0].Va);
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"VB\":\"%.1f V\",", task->meter[0].Vb);
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"VC\":\"%.1f V\",", task->meter[0].Vc);
+    getifaddrs(&ifaddr);
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == NULL)  continue;
+        if (ifa->ifa_addr->sa_family==AF_INET) { // check it is IP4 is a valid IP4 Address
+            getnameinfo(ifa->ifa_addr,
+                        sizeof(struct sockaddr_in),
+                        host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
+                    ifa->ifa_name, host);
+        }
+    }
+    freeifaddrs(ifaddr);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
-die:
-    return ret;
 }
 
 

@@ -611,6 +611,20 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
 {
     int ei, n = 0;
 
+    // 判定充电机组故障
+    // 当全部的充电机故障后才可判定充电机组故障
+    ei = 0;
+    for ( n = 0; n < tsk->modules_nr; n ++ ) {
+        if ( bit_read(tsk, S_CHARGE_M_1_ERR + n) ) {
+           ei ++;
+        }
+    }
+    if ( ei >= tsk->modules_nr ) {
+        bit_set(tsk, S_CHARGE_GROUP_ERR);
+    } else {
+        bit_clr(tsk, S_CHARGE_GROUP_ERR);
+    }
+
     for ( ei = S_ERROR + 1; ei < S_END; ei ++ ) {
         if ( bit_read(tsk, ei) ) {
             error_history_begin(thiz, ei, "N/A");
@@ -625,6 +639,7 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
     } else {
         bit_clr(task, S_ERROR);
     }
+
 
     return;
 }
@@ -690,6 +705,23 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
     }
     // 急停
     if ( task->measure[0]->measure.Flag_prtc6 & 0x40 ) {
+        fault ++;
+    }
+
+    // 综合采样盒通信故障
+    if ( bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
+        fault ++;
+    }
+    // 电能表通信故障
+    if ( bit_read(task, S_KWH_METER_COMM_DOWN) ) {
+        fault ++;
+    }
+    // 充电机组通信故障
+    if (bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+        fault ++;
+    }
+    // 充电机组故障
+    if ( bit_read(task, S_CHARGE_GROUP_ERR) ) {
         fault ++;
     }
 
