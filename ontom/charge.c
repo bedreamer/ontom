@@ -625,6 +625,7 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
         bit_clr(tsk, S_CHARGE_GROUP_ERR);
     }
 
+    n = 0;
     for ( ei = S_ERROR + 1; ei < S_END; ei ++ ) {
         if ( bit_read(tsk, ei) ) {
             error_history_begin(thiz, ei, "N/A");
