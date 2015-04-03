@@ -1586,7 +1586,7 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz)
                 (task->op_card.card.sector_4.data.passwd_code[1] & 0x0F) + '0',
                 (task->op_card.card.sector_4.data.passwd_code[1] >> 4) + '0',
                 (task->op_card.card.sector_4.data.passwd_code[2] & 0x0F) + '0',
-                (task->op_card.card.sector_4.data.passwd_code[3] >> 4) + '0');
+                (task->op_card.card.sector_4.data.passwd_code[2] >> 4) + '0');
     } else {
         if ( 0 == strcmp(op, "format") ) {
             task->op_card.card.sector_4.data.magic = 0x4F4E5057;
@@ -1723,7 +1723,7 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
-die:
+
     return ret;
 }
 
@@ -1783,7 +1783,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         }
     } else if ( job->job_status == JOB_DONE ) {
         ycdl = 100.0;
-    } else ;
+    } else {}
 
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
             "{\"status\":\"%s\","    // 状态
@@ -1804,7 +1804,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"gun_stat\":\"%s\""       // 充电枪连接状态
             "},",
             status_string[job->job_status],
-            job->job_url_commit_timestamp,
+            (unsigned int)job->job_url_commit_timestamp,
             job->job_gun_sn + 1,
             cmode_string[job->charge_mode],
             job->need_V,
