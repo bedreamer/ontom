@@ -3962,6 +3962,7 @@ ___fast_switch_2_rx:
                                                               &thiz->rx_param);
                     //thiz->master->check_err_cnt ++;
                     thiz->status = BP_UART_STAT_WR;
+                    thiz->continues_nr = 0;
                     Hachiko_pause(&thiz->rx_seed);
                     log_printf(WRN,
                                "UART: lenth fetched but check "RED("faile."));
