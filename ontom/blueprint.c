@@ -1142,7 +1142,7 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
     struct MDATA_ACK *box, *me_pre;
     char errstr[1024] = {0};
     char infstr[1024] = {0};
-    char cmd = 0;
+
     int need_echo = 0;
 
     switch (evt) {
@@ -1594,7 +1594,7 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
     int ret = ERR_ERR;
     char buff[64];
     char cmd;
-    int nr = 0, len = 0, len_i= 0;
+    int nr = 0, len = 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1888,13 +1888,8 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
 int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    int ret = ERR_ERR, nr = 0, len = 0, errnr = 0;
+    int ret = ERR_ERR, nr = 0, len = 0;
     char buff[32] = {0};
-    struct MDATA_ACK *box, *me_pre;
-    char errstr[1024] = {0};
-    char infstr[1024] = {0};
-    char cmd = 0;
-    int need_echo = 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
