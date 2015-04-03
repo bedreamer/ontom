@@ -3512,7 +3512,6 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
 
     int ret = ERR_ERR;
     unsigned char buff[64];
-    unsigned char public_buff[16];
     int nr = 0;
 
     switch (evt) {
@@ -3609,7 +3608,6 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        return ERR_ERR;
         switch ( query_stat ) {
         case SEQ_FIND_CARD:
             buff[ nr ++ ] = 0x08;
@@ -3657,6 +3655,7 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
             self->rx_param.need_bytes = 7;
             log_printf(DBG_LV3, "UART: %s:SEQ_SECTOR_RD_AUTH requested.", __FUNCTION__);
             ret = ERR_OK;
+            ret = ERR_ERR;
             break;
         case SEQ_READ_PUBLIC_BLK:
             buff[ nr ++ ] = 0x07;
