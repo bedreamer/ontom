@@ -254,7 +254,7 @@ struct bp_uart {
     // 接收参数
     struct bp_evt_param rx_param;
     // 接收缓冲区
-    char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
+    unsigned char rx_buff[CONFIG_BP_IO_BUFF_SIZE];
     // 发送参数
     struct bp_evt_param tx_param;
     // 发送缓冲区
