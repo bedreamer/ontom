@@ -18,11 +18,4 @@ int log_printf(unsigned int level, const char *fmt, ...);
 #define RED(s) "\033[31m"s"\033[0m"
 #define YEL(s) "\033[33m"s"\033[0m"
 #define debug_log log_printf
-static inline __log_printf(int l, const char * f)
-{
-    log_printf(__LINE__, DBG, "%s:%d tracked.", f, l);
-}
-
-#define debug_track() __log_printf(__LINE__, __FILE__)
-
 #endif
