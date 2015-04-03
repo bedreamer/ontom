@@ -279,7 +279,7 @@ void uarts_async_sigio(int param)
 #endif
 }
 
-static inline void __dump_uart_hex(char *hex, int len, unsigned int lv)
+static inline void __dump_uart_hex(unsigned char *hex, int len, unsigned int lv)
 {
     char buff[1024] = {0};
     int i = 0 ,l = 0, j =0;
@@ -677,7 +677,7 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    char buff[8];
+    unsigned char buff[8];
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -769,7 +769,7 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, i;
-    char buff[8];
+    unsigned char buff[8];
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1061,7 +1061,7 @@ int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    char buff[8];
+    unsigned char buff[8];
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1138,7 +1138,7 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, nr = 0, len = 0, errnr = 0;
-    char buff[32] = {0};
+    unsigned char buff[32] = {0};
     struct MDATA_ACK *box, *me_pre;
     char errstr[1024] = {0};
     char infstr[1024] = {0};
@@ -1592,7 +1592,7 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    char buff[64];
+    unsigned char buff[64];
     char cmd;
     int nr = 0, len = 0;
 
@@ -1741,7 +1741,7 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, nr  = 0, len;
-    char buff[32];
+    unsigned char buff[32];
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1889,7 +1889,7 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR, nr = 0, len = 0;
-    char buff[32] = {0};
+    unsigned char buff[32] = {0};
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -2006,7 +2006,7 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
 int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0, len;
 
     int ret = ERR_ERR;
@@ -2110,7 +2110,7 @@ int simple_box_correct_refer_V_evt_handle(struct bp_uart *self, struct bp_user *
 int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0, len;
     int i, j;
 
@@ -2237,7 +2237,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0, len;
 
     int ret = ERR_ERR;
@@ -2432,7 +2432,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0, len;
 
     switch (evt) {
@@ -2524,7 +2524,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
 int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0, len;
     int ret = ERR_ERR;
     switch (evt) {
@@ -2606,7 +2606,7 @@ unsigned char check_sum(unsigned char *buff, size_t len) {
 int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0;
     int ret = ERR_ERR;
     switch (evt) {
@@ -2758,7 +2758,7 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
 int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0;
     int ret = ERR_ERR;
     switch (evt) {
@@ -2877,7 +2877,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
 int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    char buff[32];
+    unsigned char buff[32];
     int nr = 0;
     int ret = ERR_ERR;
     switch (evt) {
@@ -3010,7 +3010,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
     static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
     int ret = ERR_ERR;
-    char buff[64];
+    unsigned char buff[64];
     unsigned char public_buff[16];
     int nr = 0;
 
@@ -3309,7 +3309,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
     static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
     int ret = ERR_ERR;
-    char buff[64];
+    unsigned char buff[64];
     unsigned char public_buff[16];
     int nr = 0;
 
@@ -3512,7 +3512,7 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
     static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
     int ret = ERR_ERR;
-    char buff[64];
+    unsigned char buff[64];
     unsigned char public_buff[16];
     int nr = 0;
 
@@ -3715,7 +3715,7 @@ int uart_sniffer_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
         static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
         int ret = ERR_ERR;
-        char buff[64];
+        unsigned char buff[64];
         unsigned char public_buff[16];
         int nr = 0;
 
