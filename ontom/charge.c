@@ -845,6 +845,10 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 bit_set(tsk, CMD_GUN_2_OUTPUT_ON);
             }
 
+            job->charged_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
+            job->charged_kwh = time(NULL) - job->charge_begin_timestamp;
+            job->charged_money = job->charged_kwh * task->kwh_price;
+
             // 有新的充电状态变化
             if ( start ) {
                 sprintf(sql, "INSERT INTO job_billing VALUES("
