@@ -846,7 +846,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             }
 
             job->charged_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
-            job->charged_kwh = time(NULL) - job->charge_begin_timestamp;
+            job->charged_time = time(NULL) - job->charge_begin_timestamp;
             job->charged_money = job->charged_kwh * task->kwh_price;
 
             // 有新的充电状态变化
