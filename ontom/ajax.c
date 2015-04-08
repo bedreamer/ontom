@@ -726,7 +726,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
         if ( 0 != strcmp(job_id, "N/A") ) {
             task->ui_job_id = __atoh(job_id);
             if ( task->uipage != UI_PAGE_JOBS ) {
-                log_printf(INF, "AJAX: UI界面在任务详情页面");
+                log_printf(DBG_LV1, "AJAX: UI界面在任务详情页面");
             }
             task->uipage = UI_PAGE_JOBS;
         } else {
@@ -1804,7 +1804,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"kwh_price\":\"%.2f\","   // 充电单价
             "\"used_kwh\":\"%.2f\","    // 已充电量
             "\"used_time\":\"%.2f\","    // 已充时长
-            "\"used_money\":\"%.2f\","    // 已充电费
+            "\"used_money\":\"%.3f\","    // 已充电费
             "\"gun_stat\":\"%s\""       // 充电枪连接状态
             "},",
             status_string[job->job_status],
