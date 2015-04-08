@@ -6,7 +6,7 @@ int log_printf(unsigned int level, const char *fmt, ...)
 	va_list ap;
     //char *lvlstr[] = {"INF", "WRN", "ERR", "DBG"};
     const char *cfg;
-    char timestamp[20] = {0}, btid[16] = {0};
+    char timestamp[20] = {0};
 
 	va_start(ap, fmt);
     __get_timestamp(timestamp);

@@ -58,9 +58,9 @@ CONFIG_DOMAIN_BEGIN
    // 充电模块个数
 {"charge_module_nr",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"14"}},
 {"charger_comm_methord",        C_STRING,   yes,    C_VALID,    .cuv.i=0,       {"CAN"}},
-{"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5000"}},
-{"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"5000"}},
-{"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"300"}},
+{"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
+{"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
+{"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
 
 // 定时器分辨率
 {"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"1000000"}},

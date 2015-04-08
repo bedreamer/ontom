@@ -1471,7 +1471,7 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
     thiz->error_seqid = task->err_seq_id_next ++;
     thiz->error_id = error_id;
     strncpy(thiz->error_string, error_string, 32);
-    strcpy(thiz->error_recover, "0000-00-00 00:00:00");
+    strcpy(thiz->error_recover, "0000-00-00 00:00:00.000");
 
     log_printf(INF, "ZEUS: 故障总数为: %d", task->err_nr);
 
