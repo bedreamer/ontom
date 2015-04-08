@@ -779,6 +779,8 @@ struct charge_job {
     double section_kwh;
     // 已经消耗的电能
     double charged_kwh;
+    // 当前阶段充电时长
+    unsigned int section_seconds;
     // 已经充电的时间长度，按秒计
     unsigned int charged_seconds;
     // 已经消费的数额, 按元记，精确到分

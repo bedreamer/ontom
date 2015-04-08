@@ -846,7 +846,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             }
 
             job->section_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
-            job->charged_seconds = time(NULL) - job->charge_begin_timestamp;
+            job->section_seconds = time(NULL) - job->charge_begin_timestamp;
             job->charged_money = (job->charged_kwh + job->section_kwh) * task->kwh_price;
 
             // 有新的充电状态变化
@@ -884,13 +884,13 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                "终止电量: %.2f KWH, 充电电量: %.2f KWH",
                                job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
-                               job->charged_kwh + job->section_kwh);
+                               used_kwh);
                     job->job_status = JOB_DONE;
                     end ++;
                 }
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_TIME ) {
-                if ( time(NULL) - job->charge_begin_timestamp >=
-                     job->charge_billing.option.set_time ) {
+                unsigned int used_seconds = job->charged_seconds + job->section_seconds;
+                if ( used_seconds >= job->charge_billing.option.set_time ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -898,8 +898,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                "终止时戳: %ld, 充电时长: %ld 秒",
                                job->charge_begin_timestamp,
                                job->charge_stop_timestamp,
-                               job->charge_stop_timestamp -
-                                job->charge_begin_timestamp);
+                               used_seconds);
                     job->job_status = JOB_DONE;
                     end ++;
                 }
@@ -933,6 +932,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             // 充电作业发生状态变化
             if ( end ) {
                 job->charged_kwh = job->charged_kwh + job->section_kwh;
+                job->charged_seconds = job->charged_seconds + job->section_seconds;
                 sprintf(sql,
                         "UPDATE job_billing SET b_end_timestamp='%ld',"
                         "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
@@ -948,11 +948,15 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                         job->job_url_commit_timestamp);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
                 job->section_kwh = 0;
+                job->charged_seconds = 0;
             }
 
         }
         break;
     case JOB_ERR_PAUSE:
+        config_write("需求电压", "4000");
+        config_write("初始电压", "4000");
+        config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
@@ -970,6 +974,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_MAN_PAUSE:
+        config_write("需求电压", "4000");
+        config_write("初始电压", "4000");
+        config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
@@ -999,22 +1006,34 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         job->job_status = JOB_WORKING;
         break;
     case JOB_ABORTING:
+        config_write("需求电压", "4000");
+        config_write("初始电压", "4000");
+        config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         job->job_status = JOB_DETACHING;
         break;
     case JOB_DONE:
+        config_write("需求电压", "4000");
+        config_write("初始电压", "4000");
+        config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_EXITTING:
+        config_write("需求电压", "4000");
+        config_write("初始电压", "4000");
+        config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_DETACHING:
+        config_write("需求电压", "4000");
+        config_write("初始电压", "4000");
+        config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         if ( job->job_gun_sn == GUN_SN0 ) {
             bit_clr(tsk, CMD_GUN_1_LOCK_ON);
