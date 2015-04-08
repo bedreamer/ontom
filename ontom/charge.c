@@ -948,7 +948,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                         job->job_url_commit_timestamp);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
                 job->section_kwh = 0;
-                job->charged_seconds = 0;
+                job->section_seconds = 0;
             }
 
         }
