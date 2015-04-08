@@ -1800,7 +1800,11 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"cremain\":\"%.2f 元\"," // 余额
             "\"CV\":\"%.1f V\","       // 充电电压
             "\"CI\":\"%.1f A\","       // 充电电流
-            "\"ycdl\":\"%.2f %%\","       // 已充电量
+            "\"ycdl\":\"%.2f %%\","    // 充电进度
+            "\"kwh_price\":\"%.2f\","   // 充电单价
+            "\"used_kwh\":\"%.2f\","    // 已充电量
+            "\"used_time\":\"%.2f\","    // 已充时长
+            "\"used_money\":\"%.2f\","    // 已充电费
             "\"gun_stat\":\"%s\""       // 充电枪连接状态
             "},",
             status_string[job->job_status],
@@ -1818,6 +1822,10 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             __bytes2double(b2l(task->measure[0]->measure.VinKM0 )),
             __bytes2double(b2l(task->measure[0]->measure.IoutBAT0)),
             ycdl,
+            task->kwh_price,
+            job->charged_kwh,
+            job->charged_seconds/60,
+            job->charged_money,
             buff
             );
 }
