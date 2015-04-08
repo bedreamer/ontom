@@ -845,9 +845,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 bit_set(tsk, CMD_GUN_2_OUTPUT_ON);
             }
 
-            job->charged_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
+            job->section_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
             job->charged_seconds = time(NULL) - job->charge_begin_timestamp;
-            job->charged_money = job->charged_kwh * task->kwh_price;
+            job->charged_money = (job->charged_kwh + job->section_kwh) * task->kwh_price;
 
             // 有新的充电状态变化
             if ( start ) {
@@ -862,8 +862,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
 
             //{{ 在这做是否充完判定
             if (job->charge_billing.mode == BILLING_MODE_AS_CAP ) {
-                if ( task->meter[0].kwh_zong - job->charge_begin_kwh_data >=
-                     job->charge_billing.option.set_kwh ) {
+                if ( job->charged_kwh + job->section_kwh >= job->charge_billing.option.set_kwh ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -871,13 +870,12 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                "终止电量: %.2f KWH, 充电电量: %.2f KWH",
                                job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
-                               task->meter[0].kwh_zong -
-                                job->charge_begin_kwh_data);
+                               job->charged_kwh + job->section_kwh);
                     job->job_status = JOB_DONE;
                     end ++;
                 }
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
-                double used_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
+                double used_kwh = job->charged_kwh + job->section_kwh;
                 if ( used_kwh * task->kwh_price >= job->charge_billing.option.set_money ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
@@ -886,8 +884,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                "终止电量: %.2f KWH, 充电电量: %.2f KWH",
                                job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
-                               task->meter[0].kwh_zong -
-                                job->charge_begin_kwh_data);
+                               job->charged_kwh + job->section_kwh);
                     job->job_status = JOB_DONE;
                     end ++;
                 }
@@ -935,6 +932,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
 
             // 充电作业发生状态变化
             if ( end ) {
+                job->charged_kwh = job->charged_kwh + job->section_kwh;
                 sprintf(sql,
                         "UPDATE job_billing SET b_end_timestamp='%ld',"
                         "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
@@ -949,6 +947,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                         job->job_status,
                         job->job_url_commit_timestamp);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+                job->section_kwh = 0;
             }
 
         }

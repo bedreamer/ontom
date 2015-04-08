@@ -775,6 +775,8 @@ struct charge_job {
     // 终止充电时的电表度数
     double charge_exit_kwh_data;
 
+    // 当前充电阶段使用的电能
+    double section_kwh;
     // 已经消耗的电能
     double charged_kwh;
     // 已经充电的时间长度，按秒计

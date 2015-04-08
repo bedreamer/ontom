@@ -1823,7 +1823,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             __bytes2double(b2l(task->measure[0]->measure.IoutBAT0)),
             ycdl,
             task->kwh_price,
-            job->charged_kwh,
+            job->charged_kwh + job->section_kwh,
             job->charged_seconds/60,
             job->charged_money,
             buff
