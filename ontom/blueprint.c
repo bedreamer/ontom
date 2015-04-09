@@ -2174,7 +2174,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         }
         for (; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
             bit_clr(task, S_CHARGE_M_1_ERR + i);
-            task->modules_on_off[n] = 0x00;
+            task->modules_on_off[i] = 0x00;
         }
 
         if ( bit_read(task, CMD_MODULE_OFF) || bit_read(task, CMD_MODULE_ON) ) {
@@ -2199,7 +2199,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
                 if ( task->modules_on_off[n] == 0x80 ) {
                     on ++;
                 } else if ( task->modules_on_off[n] == 0x81 ) {
-                    of ++;
+                    off ++;
                 } else {
                 }
             }
