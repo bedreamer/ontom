@@ -2180,7 +2180,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         if ( bit_read(task, CMD_MODULE_OFF) || bit_read(task, CMD_MODULE_ON) ) {
             for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++ ) {
                 // 清理模块开关机标志
-                kn = b2l(task->chargers[0]->chargers.charge_module_status[n/2]);
+                kn = b2l(task->chargers[0]->chargers.charge_module_status[i/2]);
                 if ( i % 2 ) {
                     kn = kn >> 8;
                 } else {
