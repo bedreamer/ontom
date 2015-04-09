@@ -323,13 +323,13 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         // 整流模块
         for (i = 0; i < t->modules_nr; i ++ ) {
             u._private = i + 1;
-            log_printf(INF, "ZEUS: 绑定串口模组(模块)[ %s.%s:%d ] <==>  %s.",
+            log_printf(INF, "ZEUS: 绑定串口模组(模块)[ %s.%s:%d ] <==>  %s.--- %s",
                        text[0], text[1], i +1, bp->dev_name,
                     bp_user_bind(bp, &u) ? RED("ERR"):GRN("OK"));
         }
         return 0;
     } else {
-        log_printf(INF, "ZEUS: 绑定串口模组[ %s.%s ] <==>  %s.",
+        log_printf(INF, "ZEUS: 绑定串口模组[ %s.%s ] <==>  %s.--- %s",
                    text[0], text[1], bp->dev_name,
                 bp_user_bind(bp, &u) ? RED("ERR"):GRN("OK"));
     }
