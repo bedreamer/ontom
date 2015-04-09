@@ -2323,7 +2323,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = task->modules_nr >> 8;
         buff[nr ++] = task->modules_nr & 0xFF;
         buff[nr ++] = task->charge_stat >> 8;
-        buff[nr ++] = 1;
+        buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON) ||
+                       bit_read(task, CMD_GUN_2_OUTPUT_ON)) ? 1 : 0;
 
         self->rx_param.need_bytes = 0;
 
