@@ -2303,8 +2303,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 
         buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
-        buff[nr ++] = ((unsigned short)((10 * (atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
-        buff[nr ++] = ((unsigned short)((10 * (atof(config_read("需求电流"))))) / task->modules_nr) & 0xFF;
+        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
+        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) & 0xFF;
         buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
@@ -2316,8 +2316,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         if ( task->modules_nr == 0 ) {
             task->modules_nr = 1;
         }
-        buff[nr ++] = ((unsigned short)((10 * (atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
-        buff[nr ++] = ((unsigned short)((10 * (atof(config_read("需求电流"))))) / task->modules_nr) & 0xFF;
+        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
+        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) & 0xFF;
         buff[nr ++] = task->modules_nr >> 8;
         buff[nr ++] = task->modules_nr & 0xFF;
         buff[nr ++] = task->charge_stat >> 8;
