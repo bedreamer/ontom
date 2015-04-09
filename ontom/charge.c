@@ -138,8 +138,6 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
             task->running_V = atof(text[3]);
         } else if( 0 == strcmp(text[1], "modules_nr") ) {
             task->modules_nr = (unsigned short)atoi(text[3]);
-        } else if ( 0 == strcmp(text[1], "modules_on_off") ) {
-            task->modules_on_off = (unsigned short)atoi(text[3]);
         }
     }
 _done:
@@ -218,23 +216,23 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
 
     if ( 0 == strcmp(text[0], "system_type") ) {
         task->sys_type = atoi(text[1]);
-        log_printf(INF, "ZEUS: 系统类型: %d", task->sys_type);
+        printf(INF, "系统类型: %d", task->sys_type);
     } else if ( 0 == strcmp(text[0], "module_kind") ) {
         task->module_model = atoi(text[1]);
-        log_printf(INF, "ZEUS: 模块型号: %d", task->module_model);
+        printf(INF, "模块型号: %d", task->module_model);
     } else if ( 0 == strcmp(text[0], "module_count") ) {
         task->modules_nr = atoi(text[1]);
-        log_printf(INF, "ZEUS: 模块个数: %d", task->modules_nr);
+        printf(INF, "模块个数: %d", task->modules_nr);
     } else if ( 0 == strcmp(text[0], "kwh_price") ) {
         task->kwh_price = atof(text[1]);
-        log_printf(INF, "ZEUS: 单位电价: %.1f", task->kwh_price);
+        printf(INF, "单位电价: %.1f", task->kwh_price);
     } else if ( 0 == strcmp(text[0], "kwh_meter_addr") ) {
         memcpy(task->meter[0].addr, text[1], 12);
         task->meter[0].addr[12] = '\0';
-        log_printf(INF, "ZEUS: 电表地址: %s", task->meter[0].addr);
+        printf(INF, "电表地址: %s", task->meter[0].addr);
     } else if ( 0 == strcmp(text[0], "work_mode") ) {
         strncpy(task->sys_work_mode, text[1], 32);
-        log_printf(INF, "ZEUS: 工作模式: %s", text[1]);
+        printf(INF, "工作模式: %s", text[1]);
     }
     return 0;
 }
@@ -260,6 +258,8 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         // {{ 这个顺序不要调换，为了规避读卡器导致的模块转换盒通信中断问题。
         {"00000007", ANC01_convert_box_write_evt_handle},
         {"00000008", ANC01_convert_box_read_evt_handle},
+        {"00000013", ANC01_convert_box_module_on_evt_handle},
+        {"00000014", ANC01_convert_box_module_off_evt_handle},
         // }}
         {"00000009", Increase_convert_box_write_evt_handle},
         {"M000000A", Increase_convert_box_read_evt_handle},
@@ -363,7 +363,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->running_I = 0.0;
     task->modules_nr = 14;
     task->charge_stat = 0x0000; // 不充电
-    task->modules_on_off = 0x0000; // 全开机
+    memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
 
     sprintf(sql, "SELECT * FROM configs");

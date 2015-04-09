@@ -1010,8 +1010,8 @@ struct charge_task {
     /*模块型号*/
     MODULE_MODEL module_model;
 
-    /*模块开关机*/
-    unsigned short modules_on_off;
+    /*模块开关机, 0x00: 无动作， 0x80: 开机, 0x81: 关机*/
+    unsigned char modules_on_off[CONFIG_SUPPORT_CHARGE_MODULE];
     //}}
 
     // {{ 电压电流校准参数
@@ -1028,6 +1028,7 @@ struct charge_task {
     // 网卡MAC  地址
     unsigned char mac_addr[32];
 };
+
 
 /* 系统信号定义
  * 前 128个信号为系统标记

@@ -2113,6 +2113,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     unsigned char buff[32];
     int nr = 0, len;
     int i, j;
+    unsigned short kn, on =0, off = 0;
 
     int ret = ERR_ERR;
     switch (evt) {
@@ -2173,6 +2174,45 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         }
         for (; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
             bit_clr(task, S_CHARGE_M_1_ERR + i);
+            task->modules_on_off[n] = 0x00;
+        }
+
+        if ( bit_read(task, CMD_MODULE_OFF) || bit_read(task, CMD_MODULE_ON) ) {
+            for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++ ) {
+                // 清理模块开关机标志
+                kn = b2l(task->chargers[0]->chargers.charge_module_status[n/2]);
+                if ( n % 2 ) {
+                    kn = kn >> 8;
+                } else {
+                    kn = kn & 0xFF;
+                }
+                if ( task->modules_on_off[n] == 0x80 && !(kn>>4) ) {
+                    log_printf(INF, "UART: 模块%d已经开机", n + 1);
+                    task->modules_on_off[n] = 0x00;
+                }
+                if ( task->modules_on_off[n] == 0x81 && (kn>>4) ) {
+                    log_printf(INF, "UART: 模块%d已经关机", n + 1);
+                    task->modules_on_off[n] = 0x00;
+                }
+            }
+            for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++ ) {
+                if ( task->modules_on_off[n] == 0x80 ) {
+                    on ++;
+                } else if ( task->modules_on_off[n] == 0x81 ) {
+                    of ++;
+                } else {
+                }
+            }
+            if ( on ) {
+                bit_set(task, CMD_MODULE_ON);
+            } else {
+                bit_clr(task, CMD_MODULE_ON);
+            }
+            if ( off ) {
+                bit_set(task, CMD_MODULE_OFF);
+            } else {
+                bit_set(task, CMD_MODULE_OFF);
+            }
         }
         break;
     // 串口发送数据请求
@@ -2253,55 +2293,38 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        if ( bit_read(task, CMD_MODULE_ON )) {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x06;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x64;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
-            self->rx_param.need_bytes = 0;
-        } else if ( bit_read(task, CMD_MODULE_OFF) ) {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x06;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x65;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) >> 8;
-            buff[nr ++] = (task->modules_on_off&0x7FFF) & 0xFF;
-            self->rx_param.need_bytes = 0;
-        } else {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x10;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x09;
-            buff[nr ++] = 0x12;
+        buff[nr ++] = 0xFF;
+        buff[nr ++] = 0x10;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x09;
+        buff[nr ++] = 0x12;
 
-            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
-            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
-            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-            if ( task->modules_nr == 0 ) {
-                task->modules_nr = 1;
-            }
-            buff[nr ++] = ((unsigned short)((10 * (atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
-            buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
-            buff[nr ++] = task->modules_nr >> 8;
-            buff[nr ++] = task->modules_nr & 0xFF;
-            buff[nr ++] = task->charge_stat >> 8;
-            buff[nr ++] = task->charge_stat & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_output_I))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+        buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
+        buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
+        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+        if ( task->modules_nr == 0 ) {
+            task->modules_nr = 1;
+        }
+        buff[nr ++] = ((unsigned short)((10 * (atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
+        buff[nr ++] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
+        buff[nr ++] = task->modules_nr >> 8;
+        buff[nr ++] = task->modules_nr & 0xFF;
+        buff[nr ++] = task->charge_stat >> 8;
+        buff[nr ++] = task->charge_stat & 0xFF;
 
-            self->rx_param.need_bytes = 0;
-         }
+        self->rx_param.need_bytes = 0;
+
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
@@ -2320,11 +2343,6 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     // 串口数据发送完成事件
     case BP_EVT_TX_FRAME_DONE:
         log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
-        if ( bit_read(task, CMD_MODULE_ON) ) {
-            bit_clr(task, CMD_MODULE_ON);
-        } else if ( bit_read(task, CMD_MODULE_OFF ) ) {
-            bit_clr(task, CMD_MODULE_OFF);
-        }
         break;
     // 串口接收单个字节超时，出现在接收帧的第一个字节
     case BP_EVT_RX_BYTE_TIMEOUT:
@@ -2344,6 +2362,167 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     }
     return ret;
 }
+
+// 配置转换盒数据-模块开机
+int ANC01_convert_box_module_on_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    unsigned char buff[32];
+    int nr = 0, len, i, ok = 0;
+    static int on_seq = 0;
+
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        ret = ERR_OK;
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        if ( bit_read(task, CMD_MODULE_ON ) ) {
+            for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++) {
+                if ( task->modules_on_off[ on_seq ] == 0x80 ) {
+                    break;
+                }
+                if ( ++ on_seq >= task->modules_nr ) on_seq = 0;
+            }
+            if ( ok == 0 ) {
+                // 没有要开机的模块
+                break;
+            }
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x06;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x64;
+            buff[nr ++] = (on_seq + 1) >> 8;
+            buff[nr ++] = (on_seq + 1) & 0xFF;
+            self->rx_param.need_bytes = 0;
+            on_seq ++;
+        } else {
+            break;
+        }
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
+
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 配置转换盒数据-模块关机
+int ANC01_convert_box_module_off_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    unsigned char buff[32];
+    int nr = 0, len, i, ok = 0;
+    static int off_seq = 0;
+
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        ret = ERR_OK;
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        if ( bit_read(task, CMD_MODULE_OFF) ) {
+            for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++) {
+                if ( task->modules_on_off[ off_seq ] == 0x80 ) {
+                    break;
+                }
+                if ( ++ off_seq >= task->modules_nr ) off_seq = 0;
+            }
+            if ( ok == 0 ) {
+                // 没有要开机的模块
+                break;
+            }
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x06;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x65;
+            buff[nr ++] = (off_seq + 1) >> 8;
+            buff[nr ++] = (off_seq + 1) & 0xFF;
+            self->rx_param.need_bytes = 0;
+        } else {
+            break;
+         }
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
+
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
 
 //CRC码表高字节
 unsigned char Increase_gabyCRCHi[] =
