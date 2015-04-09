@@ -324,7 +324,7 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
                      struct bp_evt_param *param);
 int ANC01_convert_box_module_on_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
-int ANC01_convert_box_module_off_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int ANC01_convert_box_module_off_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
