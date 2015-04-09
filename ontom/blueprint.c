@@ -2181,24 +2181,24 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
             for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++ ) {
                 // 清理模块开关机标志
                 kn = b2l(task->chargers[0]->chargers.charge_module_status[n/2]);
-                if ( n % 2 ) {
+                if ( i % 2 ) {
                     kn = kn >> 8;
                 } else {
                     kn = kn & 0xFF;
                 }
-                if ( task->modules_on_off[n] == 0x80 && !(kn>>4) ) {
-                    log_printf(INF, "UART: 模块%d已经开机", n + 1);
-                    task->modules_on_off[n] = 0x00;
+                if ( task->modules_on_off[i] == 0x80 && !(kn>>4) ) {
+                    log_printf(INF, "UART: 模块%d已经开机", i + 1);
+                    task->modules_on_off[i] = 0x00;
                 }
-                if ( task->modules_on_off[n] == 0x81 && (kn>>4) ) {
+                if ( task->modules_on_off[i] == 0x81 && (kn>>4) ) {
                     log_printf(INF, "UART: 模块%d已经关机", n + 1);
-                    task->modules_on_off[n] = 0x00;
+                    task->modules_on_off[i] = 0x00;
                 }
             }
             for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++ ) {
-                if ( task->modules_on_off[n] == 0x80 ) {
+                if ( task->modules_on_off[i] == 0x80 ) {
                     on ++;
-                } else if ( task->modules_on_off[n] == 0x81 ) {
+                } else if ( task->modules_on_off[i] == 0x81 ) {
                     off ++;
                 } else {
                 }
