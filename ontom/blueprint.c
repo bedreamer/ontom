@@ -2387,6 +2387,7 @@ int ANC01_convert_box_module_on_evt_handle(struct bp_uart *self, struct bp_user 
         if ( bit_read(task, CMD_MODULE_ON ) ) {
             for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++) {
                 if ( task->modules_on_off[ on_seq ] == 0x80 ) {
+                    ok = 1;
                     break;
                 }
                 if ( ++ on_seq >= task->modules_nr ) on_seq = 0;
@@ -2467,7 +2468,8 @@ int ANC01_convert_box_module_off_handle(struct bp_uart *self, struct bp_user *me
     case BP_EVT_TX_FRAME_REQUEST:
         if ( bit_read(task, CMD_MODULE_OFF) ) {
             for (i = 0; i < CONFIG_SUPPORT_CHARGE_MODULE && i < task->modules_nr; i ++) {
-                if ( task->modules_on_off[ off_seq ] == 0x80 ) {
+                if ( task->modules_on_off[ off_seq ] == 0x81 ) {
+                    ok = 1;
                     break;
                 }
                 if ( ++ off_seq >= task->modules_nr ) off_seq = 0;
