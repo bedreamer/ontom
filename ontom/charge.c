@@ -365,6 +365,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->charge_stat = 0x0000; // 不充电
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
+    bit_read(task, CMD_MODULE_ON);
 
     sprintf(sql, "SELECT * FROM configs");
     ret = sqlite3_exec(task->database, sql, sql_db_config_result, &done, &errmsg);

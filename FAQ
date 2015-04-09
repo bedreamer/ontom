@@ -1,0 +1,31 @@
+* 无刷卡器的情况下如何进行程序逻辑测试？
+	通过命令行工具创建作业即可
+	$ curl "http://$IP:8081/job/create.json?t=$timestamp&cid=$cardid&gun=$gunsn&remain=$remainmoney&passwd=$passwd&c_mode=$cmode{&set_V=$setI&set_I=$setI}&b_mode=$bmode&$b_mode_opt=$value"
+	参数说明:
+		$timestamp:  创建作业的时间戳，大于0即可
+		$cardid: 创建作业的卡片ID
+		$gunsn: 充电枪序号, 0 或 1
+		$remainmoney: 卡片内剩余余额
+		$passwd: 卡片验证密码
+		$c_mode: 充电模式, 可选项为: 
+			auto: 全自动充电;
+			BV:   恒压手动充电;
+			BI    恒流手动充电;
+		$set_V: 手动充电设置的充电电压
+		$set_I: 手动充电设置的充电电流
+		$b_mode: 计费模式。可选项为:
+			auto: 自动计费，按照充满为止，若是人工充电，则需要手动中止充电.
+			kwh: 按电能计费
+			cap: 同kwh
+			time: 按时间充电计费，单位为分钟
+			money: 按金额充电计费
+		$b_mode_opt: 计费中止选项, 可选项为：
+			b_money：按金额计费
+			b_kwh: 按电能计费
+			b_time: 按时间计费
+		$value: 计费中止值，仅在 $b_mode_opt != auto 下有效
+	例如：
+	IP: 192.168.1.61, 卡号为988766, 余额为234.5元, 密码为: 000000, 手动充电，设定充电模式为恒压充电(560.3V, 21A)，计费模式为按时间充电计费，共计充电60分钟
+	$ curl "http://192.168.1.61:8081/job/create.json?t=423434&cid=988766&gun=0&remain=234.5&passwd=000000&c_mode=BV&set_V=560.3&set_I=21&b_mode=time&b_time=60"
+	返回 status=PEDDING 或 status=OK, 标识创建作业成功, 此时可通过监控的查询作业页面看到创建好的充电作业。
+		
