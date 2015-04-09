@@ -216,23 +216,23 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
 
     if ( 0 == strcmp(text[0], "system_type") ) {
         task->sys_type = atoi(text[1]);
-        printf(INF, "系统类型: %d", task->sys_type);
+        printf("系统类型: %d", task->sys_type);
     } else if ( 0 == strcmp(text[0], "module_kind") ) {
         task->module_model = atoi(text[1]);
-        printf(INF, "模块型号: %d", task->module_model);
+        printf("模块型号: %d", task->module_model);
     } else if ( 0 == strcmp(text[0], "module_count") ) {
         task->modules_nr = atoi(text[1]);
-        printf(INF, "模块个数: %d", task->modules_nr);
+        printf("模块个数: %d", task->modules_nr);
     } else if ( 0 == strcmp(text[0], "kwh_price") ) {
         task->kwh_price = atof(text[1]);
-        printf(INF, "单位电价: %.1f", task->kwh_price);
+        printf("单位电价: %.1f", task->kwh_price);
     } else if ( 0 == strcmp(text[0], "kwh_meter_addr") ) {
         memcpy(task->meter[0].addr, text[1], 12);
         task->meter[0].addr[12] = '\0';
-        printf(INF, "电表地址: %s", task->meter[0].addr);
+        printf("电表地址: %s", task->meter[0].addr);
     } else if ( 0 == strcmp(text[0], "work_mode") ) {
         strncpy(task->sys_work_mode, text[1], 32);
-        printf(INF, "工作模式: %s", text[1]);
+        printf("工作模式: %s", text[1]);
     }
     return 0;
 }
