@@ -34,10 +34,10 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>  /* system data type definitions */
-#include <sys/socket.h> /* socket specific definitions */
-#include <netinet/in.h> /* INET constants and stuff */
-#include <arpa/inet.h>  /* IP address conversion stuff */
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
@@ -124,6 +124,7 @@
 #include "../thirdpart/mongoose/mongoose.h"
 #include "../thirdpart/D8/librf.h"
 #include "../thirdpart/sqlite/sqlite3.h"
+#include "../thirdpart/extso/exso.h"
 #include "list.h"
 #include "ajax.h"
 #include "config.h"
