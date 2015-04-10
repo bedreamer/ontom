@@ -37,6 +37,14 @@ typedef enum {
     GUN_UNDEFINE = 177
 }CHARGE_GUN_SN;
 
+static inline unsigned char check_sum(unsigned char *buff, size_t len) {
+    unsigned int i = 0;
+    unsigned char sum = 0;
+    while ( i < len ) {
+        sum = sum + buff[i ++];
+    }
+    return sum;
+}
 
 #pragma pack(1)
 /* 卡信息
