@@ -1646,24 +1646,6 @@ static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_job *thiz)
     }
 }
 
-static inline void __get_timestamp(char *outstring)
-{
-    time_t timep;
-    struct tm *p;
-    timep = time(NULL);
-    p =localtime(&timep);
-    struct timeval t_start;
-    gettimeofday(&t_start, NULL);
-    sprintf(outstring, "%04d-%02d-%02d %02d:%02d:%02d.%03ld",
-            p->tm_year + 1900,
-            p->tm_mon + 1,
-            p->tm_mday,
-            p->tm_hour,
-            p->tm_min,
-            p->tm_sec,
-            t_start.tv_usec / 1000);
-}
-
 static inline unsigned int __atoh(const char *hex)
 {
     unsigned int v = 0;
