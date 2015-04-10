@@ -1,6 +1,6 @@
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
-y-deps+=$(OBJS)
+m-deps+=$(OBJS)
 EX-OBJS+=build-in.a liblj.so
 
 build-in.a:$(OBJS)
