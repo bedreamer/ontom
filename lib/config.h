@@ -180,7 +180,7 @@ void config_print();
 #define config_print
 #endif /*CONFIG_DEBUG_CONFIG*/
 
-#define CONFIG_DOMAIN_BEGIN static struct config_struct configs[]={
+#define CONFIG_DOMAIN_BEGIN struct config_struct configs[]={
 #define CONFIG_DOMAIN_END {"", 0,   0,     0,  .cuv.i=0,    {""}} };
 
 #endif /*CONFIG_INCLUDED_H_*/
