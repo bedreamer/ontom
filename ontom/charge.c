@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "charge.h"
 
 struct charge_task tom;
 
