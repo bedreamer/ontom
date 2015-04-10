@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "ajax.h"
+#include "charge.h"
 
 // 生成xml文件，并返回文件大小，头部由调用者生成
 int ajax_deal_xml_proc(struct ajax_xml_struct *);
