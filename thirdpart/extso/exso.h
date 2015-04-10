@@ -43,7 +43,7 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
 /*
  * 退出.so扩展文件
  */
-struct exso_struct *exso_unload(struct exso_struct **head, struct exso_struct *exso);
+int exso_unload(struct exso_struct **head, struct exso_struct *exso);
 
 /*
  * 执行扩展的主函数
