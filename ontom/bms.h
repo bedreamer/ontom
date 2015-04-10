@@ -349,7 +349,6 @@ typedef enum {
     PGN_CEM = 0x001F00
 }CAN_PGN;
 
-#include "Hachiko.h"
 #include "charge.h"
 
 /*
