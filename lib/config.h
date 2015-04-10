@@ -183,4 +183,6 @@ void config_print();
 #define CONFIG_DOMAIN_BEGIN struct config_struct configs[]={
 #define CONFIG_DOMAIN_END {"", 0,   0,     0,  .cuv.i=0,    {""}} };
 
+extern struct config_struct configs[];
+
 #endif /*CONFIG_INCLUDED_H_*/
