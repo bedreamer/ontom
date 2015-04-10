@@ -34,8 +34,8 @@
 #include "error.h"
 #include "list.h"
 
-#include "../lib/log.h"
-#include "../lib/config.h"
-#include "../lib/Hachiko.h"
+#include "../lib/lj/log.h"
+#include "../lib/lj/config.h"
+#include "../lib/lj/Hachiko.h"
 
 #endif// ___STDAFX_H_
