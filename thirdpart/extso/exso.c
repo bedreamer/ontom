@@ -21,27 +21,27 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
 
     void *so_handle = dlopen(path, RTLD_LAZY);
     if ( so_handle == NULL ) {
-        printf("open %s faile!", path);
+        printf("open %s faile!\n", path);
         return NULL;
     }
     sprintf(entry, "exso_%s_init", modulename);
     copy.exso_init_entry = (int (*)(void *))dlsym(so_handle, entry);
     if ( dlerror() ) {
-        printf("find entry %s faile!", entry);
+        printf("find entry %s faile!\n", entry);
         dlclose(so_handle);
         return NULL;
     }
 
     sprintf(entry, "exso_%s_main_loop", modulename);
-    copy.exso_init_entry = (int (*)(void *))dlsym(so_handle, entry);
+    copy.exso_main_loop = (int (*)(void *))dlsym(so_handle, entry);
     if ( dlerror() ) {
         copy.exso_init_entry = NULL;
     }
 
     sprintf(entry, "exso_%s_exit", modulename);
-    copy.exso_init_entry = (int (*)(void *))dlsym(so_handle, entry);
+    copy.exso_exit_entry = (int (*)(void *))dlsym(so_handle, entry);
     if ( dlerror() ) {
-        printf("find entry %s faile!", entry);
+        printf("find entry %s faile!\n", entry);
         dlclose(so_handle);
         return NULL;
     }
