@@ -349,8 +349,6 @@ typedef enum {
     PGN_CEM = 0x001F00
 }CAN_PGN;
 
-#include "charge.h"
-
 /*
  * 读到一个完整数据包后调用该函数
  */
