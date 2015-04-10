@@ -36,83 +36,6 @@ typedef enum {
     GUN_UNDEFINE = 177
 }CHARGE_GUN_SN;
 
-static inline unsigned char check_sum(unsigned char *buff, size_t len) {
-    unsigned int i = 0;
-    unsigned char sum = 0;
-    while ( i < len ) {
-        sum = sum + buff[i ++];
-    }
-    return sum;
-}
-
-#pragma pack(1)
-/* 卡信息
- */
-struct user_card {
-    // 触发任务时的卡号
-    char triger_card_sn[64];
-    struct {
-        unsigned char id[16];
-        unsigned char sector_num;
-        union {
-            unsigned char buff[16];
-            struct {
-                unsigned int magic;           /*奥能魔数 'ONPW', Only-Power 0x4F4E5057 */
-                unsigned char remain_money[3]; /*余额， 范围 0.00 ~ 167772.15 */
-                unsigned char remain_sum;    /*余额校验位 */
-                unsigned char passwd_code[3];  /*6 位BCD 码密码*/
-                unsigned char passwd_sum;    /*密码校验和 */
-                unsigned short reserved;
-                unsigned char unuesed;
-                unsigned char sum;            /*校验和 */
-            }data;
-        }sector_4;
-    }card;
-};
-static inline double __card_read_remain(const struct user_card *c) {
-    unsigned int imoney = 0;
-
-    imoney += c->card.sector_4.data.remain_money[0];
-    imoney += c->card.sector_4.data.remain_money[1] * 256;
-    imoney += c->card.sector_4.data.remain_money[2] * 256 * 256;
-
-    return imoney / 100.0f;
-}
-
-static inline double __card_write_remain(struct user_card * c, double money) {
-    unsigned int imoney = money * 100;
-    c->card.sector_4.data.remain_money[0] = imoney & 0xFF;
-    c->card.sector_4.data.remain_money[1] = (imoney >> 8) & 0xFF;
-    c->card.sector_4.data.remain_money[2] = (imoney >> 16) & 0xFF;
-    c->card.sector_4.data.remain_sum =
-            check_sum(c->card.sector_4.data.remain_money, 3);
-    return money;
-}
-
-static inline void __card_read_passwd(const struct user_card *c, char *passwd) {
-    sprintf(passwd, "%d%d%d%d%d%d",
-            c->card.sector_4.data.passwd_code[2]>>4,
-            c->card.sector_4.data.passwd_code[2]&0xF,
-            c->card.sector_4.data.passwd_code[1]>>4,
-            c->card.sector_4.data.passwd_code[1]&0xF,
-            c->card.sector_4.data.passwd_code[0]>>4,
-            c->card.sector_4.data.passwd_code[0]&0xF);
-}
-
-static inline unsigned char __chars2bcd(char h, char l) {
-    if ( h > '9' || h <'0' ) h = '0';
-    if ( l > '9' || l <'0' ) l = '0';
-    return (((h - '0')&0xF)<<4)|((l-'0')&0x0F);
-}
-
-static inline void __card_write_passwd(struct user_card * c, const char* passwd) {
-    c->card.sector_4.data.passwd_code[2] = __chars2bcd(passwd[0], passwd[1]);
-    c->card.sector_4.data.passwd_code[1] = __chars2bcd(passwd[2], passwd[3]);
-    c->card.sector_4.data.passwd_code[0] = __chars2bcd(passwd[4], passwd[5]);
-    c->card.sector_4.data.passwd_sum =
-            check_sum(c->card.sector_4.data.passwd_code, 3);
-}
-
 typedef enum {
     // 寻卡模式
     SEQ_FIND_CARD = 0,
@@ -141,199 +64,6 @@ typedef enum {
     SEQ_INVALID
 }QUERY_STAT;
 
-/*
- * 综合采样盒通信数据定义
- */
-struct MDATA_ACK {
-#if 0
-    // 数据包起始魔数
-    unsigned char magic[5];
-    // 地址
-    unsigned char addr;
-    // 载荷长度
-    unsigned char len;
-
-    // 母线电压
-    unsigned short V_mx;
-    // 电池电压
-    unsigned short V_bat;
-    // 电池电流
-    unsigned short I_bat;
-    // 温度
-    unsigned short temp;
-    // 湿度
-    unsigned short wet;
-    // 保留字
-    unsigned short resv[2];
-    // 采样盒软件版本号
-    unsigned char  version;
-
-    // 母线电压过高故障，0： 正常，1：过高
-    unsigned char yx_mx_V_high:1;
-    // 母线欠压故障，0: 正常，1：欠压
-    unsigned char yx_mx_V_low:1;
-    // 母线短路故障
-    unsigned char yx_mx_short_fault:1;
-    // 电池电压过高
-    unsigned char yx_bat_V_high:1;
-    // 电池电压过低
-    unsigned char yx_bat_V_low:1;
-    // 电池链接短路
-    unsigned char yx_bat_short_fault:1;
-    // 电池反接
-    unsigned char yx_bat_revers_conn:1;
-    // 电池电流过高
-    unsigned char yx_bat_I_high:1;
-
-    // 电池绝缘故障
-    unsigned char yx_bat_institude_fault:1;
-    // 辅助电源状态
-    unsigned char yx_assit_power_stat:1;
-    // 温度状态，00: 正常，01： 过高 10： 过低
-    unsigned char yx_temprature:2;
-    // 湿度状态，00： 正常，01：过湿, 10: 过干
-    unsigned char yx_wet_rate:2;
-    unsigned char yx_prtc2_rsv:2;
-
-    unsigned char yx_prtc3_rsv;
-
-    // 总输出熔断器故障，0：无故障，1：熔断
-    unsigned char yx_rdq:1;
-    // 总直流输出跳闸, 0: 正常， 1： 跳闸
-    unsigned char yx_dc_output_tiaozha:1;
-    // 一路输出跳闸，0：正常，1：跳闸
-    unsigned char yx_dc_output_tiaozha1:1;
-    // 二路输出跳闸，0：正常，1：跳闸
-    unsigned char yx_dc_output_tiaozha2:1;
-    // 防雷器故障，0：无故障，1：防雷器故障
-    unsigned char yx_flq:1;
-    unsigned char yx_prtc4_rsv:3;
-
-    unsigned char yx_prtc5_rsv;
-
-    // 交流输入合闸状态，0：分闸，1：合闸
-    unsigned char yx_ac_hezha:1;
-    // 加热状态，0：未加热，1：加热
-    unsigned char yx_heater_stat:1;
-    // 风扇状态，0：未启动，1：启动
-    unsigned char yx_fan_stat:1;
-    // 直流输入总开关合闸，0：分闸，1：合闸
-    unsigned char yx_dc_output_hz:1;
-    // 1#充电枪输出合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_1_hezha_stat:1;
-    // 1#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
-    // @ GUN_CONN_STAT
-    unsigned char yx_gun_1_conn_stat:2;
-    // 1#充电枪辅助电源合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_1_assit_power_hezha:1;
-
-    // 2#充电枪输出合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_2_hezha_stat:1;
-    // 2#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
-    // @ GUN_CONN_STAT
-    unsigned char yx_gun_2_conn_stat:2;
-    // 2#充电枪辅助电源合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_2_assit_power_hezha:1;
-    unsigned char yx_run2_rsv:4;
-
-    unsigned char yx_run3_rsv;
-    unsigned char unused;
-
-    unsigned short crc;
-#else
-    // 数据包起始魔数
-    unsigned char magic[4];
-    // 地址
-    unsigned char addr;
-    // 功能吗
-    unsigned char op;
-    // 载荷长度
-    unsigned char len;
-
-    unsigned short VinKM0; //母线0电压 实际电压*10
-    unsigned short VinKM1;//母线1电压 实际电压*10
-    unsigned short VinBAT0;//电池0组电压，实际电压*10
-    unsigned short VinBAT1;//电池1组电压，实际电压*10
-    unsigned short IoutBAT0; //电池0组电流，实际电流*10
-    unsigned short IoutBAT1; //电池1组电流，实际电流*10
-    unsigned short VinBAT0RESP;//电池0组正对地电阻，实际电阻*10（K）
-    unsigned short VinBAT1RESP;//电池1组正对地电阻，实际电阻*10（K）
-    unsigned short VinBAT0RESN;//电池0组负对地电阻，实际电阻*10（K）
-    unsigned short VinBAT1RESN;//电池1组负对地电阻，实际电阻*10（K）
-    unsigned short Temp ;//当前温度，实际温度*10
-    unsigned short Humi; //当前湿度，实际湿度*10
-    unsigned short Reserve2;// 预留
-    unsigned short Reserve3; //预留
-    unsigned char Ver; //软件版本号， 如10 表示 Ver= 1.0;  数据一共29字节
-
-
-    unsigned char Flag_prtc1;   //充电断开类保护状态字节1：（同步状态）
-    //BIT0：母线0过压状态位；0 = 无故障，1 = 母线过压；
-    //BIT1：母线0欠压状态位；0 = 无故障，1 = 母线欠压；
-    //BIT2：母线0短路状态位；0 = 无故障，1 = 母线短路；
-    //BIT3：母线1过压状态位；0 = 无故障，1 = 母线过压；
-    //BIT4：母线1欠压状态位；0 = 无故障，1 = 母线欠压；
-    //BIT5：母线1短路状态位；0 = 无故障，1 = 母线短路；
-    //剩余bit保留
-
-    unsigned char Flag_prtc2;   //充电断开类保护状态字节2：（同步状态）
-    //BIT0：电池0组过压状态位；0 = 无故障，1 = 电池过压；
-    //BIT1：电池0组欠压状态位：0 = 无故障，1 = 电池欠压；
-    //BIT2：电池0组短路状态位：0 = 无故障，1 = 电池短路；
-    //BIT3：电池0组反接状态位；0 = 无故障，1 = 电池反接；
-    //BIT4：电池0组绝缘状态位；0 = 无故障，1 = 电池绝缘故障；
-    //BIT5：电池0组过流状态位；0 = 无故障，1 = 电池过流；
-    //剩余bit保留
-
-    unsigned char Flag_prtc3;   //充电断开类保护状态字节3：（同步状态）
-    //BIT0：电池1组过压状态位；0 = 无故障，1 = 电池过压；
-    //BIT1：电池1组欠压状态位：0 = 无故障，1 = 电池欠压；
-    //BIT2：电池1组短路状态位：0 = 无故障，1 = 电池短路；
-    //BIT3：电池1组反接状态位；0 = 无故障，1 = 电池反接；
-    //BIT4：电池1组绝缘状态位；0 = 无故障，1 = 电池绝缘故障；
-    //BIT5：电池1组过流状态位；0 = 无故障，1 = 电池过流；
-    //剩余bit保留
-
-    unsigned char Flag_prtc4;   //充电断开类保护状态字节4：（同步状态）
-    //BIT0：辅助电源状态位；0 = 无故障，1 = 辅助电源异常；
-    //BIT1..2：温度状态位；0 0= 无故障，01 = 温度过高，10= 温度过低
-    //BIT3..4：湿度状态位；0 0= 无故障，01 = 湿度过大，10=湿度过低
-    //剩余bit保留
-
-    unsigned char Flag_prtc5;   //充电断开类保护状态字节5：保留（同步状态）
-
-    unsigned char Flag_prtc6;   //充电断开类保护状态字节4：（异步状态）
-    //BIT0：总直流输出熔断器状态位：0 = 无故障，1 = 熔断；
-    //BIT1：总直流输出跳闸状态位：0 = 无故障，1 = 跳闸；
-    //BIT2：充电1路输出跳闸状态位；0 = 无故障，1 = 跳闸；
-    //BIT3：充电2路输出跳闸状态位；0 = 无故障，1 = 跳闸；
-    //BIT4：防雷器状态位；0 = 无故障，1 = 防雷器故障；
-    //BIT5：交流输入跳闸；0 = 无故障，1 = 跳闸；
-    //BIT6：急停状态位；0 = 无故障，1 = 急停；
-    //剩余bit保留
-
-    unsigned char Flag_prtc7;   //充电断开类保护状态字节5：（异步状态）保留
-
-    unsigned char Flag_run1;   //当前运行状态字节1：
-    //BIT 0: 交流输入是否合闸： 0 = 分；1 = 合； //一般情况常1
-    //BIT 1：加热状态：    0 = 未加热；1 = 加热；
-    //BIT 2：风扇状态：  0 = 未启动； 1 = 启动；
-    //BIT 3：总直流输出是否合闸：0 =分；1 =合；
-    //BIT 4：充电枪1合闸状态： 0 = 分； 1 = 合；
-    //BIT 5..6：充电枪1连接状态：00= 未连接； 1 1= 连接；01=连接保护状态；10= 连接异常
-    //BIT 7：充电枪1通信辅助电源合闸状态： 0 = 分； 1 = 合；
-
-    unsigned char Flag_run2;   //当前运行状态字节2：
-    //BIT 0：充电枪2合闸状态：0 = 分； 1 = 合；
-    //BIT 1..2：充电枪2连接状态：00 = 未连接； 11 = 连接；01=连接保护状态；10= 连接异常
-    //BIT 3：充电枪2通信辅助电源合闸状态： 0 = 分； 1 = 合；
-
-    unsigned char Flag_run3;   //当前运行状态字节3：保留 状态一共10字节
-    unsigned char unused;
-
-    unsigned short crc;
-#endif
-};
 typedef enum {
     // 分离的，未连接
     GUN_CONN_DETACHED = 0,
@@ -344,82 +74,6 @@ typedef enum {
     // 已连接
     GUN_CONN_CONNECTIVE=3
 }GUN_CONN_STAT;
-
-// 下发数据包
-struct MDATA_QRY {
-    // 数据包起始魔数
-    unsigned char magic[5];
-    // 地址
-    unsigned char addr;
-    // 载荷长度
-    unsigned char len;
-#if 1
-    // 直流总开关输出闭合，0：断开，1：闭合
-    unsigned char dc_output_hezha:1;
-    // 1#充电枪辅助电源上电，0：断电，1：上电
-    unsigned char gun_1_assit_power_on:1;
-    // 1#充电枪输出开关合闸，0：分闸，1：合闸
-    unsigned char gun_1_output_hezha:1;
-    // 2#充电枪辅助电源上电，0：断电，1：上电
-    unsigned char gun_2_assit_power_on:1;
-    // 2#充电枪输出开关合闸，0：分闸，1：合闸
-    unsigned char gun_2_output_hezha:1;
-    unsigned char cmd_rsv:3;
-#else
-    unsigned char cmd_rsv;
-#endif
-    unsigned char cmd_copy;
-    unsigned char rsvs[14];
-
-    unsigned short crc;
-};
-#define DC_SWITCH_ON        0x01
-#define GUN1_ASSIT_PWN_ON   0x02
-#define GUN1_OUTPUT_ON      0x04
-#define GUN2_ASSIT_PWN_ON   0x08
-#define GUN2_OUTPUT_ON      0x10
-#pragma pack()
-
-// 充电屏数据读写数据结构
-struct charger_config_03h_04h_10h {
-
-};
-
-// 充电屏数据结构
-struct charger_config_10h {
-    // {{ 充电屏监控返回数据
-    // 充电屏编号
-    unsigned short charger_sn;
-    // 充电机组充电状态
-    unsigned short charger_status;
-    // 充电及自身状态
-    unsigned short charger_self_status;
-    // 充电机组最高输出电压
-    unsigned short charger_max_v_out;
-    // 充电机组最低输出电压
-    unsigned short charger_min_v_out;
-    // 充电机组最大输出电流
-    unsigned short charger_max_i_out;
-    // 充电机组实际输出电压值
-    unsigned short charger_v_out;
-    // 充电机组实际输出电流值
-    unsigned short charger_i_out;
-
-    // 充电机模块输出电压
-    unsigned short charge_module_v[CONFIG_SUPPORT_CHARGE_MODULE];
-    // 充电机模块输出电流
-    unsigned short charge_module_i[CONFIG_SUPPORT_CHARGE_MODULE];
-    // 充电机模块温度
-    unsigned short charge_module_t[CONFIG_SUPPORT_CHARGE_MODULE];
-    // 充电机模块状态
-    unsigned short charge_module_status[CONFIG_SUPPORT_CHARGE_MODULE/2];
-    // 充电机模块机身编号
-    unsigned short charge_module_sn[CONFIG_SUPPORT_CHARGE_MODULE][3];
-    unsigned short charge_kaichu;
-    unsigned short charge_kairu;
-    // }}
-};
-
 // 充电计费模式
 typedef enum {
     // 无效充电模式，默认值
@@ -497,11 +151,6 @@ typedef enum {
     // 充电阶段变为中止充电推出阶段
     STAGE_CHANGE_2_ABORT       = 0x06
 }CHARGE_STAGE_CHANGE_EVENT;
-// 充电阶段改变事件处理过程
-void on_charge_stage_change(CHARGE_STAGE_CHANGE_EVENT evt,
-                            CHARGE_STAGE pre,
-                            struct charge_task *thiz);
-
 // BMS CAN通信状态定义
 typedef enum {
     // 无效模式
@@ -542,85 +191,6 @@ typedef enum {
     COMM_M_DIED = 3
 }COMM_M_STRUCT_STATUS;
 
-// 通信报文生成依据
-struct can_pack_generator {
-    // 所属阶段
-    CHARGE_STAGE stage;
-    // 生成PGN
-    unsigned int can_pgn;
-    // 数据包优先级
-    unsigned int prioriy;
-    // 数据包长度
-    unsigned int datalen;
-    // 数据包发送周期
-    unsigned int period;
-    // 心跳计数
-    unsigned int heartbeat;
-
-    // 数据包静默时间，只针对接受数据包有效
-    unsigned int can_silence;
-    // 接受数据包容忍的沉默时常，针对接收数据有效
-    unsigned int can_tolerate_silence;
-    // 计数器，接收或发送的次数
-    unsigned int can_counter;
-};
-
-// CAN 链接临时参数
-struct can_tp_param {
-    // 传输的数据包PGN
-    unsigned int tp_pgn;
-    // 即将传输的数据包大小
-    unsigned int tp_size;
-    // 即将传输的数据包个数
-    unsigned int tp_pack_nr;
-
-    // 已经接收的数据字节数
-    unsigned int tp_rcv_bytes;
-    // 已经接收的数据包个数
-    unsigned int tp_rcv_pack_nr;
-};
-
-// BMS 通讯管理描述结构，JOB的下属成员结构
-struct bms_struct {
-    COMM_M_STRUCT_STATUS status;
-    // 充电作业所处阶段,BMS 链接阶段
-    CHARGE_STAGE charge_stage;
-
-    struct charge_job *job;
-    // BMS通讯设备名, "can1|can2"
-    char *can_dev;
-    // BMS写初始化完成
-    int bms_write_init_ok;
-    // BMS读初始化完成
-    int bms_read_init_ok;
-    // CAN BMS 通信所处状态
-    CAN_BMS_STATUS can_bms_status;
-    // 连接管理的传输控制参数
-    struct can_tp_param can_tp_param;
-    // 连接管理超时控制器
-    struct Hachiko_food can_tp_bomb;
-    // 连接超时参数组状态
-    PRIVATE_STATUS can_tp_private_status;
-    // CAN数据包心跳时钟
-    struct Hachiko_food can_heart_beat;
-
-    // 车辆基本信息
-    struct pgn512_BRM  vehicle_info;
-    // BMS充电配置信息
-    struct pgn1536_BCP bms_config_info;
-    // BMS当前充电需求信息
-    struct pgn4096_BCL bms_charge_need_now;
-    // BMS 电池充电总状态信息
-    struct pgn4352_BCS bms_all_battery_status;
-    // BMS 动力蓄电池状态信息
-    struct pgn4864_BSM bms_battery_status;
-
-    // 数据库操作计数器
-    unsigned int readed;
-    unsigned int can_pack_gen_nr;
-    struct can_pack_generator *generator;
-};
-
 // 充电作业状态
 typedef enum {
     // 作业状态为空
@@ -651,20 +221,6 @@ typedef enum {
     JOB_DETACHING
 }JOBSTATUS;
 
-// 充电计费方式
-struct billing_methord {
-    // 计费方式
-    BILLING_MODE mode;
-    union {
-        // 设定充电金额, 0 - 9999
-        double set_money;
-        // 设定充电时长, 0 - 600
-        unsigned int set_time;
-        // 设定充电目标电量, 0 - 100
-        double set_kwh;
-    }option;
-};
-
 typedef enum {
     // 无效
     PRIVATE_INVALID = 0x00,
@@ -673,47 +229,6 @@ typedef enum {
     // 闲置等待
     PRIVATE_STANDBY = 0x02
 }PRIVATE_STATUS;
-
-// 采样盒 通讯管理描述结构，JOB的下属成员结构
-struct measure_struct {
-    COMM_M_STRUCT_STATUS status;
-    // 扩展测量值
-    struct MDATA_ACK measure;
-    // 前一次测量拷贝值
-    struct MDATA_ACK measure_pre_copy;
-    // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
-    time_t pre_stamp_ex_measure;
-};
-
-// 充电机 通讯管理描述结构，JOB的下属成员结构
-struct charger_struct {
-    COMM_M_STRUCT_STATUS status;
-    // 充电屏信息
-    struct charger_config_10h chargers;
-};
-
-// 电表数据
-struct meter_data {
-    // 地址
-    unsigned char addr[13];
-    // A 相电压
-    double Va;
-    // B 相电压
-    double Vb;
-    // C 相电压
-    double Vc;
-
-    // 正向总电能
-    double kwh_zong;
-    // 尖电能
-    double kwh_jian;
-    // 峰电能
-    double kwh_feng;
-    // 平电能
-    double kwh_ping;
-    // 谷电能
-    double kwh_gu;
-};
 
 // 提交命令
 typedef enum {
@@ -734,100 +249,6 @@ typedef enum {
     CHARGE_BI
 }CHARGE_MODE;
 
-// 作业提交结构
-struct job_commit_data {
-    // 作业提交命令
-    COMMIT_CMD cmd;
-    // URL端提交的时间戳
-    time_t url_commit_timestamp;
-    // 服务端提交的时间日期
-    time_t ontom_commit_date_time;
-
-    //{{ 创建作业参数
-    char card_sn[32];            // 所刷卡卡号
-    double card_remain;          // 卡内余额
-    char card_passwd[16];        // 卡片密码
-    CHARGE_GUN_SN charge_gun;    // 充电枪选择
-    CHARGE_MODE charge_mode;     // 选择自动或是手动
-    double manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
-    double manual_set_charge_current;  // 手动设置充电电流, 手动充电有效
-    BILLING_MODE  biling_mode; // 充电计费方式
-    double as_kwh;   // 按电量充，KW.h, 自动充电，默认充满
-    double as_money; // 按金额充，元
-    unsigned int as_time;  // 按时间充电，分钟数
-    //}}
-
-    struct list_head job_node;
-};
-int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
-
-/*
- * 充电作业描述，充电管理的最小单位
- */
-struct charge_job {
-    //  作业状态
-    JOBSTATUS job_status;
-    // 产生故障时的状
-    JOBSTATUS status_befor_fault;
-    // 作业序号
-    time_t job_url_commit_timestamp;
-    // 作业充电枪
-    CHARGE_GUN_SN job_gun_sn;
-    // 充电模式
-    CHARGE_MODE charge_mode;
-    // 通信CAN名称
-    char job_can_dev_name[32];
-    // 充电起始时戳， 闭合充电开关的那一刻
-    time_t charge_begin_timestamp;
-    // 充电结束时戳， 断开充电开关的那一刻
-    time_t charge_stop_timestamp;
-    // 转为实施状态时的时戳, 执行实施函数的那一刻
-    time_t charge_implemention_timestamp;
-    // BMS握手成功的时戳, 接收到第一次BRM的时刻
-    time_t charge_bms_establish_timestamp;
-    // 作业创建的时间戳
-    time_t charge_job_create_timestamp;
-    // 开始充电时的电表度数
-    double charge_begin_kwh_data;
-    // 终止充电时的电表度数
-    double charge_exit_kwh_data;
-
-    // 当前充电阶段使用的电能
-    double section_kwh;
-    // 已经消耗的电能
-    double charged_kwh;
-    // 当前阶段充电时长
-    unsigned int section_seconds;
-    // 已经充电的时间长度，按秒计
-    unsigned int charged_seconds;
-    // 已经消费的数额, 按元记，精确到分
-    double charged_money;
-
-    // 结构体引用计数
-    unsigned int ref_nr;
-
-    // {{ 充电控制参数
-    double need_V;
-    double need_I;
-    // }}
-
-    // 充电计费方式
-    struct billing_methord charge_billing;
-    // 刷卡状态
-    struct user_card card;
-    // BMS 管理模块
-    struct bms_struct bms;
-
-    // BMS 读线程ID
-    pthread_t tid_read;
-    // BMS 写线程ID
-    pthread_t tid_write;
-
-    // 作业状态字
-    volatile unsigned char single[8];
-
-    struct list_head job_node;
-};
 typedef enum {
     // 暂停作业命令
     CMD_JOB_MAN_PAUSE = 0x00,
@@ -844,26 +265,6 @@ typedef  enum {
     // 系统做初始化时恢复前一次运行时的故障
     REASON_MANAUL
 }ERR_RECOVER_REASON;
-
-// 历史故障定义
-struct error_history {
-    // 故障唯一ID
-    unsigned int error_seqid;
-    // 故障代码编号
-    unsigned int error_id;
-    // 故障起始日期, 时间
-    char error_begin[20];
-    // 故障恢复日期，时间
-    char error_recover[20];
-    // 故障参数
-    char error_string[32];
-    // 故障恢复原因
-    ERR_RECOVER_REASON error_recover_reason;
-
-    struct list_head error_me;
-};
-unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);
-void error_history_recover(struct charge_job *job, unsigned int error_id);
 
 // 充电系统类型
 typedef enum {
@@ -888,166 +289,6 @@ typedef enum {
     UI_PAGE_JOBS_POOL,
     UI_PAGE_JOBS
 }UI_PAGE;
-
-/*
- * 充电任务描述, 详细描述了系统的配置参数
- */
-struct charge_task {
-    // 已经编译为多线程安全模式，所以不用加锁
-    sqlite3 *database;
-    pthread_t tid;
-    pthread_attr_t attr;
-    // 扩展程序
-    struct exso_struct **exsos;
-
-    // 作业任务提交列表
-    struct list_head *commit_head;
-    // 作业任务提交列表锁
-    pthread_mutex_t commit_lck;
-
-    // 刷卡数据临时存储区
-    struct user_card card;
-    // 刷卡数据临时存储区
-    struct user_card op_card;
-    // 当前界面显示的页面号
-    UI_PAGE uipage;
-    // 当处于作业详情页刷卡时的当前作业ID
-    unsigned int ui_job_id;
-
-    // 当前正在执行的充电任务
-    struct charge_job *job[CONFIG_SUPPORT_CHARGE_JOBS];
-
-    // 等待作业列表
-    struct list_head *wait_head;
-    // 作业任务等待列表锁
-    pthread_mutex_t wait_lck;
-    // 等待作业个数
-    unsigned int wait_job_nr;
-
-    // 当前故障列表
-    pthread_mutex_t err_list_lck;
-    unsigned int err_nr;
-    struct list_head *err_head;
-
-    // 任务记录故障总数
-    unsigned int err_seq_id_next;
-
-    // 串口设备管理模块
-    struct bp_uart *uarts[CONFIG_SUPPORT_RS485_NR];
-    // 采样单元管理模块
-    struct measure_struct *measure[CONFIG_SUPPORT_SIMPLE_BOX_NR];
-    // 充电机管理模块
-    struct charger_struct *chargers[CONFIG_SUPPORT_CHARGE_GRP_NR];
-    // 电表电能
-    struct meter_data meter[CONFIG_SUPPORT_CHARGE_GRP_NR];
-
-    // 系统信号, 最多支持64 * 8 种信号标记
-    // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
-    // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
-    volatile unsigned char single[64];
-    // 系统前一次信号状态，用来做状态跳变比较
-    volatile unsigned char pre_single[64];
-
-    // {{ 以下为充电桩系统监控的配置数据
-    SYSTEM_TYPE sys_type;
-    /* 充电冲突映射表
-     * 充电冲突根据系统配置的充电枪个数确定, 目前系统最多支持4把枪
-     *   -------------+-------------+---------------+-----------+----------+
-     *        \冲突枪  |             |               |           |          |
-     *   充电枪 \      |  1 #充电枪   |   2 #充电枪   | 3 #充电枪  | 4 #充电枪 |
-     *   -------------+-------------+---------------+-----------+----------+
-     *      1 #充电枪  |     /      |    CONFLICT   |    OK      |    OK    |
-     *   -------------+-------------+---------------+-----------+----------+
-     *      2 #充电枪  |  CONFLICT   |       /      |    OK      |    OK    |
-     *   -------------+-------------+---------------+-----------+----------+
-     *      3 #充电枪  |     OK      |      OK       |     /     | CONFLICT |
-     *   -------------+-------------+---------------+-----------+----------+
-     *      4 #充电枪  |     OK      |      OK       |  CONFLICT |    /     |
-     *   -------------+-------------+---------------+-----------+----------+
-     * 对应位置上 / 和 OK为TRUE 表示不冲突, CONFLICT 对应位置为FALSE表示冲突
-     * 默认表格，两把枪
-     *   -------------+-------------+---------------+
-     *        \冲突枪  |             |               |
-     *   充电枪 \      |  1 #充电枪   |   2 #充电枪   |
-     *   -------------+-------------+---------------+
-     *      1 #充电枪  |     /       |    CONFLICT   |
-     *   -------------+-------------+---------------+
-     *      2 #充电枪  |  CONFLICT   |       /      |
-     *   -------------+-------------+---------------+
-     */
-    bool sys_conflict_map[CONFIG_SUPPORT_BMS_NR][CONFIG_SUPPORT_BMS_NR];
-    /*系统配置的充电枪个数*/
-    unsigned int sys_config_gun_nr;
-    /* 不同充电接口对应的CAN设备名称*/
-    char sys_can_name[CONFIG_SUPPORT_BMS_NR][128];
-    /*采样单元个数, 默认为1个，若配置两个采样盒则可以*/
-    unsigned int sys_simple_box_nr;
-    /*充电机组数， 默认1组.*/
-    unsigned int sys_charge_group_nr;
-    /*通信用485串口数个数*/
-    unsigned int sys_rs485_dev_nr;
-    /*通信用485串口设备文件名*/
-    char sys_uart_name[CONFIG_SUPPORT_RS485_NR][128];
-    // 每度电的价格
-    double kwh_price;
-    // 系统模式模式
-    char sys_work_mode[32];
-
-    // 以下适用于采样盒配置值
-    double bus_1_v_hi;
-    double bus_1_v_lo;
-    double bus_2_v_hi;
-    double bus_2_v_lo;
-    double bat_1_v_hi;
-    double bat_1_v_lo;
-    double bat_2_v_hi;
-    double bat_2_v_lo;
-    double bat_1_I_hi;
-    double bat_2_I_hi;
-    double bat_1_insti_ohm_v;
-    double bat_2_insti_ohm_v;
-    double bus1_bat1_check_v;
-    double bus2_bat2_check_v;
-    double bat1_bat2_check_I;
-
-    /*额定电流*/
-    double max_output_I;
-    /*输出限流*/
-    double limit_output_I;
-    /*电压上限值*/
-    double limit_max_V;
-    /*电压下限值*/
-    double limit_min_V;
-    /*工作电压值*/
-    double running_V;
-    /*当前电流值*/
-    double running_I;
-    /*模块个数*/
-    unsigned short modules_nr;
-    /*充电状态*/
-    unsigned short charge_stat;
-    /*模块型号*/
-    MODULE_MODEL module_model;
-
-    /*模块开关机, 0x00: 无动作， 0x80: 开机, 0x81: 关机*/
-    unsigned char modules_on_off[CONFIG_SUPPORT_CHARGE_MODULE];
-    //}}
-
-    // {{ 电压电流校准参数
-    double bus1_correct_V;
-    double bus1_read_V;
-    double bus2_correct_V;
-    double bus2_read_V;
-    double bus_correct_I;
-    double bus_read_I;
-    // }}
-
-    // 授权序号, BCD 码
-    unsigned char bcd_auth_code[16];
-    // 网卡MAC  地址
-    unsigned char mac_addr[32];
-};
-
 
 /* 系统信号定义
  * 前 128个信号为系统标记
@@ -1261,6 +502,753 @@ typedef enum {
     S_END
 }ONTOM_FLAG_SINGLE;
 
+
+
+#pragma pack(1)
+/* 卡信息
+ */
+struct user_card {
+    // 触发任务时的卡号
+    char triger_card_sn[64];
+    struct {
+        unsigned char id[16];
+        unsigned char sector_num;
+        union {
+            unsigned char buff[16];
+            struct {
+                unsigned int magic;           /*奥能魔数 'ONPW', Only-Power 0x4F4E5057 */
+                unsigned char remain_money[3]; /*余额， 范围 0.00 ~ 167772.15 */
+                unsigned char remain_sum;    /*余额校验位 */
+                unsigned char passwd_code[3];  /*6 位BCD 码密码*/
+                unsigned char passwd_sum;    /*密码校验和 */
+                unsigned short reserved;
+                unsigned char unuesed;
+                unsigned char sum;            /*校验和 */
+            }data;
+        }sector_4;
+    }card;
+};
+
+
+/*
+ * 综合采样盒通信数据定义
+ */
+struct MDATA_ACK {
+#if 0
+    // 数据包起始魔数
+    unsigned char magic[5];
+    // 地址
+    unsigned char addr;
+    // 载荷长度
+    unsigned char len;
+
+    // 母线电压
+    unsigned short V_mx;
+    // 电池电压
+    unsigned short V_bat;
+    // 电池电流
+    unsigned short I_bat;
+    // 温度
+    unsigned short temp;
+    // 湿度
+    unsigned short wet;
+    // 保留字
+    unsigned short resv[2];
+    // 采样盒软件版本号
+    unsigned char  version;
+
+    // 母线电压过高故障，0： 正常，1：过高
+    unsigned char yx_mx_V_high:1;
+    // 母线欠压故障，0: 正常，1：欠压
+    unsigned char yx_mx_V_low:1;
+    // 母线短路故障
+    unsigned char yx_mx_short_fault:1;
+    // 电池电压过高
+    unsigned char yx_bat_V_high:1;
+    // 电池电压过低
+    unsigned char yx_bat_V_low:1;
+    // 电池链接短路
+    unsigned char yx_bat_short_fault:1;
+    // 电池反接
+    unsigned char yx_bat_revers_conn:1;
+    // 电池电流过高
+    unsigned char yx_bat_I_high:1;
+
+    // 电池绝缘故障
+    unsigned char yx_bat_institude_fault:1;
+    // 辅助电源状态
+    unsigned char yx_assit_power_stat:1;
+    // 温度状态，00: 正常，01： 过高 10： 过低
+    unsigned char yx_temprature:2;
+    // 湿度状态，00： 正常，01：过湿, 10: 过干
+    unsigned char yx_wet_rate:2;
+    unsigned char yx_prtc2_rsv:2;
+
+    unsigned char yx_prtc3_rsv;
+
+    // 总输出熔断器故障，0：无故障，1：熔断
+    unsigned char yx_rdq:1;
+    // 总直流输出跳闸, 0: 正常， 1： 跳闸
+    unsigned char yx_dc_output_tiaozha:1;
+    // 一路输出跳闸，0：正常，1：跳闸
+    unsigned char yx_dc_output_tiaozha1:1;
+    // 二路输出跳闸，0：正常，1：跳闸
+    unsigned char yx_dc_output_tiaozha2:1;
+    // 防雷器故障，0：无故障，1：防雷器故障
+    unsigned char yx_flq:1;
+    unsigned char yx_prtc4_rsv:3;
+
+    unsigned char yx_prtc5_rsv;
+
+    // 交流输入合闸状态，0：分闸，1：合闸
+    unsigned char yx_ac_hezha:1;
+    // 加热状态，0：未加热，1：加热
+    unsigned char yx_heater_stat:1;
+    // 风扇状态，0：未启动，1：启动
+    unsigned char yx_fan_stat:1;
+    // 直流输入总开关合闸，0：分闸，1：合闸
+    unsigned char yx_dc_output_hz:1;
+    // 1#充电枪输出合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_1_hezha_stat:1;
+    // 1#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
+    // @ GUN_CONN_STAT
+    unsigned char yx_gun_1_conn_stat:2;
+    // 1#充电枪辅助电源合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_1_assit_power_hezha:1;
+
+    // 2#充电枪输出合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_2_hezha_stat:1;
+    // 2#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
+    // @ GUN_CONN_STAT
+    unsigned char yx_gun_2_conn_stat:2;
+    // 2#充电枪辅助电源合闸状态，0：未合闸，1：合闸
+    unsigned char yx_gun_2_assit_power_hezha:1;
+    unsigned char yx_run2_rsv:4;
+
+    unsigned char yx_run3_rsv;
+    unsigned char unused;
+
+    unsigned short crc;
+#else
+    // 数据包起始魔数
+    unsigned char magic[4];
+    // 地址
+    unsigned char addr;
+    // 功能吗
+    unsigned char op;
+    // 载荷长度
+    unsigned char len;
+
+    unsigned short VinKM0; //母线0电压 实际电压*10
+    unsigned short VinKM1;//母线1电压 实际电压*10
+    unsigned short VinBAT0;//电池0组电压，实际电压*10
+    unsigned short VinBAT1;//电池1组电压，实际电压*10
+    unsigned short IoutBAT0; //电池0组电流，实际电流*10
+    unsigned short IoutBAT1; //电池1组电流，实际电流*10
+    unsigned short VinBAT0RESP;//电池0组正对地电阻，实际电阻*10（K）
+    unsigned short VinBAT1RESP;//电池1组正对地电阻，实际电阻*10（K）
+    unsigned short VinBAT0RESN;//电池0组负对地电阻，实际电阻*10（K）
+    unsigned short VinBAT1RESN;//电池1组负对地电阻，实际电阻*10（K）
+    unsigned short Temp ;//当前温度，实际温度*10
+    unsigned short Humi; //当前湿度，实际湿度*10
+    unsigned short Reserve2;// 预留
+    unsigned short Reserve3; //预留
+    unsigned char Ver; //软件版本号， 如10 表示 Ver= 1.0;  数据一共29字节
+
+
+    unsigned char Flag_prtc1;   //充电断开类保护状态字节1：（同步状态）
+    //BIT0：母线0过压状态位；0 = 无故障，1 = 母线过压；
+    //BIT1：母线0欠压状态位；0 = 无故障，1 = 母线欠压；
+    //BIT2：母线0短路状态位；0 = 无故障，1 = 母线短路；
+    //BIT3：母线1过压状态位；0 = 无故障，1 = 母线过压；
+    //BIT4：母线1欠压状态位；0 = 无故障，1 = 母线欠压；
+    //BIT5：母线1短路状态位；0 = 无故障，1 = 母线短路；
+    //剩余bit保留
+
+    unsigned char Flag_prtc2;   //充电断开类保护状态字节2：（同步状态）
+    //BIT0：电池0组过压状态位；0 = 无故障，1 = 电池过压；
+    //BIT1：电池0组欠压状态位：0 = 无故障，1 = 电池欠压；
+    //BIT2：电池0组短路状态位：0 = 无故障，1 = 电池短路；
+    //BIT3：电池0组反接状态位；0 = 无故障，1 = 电池反接；
+    //BIT4：电池0组绝缘状态位；0 = 无故障，1 = 电池绝缘故障；
+    //BIT5：电池0组过流状态位；0 = 无故障，1 = 电池过流；
+    //剩余bit保留
+
+    unsigned char Flag_prtc3;   //充电断开类保护状态字节3：（同步状态）
+    //BIT0：电池1组过压状态位；0 = 无故障，1 = 电池过压；
+    //BIT1：电池1组欠压状态位：0 = 无故障，1 = 电池欠压；
+    //BIT2：电池1组短路状态位：0 = 无故障，1 = 电池短路；
+    //BIT3：电池1组反接状态位；0 = 无故障，1 = 电池反接；
+    //BIT4：电池1组绝缘状态位；0 = 无故障，1 = 电池绝缘故障；
+    //BIT5：电池1组过流状态位；0 = 无故障，1 = 电池过流；
+    //剩余bit保留
+
+    unsigned char Flag_prtc4;   //充电断开类保护状态字节4：（同步状态）
+    //BIT0：辅助电源状态位；0 = 无故障，1 = 辅助电源异常；
+    //BIT1..2：温度状态位；0 0= 无故障，01 = 温度过高，10= 温度过低
+    //BIT3..4：湿度状态位；0 0= 无故障，01 = 湿度过大，10=湿度过低
+    //剩余bit保留
+
+    unsigned char Flag_prtc5;   //充电断开类保护状态字节5：保留（同步状态）
+
+    unsigned char Flag_prtc6;   //充电断开类保护状态字节4：（异步状态）
+    //BIT0：总直流输出熔断器状态位：0 = 无故障，1 = 熔断；
+    //BIT1：总直流输出跳闸状态位：0 = 无故障，1 = 跳闸；
+    //BIT2：充电1路输出跳闸状态位；0 = 无故障，1 = 跳闸；
+    //BIT3：充电2路输出跳闸状态位；0 = 无故障，1 = 跳闸；
+    //BIT4：防雷器状态位；0 = 无故障，1 = 防雷器故障；
+    //BIT5：交流输入跳闸；0 = 无故障，1 = 跳闸；
+    //BIT6：急停状态位；0 = 无故障，1 = 急停；
+    //剩余bit保留
+
+    unsigned char Flag_prtc7;   //充电断开类保护状态字节5：（异步状态）保留
+
+    unsigned char Flag_run1;   //当前运行状态字节1：
+    //BIT 0: 交流输入是否合闸： 0 = 分；1 = 合； //一般情况常1
+    //BIT 1：加热状态：    0 = 未加热；1 = 加热；
+    //BIT 2：风扇状态：  0 = 未启动； 1 = 启动；
+    //BIT 3：总直流输出是否合闸：0 =分；1 =合；
+    //BIT 4：充电枪1合闸状态： 0 = 分； 1 = 合；
+    //BIT 5..6：充电枪1连接状态：00= 未连接； 1 1= 连接；01=连接保护状态；10= 连接异常
+    //BIT 7：充电枪1通信辅助电源合闸状态： 0 = 分； 1 = 合；
+
+    unsigned char Flag_run2;   //当前运行状态字节2：
+    //BIT 0：充电枪2合闸状态：0 = 分； 1 = 合；
+    //BIT 1..2：充电枪2连接状态：00 = 未连接； 11 = 连接；01=连接保护状态；10= 连接异常
+    //BIT 3：充电枪2通信辅助电源合闸状态： 0 = 分； 1 = 合；
+
+    unsigned char Flag_run3;   //当前运行状态字节3：保留 状态一共10字节
+    unsigned char unused;
+
+    unsigned short crc;
+#endif
+};
+
+// 下发数据包
+struct MDATA_QRY {
+    // 数据包起始魔数
+    unsigned char magic[5];
+    // 地址
+    unsigned char addr;
+    // 载荷长度
+    unsigned char len;
+#if 1
+    // 直流总开关输出闭合，0：断开，1：闭合
+    unsigned char dc_output_hezha:1;
+    // 1#充电枪辅助电源上电，0：断电，1：上电
+    unsigned char gun_1_assit_power_on:1;
+    // 1#充电枪输出开关合闸，0：分闸，1：合闸
+    unsigned char gun_1_output_hezha:1;
+    // 2#充电枪辅助电源上电，0：断电，1：上电
+    unsigned char gun_2_assit_power_on:1;
+    // 2#充电枪输出开关合闸，0：分闸，1：合闸
+    unsigned char gun_2_output_hezha:1;
+    unsigned char cmd_rsv:3;
+#else
+    unsigned char cmd_rsv;
+#endif
+    unsigned char cmd_copy;
+    unsigned char rsvs[14];
+
+    unsigned short crc;
+};
+#pragma pack()
+
+// 充电屏数据读写数据结构
+struct charger_config_03h_04h_10h {
+
+};
+
+// 充电屏数据结构
+struct charger_config_10h {
+    // {{ 充电屏监控返回数据
+    // 充电屏编号
+    unsigned short charger_sn;
+    // 充电机组充电状态
+    unsigned short charger_status;
+    // 充电及自身状态
+    unsigned short charger_self_status;
+    // 充电机组最高输出电压
+    unsigned short charger_max_v_out;
+    // 充电机组最低输出电压
+    unsigned short charger_min_v_out;
+    // 充电机组最大输出电流
+    unsigned short charger_max_i_out;
+    // 充电机组实际输出电压值
+    unsigned short charger_v_out;
+    // 充电机组实际输出电流值
+    unsigned short charger_i_out;
+
+    // 充电机模块输出电压
+    unsigned short charge_module_v[CONFIG_SUPPORT_CHARGE_MODULE];
+    // 充电机模块输出电流
+    unsigned short charge_module_i[CONFIG_SUPPORT_CHARGE_MODULE];
+    // 充电机模块温度
+    unsigned short charge_module_t[CONFIG_SUPPORT_CHARGE_MODULE];
+    // 充电机模块状态
+    unsigned short charge_module_status[CONFIG_SUPPORT_CHARGE_MODULE/2];
+    // 充电机模块机身编号
+    unsigned short charge_module_sn[CONFIG_SUPPORT_CHARGE_MODULE][3];
+    unsigned short charge_kaichu;
+    unsigned short charge_kairu;
+    // }}
+};
+
+// 通信报文生成依据
+struct can_pack_generator {
+    // 所属阶段
+    CHARGE_STAGE stage;
+    // 生成PGN
+    unsigned int can_pgn;
+    // 数据包优先级
+    unsigned int prioriy;
+    // 数据包长度
+    unsigned int datalen;
+    // 数据包发送周期
+    unsigned int period;
+    // 心跳计数
+    unsigned int heartbeat;
+
+    // 数据包静默时间，只针对接受数据包有效
+    unsigned int can_silence;
+    // 接受数据包容忍的沉默时常，针对接收数据有效
+    unsigned int can_tolerate_silence;
+    // 计数器，接收或发送的次数
+    unsigned int can_counter;
+};
+
+// CAN 链接临时参数
+struct can_tp_param {
+    // 传输的数据包PGN
+    unsigned int tp_pgn;
+    // 即将传输的数据包大小
+    unsigned int tp_size;
+    // 即将传输的数据包个数
+    unsigned int tp_pack_nr;
+
+    // 已经接收的数据字节数
+    unsigned int tp_rcv_bytes;
+    // 已经接收的数据包个数
+    unsigned int tp_rcv_pack_nr;
+};
+
+// BMS 通讯管理描述结构，JOB的下属成员结构
+struct bms_struct {
+    COMM_M_STRUCT_STATUS status;
+    // 充电作业所处阶段,BMS 链接阶段
+    CHARGE_STAGE charge_stage;
+
+    struct charge_job *job;
+    // BMS通讯设备名, "can1|can2"
+    char *can_dev;
+    // BMS写初始化完成
+    int bms_write_init_ok;
+    // BMS读初始化完成
+    int bms_read_init_ok;
+    // CAN BMS 通信所处状态
+    CAN_BMS_STATUS can_bms_status;
+    // 连接管理的传输控制参数
+    struct can_tp_param can_tp_param;
+    // 连接管理超时控制器
+    struct Hachiko_food can_tp_bomb;
+    // 连接超时参数组状态
+    PRIVATE_STATUS can_tp_private_status;
+    // CAN数据包心跳时钟
+    struct Hachiko_food can_heart_beat;
+
+    // 车辆基本信息
+    struct pgn512_BRM  vehicle_info;
+    // BMS充电配置信息
+    struct pgn1536_BCP bms_config_info;
+    // BMS当前充电需求信息
+    struct pgn4096_BCL bms_charge_need_now;
+    // BMS 电池充电总状态信息
+    struct pgn4352_BCS bms_all_battery_status;
+    // BMS 动力蓄电池状态信息
+    struct pgn4864_BSM bms_battery_status;
+
+    // 数据库操作计数器
+    unsigned int readed;
+    unsigned int can_pack_gen_nr;
+    struct can_pack_generator *generator;
+};
+
+// 充电计费方式
+struct billing_methord {
+    // 计费方式
+    BILLING_MODE mode;
+    union {
+        // 设定充电金额, 0 - 9999
+        double set_money;
+        // 设定充电时长, 0 - 600
+        unsigned int set_time;
+        // 设定充电目标电量, 0 - 100
+        double set_kwh;
+    }option;
+};
+
+// 采样盒 通讯管理描述结构，JOB的下属成员结构
+struct measure_struct {
+    COMM_M_STRUCT_STATUS status;
+    // 扩展测量值
+    struct MDATA_ACK measure;
+    // 前一次测量拷贝值
+    struct MDATA_ACK measure_pre_copy;
+    // 前一次读取扩展测量得到的时间戳, 通过对比时间戳来确定扩展测量是否已经更新了数据
+    time_t pre_stamp_ex_measure;
+};
+
+// 充电机 通讯管理描述结构，JOB的下属成员结构
+struct charger_struct {
+    COMM_M_STRUCT_STATUS status;
+    // 充电屏信息
+    struct charger_config_10h chargers;
+};
+
+// 电表数据
+struct meter_data {
+    // 地址
+    unsigned char addr[13];
+    // A 相电压
+    double Va;
+    // B 相电压
+    double Vb;
+    // C 相电压
+    double Vc;
+
+    // 正向总电能
+    double kwh_zong;
+    // 尖电能
+    double kwh_jian;
+    // 峰电能
+    double kwh_feng;
+    // 平电能
+    double kwh_ping;
+    // 谷电能
+    double kwh_gu;
+};
+
+// 作业提交结构
+struct job_commit_data {
+    // 作业提交命令
+    COMMIT_CMD cmd;
+    // URL端提交的时间戳
+    time_t url_commit_timestamp;
+    // 服务端提交的时间日期
+    time_t ontom_commit_date_time;
+
+    //{{ 创建作业参数
+    char card_sn[32];            // 所刷卡卡号
+    double card_remain;          // 卡内余额
+    char card_passwd[16];        // 卡片密码
+    CHARGE_GUN_SN charge_gun;    // 充电枪选择
+    CHARGE_MODE charge_mode;     // 选择自动或是手动
+    double manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
+    double manual_set_charge_current;  // 手动设置充电电流, 手动充电有效
+    BILLING_MODE  biling_mode; // 充电计费方式
+    double as_kwh;   // 按电量充，KW.h, 自动充电，默认充满
+    double as_money; // 按金额充，元
+    unsigned int as_time;  // 按时间充电，分钟数
+    //}}
+
+    struct list_head job_node;
+};
+
+//充电作业描述，充电管理的最小单位
+struct charge_job {
+    //  作业状态
+    JOBSTATUS job_status;
+    // 产生故障时的状
+    JOBSTATUS status_befor_fault;
+    // 作业序号
+    time_t job_url_commit_timestamp;
+    // 作业充电枪
+    CHARGE_GUN_SN job_gun_sn;
+    // 充电模式
+    CHARGE_MODE charge_mode;
+    // 通信CAN名称
+    char job_can_dev_name[32];
+    // 充电起始时戳， 闭合充电开关的那一刻
+    time_t charge_begin_timestamp;
+    // 充电结束时戳， 断开充电开关的那一刻
+    time_t charge_stop_timestamp;
+    // 转为实施状态时的时戳, 执行实施函数的那一刻
+    time_t charge_implemention_timestamp;
+    // BMS握手成功的时戳, 接收到第一次BRM的时刻
+    time_t charge_bms_establish_timestamp;
+    // 作业创建的时间戳
+    time_t charge_job_create_timestamp;
+    // 开始充电时的电表度数
+    double charge_begin_kwh_data;
+    // 终止充电时的电表度数
+    double charge_exit_kwh_data;
+
+    // 当前充电阶段使用的电能
+    double section_kwh;
+    // 已经消耗的电能
+    double charged_kwh;
+    // 当前阶段充电时长
+    unsigned int section_seconds;
+    // 已经充电的时间长度，按秒计
+    unsigned int charged_seconds;
+    // 已经消费的数额, 按元记，精确到分
+    double charged_money;
+
+    // 结构体引用计数
+    unsigned int ref_nr;
+
+    // {{ 充电控制参数
+    double need_V;
+    double need_I;
+    // }}
+
+    // 充电计费方式
+    struct billing_methord charge_billing;
+    // 刷卡状态
+    struct user_card card;
+    // BMS 管理模块
+    struct bms_struct bms;
+
+    // BMS 读线程ID
+    pthread_t tid_read;
+    // BMS 写线程ID
+    pthread_t tid_write;
+
+    // 作业状态字
+    volatile unsigned char single[8];
+
+    struct list_head job_node;
+};
+
+// 历史故障定义
+struct error_history {
+    // 故障唯一ID
+    unsigned int error_seqid;
+    // 故障代码编号
+    unsigned int error_id;
+    // 故障起始日期, 时间
+    char error_begin[20];
+    // 故障恢复日期，时间
+    char error_recover[20];
+    // 故障参数
+    char error_string[32];
+    // 故障恢复原因
+    ERR_RECOVER_REASON error_recover_reason;
+
+    struct list_head error_me;
+};
+
+//充电任务描述, 详细描述了系统的配置参数
+struct charge_task {
+    // 已经编译为多线程安全模式，所以不用加锁
+    sqlite3 *database;
+    pthread_t tid;
+    pthread_attr_t attr;
+    // 扩展程序
+    struct exso_struct **exsos;
+
+    // 作业任务提交列表
+    struct list_head *commit_head;
+    // 作业任务提交列表锁
+    pthread_mutex_t commit_lck;
+
+    // 刷卡数据临时存储区
+    struct user_card card;
+    // 刷卡数据临时存储区
+    struct user_card op_card;
+    // 当前界面显示的页面号
+    UI_PAGE uipage;
+    // 当处于作业详情页刷卡时的当前作业ID
+    unsigned int ui_job_id;
+
+    // 当前正在执行的充电任务
+    struct charge_job *job[CONFIG_SUPPORT_CHARGE_JOBS];
+
+    // 等待作业列表
+    struct list_head *wait_head;
+    // 作业任务等待列表锁
+    pthread_mutex_t wait_lck;
+    // 等待作业个数
+    unsigned int wait_job_nr;
+
+    // 当前故障列表
+    pthread_mutex_t err_list_lck;
+    unsigned int err_nr;
+    struct list_head *err_head;
+
+    // 任务记录故障总数
+    unsigned int err_seq_id_next;
+
+    // 串口设备管理模块
+    struct bp_uart *uarts[CONFIG_SUPPORT_RS485_NR];
+    // 采样单元管理模块
+    struct measure_struct *measure[CONFIG_SUPPORT_SIMPLE_BOX_NR];
+    // 充电机管理模块
+    struct charger_struct *chargers[CONFIG_SUPPORT_CHARGE_GRP_NR];
+    // 电表电能
+    struct meter_data meter[CONFIG_SUPPORT_CHARGE_GRP_NR];
+
+    // 系统信号, 最多支持64 * 8 种信号标记
+    // 前面 16 * 8 = 128 个信号是系统内部使用信号标记
+    // 后面 的为遥信 信号定义 @ enum ONTOM_FLAG_SINGLE
+    volatile unsigned char single[64];
+    // 系统前一次信号状态，用来做状态跳变比较
+    volatile unsigned char pre_single[64];
+
+    // {{ 以下为充电桩系统监控的配置数据
+    SYSTEM_TYPE sys_type;
+    /* 充电冲突映射表
+     * 充电冲突根据系统配置的充电枪个数确定, 目前系统最多支持4把枪
+     *   -------------+-------------+---------------+-----------+----------+
+     *        \冲突枪  |             |               |           |          |
+     *   充电枪 \      |  1 #充电枪   |   2 #充电枪   | 3 #充电枪  | 4 #充电枪 |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      1 #充电枪  |     /      |    CONFLICT   |    OK      |    OK    |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      2 #充电枪  |  CONFLICT   |       /      |    OK      |    OK    |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      3 #充电枪  |     OK      |      OK       |     /     | CONFLICT |
+     *   -------------+-------------+---------------+-----------+----------+
+     *      4 #充电枪  |     OK      |      OK       |  CONFLICT |    /     |
+     *   -------------+-------------+---------------+-----------+----------+
+     * 对应位置上 / 和 OK为TRUE 表示不冲突, CONFLICT 对应位置为FALSE表示冲突
+     * 默认表格，两把枪
+     *   -------------+-------------+---------------+
+     *        \冲突枪  |             |               |
+     *   充电枪 \      |  1 #充电枪   |   2 #充电枪   |
+     *   -------------+-------------+---------------+
+     *      1 #充电枪  |     /       |    CONFLICT   |
+     *   -------------+-------------+---------------+
+     *      2 #充电枪  |  CONFLICT   |       /      |
+     *   -------------+-------------+---------------+
+     */
+    bool sys_conflict_map[CONFIG_SUPPORT_BMS_NR][CONFIG_SUPPORT_BMS_NR];
+    /*系统配置的充电枪个数*/
+    unsigned int sys_config_gun_nr;
+    /* 不同充电接口对应的CAN设备名称*/
+    char sys_can_name[CONFIG_SUPPORT_BMS_NR][128];
+    /*采样单元个数, 默认为1个，若配置两个采样盒则可以*/
+    unsigned int sys_simple_box_nr;
+    /*充电机组数， 默认1组.*/
+    unsigned int sys_charge_group_nr;
+    /*通信用485串口数个数*/
+    unsigned int sys_rs485_dev_nr;
+    /*通信用485串口设备文件名*/
+    char sys_uart_name[CONFIG_SUPPORT_RS485_NR][128];
+    // 每度电的价格
+    double kwh_price;
+    // 系统模式模式
+    char sys_work_mode[32];
+    // }}
+
+    // 以下适用于采样盒配置值
+    double bus_1_v_hi;
+    double bus_1_v_lo;
+    double bus_2_v_hi;
+    double bus_2_v_lo;
+    double bat_1_v_hi;
+    double bat_1_v_lo;
+    double bat_2_v_hi;
+    double bat_2_v_lo;
+    double bat_1_I_hi;
+    double bat_2_I_hi;
+    double bat_1_insti_ohm_v;
+    double bat_2_insti_ohm_v;
+    double bus1_bat1_check_v;
+    double bus2_bat2_check_v;
+    double bat1_bat2_check_I;
+
+    /*额定电流*/
+    double max_output_I;
+    /*输出限流*/
+    double limit_output_I;
+    /*电压上限值*/
+    double limit_max_V;
+    /*电压下限值*/
+    double limit_min_V;
+    /*工作电压值*/
+    double running_V;
+    /*当前电流值*/
+    double running_I;
+    /*模块个数*/
+    unsigned short modules_nr;
+    /*充电状态*/
+    unsigned short charge_stat;
+    /*模块型号*/
+    MODULE_MODEL module_model;
+
+    /*模块开关机, 0x00: 无动作， 0x80: 开机, 0x81: 关机*/
+    unsigned char modules_on_off[CONFIG_SUPPORT_CHARGE_MODULE];
+    //}}
+
+    // {{ 电压电流校准参数
+    double bus1_correct_V;
+    double bus1_read_V;
+    double bus2_correct_V;
+    double bus2_read_V;
+    double bus_correct_I;
+    double bus_read_I;
+    // }}
+
+    // 授权序号, BCD 码
+    unsigned char bcd_auth_code[16];
+    // 网卡MAC  地址
+    unsigned char mac_addr[32];
+};
+
+static inline unsigned char check_sum(unsigned char *buff, size_t len) {
+    unsigned int i = 0;
+    unsigned char sum = 0;
+    while ( i < len ) {
+        sum = sum + buff[i ++];
+    }
+    return sum;
+}
+static inline double __card_read_remain(const struct user_card *c) {
+    unsigned int imoney = 0;
+
+    imoney += c->card.sector_4.data.remain_money[0];
+    imoney += c->card.sector_4.data.remain_money[1] * 256;
+    imoney += c->card.sector_4.data.remain_money[2] * 256 * 256;
+
+    return imoney / 100.0f;
+}
+
+static inline double __card_write_remain(struct user_card * c, double money) {
+    unsigned int imoney = money * 100;
+    c->card.sector_4.data.remain_money[0] = imoney & 0xFF;
+    c->card.sector_4.data.remain_money[1] = (imoney >> 8) & 0xFF;
+    c->card.sector_4.data.remain_money[2] = (imoney >> 16) & 0xFF;
+    c->card.sector_4.data.remain_sum =
+            check_sum(c->card.sector_4.data.remain_money, 3);
+    return money;
+}
+
+static inline void __card_read_passwd(const struct user_card *c, char *passwd) {
+    sprintf(passwd, "%d%d%d%d%d%d",
+            c->card.sector_4.data.passwd_code[2]>>4,
+            c->card.sector_4.data.passwd_code[2]&0xF,
+            c->card.sector_4.data.passwd_code[1]>>4,
+            c->card.sector_4.data.passwd_code[1]&0xF,
+            c->card.sector_4.data.passwd_code[0]>>4,
+            c->card.sector_4.data.passwd_code[0]&0xF);
+}
+
+static inline unsigned char __chars2bcd(char h, char l) {
+    if ( h > '9' || h <'0' ) h = '0';
+    if ( l > '9' || l <'0' ) l = '0';
+    return (((h - '0')&0xF)<<4)|((l-'0')&0x0F);
+}
+
+static inline void __card_write_passwd(struct user_card * c, const char* passwd) {
+    c->card.sector_4.data.passwd_code[2] = __chars2bcd(passwd[0], passwd[1]);
+    c->card.sector_4.data.passwd_code[1] = __chars2bcd(passwd[2], passwd[3]);
+    c->card.sector_4.data.passwd_code[0] = __chars2bcd(passwd[4], passwd[5]);
+    c->card.sector_4.data.passwd_sum =
+            check_sum(c->card.sector_4.data.passwd_code, 3);
+}
+
+
 // 位设置
 static inline void __bit_set(volatile unsigned char *byte, ONTOM_FLAG_SINGLE single)
 {
@@ -1401,6 +1389,9 @@ static inline double bytes2double(unsigned char h, unsigned l, unsigned int acc)
     return (h * 256 + l) / (1.0f * acc);
 }
 
+int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
+unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);
+void error_history_recover(struct charge_job *job, unsigned int error_id);
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
 void job_running(struct charge_task *, struct charge_job *);
 void job_running(struct charge_task *tsk, struct charge_job *thiz);
