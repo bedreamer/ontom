@@ -34,7 +34,7 @@
  * +8987_a=fasdf
  * +------------------------------------------------------------------------
  *******************************************************************************/
-#include "stdafx.h"
+#include "../ontom/stdafx.h"
 
 static char *value_type[] = {"STRING", "INT", "FLOAT", "BOOL", "N/A"};
 //static char *value_system[] = {"NO", "YES", "N/A"};
