@@ -2779,15 +2779,6 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
     return ret;
 }
 
-unsigned char check_sum(unsigned char *buff, size_t len) {
-    unsigned int i = 0;
-    unsigned char sum = 0;
-    while ( i < len ) {
-        sum = sum + buff[i ++];
-    }
-    return sum;
-}
-
 // 从电表读取电能数据
 int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
