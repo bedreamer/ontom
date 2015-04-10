@@ -12,7 +12,6 @@ int exso_default_init(void *p)
 int exso_default_main_loop(void *p)
 {
     nr ++;
-    if ( 0 == (nr % 1000) )
     printf("*****   Plugin default say: Hello %d\n", nr);
     return ERR_OK;
 }
