@@ -53,7 +53,7 @@ EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 SEP-DIRS=thirdpart/mongoose thirdpart/sqlite
 # must be the last one.
 LAST-DIR=
-SUB-DIRS=ontom
+SUB-DIRS=ontom lib
 EX-OBJS=
 PHONY+=EX-OBJS
 
