@@ -13,11 +13,8 @@ struct charge_task;
 extern struct charge_task *task;
 struct MDATA_ACK;
 struct bp_uart;
-#include <pthread.h>
-#include "list.h"
 #include "bms.h"
 
-#include "../thirdpart/sqlite/sqlite3.h"
 // 无效时戳，初始化时默认赋值， 用于time_t默认值
 #define INVALID_TIMESTAMP  0x00000000
 // BMS 通信时的缓冲区
