@@ -752,6 +752,9 @@ struct MDATA_QRY {
 
     unsigned short crc;
 };
+
+#include "bms.h"
+
 #pragma pack()
 
 // 充电屏数据读写数据结构
