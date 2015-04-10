@@ -1590,6 +1590,11 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
     return ret;
 }
 
+#define DC_SWITCH_ON        0x01
+#define GUN1_ASSIT_PWN_ON   0x02
+#define GUN1_OUTPUT_ON      0x04
+#define GUN2_ASSIT_PWN_ON   0x08
+#define GUN2_OUTPUT_ON      0x10
 int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
