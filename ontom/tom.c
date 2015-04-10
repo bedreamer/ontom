@@ -1,82 +1,12 @@
 #include "stdafx.h"
 #include "charge.h"
 
-
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
-
-extern void * thread_measure_service(void *) ___THREAD_ENTRY___;
 extern void * thread_charger_service(void *) ___THREAD_ENTRY___;
 extern void * thread_backgroud_service(void *) ___THREAD_ENTRY___;
 extern void * thread_charge_task_service(void *) ___THREAD_ENTRY___;
 
 // 串口通信 服务线程
-// 提供串口通信服务  ISO7816 卡片
-void *thread_measure_service(void *arg) ___THREAD_ENTRY___
-{
-    int *done = (int *)arg;
-    int mydone = 0;
-    int icdev, ret, initok = 1;
-    unsigned long _Snr;
-    char buff[32] = {0};
-
-    if ( done == NULL ) done = &mydone;
-    log_printf(INF, "%s running...", __FUNCTION__);
-____reinit:
-    icdev = dc_init(100, 9600);//初始化串口1，波特率9600
-
-    if ( icdev > 0 ) {
-        log_printf(INF, "open D8 reader OK...");
-        dc_beep(icdev, 100);
-        initok = 1;
-    } else if ( icdev < 0 ) {
-        initok = 0;
-        log_printf(ERR, "open D8 reader ERROR: %d", icdev);
-    }
-
-    while ( ! *done ) {
-
-        sleep(2);
-
-        if ( 0 == initok ) {
-            goto ____reinit;
-            continue;
-        }
-        ret = dc_card(icdev, 0, &_Snr);
-        if ( ret > 0 ) {
-            continue;
-        } else if ( ret < 0 ) {
-            initok = 0;
-            continue;
-        }
-        log_printf(INF, "GET CARD: %08X", _Snr);
-        dc_beep(icdev, 50);
-        usleep(100000);
-        dc_beep(icdev, 50);
-
-        sprintf(buff, "%08X", (unsigned int)_Snr);
-        if ( config_read("triger_card_sn")[0] == 'N' ) {
-            config_write("triger_card_sn", buff);
-            log_printf(INF, "card trigerd.");
-            continue;
-        }
-        if ( 0 != strcmp(config_read("triger_card_sn"), buff) ) {
-            continue;
-        } else if ( config_read("confirm_card_sn")[0] == 'N' ) {
-            config_write("confirm_card_sn", buff);
-            log_printf(INF, "card confirmed.");
-            continue;
-        }
-
-        if ( 0 == strcmp(config_read("triger_card_sn"), buff) &&
-             0 == strcmp(config_read("confirm_card_sn"), buff) ) {
-            config_write("settle_card_sn", buff);
-            log_printf(INF, "card settled.");
-            continue;
-        }
-    }
-
-    return NULL;
-}
 
 // 充电机通信服务线程
 void *thread_charger_service(void *arg) ___THREAD_ENTRY___
