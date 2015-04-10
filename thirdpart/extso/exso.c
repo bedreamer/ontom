@@ -12,7 +12,7 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
                               const char *path, void *param)
 {
     struct exso_struct *exso = NULL;
-    struct exso_struct copy = {0};
+    struct exso_struct copy;
     char entry[128] = {0};
 
     if ( head == NULL ) return NULL;
