@@ -38,9 +38,9 @@
 #include "../lib/Hachiko.h"
 
 #include "ajax.h"
+#include "list.h"
 #include "blueprint.h"
 #include "bms.h"
 #include "charge.h"
-#include "list.h"
 
 #endif// ___STDAFX_H_
