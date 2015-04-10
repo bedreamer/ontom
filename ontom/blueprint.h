@@ -17,7 +17,6 @@
 #ifndef _BLUE_PRINT_INCLUED_H_
 #define _BLUE_PRINT_INCLUED_H_
 
-#include "Hachiko.h"
 struct charge_job;
 struct bp_uart;
 #define CONFIG_BP_IO_BUFF_SIZE   512
