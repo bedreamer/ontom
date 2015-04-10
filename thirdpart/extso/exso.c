@@ -99,6 +99,8 @@ void exso_do_mainloop(struct exso_struct **head)
                 thiz->exso_init_entry = NULL;
                 thiz->exso_status = EXSO_DEL;
             } else {
+                thiz->exso_init_entry_copy = thiz->exso_init_entry;
+                thiz->exso_init_entry = NULL;
                 thiz->exso_status = EXSO_OK;
             }
         } else if ( thiz->exso_main_loop &&
