@@ -15,9 +15,7 @@ struct MDATA_ACK;
 struct bp_uart;
 #include <pthread.h>
 #include "list.h"
-#include "Hachiko.h"
 #include "bms.h"
-#include "config.h"
 
 #include "../thirdpart/sqlite/sqlite3.h"
 // 无效时戳，初始化时默认赋值， 用于time_t默认值
