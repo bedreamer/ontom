@@ -75,7 +75,7 @@ int exso_unload(struct exso_struct **head, struct exso_struct *exso)
 /*
  * 执行扩展的主函数
  */
-int exso_do_mainloop(struct exso_struct **head)
+void exso_do_mainloop(struct exso_struct **head)
 {
     int ret;
     struct exso_struct *thiz;
