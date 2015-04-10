@@ -99,7 +99,7 @@ int exso_do_mainloop(struct exso_struct **head)
         } else if ( thiz->exso_main_loop &&
                     thiz->exso_status == EXSO_OK ) {
             thiz->exso_main_loop( thiz->exso_param );
-        } else ;
+        } else {};
 
         if ( thiz->exso_status == EXSO_DEL ) {
             if ( thiz->exso_exit_entry ) {
