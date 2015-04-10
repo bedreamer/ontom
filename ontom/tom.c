@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#include "charge.h"
+
+
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 
 extern void * thread_measure_service(void *) ___THREAD_ENTRY___;
