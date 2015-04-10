@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "charge.h"
+#include "blueprint.h"
 
 struct charge_task tom;
 
