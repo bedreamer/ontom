@@ -1358,7 +1358,7 @@ struct charge_task {
     pthread_t tid;
     pthread_attr_t attr;
     // 扩展程序
-    struct exso_struct **exsos;
+    struct exso_struct *exsos;
 
     // 作业任务提交列表
     struct list_head *commit_head;
