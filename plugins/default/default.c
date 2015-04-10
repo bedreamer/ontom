@@ -3,13 +3,13 @@
 
 int nr = 0;
 
-int exso_demo_init(void *p)
+int exso_default_init(void *p)
 {
     printf("******  Plugin  default  initialized  ******");
     return ERR_OK;
 }
 
-int exso_demo_main_loop(void *p)
+int exso_default_main_loop(void *p)
 {
     nr ++;
     if ( 0 == (nr % 1000) )
@@ -17,7 +17,7 @@ int exso_demo_main_loop(void *p)
     return ERR_OK;
 }
 
-int exso_demo_exit(void *p)
+int exso_default_exit(void *p)
 {
     printf("******  Plugin  default  exited  ******");
     return ERR_OK;
