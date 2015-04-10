@@ -50,7 +50,7 @@ PHONY+=y-objs m-objs s-objs b-objs
 EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	PWD ARCH WORKDIR IMGFILE Q CFLAGS CCFLAGS CMODULE \
 	BINASFLAGS CPFLAGS EXFLAGS yobjs-list mobjs-list sobjs-list
-SEP-DIRS=thirdpart/mongoose thirdpart/sqlite
+SEP-DIRS=thirdpart/mongoose thirdpart/sqlite thirdpart/extso
 # must be the last one.
 LAST-DIR=
 SUB-DIRS=ontom lib/lj plugins/default plugins/demo
