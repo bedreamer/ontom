@@ -36,7 +36,7 @@
  *******************************************************************************/
 #include "stdafx.h"
 
-static char *value_type[] = {"STRING", "INT", "FLOAT", "BOOL", "N/A"};
+const char *value_type[] = {"STRING", "INT", "FLOAT", "BOOL", "N/A"};
 //static char *value_system[] = {"NO", "YES", "N/A"};
 //static char *value_status[] = {"INVALID", "VALID", "MODIFY", "N/A"};
 //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
