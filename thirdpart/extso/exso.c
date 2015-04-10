@@ -81,8 +81,8 @@ void exso_do_mainloop(struct exso_struct **head)
     int ret;
     struct exso_struct *thiz;
 
-    if ( head == NULL ) return 0;
-    if ( *head == NULL ) return 0;
+    if ( head == NULL ) return;
+    if ( *head == NULL ) return;
 
     thiz = *head;
 
