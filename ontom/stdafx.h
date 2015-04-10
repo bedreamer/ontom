@@ -32,6 +32,7 @@
 #include "../thirdpart/extso/exso.h"
 
 #include "error.h"
+#include "list.h"
 
 #include "../lib/log.h"
 #include "../lib/config.h"
