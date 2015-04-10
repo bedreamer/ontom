@@ -20,8 +20,10 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
     if ( modulename == NULL ) return NULL;
 
     void *so_handle = dlopen(path, RTLD_LAZY);
-    if ( so_handle == NULL ) return NULL;
-
+    if ( so_handle == NULL ) {
+        printf("open %s faile!", path);
+        return NULL;
+    }
     sprintf(entry, "exso_%s_init", modulename);
     copy.exso_init_entry = (int (*)(void *))dlsym(so_handle, entry);
     if ( dlerror() ) {
