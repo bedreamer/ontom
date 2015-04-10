@@ -20,7 +20,40 @@ struct ajax_xml_struct {
 	char iobuff[XML_IO_SIZE];
 };
 
-// 生成xml文件
+int ajax_version_xml_proc(struct ajax_xml_struct *);
+int ajax_uart_debug_page(struct ajax_xml_struct *thiz);
+int ajax_system_query_json_proc(struct ajax_xml_struct *thiz);
+int ajax_system_history_proc(struct ajax_xml_struct *thiz);
+int ajax_system_error_proc(struct ajax_xml_struct *thiz);
+int ajax_system_do_active(struct ajax_xml_struct *thiz);
+int ajax_system_detail_proc(struct ajax_xml_struct *thiz);
+int ajax_system_config_save_proc(struct ajax_xml_struct *thiz);
+int ajax_system_config_proc(struct ajax_xml_struct *thiz);
+int ajax_system_config_options_proc(struct ajax_xml_struct *thiz);
+int ajax_system_about_proc(struct ajax_xml_struct *thiz);
+int ajax_query_xml_proc(struct ajax_xml_struct *thiz);
+int ajax_query_json_proc(struct ajax_xml_struct *thiz);
+int ajax_module_query_proc(struct ajax_xml_struct *thiz);
+int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_query_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_create_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz);
+int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz);
 int ajax_gen_xml(struct ajax_xml_struct *thiz);
+int ajax_debug_list(struct ajax_xml_struct *thiz);
+int ajax_debug_json_list(struct ajax_xml_struct *thiz);
+int ajax_debug_commit(struct ajax_xml_struct *thiz);
+int ajax_debug_bit_write(struct ajax_xml_struct *thiz);
+int ajax_debug_bit_read(struct ajax_xml_struct *thiz);
+int ajax_deal_xml_proc(struct ajax_xml_struct *);
+int ajax_confirm_charge_xml_proc(struct ajax_xml_struct *thiz);
+int ajax_charge_status_xml_proc(struct ajax_xml_struct *);
+int ajax_card_init_proc(struct ajax_xml_struct *thiz);
+int ajax_battery_status_xml_proc(struct ajax_xml_struct *);
+int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
+int ajax_alarm_xml_proc(struct ajax_xml_struct *);
 
 #endif /*_AJAX_DEF_INCLUDED_H*/
