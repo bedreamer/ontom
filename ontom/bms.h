@@ -424,21 +424,6 @@ typedef enum {
     EVT_RET_TX_ABORT = 4
 }EVT_PARAM;
 
-// CAN 链接临时参数
-struct can_tp_param {
-    // 传输的数据包PGN
-    unsigned int tp_pgn;
-    // 即将传输的数据包大小
-    unsigned int tp_size;
-    // 即将传输的数据包个数
-    unsigned int tp_pack_nr;
-
-    // 已经接收的数据字节数
-    unsigned int tp_rcv_bytes;
-    // 已经接收的数据包个数
-    unsigned int tp_rcv_pack_nr;
-};
-
 // 事件通知结构
 struct event_struct {
     // 事件参数
@@ -491,47 +476,6 @@ typedef enum {
     I_BEM = 18,
     I_CEM = 19
 }CAN_PGN_STATISTICS;
-
-// BMS 通讯管理描述结构，JOB的下属成员结构
-struct bms_struct {
-    COMM_M_STRUCT_STATUS status;
-    // 充电作业所处阶段,BMS 链接阶段
-    CHARGE_STAGE charge_stage;
-
-    struct charge_job *job;
-    // BMS通讯设备名, "can1|can2"
-    char *can_dev;
-    // BMS写初始化完成
-    int bms_write_init_ok;
-    // BMS读初始化完成
-    int bms_read_init_ok;
-    // CAN BMS 通信所处状态
-    CAN_BMS_STATUS can_bms_status;
-    // 连接管理的传输控制参数
-    struct can_tp_param can_tp_param;
-    // 连接管理超时控制器
-    struct Hachiko_food can_tp_bomb;
-    // 连接超时参数组状态
-    PRIVATE_STATUS can_tp_private_status;
-    // CAN数据包心跳时钟
-    struct Hachiko_food can_heart_beat;
-
-    // 车辆基本信息
-    struct pgn512_BRM  vehicle_info;
-    // BMS充电配置信息
-    struct pgn1536_BCP bms_config_info;
-    // BMS当前充电需求信息
-    struct pgn4096_BCL bms_charge_need_now;
-    // BMS 电池充电总状态信息
-    struct pgn4352_BCS bms_all_battery_status;
-    // BMS 动力蓄电池状态信息
-    struct pgn4864_BSM bms_battery_status;
-
-    // 数据库操作计数器
-    unsigned int readed;
-    unsigned int can_pack_gen_nr;
-    struct can_pack_generator *generator;
-};
 
 int about_packet_reciev_done(struct charge_job *thiz, struct event_struct *param);
 int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param);
