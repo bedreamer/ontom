@@ -618,7 +618,7 @@ typedef enum {
     // 闲置等待
     PRIVATE_STANDBY = 0x02
 }PRIVATE_STATUS;
-
+struct can_tp_param;
 // BMS 通讯管理描述结构，JOB的下属成员结构
 struct bms_struct {
     COMM_M_STRUCT_STATUS status;
