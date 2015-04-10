@@ -5,7 +5,8 @@
  * 读卡器 - 串口通信过程
  */
 #include "stdafx.h"
-#include "Hachiko.h"
+#include "bms.h"
+#include "charge.h"
 
 // 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
 void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachiko_food *self)
