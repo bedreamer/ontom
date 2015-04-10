@@ -2,6 +2,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include <malloc.h>
+#include <string.h>
 #include "exso.h"
 
 /*
@@ -12,7 +13,7 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
 {
     struct exso_struct *exso = NULL;
     struct exso_struct copy = {0};
-    char entry[128];
+    char entry[128] = {0};
 
     if ( head == NULL ) return NULL;
     if ( path == NULL ) return NULL;
