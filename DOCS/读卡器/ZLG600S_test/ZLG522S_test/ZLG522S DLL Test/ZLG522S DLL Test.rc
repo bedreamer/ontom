@@ -1,0 +1,603 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\ZLG522S DLL Test.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""l.chs\\afxres.rc""          // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\ZLG522S DLL Test.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 ZLG522S DLL Test"
+FONT 9, "宋体"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "ZLG522S DLL Test 1.0 版",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "版权所有 (C) 2010",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "确定",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_ZLG522SDLLTEST_DIALOG DIALOGEX 0, 0, 559, 397
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "ZLG522S DLL Test"
+FONT 9, "宋体", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_COMBO_MODULE_TYPE,54,20,50,186,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_COMNO,54,38,50,167,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_BAUD_RATE,54,56,50,147,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "打开",IDC_BUTTON_OPEN,52,74,50,14
+    LTEXT           "模块类型：",IDC_STATIC,12,23,41,8
+    LTEXT           "串口号：",IDC_STATIC,19,41,33,8
+    LTEXT           "波特率：",IDC_STATIC,19,59,33,8
+    GROUPBOX        "串口设置",IDC_STATIC,7,7,103,96
+    EDITTEXT        IDC_EDIT_DEV_INFO,123,19,72,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "获取模块信息",IDC_BUTTON_GET_DEV_INFO,201,20,50,14
+    CONTROL         "Tab1",IDC_TAB_CARD_MODE,"SysTabControl32",TCS_MULTILINE,
+                    7,110,545,280
+    PUSHBUTTON      "配置PCD",IDC_BUTTON_CFG_PCD,131,56,50,14
+    PUSHBUTTON      "关闭PCD",IDC_BUTTON_CLOSE_PCD,131,74,50,14
+    EDITTEXT        IDC_EDIT_REG_ADR,243,56,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_REG_VAL,243,74,18,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "读寄存器",IDC_BUTTON_READ_REG,272,56,50,14
+    PUSHBUTTON      "写寄存器",IDC_BUTTON_WRATE_REG,272,74,50,14
+    CONTROL         "天线关闭",IDC_RADIO_TX_MODE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,472,33,48,10
+    CONTROL         "仅TX1驱动",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,472,
+                    48,52,10
+    CONTROL         "仅TX2驱动",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,472,
+                    63,52,10
+    CONTROL         "TX1、2同时驱动",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,
+                    472,78,72,10
+    GROUPBOX        "设备控制",IDC_STATIC,117,7,435,96
+    GROUPBOX        "天线驱动模式",IDC_STATIC,466,20,80,75
+    PUSHBUTTON      "模式设置",IDC_BUTTON_SET_MODULE_WORK_MODE,271,20,50,14
+    PUSHBUTTON      "卡复位",IDC_BUTTON_CARD_RESET,385,74,50,14
+    LTEXT           "寄存器地址：0x",IDC_STATIC,186,58,57,8
+    LTEXT           "寄存器值：0x",IDC_STATIC,194,76,49,8
+    EDITTEXT        IDC_EDIT_PAUSE_TIME,415,36,18,14,ES_AUTOHSCROLL
+    LTEXT           "载波关闭时间：",IDC_STATIC,357,39,57,8
+    EDITTEXT        IDC_EDIT_WAIT_TIME,415,56,18,14,ES_AUTOHSCROLL
+    LTEXT           "载波开启保持时间：",IDC_STATIC,341,59,73,8
+    GROUPBOX        "PCD控制",IDC_STATIC,124,40,205,55
+    GROUPBOX        "卡复位",IDC_STATIC,335,20,126,75
+    LTEXT           "(ms)",IDC_STATIC,434,39,17,8
+    LTEXT           "(ms)",IDC_STATIC,434,59,17,8
+END
+
+IDD_DIALOG_MIFARE DIALOG DISCARDABLE  0, 0, 545, 265
+STYLE WS_CHILD
+FONT 9, "宋体"
+BEGIN
+    COMBOBOX        IDC_COMBO_REQ_CODE,62,18,70,114,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "请求",IDC_BUTTON_REQUEST,14,34,50,14
+    EDITTEXT        IDC_EDIT_UID,195,34,84,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "防碰撞",IDC_BUTTON_ANTI,90,34,50,14
+    PUSHBUTTON      "选择",IDC_BUTTON_SELECT,14,52,50,14
+    EDITTEXT        IDC_EDIT_DATA,47,164,194,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "认证",IDC_BUTTON_AUTH,246,110,30,14
+    COMBOBOX        IDC_COMBO_AUTH_SECTOR,47,92,48,166,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "A型卡激活",IDC_BUTTON_ACTI,90,52,50,14
+    LTEXT           "请求类型：",IDC_STATIC,15,19,41,8
+    LTEXT           "卡号：0x",IDC_STATIC,158,37,33,8
+    LTEXT           "请求应答：0x",IDC_STATIC,142,18,49,8
+    EDITTEXT        IDC_EDIT_ATQ,195,16,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SAK,195,52,40,14,ES_AUTOHSCROLL
+    LTEXT           "选择应答：0x",IDC_STATIC,142,54,49,8
+    LTEXT           "扇区：",IDC_STATIC,21,94,25,8
+    LTEXT           "密钥：",IDC_STATIC,21,114,25,8
+    EDITTEXT        IDC_EDIT_AUTH_KEY,47,110,76,14,ES_AUTOHSCROLL
+    LTEXT           "数据：",IDC_STATIC,21,168,25,8
+    LTEXT           "天线驱动模式：",IDC_STATIC,395,21,57,8
+    COMBOBOX        IDC_COMBO_AUTO_TXMODE,455,18,77,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "请求模式：",IDC_STATIC,411,39,41,8
+    COMBOBOX        IDC_COMBO_AUTO_REQ_CODE,455,36,77,110,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "认证模式：",IDC_STATIC,411,56,41,8
+    COMBOBOX        IDC_COMBO_AUTO_AUTH_MODE,455,54,77,166,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_AUTO_SECTOR,455,72,77,261,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_AUTO_KEY,338,144,194,14,ES_AUTOHSCROLL
+    LTEXT           "扇区：",IDC_STATIC,427,75,25,8
+    LTEXT           "块号：",IDC_STATIC,427,92,25,8
+    COMBOBOX        IDC_COMBO_AUTO_BNR,455,90,77,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "块数：",IDC_STATIC,427,110,25,8
+    COMBOBOX        IDC_COMBO_AUTO_EXT,455,108,77,110,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "密钥：",IDC_STATIC,309,147,25,8
+    CONTROL         "CRYPTO 1",IDC_RADIO_AUTO_CRYPTO1,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,338,110,48,10
+    CONTROL         "AES",IDC_RADIO_AUTO_AES,"Button",BS_AUTORADIOBUTTON,338,
+                    128,28,10
+    GROUPBOX        "A型卡自动检测参数",IDC_STATIC,290,7,248,176
+    LTEXT           "密钥类型：",IDC_STATIC,293,119,41,8
+    CONTROL         "串口主动发送",IDC_CHECK_AUTO_SEND,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,303,33,64,10
+    CONTROL         "检测到卡时产生中断",IDC_CHECK_AUTO_INIT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,303,50,88,10
+    CONTROL         "数据输出后继续检测",IDC_CHECK_AUTO_CONT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,303,67,88,10
+    CONTROL         "最后执行Halt()命令",IDC_CHECK_AUTO_HALT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,303,84,88,10
+    GROUPBOX        "自动检测模式",IDC_STATIC,296,17,100,84
+    PUSHBUTTON      "读",IDC_BUTTON_READ,246,144,30,14
+    PUSHBUTTON      "写",IDC_BUTTON_WRITE,246,164,30,14
+    GROUPBOX        "激活",IDC_STATIC,7,7,277,64
+    LTEXT           "原值块：",IDC_STATIC,13,222,33,8
+    COMBOBOX        IDC_COMBO_SBLOCK,47,220,37,169,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "加",IDC_BUTTON_INC_VAL,87,200,30,14
+    PUSHBUTTON      "减",IDC_BUTTON_DEC_,88,218,30,14
+    PUSHBUTTON      "复制",IDC_BUTTON_RES,88,236,30,14
+    LTEXT           "值：",IDC_STATIC,132,221,17,8
+    EDITTEXT        IDC_EDIT_VAL,151,218,40,14,ES_AUTOHSCROLL
+    LTEXT           "目的值块：",IDC_STATIC,197,222,41,8
+    COMBOBOX        IDC_COMBO_DBLOCK,240,220,37,133,CBS_DROPDOWN | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "读值块",IDC_BUTTON_READ_VAL,47,200,30,14
+    PUSHBUTTON      "写值块",IDC_BUTTON_WRITE_VAL,246,200,30,14
+    GROUPBOX        "认证",IDC_STATIC,7,74,277,58
+    GROUPBOX        "数据块（包括值块和密钥配置块）操作",IDC_STATIC,7,134,
+                    277,50
+    PUSHBUTTON      "设置自动检测",IDC_BUTTON_AUTO_SET_PARA,482,162,50,14
+    GROUPBOX        "值块操作",IDC_STATIC,7,188,277,70
+    COMBOBOX        IDC_COMBO_BLOCK,47,146,48,112,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "块号：",IDC_STATIC,21,148,25,8
+    LTEXT           "认证模式：",IDC_STATIC,151,94,41,8
+    COMBOBOX        IDC_COMBO_AUTH_MODE,194,92,77,166,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_AUTH_KEY_SECTOR,194,110,49,148,CBS_DROPDOWN | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "密钥扇区：",IDC_STATIC,151,111,41,8
+    COMBOBOX        IDC_COMBO_AUTO_KEY_SECTOR,455,126,77,148,CBS_DROPDOWN | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "密钥扇区：",IDC_STATIC,411,128,41,8
+END
+
+IDD_DIALOG_SET_WORK_MODE DIALOG DISCARDABLE  0, 0, 373, 191
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "设置模块工作模式（ZLG522SP）"
+FONT 9, "宋体"
+BEGIN
+    DEFPUSHBUTTON   "设置",IDOK,187,170,50,14
+    PUSHBUTTON      "取消",IDCANCEL,305,170,50,14
+    CONTROL         "修改工作模式",IDC_CHECK_CHANGE_WORK_MODE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,20,64,10
+    CONTROL         "修改通讯波特率",IDC_CHECK_CHANGE_BAUD_RATE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,92,72,10
+    CONTROL         "修改模块地址",IDC_CHECK_CHANGE_MODULE_ADR,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,15,150,64,10
+    CONTROL         "修改自动检测参数",IDC_CHECK_CHANGE_AUTO_DETECT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,128,20,80,10
+    GROUPBOX        "修改工作模式",IDC_STATIC,7,7,106,68
+    GROUPBOX        "修改通讯波特率（UART）",IDC_STATIC,7,77,106,56
+    GROUPBOX        "修改模块地址",IDC_STATIC,7,137,105,47
+    LTEXT           "模块地址：0x",IDC_STATIC,15,168,49,8
+    EDITTEXT        IDC_EDIT_MODULE_ADR,72,164,20,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_BAUD_RATE_NO,60,112,48,129,CBS_DROPDOWN | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "波特率：",IDC_STATIC,23,114,33,8
+    LTEXT           "通讯模式：",IDC_STATIC,15,40,41,8
+    COMBOBOX        IDC_COMBO_COMM_MODE,60,38,48,146,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "工作模式：",IDC_STATIC,15,58,41,8
+    COMBOBOX        IDC_COMBO_WORK_MODE,60,56,48,128,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "天线驱动模式：",IDC_STATIC,246,20,57,8
+    COMBOBOX        IDC_COMBO_TXMODE,305,18,48,128,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "请求模式：",IDC_STATIC,262,38,41,8
+    COMBOBOX        IDC_COMBO_REQ_MODE,305,36,48,110,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "认证模式：",IDC_STATIC,263,59,41,8
+    COMBOBOX        IDC_COMBO_AUTH_MODE,305,54,48,166,CBS_DROPDOWN | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_SECTOR,305,74,48,261,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_KEY,171,146,190,14,ES_AUTOHSCROLL
+    LTEXT           "扇区：",IDC_STATIC,279,76,25,8
+    LTEXT           "块号：",IDC_STATIC,279,94,25,8
+    COMBOBOX        IDC_COMBO_BNR,305,92,48,128,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "块数：",IDC_STATIC,279,112,25,8
+    COMBOBOX        IDC_COMBO_EXT,305,110,48,110,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "密钥：",IDC_STATIC,144,150,25,8
+    CONTROL         "CRYPTO 1",IDC_RADIO_CRYPTO1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,171,128,48,10
+    CONTROL         "AES",IDC_RADIO_AES,"Button",BS_AUTORADIOBUTTON,305,128,
+                    28,10
+    GROUPBOX        "修改自动检测模式",IDC_STATIC,120,7,246,159
+    LTEXT           "密钥类型：",IDC_STATIC,128,130,41,8
+    CONTROL         "串口主动发送",IDC_CHECK_,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,135,51,64,10
+    CONTROL         "检测到卡时产生中断",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,135,68,88,10
+    CONTROL         "数据输出后继续检测",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,135,85,88,10
+    CONTROL         "最后执行Halt()命令",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,135,102,88,10
+    GROUPBOX        "自动检测模式",IDC_STATIC,127,35,103,84
+END
+
+IDD_DIALOG_ISO14443 DIALOG DISCARDABLE  0, 0, 545, 265
+STYLE WS_CHILD
+FONT 9, "宋体"
+BEGIN
+    COMBOBOX        IDC_COMBO_REQ_CODE,61,18,70,134,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "激活",IDC_BUTTON_ACTI,136,16,50,14
+    LTEXT           "请求类型：",IDC_STATIC,16,20,41,8
+    LTEXT           "卡信息：",IDC_STATIC,203,22,33,8
+    EDITTEXT        IDC_EDIT_CARD_INFO,241,16,289,14,ES_AUTOHSCROLL
+    GROUPBOX        "激活",IDC_STATIC,7,7,531,46
+    LTEXT           "ATS：",IDC_STATIC,218,36,21,8
+    EDITTEXT        IDC_EDIT_ATS,241,33,289,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "RATS",IDC_BUTTON_RATS,136,33,50,14
+    EDITTEXT        IDC_EDIT_SEND,61,71,468,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_REV,61,107,468,14,ES_AUTOHSCROLL
+    LTEXT           "发送数据：",IDC_STATIC,16,76,41,8
+    LTEXT           "接收数据：",IDC_STATIC,16,108,41,8
+    PUSHBUTTON      "发送",IDC_BUTTON_SEND,16,89,50,14
+    PUSHBUTTON      "DeSelect",IDC_BUTTON_DESELECT,60,33,50,14
+    GROUPBOX        "Static",IDC_STATIC,7,60,531,70
+    LISTBOX         IDC_LIST1,7,137,531,121,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_PLUSCPU DIALOG DISCARDABLE  0, 0, 545, 265
+STYLE WS_CHILD
+FONT 9, "宋体"
+BEGIN
+    COMBOBOX        IDC_COMBO_REQ_CODE,70,18,48,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "请求",IDC_BUTTON_REQUEST,14,34,50,14
+    EDITTEXT        IDC_EDIT4,195,34,84,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "防碰撞",IDC_BUTTON_AUTI,70,34,50,14
+    PUSHBUTTON      "选择",IDC_BUTTON_SELECT,14,52,50,14
+    EDITTEXT        IDC_EDIT5,55,164,170,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "认证",IDC_BUTTON_AUTH,191,110,50,14
+    COMBOBOX        IDC_COMBO_AUTH_SECTOR,55,92,48,30,CBS_DROPDOWN | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_KEY_TYPE,193,92,48,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "A型卡激活",IDC_BUTTON10,70,52,50,14
+    LTEXT           "请求类型：",IDC_STATIC,23,19,41,8
+    LTEXT           "卡号：0x",IDC_STATIC,158,37,33,8
+    LTEXT           "请求应答：0x",IDC_STATIC,142,18,49,8
+    EDITTEXT        IDC_EDIT6,195,16,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT7,195,52,40,14,ES_AUTOHSCROLL
+    LTEXT           "选择应答：0x",IDC_STATIC,142,54,49,8
+    LTEXT           "扇区：",IDC_STATIC,29,94,25,8
+    LTEXT           "密钥类型：  ",IDC_STATIC,142,94,49,8
+    LTEXT           "密钥：",IDC_STATIC,29,114,25,8
+    EDITTEXT        IDC_EDIT8,55,110,110,14,ES_AUTOHSCROLL
+    LTEXT           "数据：",IDC_STATIC,29,168,25,8
+    LTEXT           "天线驱动模式：",IDC_STATIC,419,20,57,8
+    COMBOBOX        IDC_COMBO_TXMODE,479,18,48,128,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "请求模式：",IDC_STATIC,435,38,41,8
+    COMBOBOX        IDC_COMBO_REQ_MODE,479,36,48,110,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "认证模式：",IDC_STATIC,437,59,41,8
+    COMBOBOX        IDC_COMBO_AUTH_MODE,479,54,48,166,CBS_DROPDOWN | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_SECTOR,479,74,48,261,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_KEY,345,146,190,14,ES_AUTOHSCROLL
+    LTEXT           "扇区：",IDC_STATIC,453,76,25,8
+    LTEXT           "块号：",IDC_STATIC,453,94,25,8
+    COMBOBOX        IDC_COMBO_BNR,479,92,48,128,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "块数：",IDC_STATIC,453,112,25,8
+    COMBOBOX        IDC_COMBO_EXT,479,110,48,110,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "密钥：",IDC_STATIC,317,150,25,8
+    CONTROL         "CRYPTO 1",IDC_RADIO_CRYPTO1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,345,128,48,10
+    CONTROL         "AES",IDC_RADIO_AES,"Button",BS_AUTORADIOBUTTON,479,128,
+                    28,10
+    GROUPBOX        "A型卡自动检测参数",IDC_STATIC,292,7,246,159
+    LTEXT           "密钥类型：",IDC_STATIC,301,130,41,8
+    CONTROL         "串口主动发送",IDC_CHECK_2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,309,51,64,10
+    CONTROL         "检测到卡时产生中断",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,309,68,88,10
+    CONTROL         "数据输出后继续检测",IDC_CHECK10,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,309,85,88,10
+    CONTROL         "最后执行Halt()命令",IDC_CHECK11,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,309,102,88,10
+    GROUPBOX        "自动检测模式",IDC_STATIC,301,35,103,84
+    PUSHBUTTON      "读",IDC_BUTTON_READ,231,164,20,14
+    PUSHBUTTON      "写",IDC_BUTTON_WRITE,256,164,20,14
+    GROUPBOX        "激活",IDC_STATIC,7,7,281,64
+    LTEXT           "原值块：",IDC_STATIC,21,222,33,8
+    COMBOBOX        IDC_COMBO4,55,220,30,132,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "加",IDC_BUTTON13,93,200,30,14
+    PUSHBUTTON      "减",IDC_BUTTON14,94,218,30,14
+    PUSHBUTTON      "复制",IDC_BUTTON15,94,236,30,14
+    LTEXT           "值：0x",IDC_STATIC,130,221,25,8
+    EDITTEXT        IDC_EDIT9,157,218,40,14,ES_AUTOHSCROLL
+    LTEXT           "目的值块：",IDC_STATIC,203,222,41,8
+    COMBOBOX        IDC_COMBO5,246,220,30,133,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "读值块",IDC_BUTTON16,55,200,30,14
+    PUSHBUTTON      "写值块",IDC_BUTTON17,246,200,30,14
+    GROUPBOX        "认证",IDC_STATIC,7,74,281,58
+    GROUPBOX        "数据块（包括值块和密钥配置块）操作",IDC_STATIC,7,134,
+                    281,55
+    PUSHBUTTON      "设置自动检测",IDC_BUTTON18,321,16,50,14
+    PUSHBUTTON      "获取自动检测",IDC_BUTTON19,366,182,50,14
+    GROUPBOX        "A型卡自动检测结果",IDC_STATIC,292,169,246,89
+    CONTROL         "继续检测",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,311,186,48,10
+    CONTROL         "Radio1",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON,426,186,
+                    40,10
+    CONTROL         "Radio2",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,485,186,
+                    40,10
+    EDITTEXT        IDC_EDIT10,355,200,170,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT11,355,218,170,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT12,356,236,170,14,ES_AUTOHSCROLL
+    GROUPBOX        "值块操作",IDC_STATIC,7,193,281,65
+    COMBOBOX        IDC_COMBO6,57,146,48,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "块号：",IDC_STATIC,29,148,25,8
+END
+
+IDD_DIALOG_AUTO_RES DIALOG DISCARDABLE  0, 0, 275, 181
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "获取自动检测结果"
+FONT 9, "宋体"
+BEGIN
+    PUSHBUTTON      "退出",IDCANCEL,211,154,50,14
+    EDITTEXT        IDC_EDIT_UID,67,56,84,14,ES_AUTOHSCROLL
+    LTEXT           "卡号：0x",IDC_STATIC,33,59,33,8
+    LTEXT           "请求应答：0x",IDC_STATIC,17,40,49,8
+    EDITTEXT        IDC_EDIT_ATQ,67,38,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SAK,67,74,40,14,ES_AUTOHSCROLL
+    LTEXT           "选择应答：0x",IDC_STATIC,17,77,49,8
+    EDITTEXT        IDC_EDIT_TX,67,20,84,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BLOCK1,67,92,194,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BLOCK2,67,110,194,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BLOCK3,67,128,194,14,ES_AUTOHSCROLL
+    GROUPBOX        "自动检测数据",IDC_STATIC,7,7,261,141
+    LTEXT           "天线：  ",IDC_STATIC,33,23,33,8
+    LTEXT           "第1块数据：  ",IDC_STATIC,13,95,53,8
+    LTEXT           "第2块数据：  ",IDC_STATIC,13,113,53,8
+    LTEXT           "第3块数据：  ",IDC_STATIC,13,129,53,8
+    CONTROL         "取消检测",IDC_RADIO_CNT,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,16,158,48,10
+    CONTROL         "继续检测",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,67,158,
+                    48,10
+    PUSHBUTTON      "获取检测结果",IDC_BUTTON_GET_AUTO_RES,131,154,50,14
+    PUSHBUTTON      "读检测结果",IDC_BUTTON_READ_RES,205,56,50,14
+    LTEXT           "超时设置（ms）：",IDC_STATIC,148,42,65,8
+    EDITTEXT        IDC_EDIT_TIME_OVER,215,38,40,14,ES_AUTOHSCROLL
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "ZLG522S DLL Test Microsoft 基础类应用程序\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "ZLG522S DLL Test\0"
+            VALUE "LegalCopyright", "版权所有 (C) 2010\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "ZLG522S DLL Test.EXE\0"
+            VALUE "ProductName", "ZLG522S DLL Test 应用程序\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_ZLG522SDLLTEST_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 552
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 390
+    END
+
+    IDD_DIALOG_MIFARE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 538
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 258
+    END
+
+    IDD_DIALOG_SET_WORK_MODE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 366
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 184
+    END
+
+    IDD_DIALOG_ISO14443, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 538
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 258
+    END
+
+    IDD_DIALOG_PLUSCPU, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 538
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 258
+    END
+
+    IDD_DIALOG_AUTO_RES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 268
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 173
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ABOUTBOX            "关于 ZLG522S DLL Test(&A)..."
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE 4, 2
+#pragma code_page(936)
+#endif //_WIN32
+#include "res\ZLG522S DLL Test.rc2"  // non-Microsoft Visual C++ edited resources
+#include "l.chs\afxres.rc"          // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,85 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: ZLG522S DLL Test - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E0.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Release/" /Fp"Release/ZLG522S DLL Test.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\AutoDetectRes.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\BSEdit.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\HexEdit.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\SetModuleMode.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\ZLG522S DLL Test.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\ZLG522S DLL TestDlg.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\ZLG522S_ISO14443A.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\ZLG522S_Mifare.cpp"
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\ZLG522S_PlusCPU.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E0.tmp" 
+Creating temporary file "C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E2.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Release/" /Fp"Release/ZLG522S DLL Test.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\ZLG600模块资料上传\ZLG600SP系列要上传的资料\供用户下载的资料\ZLG600上位机动态库及测试程序（加密）\ZLG522S_test\ZLG522S DLL Test\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E2.tmp" 
+<h3>Output Window</h3>
+Compiling...
+StdAfx.cpp
+Compiling...
+AutoDetectRes.cpp
+BSEdit.cpp
+HexEdit.cpp
+SetModuleMode.cpp
+ZLG522S DLL Test.cpp
+ZLG522S DLL TestDlg.cpp
+ZLG522S_ISO14443A.cpp
+ZLG522S_Mifare.cpp
+ZLG522S_PlusCPU.cpp
+Generating Code...
+Creating temporary file "C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E3.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:no /pdb:"Release/ZLG522S DLL Test.pdb" /machine:I386 /out:"Release/ZLG522S DLL Test.exe" 
+".\Release\AutoDetectRes.obj"
+".\Release\BSEdit.obj"
+".\Release\HexEdit.obj"
+".\Release\SetModuleMode.obj"
+".\Release\StdAfx.obj"
+".\Release\ZLG522S DLL Test.obj"
+".\Release\ZLG522S DLL TestDlg.obj"
+".\Release\ZLG522S_ISO14443A.obj"
+".\Release\ZLG522S_Mifare.obj"
+".\Release\ZLG522S_PlusCPU.obj"
+".\Release\ZLG522S DLL Test.res"
+".\ZLG522S.lib"
+]
+Creating command line "link.exe @C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E3.tmp"
+<h3>Output Window</h3>
+Linking...
+Creating temporary file "C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E5.tmp" with contents
+[
+/nologo /o"Release/ZLG522S DLL Test.bsc" 
+".\Release\StdAfx.sbr"
+".\Release\AutoDetectRes.sbr"
+".\Release\BSEdit.sbr"
+".\Release\HexEdit.sbr"
+".\Release\SetModuleMode.sbr"
+".\Release\ZLG522S DLL Test.sbr"
+".\Release\ZLG522S DLL TestDlg.sbr"
+".\Release\ZLG522S_ISO14443A.sbr"
+".\Release\ZLG522S_Mifare.sbr"
+".\Release\ZLG522S_PlusCPU.sbr"]
+Creating command line "bscmake.exe @C:\DOCUME~1\HETAIG~1\LOCALS~1\Temp\RSP14E5.tmp"
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+ZLG522S DLL Test.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
