@@ -530,6 +530,18 @@ typedef enum {
     CAN_TP_ABRT= 0x60
 }CAN_TP_STATUS;
 
+// 通信管理单元状态
+typedef enum {
+    // 管理但愿正在初始化
+    COMM_M_INIT = 0,
+    // 管理单元正在执行
+    COMM_M_WORKING = 1,
+    // 管理单元正在停止
+    COMM_M_STOPPING = 2,
+    // 管理单元已经终止
+    COMM_M_DIED = 3
+}COMM_M_STRUCT_STATUS;
+
 // 通信报文生成依据
 struct can_pack_generator {
     // 所属阶段
@@ -652,18 +664,6 @@ struct billing_methord {
         double set_kwh;
     }option;
 };
-
-// 通信管理单元状态
-typedef enum {
-    // 管理但愿正在初始化
-    COMM_M_INIT = 0,
-    // 管理单元正在执行
-    COMM_M_WORKING = 1,
-    // 管理单元正在停止
-    COMM_M_STOPPING = 2,
-    // 管理单元已经终止
-    COMM_M_DIED = 3
-}COMM_M_STRUCT_STATUS;
 
 typedef enum {
     // 无效
