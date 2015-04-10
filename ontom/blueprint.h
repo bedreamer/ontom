@@ -295,7 +295,7 @@ static inline int bp_user_bind(struct bp_uart *bp, struct bp_user *u) {
 
     return ERR_OK;
 }
-unsigned char check_sum(unsigned char *buff, size_t len);
+
 int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt, struct bp_evt_param *param);
 int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
