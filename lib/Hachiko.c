@@ -9,7 +9,7 @@
  * 定时器粒度调整，为了满足串口快速切换和发送数据完成的判断，所以将定时器的分辨率从10ms
  * 提高到1ms。
  */
-#include "../ontom/stdafx.h"
+#include "stdafx.h"
 
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN

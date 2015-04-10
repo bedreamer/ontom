@@ -1,4 +1,4 @@
-#include "../ontom/stdafx.h"
+#include "stdafx.h"
 
 int log_printf(unsigned int level, const char *fmt, ...)
 {
