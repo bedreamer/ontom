@@ -641,6 +641,7 @@ void config_print()
 }
 #endif /*CONFIG_DEBUG_CONFIG*/
 
+#if 0
 // 生成动态设置页面
 int ajax_debug_list(struct ajax_xml_struct *thiz)
 {
@@ -748,3 +749,4 @@ int ajax_debug_commit(struct ajax_xml_struct *thiz)
     thiz->ct = "text/html";
     return ERR_ERR;
 }
+#endif
