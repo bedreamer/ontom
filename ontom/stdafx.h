@@ -31,6 +31,8 @@
 #include "../thirdpart/sqlite/sqlite3.h"
 #include "../thirdpart/extso/exso.h"
 
+#include "error.h"
+
 #include "../lib/log.h"
 #include "../lib/config.h"
 #include "../lib/Hachiko.h"
@@ -39,7 +41,6 @@
 #include "blueprint.h"
 #include "bms.h"
 #include "charge.h"
-#include "error.h"
 #include "list.h"
 
 #endif// ___STDAFX_H_
