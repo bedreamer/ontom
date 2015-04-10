@@ -383,7 +383,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     print_POST_configure();
 
     // 启动八公定时器
-    Hachiko_init();
+    Hachiko_init(config_read("HachikoTTL"));
 
     /* 方案1：
      *   一组充电机， 一个采样盒，两把枪
