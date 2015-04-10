@@ -27,7 +27,7 @@
 #include <linux/can/raw.h>
 #include <arpa/inet.h>
 
-#include "../ontom/error.h"
+#include "../../ontom/error.h"
 
 #include "config.h"
 #include "Hachiko.h"
