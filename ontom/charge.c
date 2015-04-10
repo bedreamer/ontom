@@ -596,6 +596,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             if ( task->sys_config_gun_nr == 4 && task->sys_charge_group_nr == 4 ) {
             }
             //}}} 没实现
+
+            exso_do_mainloop( task->exsos );
         } while ( 0 );
 
         usleep(50000);
