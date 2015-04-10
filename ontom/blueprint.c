@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "blueprint.h"
+#include "charge.h"
 
 int configure_uart(int fd, int baud_rate, int databits, int stopbits, int parity)
 {
