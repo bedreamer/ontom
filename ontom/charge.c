@@ -387,6 +387,12 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     // 启动八公定时器
     Hachiko_init(config_read("HachikoTTL"));
 
+    if ( ! exso_load(&task->exsos, "default", "/usr/zeus/exso_default.so", task) ) {
+        log_printf(WRN, "ZEUS: load default plugin faile.");
+    } else {
+        log_printf(WRN, "ZEUS: default plugin loaded.");
+    }
+
     /* 方案1：
      *   一组充电机， 一个采样盒，两把枪
      *   两把枪分时充电
@@ -597,7 +603,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             }
             //}}} 没实现
 
-            exso_do_mainloop( task->exsos );
+            exso_do_mainloop( & task->exsos );
         } while ( 0 );
 
         usleep(50000);
