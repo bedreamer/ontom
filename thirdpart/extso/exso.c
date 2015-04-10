@@ -27,6 +27,7 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
     sprintf(entry, "exso_%s_init", modulename);
     copy.exso_init_entry = (int (*)(void *))dlsym(so_handle, entry);
     if ( dlerror() ) {
+        printf("find entry %s faile!", entry);
         dlclose(so_handle);
         return NULL;
     }
@@ -40,6 +41,7 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
     sprintf(entry, "exso_%s_exit", modulename);
     copy.exso_init_entry = (int (*)(void *))dlsym(so_handle, entry);
     if ( dlerror() ) {
+        printf("find entry %s faile!", entry);
         dlclose(so_handle);
         return NULL;
     }
