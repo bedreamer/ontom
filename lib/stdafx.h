@@ -29,4 +29,8 @@
 
 #include "../ontom/error.h"
 
+#include "config.h"
+#include "Hachiko.h"
+#include "log.h"
+
 #endif// ___STDAFX_H_
