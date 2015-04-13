@@ -1,7 +1,7 @@
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
 m-deps+=$(OBJS)
-EX-OBJS+=build-in.a libmongoose.so
+EX-OBJS+=build-in.a $(WORKDIR)/libmongoose.so
 
 build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"

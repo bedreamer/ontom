@@ -1,5 +1,5 @@
 m-deps+=sqlite3.o
-EX-OBJS+=build-in.a libsqlite3.so
+EX-OBJS+=build-in.a $(WORKDIR)/libsqlite3.so
 EXFLAGS=-DSQLITE_THREADSAFE
 
 build-in.a:sqlite3.o
