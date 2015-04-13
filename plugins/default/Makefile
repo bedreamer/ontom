@@ -8,7 +8,7 @@ build-in.a:$(OBJS)
 	$(Q)$(AR) -cqs $@ $^
 
 exso_default.so:$(OBJS)
-	$(Q)echo "  **LD**      exso_default.so"
+	$(Q)echo "  **LD**      $@"
 	$(Q)$(LD) -shared $(LDFLAGS) -o $@ $^
 
 include $(WORKDIR)/Rule.make

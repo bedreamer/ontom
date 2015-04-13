@@ -1,10 +1,14 @@
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
-y-deps+=$(OBJS)
-EX-OBJS+=build-in.a
+m-deps+=$(OBJS)
+EX-OBJS+=build-in.a libexso.so
 
 build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"
 	$(Q)$(AR) -cqs $@ $^
+
+libexso.so:$(OBJS)
+	$(Q)echo "  **LD**      $@"
+	$(Q)$(LD) -shared $(LDFLAGS) -o $@ $^
 
 include $(WORKDIR)/Rule.make
