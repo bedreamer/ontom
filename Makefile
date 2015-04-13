@@ -56,7 +56,7 @@ EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 SEP-DIRS=thirdpart/mongoose thirdpart/sqlite thirdpart/extso
 # must be the last one.
 LAST-DIR=
-SUB-DIRS=ontom lib/lj plugins/default plugins/demo
+SUB-DIRS=ontom lib/lj plugins/default plugins/104 plugins/demo
 EX-OBJS=
 PHONY+=EX-OBJS
 
