@@ -30,7 +30,7 @@ int exso_default_main_loop(void *p)
         struct exso_struct *thiz;
         const char *plugins_path = config_read("exso_path");
 
-        sprintf(exso_path, "%slib%s.so", plugins_path, load_exso_name);
+        sprintf(exso_path, "%sexso_%s.so", plugins_path, load_exso_name);
         thiz = exso_load( &(t->exsos), load_exso_name, exso_path, p);
         if ( thiz == NULL ) {
             log_printf(WRN, "EXSO: load <%s:%s> faile!!!!", load_exso_name, exso_path);
