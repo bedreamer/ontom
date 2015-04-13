@@ -7,7 +7,7 @@ build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"
 	$(Q)$(AR) -cqs $@ $^
 
-libmongoose.so:$(OBJS)
+$(WORKDIR)/libmongoose.so:$(OBJS)
 	$(Q)echo "  **LD**      $@"
 	$(Q)$(LD) -shared $(LDFLAGS) -o $@ $^
 

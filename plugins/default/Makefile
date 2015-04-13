@@ -7,7 +7,7 @@ build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"
 	$(Q)$(AR) -cqs $@ $^
 
-exso_default.so:$(OBJS)
+$(WORKDIR)/exso_default.so:$(OBJS)
 	$(Q)echo "  **LD**      $@"
 	$(Q)$(LD) -shared $(LDFLAGS) -o $@ $^
 
