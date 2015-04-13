@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "../../ontom/error.h"
-#include "../../lib/lj/config.h"
-#include "../../lib/lj/log.h"
+#include "../../lib/lj/stdafx.h"
 #include "../../ontom/charge.h"
 #include "../../thirdpart/extso/exso.h"
 
