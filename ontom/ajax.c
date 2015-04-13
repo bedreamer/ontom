@@ -1691,10 +1691,11 @@ void ajax_auth_proc(struct ajax_xml_struct *thiz)
     int ret = ERR_OK;
 
     thiz->ct = "application/json";
+    thiz->xml_len = 0;
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"status\":\"CONFIRMED\",", task->meter[0].Va);
+            "\"status\":\"CONFIRMED\",");
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
