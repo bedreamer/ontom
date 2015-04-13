@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "../../ontom/error.h"
+#include "../../thirdpart/sqlite/sqlite3.h"
+#include "../../thirdpart/extso/exso.h"
 #include "../../lib/lj/stdafx.h"
 #include "../../ontom/charge.h"
-#include "../../thirdpart/extso/exso.h"
 
 int exso_default_init(void *p)
 {
