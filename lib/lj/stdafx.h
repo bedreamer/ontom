@@ -29,6 +29,7 @@
 
 #include "../../ontom/error.h"
 
+#include "list.h"
 #include "config.h"
 #include "Hachiko.h"
 #include "log.h"
