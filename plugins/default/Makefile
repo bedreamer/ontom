@@ -1,7 +1,7 @@
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
 m-deps+=$(OBJS)
-EX-OBJS+=build-in.a exso_default.so
+EX-OBJS+=build-in.a $(WORKDIR)/exso_default.so
 
 build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"
