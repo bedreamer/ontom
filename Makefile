@@ -34,8 +34,8 @@ CPFLAGS=-I./ontom -I./thirdpart/D8 -I./thirdpart/mongoose -I./thirdpart/sqlite -
 EXFLAGS=
 LDFLAGS=-L. -L/home/tom/workspace/qt-4.8.2-arm/lib \
 	-L/home/tom/workspace/tslib/lib -L$(WORKDIR)/lib \
-	-L$(WORKDIR)/thirdpart/mongoose
-	-L$(WORKDIR)/thirdpart/sqlite
+	-L$(WORKDIR)/thirdpart/mongoose \
+	-L$(WORKDIR)/thirdpart/sqlite \
 	-L$(WORKDIR)/thirdpart/extso
 LDEXFLAGS=-lrt -lpthread -ldl -llj -lmongoose -lsqlite3 -lexso
 # build-in objects.
