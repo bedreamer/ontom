@@ -67,9 +67,8 @@ CONFIG_DOMAIN_BEGIN
 {"debug_lvC",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
 {"debug_lvD",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
 
-{"exso_path",                  C_STRING,   no,     C_VALID,    .cuv.i=0,       {"/usr/zeus/plugins/"}},
+{"exso_path",                   C_STRING,   no,     C_VALID,    .cuv.i=0,       {"/usr/zeus/plugins/"}},
 {"load_exso",                   C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
-{"load_name",                   C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
 {"unload_exso",                 C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
 
 // 开始充电任务的刷卡卡号
