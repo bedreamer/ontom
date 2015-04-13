@@ -55,5 +55,6 @@ int ajax_card_init_proc(struct ajax_xml_struct *thiz);
 int ajax_battery_status_xml_proc(struct ajax_xml_struct *);
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
 int ajax_alarm_xml_proc(struct ajax_xml_struct *);
+void ajax_auth_proc(struct ajax_xml_struct *thiz);
 
 #endif /*_AJAX_DEF_INCLUDED_H*/

@@ -28,6 +28,7 @@ struct xml_generator {
     {"/system/detail.json",     ajax_system_detail_proc},
     {"/system/card.json",       ajax_card_init_proc,},
     {"/system/jiaozhun.json",   ajax_jiaozhun_proc,},
+    {"/system/auth.json",       ajax_auth_proc,},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -1676,6 +1677,24 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
             bit_read(task, S_MEASURE_1_COMM_DOWN)?"ERR":"OK");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"CCS\":\"%s\",",
             bit_read(task, S_CONVERT_BOX_COMM_DOWN)?"ERR":"OK");
+
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
+
+    return ret;
+}
+
+void ajax_auth_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK;
+
+    thiz->ct = "application/json";
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "\"status\":\"CONFIRMED\",", task->meter[0].Va);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
