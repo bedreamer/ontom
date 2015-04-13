@@ -32,8 +32,8 @@
 #include "../thirdpart/extso/exso.h"
 
 #include "error.h"
-#include "list.h"
 
+#include "../lib/lj/list.h"
 #include "../lib/lj/log.h"
 #include "../lib/lj/config.h"
 #include "../lib/lj/Hachiko.h"
