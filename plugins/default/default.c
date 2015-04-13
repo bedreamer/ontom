@@ -22,23 +22,22 @@ int exso_default_main_loop(void *p)
 
     if ( t == NULL ) return ERR_ERR;
     const char *load_exso_name = config_read("load_exso");
-    const char *exso_name = config_read("load_name");
     const char *unload_exso_name = config_read("unload_exso");
 
-    if ( load_exso_name != NULL && exso_name != NULL  && 0 != strcmp("N/A", load_exso_name) ) {
+    if ( load_exso_name != NULL && 0 != strcmp("N/A", load_exso_name) ) {
         char exso_path[256];
         struct exso_struct *thiz;
         const char *plugins_path = config_read("exso_path");
 
-        config_write("load_name", "N/A");
+        config_write("load_exso", "N/A");
         config_write("load_name", "N/A");
         sprintf(exso_path, "%s%s", plugins_path, load_exso_name);
-        thiz = exso_load( &(t->exsos), exso_name, exso_path, p);
+        thiz = exso_load( &(t->exsos), load_exso_name, exso_path, p);
         if ( thiz == NULL ) {
-            log_printf(WRN, "EXSO: load <%s:%s> faile!!!!", exso_name, plugins_path);
+            log_printf(WRN, "EXSO: load <%s:%s> faile!!!!", load_exso_name, exso_path);
             return ERR_ERR;
         } else {
-            log_printf(INF, "EXSO: <%s:%s> loaded.", exso_name, plugins_path);
+            log_printf(INF, "EXSO: <%s:%s> loaded.", load_exso_name, exso_path);
             return ERR_OK;
         }
     } else if ( unload_exso_name != NULL && 0 != strcmp("N/A", unload_exso_name)  ) {
