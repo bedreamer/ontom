@@ -12,7 +12,7 @@ int exso_demo_init(void *p)
 int exso_demo_main_loop(void *p)
 {
     nr ++;
-    if ( 0 == (nr % 1000) )
+    if ( 0 == (nr % 10) )
     printf("*****   Plugin demo say: Hello %d", nr);
     return ERR_OK;
 }
