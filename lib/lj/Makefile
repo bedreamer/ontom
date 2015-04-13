@@ -8,7 +8,7 @@ build-in.a:$(OBJS)
 	$(Q)$(AR) -cqs $@ $^
 
 $(WORKDIR)/liblj.so:$(OBJS)
-	$(Q)echo "  **LD**      liblj.so"
+	$(Q)echo "  **LD**      $@"
 	$(Q)$(LD) -shared $(LDFLAGS) -o $@ $^
 
 include $(WORKDIR)/Rule.make

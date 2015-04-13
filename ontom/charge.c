@@ -387,6 +387,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     // 启动八公定时器
     Hachiko_init(config_read("HachikoTTL"));
 
+    // 加载默认的扩展程序
     if ( ! exso_load(&task->exsos, "default", "/usr/zeus/plugins/exso_default.so", task) ) {
         log_printf(WRN, "ZEUS: load default plugin faile.");
     } else {
