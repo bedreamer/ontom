@@ -30,6 +30,8 @@ int exso_default_main_loop(void *p)
         struct exso_struct *thiz;
         const char *plugins_path = config_read("exso_path");
 
+        config_write("load_name", "N/A");
+        config_write("load_name", "N/A");
         sprintf(exso_path, "%s%s", plugins_path, load_exso_name);
         thiz = exso_load( &(t->exsos), exso_name, exso_path, p);
         if ( thiz == NULL ) {
