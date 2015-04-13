@@ -35,6 +35,7 @@
  * +------------------------------------------------------------------------
  *******************************************************************************/
 #include "stdafx.h"
+#include "config.h"
 
 const char *value_type[] = {"STRING", "INT", "FLOAT", "BOOL", "N/A"};
 //static char *value_system[] = {"NO", "YES", "N/A"};
@@ -47,17 +48,12 @@ CONFIG_DOMAIN_BEGIN
 {"socket_config", 				C_BOOL,		no,		C_INVALID,  .cuv.b=true,    {"TRUE"}},
 {"socket_config_port", 			C_INT,		no,		C_INVALID,  .cuv.i=9990,    {"9990"}},
 {"socket_config_autheticate", 	C_BOOL,     no,		C_INVALID,  .cuv.n=0,       {"TRUE"}},
-{"version_httpd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
-{"version_browser",             C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
-{"version_tomd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
-{"version_godd",                C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"N/A"}},
+
 {"manual_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"00000"}},
 {"system_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"11111"}},
 {"manufacturer_passwd",         C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"8989889"}},
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
-   // 充电模块个数
-{"charge_module_nr",            C_INT,      yes,    C_VALID,    .cuv.i=14,      {"14"}},
-{"charger_comm_methord",        C_STRING,   yes,    C_VALID,    .cuv.i=0,       {"CAN"}},
+
 {"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
 {"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
 {"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
@@ -71,30 +67,22 @@ CONFIG_DOMAIN_BEGIN
 {"debug_lvC",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
 {"debug_lvD",                   C_BOOL,     no,     C_VALID,    .cuv.i=0,       {"FALSE"}},
 
+{"exso_path",                  C_STRING,   no,     C_VALID,    .cuv.i=0,       {"/usr/zeus/plugins/"}},
+{"load_exso",                   C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
+{"load_name",                   C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
+{"unload_exso",                 C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
 
 // 开始充电任务的刷卡卡号
 {"triger_card_sn",              C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
-   // 确认充电的刷卡卡号
-{"confirm_card_sn",             C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
-   // 终止充电的刷卡卡号
-{"settle_card_sn",              C_STRING,   no,     C_VALID,    .cuv.i=0,       {"N/A"}},
-   // 卡内余额
-{"card_remaind_money",          C_FLOAT,    no,     C_VALID,    .cuv.f=0.0f,    {"0.0"}},
    // 卡密码
 {"card_passwd",                 C_STRING,   no,     C_VALID,    .cuv.i=0,       {"000000"}},
    // 卡状态
 {"card_status",                 C_STRING,   no,     C_VALID,    .cuv.i=0,       {"NORMAL"}},
 // 用户配置数据
-   // 超级卡序列号
+// 超级卡序列号
 {"super_card_sn",               C_STRING,  yes,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"socket_config_username", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"socket_config_passwd", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
-{"charge_pile_serial",          C_STRING,  yes,     C_INVALID,  .cuv.n=0,       {"N/A"}},
-{"price",                       C_FLOAT,   yes,     C_INVALID,  .cuv.f=0.0f,    {"0.0"}},
-    // 系统通讯模型
-{"comm_methord_module",         C_STRING,  yes,     C_VALID,    .cuv.i=0,       {"M-01"}},
-// 关键故障标记, 标识是否可进行充电, 参考文档 充电桩相关信息.xlsx 充电桩故障对照表
-{"keyfault",                    C_STRING,  no,      C_VALID,    .cuv.i=0,       {"X11100111111100100110000011111"}},
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
