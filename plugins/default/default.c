@@ -18,6 +18,7 @@ int exso_default_init(void *p)
 
 int exso_default_main_loop(void *p)
 {
+    int ret = ERR_OK;
     struct charge_task *t = (struct charge_task *)p;
 
     if ( t == NULL ) return ERR_ERR;
@@ -29,21 +30,21 @@ int exso_default_main_loop(void *p)
         struct exso_struct *thiz;
         const char *plugins_path = config_read("exso_path");
 
-        config_write("load_exso", "N/A");
-        config_write("load_name", "N/A");
         sprintf(exso_path, "%s%s", plugins_path, load_exso_name);
         thiz = exso_load( &(t->exsos), load_exso_name, exso_path, p);
         if ( thiz == NULL ) {
             log_printf(WRN, "EXSO: load <%s:%s> faile!!!!", load_exso_name, exso_path);
-            return ERR_ERR;
+            ret = ERR_ERR;
         } else {
             log_printf(INF, "EXSO: <%s:%s> loaded.", load_exso_name, exso_path);
-            return ERR_OK;
+            ret = ERR_OK;
         }
+        config_write("load_exso", "N/A");
+        config_write("load_name", "N/A");
     } else if ( unload_exso_name != NULL && 0 != strcmp("N/A", unload_exso_name)  ) {
     } else {}
 
-    return ERR_OK;
+    return ret;
 }
 
 int exso_default_exit(void *p)
