@@ -1686,7 +1686,7 @@ int ajax_jiaozhun_proc(struct ajax_xml_struct *thiz)
     return ret;
 }
 
-void ajax_auth_proc(struct ajax_xml_struct *thiz)
+int ajax_auth_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
 
