@@ -54,7 +54,7 @@ struct p104_control_panel {
     unsigned char single[8];
 };
 
-#program pack(1)
+#pragma pack(1)
 // 链路控制结构
 struct p104_link_controller {
     unsigned char s_68h;
@@ -68,6 +68,6 @@ struct p104_link_controller {
 
     unsigned char app_buff[256];
 };
-#program pack()
+#pragma pack()
 
 #endif // INCLUDED_104_H
