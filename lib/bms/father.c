@@ -36,7 +36,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
     while ( 1 ) {
         usleep(5000);
-
+#if 0
         if ( 0x7F != thiz->bms.bms_write_init_ok ) {
             // 进行数据结构的初始化操作
             can_packet_callback(thiz, EVENT_CAN_INIT, &param);
@@ -153,6 +153,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             thiz->bms.can_bms_status = CAN_NORMAL;
             log_printf(DBG_LV2, "BMS: connection aborted.");
         }
+#endif
     }
     return NULL;
 }
@@ -201,7 +202,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     param.buff_payload = 0;
     while ( 1 ) {
         usleep(5000);
-
+#if 0
         if ( thiz->bms.can_bms_status  == CAN_INVALID ) {
             continue;
         }
@@ -398,6 +399,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         } else if ( thiz->bms.can_bms_status == CAN_TP_RD ) {
             // CAN通信处于连接管理模式
         }
+#endif
     }
 
     return NULL;
