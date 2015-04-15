@@ -1,5 +1,5 @@
-#ifndef FATHER_H
-#define FATHER_H
+#ifndef BMS_FATHER_H
+#define BMS_FATHER_H
 
 /*
  * 不同厂商的BMS通信逻辑可能不同，但又不能在程序中将不同BMS场上的特性完全包含进来，
@@ -159,4 +159,4 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job);
  */
 int bmsdriver_init(struct charge_task *);
 
-#endif // FATHER_H
+#endif // BMS_FATHER_H
