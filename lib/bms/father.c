@@ -166,12 +166,12 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     }
     return NULL;
 }
+#if 0
 
 // bms 通信 读 服务线程
 // 提供bms通信服务
 void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 {
-#if 0
     int *done = (int *)arg;
     int mydone = 0;
     int s;
@@ -412,9 +412,9 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     }
 
-#endif
     return NULL;
 }
+#endif
 
 /*
  * BMS 驱动初始化
@@ -429,7 +429,7 @@ int bmsdriver_init(struct charge_task *tsk)
     }
 
     // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
-    ret = pthread_create( & tsk->tid_read, &tsk->attr, thread_bms_read_service, tsk);
+    //ret = pthread_create( & tsk->tid_read, &tsk->attr, thread_bms_read_service, tsk);
     if ( 0 != ret ) {
         log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
     }
