@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../thirdpart/sqlite/sqlite3.h"
+#include "../../thirdpart/sqlite/sqlite3.h"
 #include "../lj/stdafx.h"
 #include "../../ontom/charge.h"
 #include "father.h"
