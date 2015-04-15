@@ -171,6 +171,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 // 提供bms通信服务
 void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 {
+#if 0
     int *done = (int *)arg;
     int mydone = 0;
     int s;
@@ -211,7 +212,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     param.buff_payload = 0;
     while ( 1 ) {
         usleep(5000);
-#if 0
+
         if ( thiz->bms.can_bms_status  == CAN_INVALID ) {
             continue;
         }
@@ -408,9 +409,10 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         } else if ( thiz->bms.can_bms_status == CAN_TP_RD ) {
             // CAN通信处于连接管理模式
         }
-#endif
+
     }
 
+#endif
     return NULL;
 }
 
