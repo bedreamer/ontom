@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "../lj/stdafx.h"
 #include "../../ontom/charge.h"
 #include "father.h"
 
