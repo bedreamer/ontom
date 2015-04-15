@@ -14,7 +14,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     struct sockaddr_can addr;
     struct ifreq ifr;
     struct can_frame frame;
-    struct event_struct param;
+    struct bms_event_struct param;
     unsigned char txbuff[32];
     int nbytes;
     struct charge_job *thiz = (struct charge_job *)arg;
@@ -169,7 +169,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     struct ifreq ifr;
     struct can_frame frame;
     int nbytes;
-    struct event_struct param;
+    struct bms_event_struct param;
     // 用于链接管理的数据缓冲
     unsigned char tp_buff[2048];
     struct charge_job * thiz = (struct charge_job *)arg;
