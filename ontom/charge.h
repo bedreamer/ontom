@@ -1322,7 +1322,7 @@ struct charge_job {
     // BMS 管理模块
     struct bms_struct bms;
     // 多包通信参数
-    struct bms_event_struct *param;
+    struct bms_event_struct param;
 
     // 作业状态字
     volatile unsigned char single[8];
