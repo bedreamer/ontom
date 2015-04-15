@@ -16,6 +16,13 @@
  * 为了实现兼容，所有数据字段定义均放在 charge.h 中定义，若BMS上传数据包有不同之处
  * 需要主动做相关数据移位。
  */
+// 充电机地址
+#define CAN_ADDR_CHARGER   0x56  // 86
+// BMS地址
+#define CAN_ADDR_BMS       0xF4  // 244
+#define CAN_RCV_ID_MASK    ((CAN_ADDR_CHARGER<<8)|CAN_ADDR_BMS)
+#define CAN_TX_ID_MASK    ((CAN_ADDR_CHARGER)|CAN_ADDR_BMS<<8)
+
 /*
  * 读到一个完整数据包后调用该函数
  */
