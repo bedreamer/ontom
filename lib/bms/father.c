@@ -417,7 +417,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 /*
  * BMS 驱动初始化
  */
-int bmsdriver_init(struct charge_task *tsk)
+int bmsdriver_init(struct charge_task *)
 {
     int ret;
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
