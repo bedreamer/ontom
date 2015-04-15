@@ -1,5 +1,5 @@
-#ifndef ___STDAFX_H_
-#define ___STDAFX_H_
+#ifndef __BMS_STDAFX_H_
+#define __BMS_STDAFX_H_
 
 #include <stdio.h>
 #include <unistd.h>
@@ -27,4 +27,4 @@
 #include <linux/can/raw.h>
 #include <arpa/inet.h>
 
-#endif// ___STDAFX_H_
+#endif// __BMS_STDAFX_H_
