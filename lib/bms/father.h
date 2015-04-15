@@ -127,7 +127,9 @@ struct bmsdriver {
 
     // 被加载时间
     time_t loaded;
-    unsigned int binder_nr;
+    // 只有一个CAN 因此最多能绑定一个作业
+    // 不排除以后多枪充电的可能
+    struct charge_job *binder[1];
 
     /* 安装驱动到系统中, 做相关的初始化动作 */
     int (*driver_install)(struct charge_task *);
@@ -135,8 +137,9 @@ struct bmsdriver {
     int (*driver_uninstall)();
 
     /* 驱动主函数，接收驱动事件 */
-    int (*driver_main_proc)(BMS_EVENT_CAN, struct bms_event_struct *,
-                            struct charge_job *, struct bmsdriver *);
+    int (*driver_main_proc)(struct charge_job *, BMS_EVENT_CAN,
+                            struct bms_event_struct *, struct bmsdriver *);
+    struct bmsdriver *next;
 };
 
 /* 搜索对应生产商的BMS驱动
