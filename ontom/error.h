@@ -1,6 +1,8 @@
 #ifndef _ERROR_H_
 #define _ERROR_H_
 
+#define ___THREAD_ENTRY___
+
 // 没有错误
 #define ERR_OK    0x00000000
 // 有错误

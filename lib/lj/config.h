@@ -3,9 +3,6 @@
 
 //{{{{{{{{{{{{{
 #define _DEBUG  0
-
-#define ___THREAD_ENTRY___
-
 // 控制配置模块的调试
 #if _DEBUG >= 1
 	#define CONFIG_DEBUG_CONFIG  1
