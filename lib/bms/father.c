@@ -410,5 +410,18 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
  */
 int bmsdriver_init(struct charge_task *tsk)
 {
+    // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
+    ret = pthread_create( & tsk->tid_write, &tsk->attr, thread_bms_write_service, tsk);
+    if ( 0 != ret ) {
+        log_printf(ERR, "CAN-BUS reader start up.                       FAILE!!!!");
+        goto die;
+    }
+
+    // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
+    ret = pthread_create( & tsk->tid_read, &tsk->attr, thread_bms_read_service, tsk);
+    if ( 0 != ret ) {
+        log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
+        goto die;
+    }
     return 0;
 }

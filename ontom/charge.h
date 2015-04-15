@@ -1322,11 +1322,6 @@ struct charge_job {
     // BMS 管理模块
     struct bms_struct bms;
 
-    // BMS 读线程ID
-    pthread_t tid_read;
-    // BMS 写线程ID
-    pthread_t tid_write;
-
     // 作业状态字
     volatile unsigned char single[8];
 
@@ -1361,6 +1356,10 @@ struct charge_task {
     struct exso_struct *exsos;
     // BMS 驱动程序
     struct bmsdriver *bmsdriver;
+    // BMS 读线程ID
+    pthread_t tid_read;
+    // BMS 写线程ID
+    pthread_t tid_write;
 
     // 作业任务提交列表
     struct list_head *commit_head;
