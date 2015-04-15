@@ -75,8 +75,8 @@ void *fuck_p104_service(void *arg)
    }
 
 thread_die:
-    if ( s_config != -1  ) {
-        close(s_config);
+    if ( s_srv != -1  ) {
+        close(s_srv);
     }
     return NULL;
 }
