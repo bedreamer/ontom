@@ -28,6 +28,7 @@
 #include <arpa/inet.h>
 
 #include "../../ontom/error.h"
+#include "../lj/stdafx.h"
 #include "../../ontom/charge.h"
 
 #endif// ___STDAFX_H_
