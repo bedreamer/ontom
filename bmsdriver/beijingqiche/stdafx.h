@@ -27,6 +27,8 @@
 #include <linux/can/raw.h>
 #include <arpa/inet.h>
 
+#include "../../thirdpart/sqlite/sqlite3.h"
+
 #include "../../ontom/error.h"
 #include "../../lib/lj/stdafx.h"
 #include "../../ontom/charge.h"
