@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "../../ontom/charge.h"
 #include "father.h"
 
 // bms 通信 写 服务线程
