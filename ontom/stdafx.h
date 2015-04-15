@@ -37,5 +37,6 @@
 #include "../lib/lj/log.h"
 #include "../lib/lj/config.h"
 #include "../lib/lj/Hachiko.h"
+#include "../lib/bms/father.h"
 
 #endif// ___STDAFX_H_

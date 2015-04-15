@@ -405,3 +405,10 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     return NULL;
 }
 
+/*
+ * BMS 驱动初始化
+ */
+int bmsdriver_init(struct charge_task *tsk)
+{
+    return 0;
+}

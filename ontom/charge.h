@@ -1359,6 +1359,8 @@ struct charge_task {
     pthread_attr_t attr;
     // 扩展程序
     struct exso_struct *exsos;
+    // BMS 驱动程序
+    struct bmsdriver *bmsdriver;
 
     // 作业任务提交列表
     struct list_head *commit_head;

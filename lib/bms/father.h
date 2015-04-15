@@ -151,4 +151,9 @@ struct bmsdriver *bmsdriver_search(unsigned int vendor_id, const char *ver);
  */
 int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job);
 
+/*
+ * BMS 驱动初始化
+ */
+int bmsdriver_init(struct charge_task *);
+
 #endif // FATHER_H
