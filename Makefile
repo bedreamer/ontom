@@ -37,7 +37,7 @@ LDFLAGS=-L. -L/home/tom/workspace/qt-4.8.2-arm/lib \
 	-L$(WORKDIR)/thirdpart/mongoose \
 	-L$(WORKDIR)/thirdpart/sqlite \
 	-L$(WORKDIR)/thirdpart/extso
-LDEXFLAGS=-lrt -lpthread -ldl -llj -lmongoose -lsqlite3 -lexso
+LDEXFLAGS=-lrt -lpthread -ldl -llj -lmongoose -lsqlite3 -lexso -lbms
 # build-in objects.
 y-objs=
 yobjs-list:=$(WORKDIR)/.yobjs
@@ -56,7 +56,7 @@ EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 SEP-DIRS=thirdpart/mongoose thirdpart/sqlite thirdpart/extso
 # must be the last one.
 LAST-DIR=
-SUB-DIRS=ontom lib/lj plugins/default plugins/104 plugins/demo
+SUB-DIRS=ontom lib/lj lib/bms plugins/default plugins/104 plugins/demo
 EX-OBJS=
 PHONY+=EX-OBJS
 

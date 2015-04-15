@@ -28,11 +28,9 @@ void *fuck_p104_service(void *arg)
     //    2404 TCP iec-104 IEC 60870-5-104 process control over IP
     //    2404 UDP iec-104 IEC 60870-5-104 process control over IP
     const char *pport = "2404";
-    int s_config = -1;
+    int s_srv = -1, s_cli = -1;
     struct sockaddr_in si_me, si_other;
-    struct socket_config_request request;
-    struct socket_config_ack ack;
-    int recv_len, slen;
+    int slen;
 
     srv_port = atoi(pport);
     if ( srv_port <= 2048 ) {
@@ -41,12 +39,13 @@ void *fuck_p104_service(void *arg)
         goto thread_die;
     }
 
-    s_config = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if ( -1 == s_config ) {
+    s_srv = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if ( -1 == s_srv ) {
         log_printf(ERR, "create socket confige server faile!");
         goto thread_die;
     }
 
+    fcntl(s_srv, F_SETFL, FASYNC);
     // zero out the structure
     memset((char *) &si_me, 0, sizeof(si_me));
 
@@ -55,19 +54,24 @@ void *fuck_p104_service(void *arg)
     si_me.sin_addr.s_addr = htonl(INADDR_ANY);
 
     //bind socket to port
-    if( bind(s_config , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
+    if( bind(s_srv , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
         log_printf(ERR, "bind to port %d faile, abort.", srv_port);
+        goto thread_die;
+    }
+
+    if ( -1 == listen( s_srv, 1) ) {
+        log_printf(ERR, "listen to port %d faile, abort.", srv_port);
         goto thread_die;
     }
 
     while ( ok ) {
         usleep(5000);
         slen = sizeof(si_other);
-        memset(&ack, 0, sizeof(ack));
-        recv_len = recvfrom(s_config, &request,
-                 sizeof(struct socket_config_request),
-                 0, (struct sockaddr *) &si_other, (socklen_t * __restrict__)&slen);
-        if ( recv_len <= 0 ) continue;
+        s_cli = accept( s_srv, (struct sockaddr *)&si_other, &slen);
+        if ( s_cli == -1 ) {
+            log_printf(WRN, "P104: invalid socket cnnnection.");
+            continue;
+        }
    }
 
 thread_die:

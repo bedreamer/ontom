@@ -58,6 +58,13 @@ CONFIG_DOMAIN_BEGIN
 {"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
 {"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
 
+{"INIT_V1",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
+{"INIT_V2",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
+{"need_V1",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
+{"need_V2",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
+{"need_I1",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
+{"need_I2",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
+
 // 定时器分辨率
 {"HachikoTTL",                  C_INT,      no,     C_VALID,    .cuv.i=0,       {"1000000"}},
 // 线程栈大小，单位KB
