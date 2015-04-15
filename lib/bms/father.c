@@ -127,10 +127,10 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                     nbytes = write(s, &frame, sizeof(struct can_frame));
                     if ( (unsigned int)nbytes < thiz->param.buff_payload ) {
                         thiz->param.evt_param = EVT_RET_ERR;
-                        driver->driver_main_proccan_packet_callback(thiz, EVENT_TX_FAILS, &thiz->param, driver);
+                        driver->driver_main_proc(thiz, EVENT_TX_FAILS, &thiz->param, driver);
                     } else {
                         thiz->param.evt_param = EVT_RET_OK;
-                        driver->driver_main_proccan_packet_callback(thiz, EVENT_TX_DONE, &thiz->param, driver);
+                        driver->driver_main_proc(thiz, EVENT_TX_DONE, &thiz->param, driver);
                     }
                 } else if ( thiz->param.buff_payload > 8 ) {
                     // 大于8字节的数据包在这里处理，程序向后兼容
