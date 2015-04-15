@@ -27,6 +27,4 @@
 #include <linux/can/raw.h>
 #include <arpa/inet.h>
 
-#include "../lj/stdafx.h"
-
 #endif// ___STDAFX_H_
