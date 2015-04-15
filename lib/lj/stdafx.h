@@ -1,5 +1,5 @@
-#ifndef ___STDAFX_H_
-#define ___STDAFX_H_
+#ifndef _LIB__STDAFX_H_
+#define _LIB__STDAFX_H_
 
 #include <stdio.h>
 #include <unistd.h>
@@ -34,4 +34,4 @@
 #include "Hachiko.h"
 #include "log.h"
 
-#endif// ___STDAFX_H_
+#endif// _LIB__STDAFX_H_

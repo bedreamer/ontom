@@ -1,5 +1,5 @@
-#ifndef ___STDAFX_H_
-#define ___STDAFX_H_
+#ifndef _DRI__STDAFX_H_
+#define _DRI__STDAFX_H_
 
 #include <stdio.h>
 #include <unistd.h>
@@ -31,4 +31,4 @@
 #include "../../lib/lj/stdafx.h"
 #include "../../ontom/charge.h"
 
-#endif// ___STDAFX_H_
+#endif// _DRI__STDAFX_H_
