@@ -410,6 +410,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
  */
 int bmsdriver_init(struct charge_task *tsk)
 {
+    int ret;
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & tsk->tid_write, &tsk->attr, thread_bms_write_service, tsk);
     if ( 0 != ret ) {
