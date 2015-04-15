@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "../../thirdpart/sqlite/sqlite3.h"
 #include "../lj/stdafx.h"
-#include "father.h"
 #include "../../ontom/charge.h"
+#include "father.h"
 
 // bms 通信 写 服务线程
 // 提供bms通信服务
