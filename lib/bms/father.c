@@ -275,7 +275,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 if ( nbytes != sizeof(struct can_frame) ) {
                     thiz->param.evt_param = EVT_RET_ERR;
                     log_printf(DBG_LV3, "BMS: read frame error %x", frame.can_id);
-                    driver->driver_main_proc(thiz, EVENT_RX_ERROR, &thiz->param);
+                    driver->driver_main_proc(thiz, EVENT_RX_ERROR, &thiz->param, driver);
                     continue;
                 }
 
@@ -330,7 +330,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                         log_printf(DBG_LV3,
                                    "BMS: data transfer complete PGN=%08X change to ACK",
                                    thiz->bms.can_tp_param.tp_pgn);
-                        driver->driver_main_proc(thiz, EVENT_RX_DONE, &thiz->param);
+                        driver->driver_main_proc(thiz, EVENT_RX_DONE, &thiz->param, driver);
                         // 数据链接接受完成
                         thiz->bms.can_bms_status = CAN_TP_RD | CAN_TP_ACK;
                     }
@@ -432,7 +432,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     thiz->param.buff_payload = frame.can_dlc;
                     thiz->param.evt_param = EVT_RET_INVALID;
                     memcpy((void * __restrict__)thiz->param.buff.rx_buff, frame.data, 8);
-                    driver->driver_main_proc(thiz, EVENT_RX_DONE, &thiz->param);
+                    driver->driver_main_proc(thiz, EVENT_RX_DONE, &thiz->param, driver);
                     log_printf(DBG_LV0, "BMS: read a frame done. %08X", frame.can_id);
                 }
 
