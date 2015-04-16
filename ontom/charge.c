@@ -129,7 +129,7 @@ int sql_db_config_result(void *param, int nr, char **text, char **name)
                 task->sys_type = SYSTEM_FENTISHI;
             } else if ( 0 == strcmp(text[3], "一体式") ) {
                 task->sys_type = SYSTEM_YITISHI;
-            } else ;
+            } else {}
         } else if( 0 == strcmp(text[1], "limit_output_I") ) {
             task->limit_output_I = atof(text[3]);
         } else if ( 0 == strcmp(text[1], "limit_max_V") ) {
@@ -291,7 +291,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         return 0;
     }
     strncpy(u.name, text[1], 32);
-    u._private = atoi(text[2]);
+    u._private = (void*)atoi(text[2]);
     rs485 = atoi(text[3]);
     u.hw_bps = atoi(text[4]);
     d = atoi(text[6]);
@@ -522,7 +522,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     bmsdriver_init(task);
 
     task->bmsdriver = NULL;
-    task->bmsdriver = bmsdriver_search(task, 1, "1.0");
+    //task->bmsdriver = bmsdriver_search(task, 1, "1.0");
 
     //memset(task->single, 255, sizeof(task->single));
 
