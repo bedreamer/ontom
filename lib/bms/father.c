@@ -545,5 +545,10 @@ die:
  */
 int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
 {
-    return 0;
+    if ( !drv || ! job ) return ERR_ERR;
+
+    if ( drv->binder[0] ) return ERR_ERR;
+    drv->binder[0] = job;
+
+    return ERR_OK;
 }
