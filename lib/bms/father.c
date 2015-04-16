@@ -532,7 +532,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                  "bms_vendor.disabled='FALSE' AND"
                  "bms_vendor.bms_version='%s' AND"
                  "bms_vendor.id=%d ORDER BY pgn",
-           ver, id);
+           ver, vendor_id);
 
         int ret = sqlite3_get_table(tsk->database, sql, &rst, &nr, &pn, *msg);
         if ( ret != 0 ) {
@@ -552,7 +552,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                       "bms_vendor.disabled='FALSE' AND "
                       "bms_vendor.bms_version='%s' AND "
                       "bms_vendor.id=%d ORDER BY pgn",
-                ver, id
+                ver, vendor_id
          );
 
     } while (0);
