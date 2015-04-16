@@ -538,7 +538,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
         char **pp = &p;
         int ret = sqlite3_get_table(tsk->database, sql, &pp, &nr, &pn, &msg);
         if ( ret != 0 ) {
-            log_printf(ERR, "没有查询到注册的驱动数据 %s.", rst);
+            log_printf(ERR, "没有查询到注册的驱动数据 %d,%d.", nr, pn);
             goto die;
         }
         log_printf(INF, "fadsfa  <%s>", rst[0]);
