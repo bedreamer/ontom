@@ -527,14 +527,16 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
         int nr = 0, pn = 0;
 
         sprintf(sql,
-                "SELECT bms_vendor.vendor_name,"
+                "SELECT symbol_define.symbol_value,"
+                       "bms_vendor.vendor_name,"
                        "bms_vendor.id,"
                        "bms_can_pack_generator.pgn,"
                        "bms_can_pack_generator.mnemonic,"
                        "bms_can_pack_generator.name "
-                "FROM bms_vendor, bms_can_pack_generator "
+                "FROM bms_vendor, bms_can_pack_generator, symbol_define "
                      "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
                       "bms_can_pack_generator.disabled='FALSE' AND "
+                      "bms_can_pack_generator.stage=symbol_define.symbol_name AND "
                       "bms_vendor.bms_version='%s' AND "
                       "bms_vendor.id=%d ORDER BY pgn;",
                 ver, vendor_id);
@@ -543,7 +545,13 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
             log_printf(ERR, "没有查询到注册的驱动数据 %s %d,%d.",sql, nr, pn);
             goto die;
         }
-        log_printf(INF, "fadsfa  <%s>%d,%d", rst[5], nr, pn);
+        drv.can_pack_gen_nr_copy = nr;
+        drv.generator_copy = (struct can_pack_generator*)malloc(sizeof(struct can_pack_generator)*nr);
+        if ( drv.generator_copy == NULL ) {
+            log_printf(ERR, "BMSDRVIER: 内存不足，无法加载数据包生成器.");
+            goto die;
+        }
+        log_printf(INF, "fadsfa  <%s:%s:%s:%s:%s>%d,%d", rst[5], nr, pn);
 
     } while (0);
 
