@@ -33,6 +33,11 @@
 #include "pgn.h"
 
 int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *param);
+void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachiko_food *self);
+
+
+
+
 int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                         struct bms_event_struct *param, struct bmsdriver *drv)
 {
@@ -236,6 +241,86 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
 
     return ERR_OK;
 }
+
+// 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
+void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachiko_food *self)
+{
+    if (evt == HACHIKO_TIMEOUT ) {
+        unsigned int i = 0;
+        struct charge_job * thiz = (struct charge_job *)_private;
+        struct can_pack_generator *gen, *me;
+        for ( i = 0; i < thiz->bms.can_pack_gen_nr; i++ ) {
+            gen = & thiz->bms.generator[i];
+            if ( gen->stage == thiz->bms.charge_stage ) {
+                if ( gen->heartbeat < gen->period ) {
+                    gen->heartbeat += 1;
+                } else {
+                    gen->heartbeat = gen->period;
+                }
+            } else {
+                gen->heartbeat = 0;
+            }
+        }
+
+
+        /*
+         * 为了能够侦探到接受数据包的超时事件，需要在这里进行一个计数操作
+         * 当can_silence 计数大于等于 can_tolerate_silence 时认为对应数据包接收超时，需要在BMS逻辑主线程
+         * 中做相应处理.
+         *
+         * BEM和CEM不在超时统计范围内
+         */
+        for ( i = 0; i < thiz->bms.can_pack_gen_nr; i++ ) {
+            me = &thiz->bms.generator[i];
+            if ((bit_read(thiz, F_GUN_1_PHY_CONN_STATUS)&&
+                 bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))
+                    ||
+                (bit_read(thiz, F_GUN_2_PHY_CONN_STATUS)&&
+                 bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))){
+                me->can_silence ++;
+            } else continue;
+            if ( me->can_tolerate_silence < me->can_silence ) {
+                switch (thiz->bms.charge_stage) {
+                case CHARGE_STAGE_HANDSHACKING:
+                    if (me->can_pgn != PGN_BRM) break;
+                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
+                            bit_set(thiz, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
+                            thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                        }
+                    break;
+                case CHARGE_STAGE_CONFIGURE:
+                    if (me->can_pgn != PGN_BCP) break;
+                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
+                            bit_set(thiz, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障"));
+                            thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                        }
+                    break;
+                case CHARGE_STAGE_CHARGING:
+                    if (me->can_pgn != PGN_BCL) break;
+                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
+                            bit_set(thiz, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障"));
+                            thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                        }
+                    break;
+                case CHARGE_STAGE_DONE:
+                    if (me->can_pgn != PGN_BSD) break;
+                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
+                            bit_set(thiz, S_BMS_COMM_DOWN);
+                            log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障"));
+                            thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                        }
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+}
+
 
 // CAN数据包接受完成
 int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *param)
