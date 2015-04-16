@@ -14,7 +14,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     struct sockaddr_can addr;
     struct ifreq ifr;
     struct can_frame frame;
-    struct bms_event_struct param;
     unsigned char txbuff[32];
     int nbytes;
     struct charge_task *tsk = (struct charge_task *)arg;
@@ -34,8 +33,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
     log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
 
-    param.buff_payload = 0;
-    param.evt_param = EVT_RET_INVALID;
 #if 1
     while ( 1 ) {
         usleep(5000);
@@ -61,7 +58,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                  * 时，采用EVENT_TX_REQUEST 当CAN处于CAN_TP_RD时采用EVENT_TX_TP_REQUEST
                  */
                 thiz->param.buff.tx_buff = txbuff;
-                param.buff_size = sizeof(txbuff);
+                thiz->param.buff_size = sizeof(txbuff);
                 thiz->param.evt_param = EVT_RET_INVALID;
                 if ( thiz->bms.can_bms_status & CAN_NORMAL ) {
                     driver->driver_main_proc(thiz, EVENT_TX_REQUEST, &thiz->param, driver);
@@ -167,8 +164,9 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 #endif
     return NULL;
 }
-#if 0
 
+
+#if 0
 // bms 通信 读 服务线程
 // 提供bms通信服务
 void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
