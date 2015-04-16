@@ -38,7 +38,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 // 握手-CRM-充电机辨识报文
-int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[0];
 
@@ -65,7 +65,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
 }
 
 // 配置-CTS-充电机发送时间同步信息
-int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN1792(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[1];
     struct pgn1792_CTS cts;
@@ -107,7 +107,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
 }
 
 // 配置-CML-充电机最大输出能力
-int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN2048(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[2];
     struct pgn2048_CML cml;
@@ -129,7 +129,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
 }
 
 // 配置-CRO-充电机输出准备就绪状态
-int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[3];
     struct pgn2560_CRO cro;
@@ -150,7 +150,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
 }
 
 // 充电-CCS-充电机充电状态
-int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[4];
     struct pgn4608_CCS ccs;
@@ -173,7 +173,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
 }
 
 // 充电-CST-充电机中止充电
-int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[5];
     (void)thiz;
@@ -184,7 +184,7 @@ int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param)
 }
 
 // 结束-CSD-充电机统计数据
-int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[6];
     (void)thiz;
@@ -195,7 +195,7 @@ int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param)
 }
 
 // 错误-CEM-充电机错误报文
-int gen_packet_PGN7936(struct charge_job * thiz, struct event_struct* param)
+int gen_packet_PGN7936(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[7];
     (void)thiz;
