@@ -36,7 +36,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
     param.buff_payload = 0;
     param.evt_param = EVT_RET_INVALID;
-#if 0
+#if 1
     while ( 1 ) {
         usleep(5000);
         // 轮询所有的驱动
