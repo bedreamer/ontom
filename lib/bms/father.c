@@ -523,7 +523,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     log_printf(INF, "BMSDRVIER: 开始加载数据包生成器...");
     do {
         char sql[1024];
-        char rst[4][16], *msg = NULL;
+        char **rst, *msg = NULL;
         int nr = 0, pn = 0;
 
         sprintf(sql, "SELECT COUNT(*) FROM bms_can_pack_generator,bms_vendor "
