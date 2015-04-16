@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <dlfcn.h>
 #include <time.h>
 #include <stdarg.h>
 #include <malloc.h>
