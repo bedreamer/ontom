@@ -534,7 +534,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                        "bms_can_pack_generator.mnemonic,"
                        "bms_can_pack_generator.name "
                 "FROM bms_vendor, bms_can_pack_generator, symbol_define "
-                     "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
+                "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
                       "bms_can_pack_generator.disabled='FALSE' AND "
                       "bms_can_pack_generator.stage=symbol_define.symbol_name AND "
                       "bms_vendor.bms_version='%s' AND "
