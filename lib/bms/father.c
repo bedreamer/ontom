@@ -69,7 +69,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         // 轮询所有的驱动
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
             int i;
-            for ( i = 0; driver->binder[i], thiz = driver->binder[i]; i ++ ) {
+            for ( i = 0; driver->binder[i] && thiz = driver->binder[i]; i ++ ) {
 
                 if ( 0x7F != thiz->bms.bms_write_init_ok ) {
                     // 进行数据结构的初始化操作
@@ -252,7 +252,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         // 轮询所有的驱动
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
             int i;
-            for ( i = 0; driver->binder[i], thiz = driver->binder[i]; i ++ ) {
+            for ( i = 0; driver->binder[i] && thiz = driver->binder[i]; i ++ ) {
 
                 if ( thiz->bms.can_bms_status  == CAN_INVALID ) {
                     continue;
