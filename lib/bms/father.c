@@ -526,20 +526,6 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
         char **rst, *msg = NULL;
         int nr = 0, pn = 0;
 
-        sprintf(sql, "SELECT COUNT(*) FROM bms_can_pack_generator,bms_vendor "
-                "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
-                 "bms_can_pack_generator.disabled='FALSE' AND "
-                 "bms_vendor.bms_version='%s' AND "
-                 "bms_vendor.id=%d ORDER BY pgn;",
-           ver, vendor_id);
-
-
-        int ret = sqlite3_get_table(tsk->database, sql, &rst, &nr, &pn, &msg);
-        if ( ret != 0 ) {
-            log_printf(ERR, "没有查询到注册的驱动数据 %s %d,%d.",sql, nr, pn);
-            goto die;
-        }
-        log_printf(INF, "fadsfa  <%s>%d,%d", rst[1], nr, pn);
         sprintf(sql,
                 "SELECT bms_vendor.vendor_name,"
                        "bms_vendor.id,"
@@ -551,8 +537,13 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                       "bms_can_pack_generator.disabled='FALSE' AND "
                       "bms_vendor.bms_version='%s' AND "
                       "bms_vendor.id=%d ORDER BY pgn;",
-                ver, vendor_id
-         );
+                ver, vendor_id);
+        int ret = sqlite3_get_table(tsk->database, sql, &rst, &nr, &pn, &msg);
+        if ( ret != 0 ) {
+            log_printf(ERR, "没有查询到注册的驱动数据 %s %d,%d.",sql, nr, pn);
+            goto die;
+        }
+        log_printf(INF, "fadsfa  <%s>%d,%d", rst[1], nr, pn);
 
     } while (0);
 
