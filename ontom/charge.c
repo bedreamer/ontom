@@ -519,12 +519,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     pthread_mutex_init(&task->wait_lck, NULL);
     pthread_mutex_init(&task->err_list_lck, NULL);
 
-
     task->bmsdriver = NULL;
     task->bmsdriver = bmsdriver_search(task, 1, "1.0");
-    if ( task->bmsdriver ) {
-        log_printf(INF, "ZEUS: dfadsf");
-    }
     bmsdriver_init(task);
 
     //memset(task->single, 255, sizeof(task->single));
@@ -762,6 +758,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         job->job_status = JOB_STANDBY;
         bit_clr(tsk, F_CHARGE_LED);
+        if ( job->charge_mode == CHARGE_AUTO ) {
+            bind_bmsdriver(bmsdriver_search(task, 1, "1.0"), job);
+        }
         break;
     case JOB_STANDBY:
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
