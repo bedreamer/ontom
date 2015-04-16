@@ -542,7 +542,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                 ver, vendor_id);
         int ret = sqlite3_get_table(tsk->database, sql, &rst, &nr, &pn, &msg);
         if ( ret != 0 ) {
-            log_printf(ERR, "没有查询到注册的驱动数据 %s %d,%d.",sql, nr, pn);
+            log_printf(ERR, "没有查询到注册的驱动数据 %s", msg);
             goto die;
         }
         log_printf(INF, "done %d, ", sizeof(struct can_pack_generator)*nr);
