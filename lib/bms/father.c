@@ -533,7 +533,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
         dlclose(drv.handle);
         goto die;
     }
-    memcpy(&real, &drv, sizeof(struct bmsdriver));
+    memcpy(real, &drv, sizeof(struct bmsdriver));
     log_printf(INF, "BMSDRVIER: driver loaded: %s", driver_name);
 die:
     return real;
