@@ -519,13 +519,13 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     pthread_mutex_init(&task->wait_lck, NULL);
     pthread_mutex_init(&task->err_list_lck, NULL);
 
-    bmsdriver_init(task);
 
     task->bmsdriver = NULL;
     task->bmsdriver = bmsdriver_search(task, 1, "1.0");
     if ( task->bmsdriver ) {
         log_printf(INF, "ZEUS: dfadsf");
     }
+    bmsdriver_init(task);
 
     //memset(task->single, 255, sizeof(task->single));
 
