@@ -204,7 +204,7 @@ int gen_packet_PGN7936(struct charge_job * thiz, struct bms_event_struct* param)
     return 0;
 }
 
-
+// 驱动对外接口
 int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                         struct bms_event_struct *param, struct bmsdriver *drv)
 {
