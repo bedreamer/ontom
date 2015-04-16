@@ -144,6 +144,11 @@ struct bmsdriver {
     /* 驱动主函数，接收驱动事件 */
     int (*driver_main_proc)(struct charge_job *, BMS_EVENT_CAN,
                             struct bms_event_struct *, struct bmsdriver *);
+
+    // 数据包生成器个数
+    unsigned int can_pack_gen_nr_copy;
+    // 数据包生成器数据库拷贝
+    struct can_pack_generator *generator_copy;
     struct bmsdriver *next;
 };
 

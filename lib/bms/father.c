@@ -521,11 +521,23 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
         goto die;
     }
 
+    log_printf(INF, "BMSDRVIER: 开始加载数据包生成器...");
+    do {
+        char sql[256];
+        char rst[4][16], *msg = NULL;
+        int nr = 0, pn = 0;
+        int ret = sqlite3_get_table(tsk->database, sql,
+                          &rst, &nr, &pn, *msg);
+        if ( ret != 0 ) {
+            log_printf(ERR, "没有查询到注册的驱动数据.");
+            goto die;
+        }
+    } while (0);
+
     strncpy(drv.vendor_name, "default", 64);
     drv.vendor_id = vendor_id;
     strncpy(drv.version, ver, 16);
     drv.loaded = time(NULL);
-
     real = (struct bmsdriver *)malloc(sizeof(struct bmsdriver));
     if ( real == NULL ) {
         log_printf(ERR, "BMSDRVIER: memory low, could not load driver: bmsdrv_%d_%s.so",
@@ -534,6 +546,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
         goto die;
     }
     memcpy(real, &drv, sizeof(struct bmsdriver));
+
     log_printf(INF, "BMSDRVIER: driver loaded: %s", driver_name);
 die:
     return real;

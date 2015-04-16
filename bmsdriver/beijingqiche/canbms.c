@@ -217,6 +217,10 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
         log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_HANDSHACKING"));
         thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
         //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
+        do {
+            char sql[512];
+            int gen_nr;
+        } while (0);
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
