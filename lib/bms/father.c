@@ -511,10 +511,10 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     }
 
     drv.driver_main_proc = (int (*)(struct charge_job *, BMS_EVENT_CAN,
-                          struct bms_event_struct *, struct bmsdriver *))dlsym(so_handle, "driver_main_proc");
+                          struct bms_event_struct *, struct bmsdriver *))dlsym(drv.handle, "driver_main_proc");
     if ( dlerror() ) {
         log_printf(ERR, "BMSDRVIER: find  entry <driver_main_proc> faile!\n",);
-        dlclose(so_handle);
+        dlclose(drv.handle);
         goto die;
     }
 
@@ -527,6 +527,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     if ( real == NULL ) {
         log_printf(ERR, "BMSDRVIER: memory low, could not load driver: bmsdrv_%d_%s.so",
                    vendor_id, ver);
+        dlclose(drv.handle);
         goto die;
     }
     memcpy(&real, &drv, sizeof(struct bmsdriver));
