@@ -53,7 +53,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
-    strcpy(ifr.ifr_name, thiz->bms.can_dev );
+    strcpy(ifr.ifr_name, "can0" );
     ioctl(s, SIOCGIFINDEX, &ifr);
 
     addr.can_family = PF_CAN;
@@ -242,7 +242,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     fcntl(s, F_SETFL, FASYNC);
-    strcpy(ifr.ifr_name, thiz->bms.can_dev );
+    strcpy(ifr.ifr_name, "can0" );
     ioctl(s, SIOCGIFINDEX, &ifr);
     addr.can_family = PF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
