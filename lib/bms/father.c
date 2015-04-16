@@ -545,7 +545,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
             log_printf(ERR, "没有查询到注册的驱动数据 %s %d,%d.",sql, nr, pn);
             goto die;
         }
-        log_printf(INF, "done");
+        log_printf(INF, "done %d, ", sizeof(struct can_pack_generator)*nr);
         drv.can_pack_gen_nr_copy = nr;
         drv.generator_copy = (struct can_pack_generator*)malloc(sizeof(struct can_pack_generator)*nr);
         if ( drv.generator_copy == NULL ) {
