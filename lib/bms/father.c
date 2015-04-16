@@ -237,8 +237,6 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     unsigned int dbg_packets = 0;
 
-    thiz->bms.can_tp_bomb._private = (void *)thiz;
-
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     fcntl(s, F_SETFL, FASYNC);
