@@ -35,7 +35,174 @@
 int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *param);
 void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachiko_food *self);
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// 握手-CRM-充电机辨识报文
+int gen_packet_PGN256(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[0];
 
+    log_printf(DBG_LV0, "BMS: 握手-CRM-充电机辨识报文");
+
+    if ( 0 == bit_read(thiz, F_BMS_RECOGNIZED) ) {
+        param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
+    } else {
+        param->buff.tx_buff[0] = BMS_RECOGNIZED;
+        bit_set(thiz, F_VEHICLE_RECOGNIZED);
+    }
+
+    param->buff.tx_buff[1] = 0x01;
+    strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
+    param->buff.tx_buff[7] = 0xFF;
+    param->buff_payload = gen->datalen;
+    param->can_id = gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+
+    param->evt_param = EVT_RET_OK;
+
+    thiz->bms.generator[I_BRM].can_counter ++;
+
+    return 0;
+}
+
+// 配置-CTS-充电机发送时间同步信息
+int gen_packet_PGN1792(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[1];
+    struct pgn1792_CTS cts;
+    time_t timep;
+    struct tm *p;
+
+    time(&timep);
+    p =localtime(&timep);
+    if ( p == NULL ) {
+        param->evt_param = EVT_RET_ERR;
+        return 0;
+    }
+    cts.spn2823_bcd_sec = (((p->tm_sec / 10 ) & 0x0F ) << 4) |
+            ((p->tm_sec % 10) & 0x0F);
+    cts.spn2823_bcd_min = (((p->tm_min / 10 ) & 0x0F ) << 4) |
+            ((p->tm_min % 10) & 0x0F);
+    cts.spn2823_bcd_hour = (((p->tm_hour / 10 ) & 0x0F ) << 4) |
+            ((p->tm_hour % 10) & 0x0F);
+    cts.spn2823_bcd_day = (((p->tm_mday / 10 ) & 0x0F ) << 4) |
+            ((p->tm_mday % 10) & 0x0F);
+    cts.spn2823_bcd_mon = (((p->tm_mon / 10 ) & 0x0F ) << 4) |
+            ((p->tm_mon % 10) & 0x0F);
+    cts.spn2823_bcd_year_h = (((p->tm_year / 100 ) & 0x0F ) << 4) |
+            ((p->tm_year % 100) & 0x0F);
+    cts.spn2823_bcd_year_l = (((p->tm_year / 10 ) & 0x0F ) << 4) |
+            ((p->tm_year % 10) & 0x0F);
+
+    memset(param->buff.tx_buff, 0xFF, 8);
+    memcpy(param->buff.tx_buff, &cts, sizeof(struct pgn1792_CTS));
+
+    param->buff_payload = gen->datalen;
+    param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+
+    param->evt_param = EVT_RET_OK;
+
+    thiz->bms.generator[I_CTS].can_counter ++;
+
+    return 0;
+}
+
+// 配置-CML-充电机最大输出能力
+int gen_packet_PGN2048(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[2];
+    struct pgn2048_CML cml;
+
+    cml.spn2824_max_output_voltage = 7500;
+    cml.spn2825_min_output_voltage = 2400;
+    cml.spn2826_max_output_current = 3000;
+    memset(param->buff.tx_buff, 0xFF, 8);
+    memcpy((void * __restrict__)param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
+
+    param->buff_payload = gen->datalen;
+    param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+
+    param->evt_param = EVT_RET_OK;
+
+    thiz->bms.generator[I_CML].can_counter ++;
+
+    return 0;
+}
+
+// 配置-CRO-充电机输出准备就绪状态
+int gen_packet_PGN2560(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[3];
+    struct pgn2560_CRO cro;
+
+    cro.spn2830_charger_ready_for_charge = CHARGER_READY_FOR_CHARGE;
+
+    memset(param->buff.tx_buff, 0xFF, 8);
+    memcpy(param->buff.tx_buff, &cro, sizeof(struct pgn2560_CRO));
+
+    param->buff_payload = gen->datalen;
+    param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+
+    param->evt_param = EVT_RET_OK;
+
+    thiz->bms.generator[I_CRO].can_counter ++;
+
+    return 0;
+}
+
+// 充电-CCS-充电机充电状态
+int gen_packet_PGN4608(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[4];
+    struct pgn4608_CCS ccs;
+
+    ccs.spn3081_output_voltage = 7500;
+    ccs.spn3082_outpu_current  = 1200;
+    ccs.spn3083_charge_time = 122;
+
+    memset(param->buff.tx_buff, 0xFF, 8);
+    memcpy((void * __restrict__)param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
+
+    param->buff_payload = gen->datalen;
+    param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+
+    param->evt_param = EVT_RET_OK;
+
+    thiz->bms.generator[I_CCS].can_counter ++;
+
+    return 0;
+}
+
+// 充电-CST-充电机中止充电
+int gen_packet_PGN6656(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[5];
+    (void)thiz;
+    (void)param;
+    (void)gen;
+    return 0;
+
+}
+
+// 结束-CSD-充电机统计数据
+int gen_packet_PGN7424(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[6];
+    (void)thiz;
+    (void)param;
+    (void)gen;
+    return 0;
+
+}
+
+// 错误-CEM-充电机错误报文
+int gen_packet_PGN7936(struct charge_job * thiz, struct event_struct* param)
+{
+    struct can_pack_generator *gen = &thiz->bms.generator[7];
+    (void)thiz;
+    (void)param;
+    (void)gen;
+    return 0;
+}
 
 
 int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
