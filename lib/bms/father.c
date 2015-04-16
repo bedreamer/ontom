@@ -528,11 +528,11 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
 
         sprintf(sql,
                 "SELECT symbol_define.symbol_value,"
-                    "bms_can_pack_generator.bms_can_pgn,"
-                    "bms_can_pack_generator.bms_can_prioriy,"
-                    "bms_can_pack_generator.bms_can_datalen,"
-                    "bms_can_pack_generator.bms_can_period,"
-                    "bms_can_pack_generator.bms_can_tolerate_silence "
+                    "bms_can_pack_generator.pgn,"
+                    "bms_can_pack_generator.prioriy,"
+                    "bms_can_pack_generator.datalen,"
+                    "bms_can_pack_generator.period,"
+                    "bms_can_pack_generator.timeout "
                 "FROM bms_vendor, bms_can_pack_generator, symbol_define "
                 "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
                       "bms_can_pack_generator.disabled='FALSE' AND "
