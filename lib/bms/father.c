@@ -540,12 +540,12 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                       "bms_vendor.bms_version='%s' AND "
                       "bms_vendor.id=%d ORDER BY pgn;",
                 ver, vendor_id);
-        log_printf(INF, "%s", sql);
         int ret = sqlite3_get_table(tsk->database, sql, &rst, &nr, &pn, &msg);
         if ( ret != 0 ) {
             log_printf(ERR, "没有查询到注册的驱动数据 %s %d,%d.",sql, nr, pn);
             goto die;
         }
+        log_printf(INF, "done");
         drv.can_pack_gen_nr_copy = nr;
         drv.generator_copy = (struct can_pack_generator*)malloc(sizeof(struct can_pack_generator)*nr);
         if ( drv.generator_copy == NULL ) {
