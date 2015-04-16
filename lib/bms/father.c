@@ -543,7 +543,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
             log_printf(ERR, "没有查询到注册的驱动数据 %s %d,%d.",sql, nr, pn);
             goto die;
         }
-        log_printf(INF, "fadsfa  <%s>%d,%d", rst[1], nr, pn);
+        log_printf(INF, "fadsfa  <%s>%d,%d", rst[5], nr, pn);
 
     } while (0);
 
