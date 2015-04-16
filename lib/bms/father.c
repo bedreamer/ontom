@@ -87,7 +87,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                  * 状态进行判定，当CAN处于CAN_NORMAL时进行普通的写操作，当CAN处于CAN_TP_RD
                  * 时，采用EVENT_TX_REQUEST 当CAN处于CAN_TP_RD时采用EVENT_TX_TP_REQUEST
                  */
-                thiz->param.buff.tx_buff = txbuff;
                 thiz->param.buff_size = sizeof(txbuff);
                 thiz->param.evt_param = EVT_RET_INVALID;
                 if ( thiz->bms.can_bms_status & CAN_NORMAL ) {
