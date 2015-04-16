@@ -61,14 +61,14 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     addr.can_ifindex = ifr.ifr_ifindex;
     bind(s, (struct sockaddr *)&addr, sizeof(addr));
 
-    log_printf(INF, "%s running...s=%d", __FUNCTION__, s);
+    log_printf(INF, "BMS: %s running...s=%d", __FUNCTION__, s);
 
 #if 1
     while ( 1 ) {
         usleep(5000);
         // 轮询所有的驱动
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
-            int i;
+            unsigned int i;
             for ( i = 0; driver->binder[i] &&
                   i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
@@ -253,7 +253,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         usleep(5000);
         // 轮询所有的驱动
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
-            int i;
+            unsigned int i;
             for ( i = 0; driver->binder[i] &&
                   i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
