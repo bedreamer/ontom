@@ -25,9 +25,13 @@
 #include <arpa/inet.h>
 
 #include "../../thirdpart/sqlite/sqlite3.h"
-#include "../lj/stdafx.h"
-#include "../../ontom/charge.h"
+#include "../../ontom/error.h"
+#include "../lj/list.h"
+#include "../lj/config.h"
+#include "../lj/Hachiko.h"
+#include "../lj/log.h"
 #include "father.h"
+#include "../../ontom/charge.h"
 
 // bms 通信 写 服务线程
 // 提供bms通信服务
