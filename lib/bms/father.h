@@ -98,6 +98,9 @@ typedef enum {
     EVT_RET_TX_ABORT = 4
 }BMS_EVT_PARAM;
 
+struct charge_job;
+struct charge_task;
+
 // 事件通知结构
 struct bms_event_struct {
     // 事件参数
