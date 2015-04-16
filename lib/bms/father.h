@@ -128,6 +128,8 @@ struct bmsdriver {
     char version[16];
     char vendor_name[64];
 
+    void *handle;
+
     // 被加载时间
     time_t loaded;
     // 只有一个CAN 因此最多能绑定一个作业
@@ -149,7 +151,7 @@ struct bmsdriver {
  * 先从bms驱动缓存中搜索，如果没有搜索到则到bms驱动目录搜索，若没有则会导致
  * 驱动不匹配而无法充电。
  */
-struct bmsdriver *bmsdriver_search(unsigned int vendor_id, const char *ver);
+struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_id, const char *ver);
 
 /*
  * 作业和驱动进行绑定

@@ -482,19 +482,53 @@ int bmsdriver_init(struct charge_task *tsk)
  * 先从bms驱动缓存中搜索，如果没有搜索到则到bms驱动目录搜索，若没有则会导致
  * 驱动不匹配而无法充电。
  */
-struct bmsdriver *bmsdriver_search(unsigned int vendor_id, const char *ver)
+struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_id, const char *ver)
 {
     char driver_name[64];
     struct bmsdriver drv, *real =NULL;
 
+    memset(&drv, 0, sizeof(struct bmsdriver));
+
+    real = tsk->bmsdriver;
+    while ( NULL != real ) {
+        if ( real->vendor_id == vendor_id &&
+             0 == strcmp(real->version, ver) ) {
+            // matched
+            break;
+        }
+        real = real->next;
+    }
+    if ( real ) return real;
+
+    // not found driver in cache, search driver in path next.
+    real = NULL;
     sprintf("/usr/zeus/drivers/bmsdrv_%d_%s.so", vendor_id, ver);
     drv.handle = dlopen(driver_name, RTLD_LAZY);
     if ( drv.handle == NULL ) {
         log_printf(ERR, "BMSDRVIER: 无法加载bms驱动程序: %s", driver_name);
+        goto die;
     }
 
     drv.driver_main_proc = (int (*)(struct charge_job *, BMS_EVENT_CAN,
                           struct bms_event_struct *, struct bmsdriver *))dlsym(so_handle, "driver_main_proc");
+    if ( dlerror() ) {
+        log_printf(ERR, "BMSDRVIER: find  entry <driver_main_proc> faile!\n",);
+        dlclose(so_handle);
+        goto die;
+    }
+
+    strncpy(drv.vendor_name, "default", 64);
+    drv.vendor_id = vendor_id;
+    strncpy(drv.version, ver, 16);
+    drv.loaded = time(NULL);
+
+    real = (struct bmsdriver *)malloc(sizeof(struct bmsdriver));
+    if ( real == NULL ) {
+        log_printf(ERR, "BMSDRVIER: memory low, could not load driver: bmsdrv_%d_%s.so",
+                   vendor_id, ver);
+        goto die;
+    }
+    memcpy(&real, &drv, sizeof(struct bmsdriver));
 die:
     return real;
 }

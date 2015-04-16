@@ -521,6 +521,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     bmsdriver_init(task);
 
+    task->bmsdriver = NULL;
+    task->bmsdriver = bmsdriver_search(task, 1, "1.0");
+
     //memset(task->single, 255, sizeof(task->single));
 
     while ( 1 ) {
