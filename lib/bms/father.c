@@ -513,7 +513,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     drv.driver_main_proc = (int (*)(struct charge_job *, BMS_EVENT_CAN,
                           struct bms_event_struct *, struct bmsdriver *))dlsym(drv.handle, "driver_main_proc");
     if ( dlerror() ) {
-        log_printf(ERR, "BMSDRVIER: find  entry <driver_main_proc> faile!\n",);
+        log_printf(ERR, "BMSDRVIER: find  entry <driver_main_proc> faile!\n");
         dlclose(drv.handle);
         goto die;
     }
