@@ -106,11 +106,11 @@ struct bms_event_struct {
     // 事件参数
     BMS_EVT_PARAM evt_param;
 
-    union {
+    struct {
         // 发送缓冲区地址， 针对EVENT_TX_REQUEST设置
-        unsigned char *tx_buff;
+        unsigned char tx_buff[32];
         // 接收缓冲区地址，针对EVENT_RX_DONE设置
-        const unsigned char* rx_buff;
+        const unsigned char rx_buff[256];
     }buff;
     // 缓冲区大小
     unsigned int buff_size;
