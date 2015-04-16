@@ -31,8 +31,8 @@
 #include "../../lib/bms/father.h"
 #include "../../ontom/charge.h"
 
-int driver_main_proc(struct charge_job *, BMS_EVENT_CAN,
-                        struct bms_event_struct *, struct bmsdriver *)
+int driver_main_proc(struct charge_job *j, BMS_EVENT_CAN evt,
+                        struct bms_event_struct *p, struct bmsdriver *drv)
 {
     return ERR_OK;
 }
