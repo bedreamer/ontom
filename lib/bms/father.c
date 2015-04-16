@@ -196,6 +196,19 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
 
 
 #if 1
+// CAN 数据发送报文
+void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *_private,
+                            const struct Hachiko_food *self)
+{
+    if ( evt == HACHIKO_TIMEOUT ) {
+        struct charge_job * thiz = (struct charge_job *)_private;
+        log_printf(WRN, "BMS: CAN data transfer terminal due to time out.");
+        thiz->bms.can_bms_status = CAN_NORMAL;
+    } else if ( evt == HACHIKO_DIE ) {
+
+    }
+}
+
 // bms 通信 读 服务线程
 // 提供bms通信服务
 void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
