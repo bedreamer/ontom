@@ -533,7 +533,6 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                     "bms_can_pack_generator.bms_can_datalen,"
                     "bms_can_pack_generator.bms_can_period,"
                     "bms_can_pack_generator.bms_can_tolerate_silence "
-                    "FROM symbol_define,bms_can_pack_generator "
                 "FROM bms_vendor, bms_can_pack_generator, symbol_define "
                 "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
                       "bms_can_pack_generator.disabled='FALSE' AND "
