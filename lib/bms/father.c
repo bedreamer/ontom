@@ -528,8 +528,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
 
         sprintf(sql, "SELECT COUNT(*) FROM bms_can_pack_generator,bms_vendor "
                 "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
-                 "bms_can_pack_generator.disabled='TRUE' AND "
-                 "bms_vendor.disabled='FALSE' AND "
+                 "bms_can_pack_generator.disabled='FALSE' AND "
                  "bms_vendor.bms_version='%s' AND "
                  "bms_vendor.id=%d ORDER BY pgn",
            ver, vendor_id);
@@ -550,8 +549,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                        "bms_can_pack_generator.name "
                 "FROM bms_vendor, bms_can_pack_generator "
                      "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
-                      "bms_can_pack_generator.disabled='TRUE' AND "
-                      "bms_vendor.disabled='FALSE' AND "
+                      "bms_can_pack_generator.disabled='FALSE' AND "
                       "bms_vendor.bms_version='%s' AND "
                       "bms_vendor.id=%d ORDER BY pgn",
                 ver, vendor_id
