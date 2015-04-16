@@ -30,6 +30,8 @@
 #include "../../lib/lj/stdafx.h"
 #include "../../lib/bms/father.h"
 #include "../../ontom/charge.h"
+#include "pgn.h"
+
 int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *param);
 int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                         struct bms_event_struct *param, struct bmsdriver *drv)
