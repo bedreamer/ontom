@@ -70,7 +70,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
             int i;
             for ( i = 0; driver->binder[i] &&
-                  i < sizeof(driver->binder)/sizeof(charge_job *); i ++ ) {
+                  i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
 
                 if ( 0x7F != thiz->bms.bms_write_init_ok ) {
@@ -255,7 +255,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
             int i;
             for ( i = 0; driver->binder[i] &&
-                  i < sizeof(driver->binder)/sizeof(charge_job *); i ++ ) {
+                  i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
 
                 if ( thiz->bms.can_bms_status  == CAN_INVALID ) {
