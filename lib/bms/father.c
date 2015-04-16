@@ -510,28 +510,51 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     drv.handle = dlopen(driver_name, RTLD_LAZY);
     if ( drv.handle == NULL ) {
         log_printf(ERR, "BMSDRVIER: 无法加载bms驱动程序: %s", driver_name);
-        goto die;
+        return NULL;
     }
 
     drv.driver_main_proc = (int (*)(struct charge_job *, BMS_EVENT_CAN,
                           struct bms_event_struct *, struct bmsdriver *))dlsym(drv.handle, "driver_main_proc");
     if ( dlerror() ) {
         log_printf(ERR, "BMSDRVIER: find  entry <driver_main_proc> faile!\n");
-        dlclose(drv.handle);
         goto die;
     }
 
     log_printf(INF, "BMSDRVIER: 开始加载数据包生成器...");
     do {
-        char sql[256];
+        char sql[1024];
         char rst[4][16], *msg = NULL;
         int nr = 0, pn = 0;
-        int ret = sqlite3_get_table(tsk->database, sql,
-                          &rst, &nr, &pn, *msg);
+
+        sprintf(sql, "SELECT COUNT(*) FROM bms_can_pack_generator "
+                "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND"
+                 "bms_can_pack_generator.disabled='TRUE' AND"
+                 "bms_vendor.disabled='FALSE' AND"
+                 "bms_vendor.bms_version='%s' AND"
+                 "bms_vendor.id=%d ORDER BY pgn",
+           ver, id);
+
+        int ret = sqlite3_get_table(tsk->database, sql, &rst, &nr, &pn, *msg);
         if ( ret != 0 ) {
             log_printf(ERR, "没有查询到注册的驱动数据.");
             goto die;
         }
+        log_printf(INF, "fadsfa  <%s>", rst[0]);
+        sprintf(sql,
+                "SELECT bms_vendor.vendor_name,"
+                       "bms_vendor.id,"
+                       "bms_can_pack_generator.pgn,"
+                       "bms_can_pack_generator.mnemonic,"
+                       "bms_can_pack_generator.name "
+                "FROM bms_vendor, bms_can_pack_generator "
+                     "WHERE bms_can_pack_generator.bms_id=bms_vendor.id AND "
+                      "bms_can_pack_generator.disabled='TRUE' AND "
+                      "bms_vendor.disabled='FALSE' AND "
+                      "bms_vendor.bms_version='%s' AND "
+                      "bms_vendor.id=%d ORDER BY pgn",
+                ver, id
+         );
+
     } while (0);
 
     strncpy(drv.vendor_name, "default", 64);
@@ -542,14 +565,15 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     if ( real == NULL ) {
         log_printf(ERR, "BMSDRVIER: memory low, could not load driver: bmsdrv_%d_%s.so",
                    vendor_id, ver);
-        dlclose(drv.handle);
         goto die;
     }
     memcpy(real, &drv, sizeof(struct bmsdriver));
 
     log_printf(INF, "BMSDRVIER: driver loaded: %s", driver_name);
-die:
     return real;
+die:
+    dlclose(drv.handle);
+    return NULL;
 }
 
 /*
