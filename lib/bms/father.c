@@ -523,7 +523,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     log_printf(INF, "BMSDRVIER: 开始加载数据包生成器...");
     do {
         char sql[1024];
-        char rst[4][16], *msg = NULL;
+        char rst[16], *msg = NULL;
         int nr = 0, pn = 0;
 
         sprintf(sql, "SELECT COUNT(*) FROM bms_can_pack_generator "
@@ -534,7 +534,9 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
                  "bms_vendor.id=%d ORDER BY pgn",
            ver, vendor_id);
 
-        int ret = sqlite3_get_table(tsk->database, sql, &rst, &nr, &pn, *msg);
+        char *p = rst;
+        char **pp = &p;
+        int ret = sqlite3_get_table(tsk->database, sql, &pp, &nr, &pn, *msg);
         if ( ret != 0 ) {
             log_printf(ERR, "没有查询到注册的驱动数据.");
             goto die;
