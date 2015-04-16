@@ -220,7 +220,6 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     struct ifreq ifr;
     struct can_frame frame;
     int nbytes;
-    struct bms_event_struct param;
     // 用于链接管理的数据缓冲
     unsigned char tp_buff[2048];
     struct charge_task *tsk = (struct charge_task *)arg;
@@ -466,7 +465,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
  */
 int bmsdriver_init(struct charge_task *tsk)
 {
-    int ret;
+    int ret = 0;
     // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
     ret = pthread_create( & tsk->tid_write, &tsk->attr, thread_bms_write_service, tsk);
     if ( 0 != ret ) {
@@ -474,7 +473,7 @@ int bmsdriver_init(struct charge_task *tsk)
     }
 
     // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
-    ret = pthread_create( & tsk->tid_read, &tsk->attr, thread_bms_read_service, tsk);
+    //ret = pthread_create( & tsk->tid_read, &tsk->attr, thread_bms_read_service, tsk);
     if ( 0 != ret ) {
         log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
     }
