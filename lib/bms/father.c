@@ -553,7 +553,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
             goto die;
         }
         int l;
-        for ( l = 0; l < pn; l ++ ) {
+        for ( l = 0; l < nr; l ++ ) {
             log_printf(INF, "<%s:%s:%s:%s:%s>",
                        rst[l * 6 + 0], rst[l * 6 + 1],
                        rst[l * 6 + 2], rst[l * 6 + 3],
