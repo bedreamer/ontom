@@ -484,7 +484,19 @@ int bmsdriver_init(struct charge_task *tsk)
  */
 struct bmsdriver *bmsdriver_search(unsigned int vendor_id, const char *ver)
 {
-    return NULL;
+    char driver_name[64];
+    struct bmsdriver drv, *real =NULL;
+
+    sprintf("/usr/zeus/drivers/bmsdrv_%d_%s.so", vendor_id, ver);
+    drv.handle = dlopen(driver_name, RTLD_LAZY);
+    if ( drv.handle == NULL ) {
+        log_printf(ERR, "BMSDRVIER: 无法加载bms驱动程序: %s", driver_name);
+    }
+
+    drv.driver_main_proc = (int (*)(struct charge_job *, BMS_EVENT_CAN,
+                          struct bms_event_struct *, struct bmsdriver *))dlsym(so_handle, "driver_main_proc");
+die:
+    return real;
 }
 
 /*
