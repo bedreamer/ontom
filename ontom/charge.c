@@ -612,7 +612,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             }
             //}}} 没实现
 
-            exso_do_mainloop( & task->exsos );
+            //exso_do_mainloop( & task->exsos );
         } while ( 0 );
 
         usleep(50000);
