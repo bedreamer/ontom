@@ -525,7 +525,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     if ( task->bmsdriver ) {
         log_printf(INF, "ZEUS: dfadsf");
     }
-    bmsdriver_init(task);
+    //bmsdriver_init(task);
 
     //memset(task->single, 255, sizeof(task->single));
 
