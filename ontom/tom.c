@@ -160,63 +160,36 @@ static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
 
 {
 
-        static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
+    static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
+    int i;
+    ucontext_t *ucontext = (ucontext_t*)ptr;
+    void *bt[100];
+    char **strings;
 
-        int i;
+    printf("Segmentation Fault Trace:\n");
+    printf("info.si_signo = %d\n", signum);
+    printf("info.si_errno = %d\n", info->si_errno);
+    printf("info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
+    printf("info.si_addr  = %p\n", info->si_addr);
 
-        ucontext_t *ucontext = (ucontext_t*)ptr;
+    /*for arm*/
+    printf("the arm_fp 0x%3x\n",ucontext->uc_mcontext.arm_fp);
+    printf("the arm_ip 0x%3x\n",ucontext->uc_mcontext.arm_ip);
+    printf("the arm_sp 0x%3x\n",ucontext->uc_mcontext.arm_sp);
+    printf("the arm_lr 0x%3x\n",ucontext->uc_mcontext.arm_lr);
+    printf("the arm_pc 0x%3x\n",ucontext->uc_mcontext.arm_pc);
+    printf("the in_code 0x%3x\n", *(unsigned int *)(void*)ucontext->uc_mcontext.arm_pc);
+    printf("the arm_cpsr 0x%3x\n",ucontext->uc_mcontext.arm_cpsr);
+    printf("the falut_address 0x%3x\n",ucontext->uc_mcontext.fault_address);
 
-        void *bt[100];
-
-        char **strings;
-
-
-
-        printf("Segmentation Fault Trace:\n");
-
-        printf("info.si_signo = %d\n", signum);
-
-        printf("info.si_errno = %d\n", info->si_errno);
-
-        printf("info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
-
-        printf("info.si_addr  = %p\n", info->si_addr);
-
-
-
-        /*for arm*/
-
-        printf("the arm_fp 0x%3x\n",ucontext->uc_mcontext.arm_fp);
-
-        printf("the arm_ip 0x%3x\n",ucontext->uc_mcontext.arm_ip);
-
-        printf("the arm_sp 0x%3x\n",ucontext->uc_mcontext.arm_sp);
-
-        printf("the arm_lr 0x%3x\n",ucontext->uc_mcontext.arm_lr);
-
-        printf("the arm_pc 0x%3x\n",ucontext->uc_mcontext.arm_pc);
-
-        printf("the arm_cpsr 0x%3x\n",ucontext->uc_mcontext.arm_cpsr);
-
-        printf("the falut_address 0x%3x\n",ucontext->uc_mcontext.fault_address);
-
-
-
-        printf("Stack trace (non-dedicated):");
-
-        int sz = backtrace(bt, 20);
-
-        printf("the stack trace is %d\n",sz);
-
-        strings = backtrace_symbols(bt, sz);
-
-        for(i = 0; i < sz; ++i){
-
-                printf("%s\n", strings[i]);
-
-        }
-
-        dump((unsigned int)ucontext->uc_mcontext.arm_pc);
+    printf("Stack trace (non-dedicated):");
+    int sz = backtrace(bt, 20);
+    printf("the stack trace is %d\n",sz);
+    strings = backtrace_symbols(bt, sz);
+    for(i = 0; i < sz; ++i){
+         printf("%s\n", strings[i]);
+    }
+    dump((unsigned int)ucontext->uc_mcontext.arm_pc);
     _exit (-1);
 
 }
