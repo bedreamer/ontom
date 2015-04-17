@@ -1156,24 +1156,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
 
     log_printf(INF, "开始创建作业");
 
-    if ( need->charge_mode == CHARGE_AUTO ) {
-        sprintf(sql,
-                "SELECT COUNT(*) from symbol_define,bms_can_pack_generator "
-                "WHERE bms_can_pack_generator.bms_can_status='ENABLE' AND "
-                "symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage");
-        ret = sqlite3_exec(tsk->database, sql, sql_query_result_conter, &nr_gen, &errmsg);
-        if ( ret ) {
-            log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
-        }
-        if ( nr_gen <= 0 ) {
-            log_printf(ERR, "ZEUS: DATA LOST, job aborted!!");
-            // 中止作业
-        }
-    }
-
-    s = sizeof(struct charge_job);
-    s = s + sizeof(struct can_pack_generator) * nr_gen;
-    thiz = (struct charge_job *)malloc(s);
+    thiz = (struct charge_job *)malloc(sizeof(struct charge_job));
     if (thiz == NULL) {
         log_printf(ERR, "ZEUS: LOW memory, job create faile, aborted.");
         // 中止作业
@@ -1209,50 +1192,6 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
         thiz->need_V = need->manual_set_charge_volatage;
     }
 
-    thiz->charge_bms_establish_timestamp = rand() % 10000 + 5000;
-
-    thiz->bms.readed = 0; // 用户操作数据记录时的临时记录
-    thiz->bms.can_pack_gen_nr = nr_gen;
-    thiz->bms.generator =
-       (struct can_pack_generator*)(((char *)thiz) + sizeof(struct charge_job));
-    sprintf(sql,
-            "SELECT symbol_define.symbol_value,"
-            "bms_can_pack_generator.bms_can_pgn,"
-            "bms_can_pack_generator.bms_can_prioriy,"
-            "bms_can_pack_generator.bms_can_datalen,"
-            "bms_can_pack_generator.bms_can_period,"
-            "bms_can_pack_generator.bms_can_tolerate_silence "
-            "FROM symbol_define,bms_can_pack_generator "
-            "WHERE symbol_define.symbol_name=bms_can_pack_generator.bms_can_stage");
-    ret = sqlite3_exec(tsk->database, sql, sql_query_BMS_pack_gen, thiz, &errmsg);
-    if ( ret ) {
-        log_printf(ERR, "ZEUS: DATABASE error: %s", errmsg);
-    }
-
-#if 0
-    for ( i = 0; i < thiz->bms.can_pack_gen_nr; i ++) {
-        printf("\t%4d  %08X  %2d   %9d  %5d   %d\n",
-               thiz->bms.generator[i].stage,
-               thiz->bms.generator[i].can_pgn,
-               thiz->bms.generator[i].prioriy,
-               thiz->bms.generator[i].datalen,
-               thiz->bms.generator[i].period,
-               thiz->bms.generator[i].can_tolerate_silence);
-    }
-    // BMS 数据包写线程，从队列中取出要写的数据包并通过CAN总线发送出去
-    ret = pthread_create( & thiz->tid_write, &task->attr, thread_bms_write_service, thiz);
-    if ( 0 != ret ) {
-        log_printf(ERR, "CAN-BUS reader start up.                       FAILE!!!!");
-        goto die;
-    }
-
-    // BMS读书举报线程，从CAN总线读取数据包后将数据存入读入数据队列等待处理。
-    ret = pthread_create( & thiz->tid_read, &task->attr, thread_bms_read_service, thiz);
-    if ( 0 != ret ) {
-        log_printf(ERR, "CAN-BUS writer start up.                       FAILE!!!!");
-        goto die;
-    }
-#endif
     thiz->job_status = JOB_WAITTING;
 
     pthread_mutex_lock(&task->wait_lck);

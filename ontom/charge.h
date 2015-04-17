@@ -1180,6 +1180,9 @@ struct bms_struct {
     // BMS 动力蓄电池状态信息
     struct pgn4864_BSM bms_battery_status;
 
+    // BMS 驱动
+    struct bmsdriver *driver;
+
     // 数据库操作计数器
     unsigned int readed;
     unsigned int can_pack_gen_nr;
