@@ -218,6 +218,10 @@ void Hachiko_CAN_TP_notify_proc(Hachiko_EVT evt, void *_private,
     }
 }
 
+void dump_can_pack(struct can_frame *f)
+{
+}
+
 // bms 通信 读 服务线程
 // 提供bms通信服务
 void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
@@ -305,7 +309,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     continue;
                 }
 
-                debug_log(DBG_LV1,
+                debug_log(INF,
                            "BMS: get %dst packet %08X:%02X%02X%02X%02X%02X%02X%02X%02X",
                            dbg_packets,
                            frame.can_id,
