@@ -214,7 +214,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
         // 事件循环函数初始化
         thiz->bms.can_bms_status = CAN_NORMAL;
         thiz->bms.can_heart_beat.Hachiko_notify_proc= heart_beart_notify_proc;
-        ret = Hachiko_new(&thiz->bms.can_heart_beat, HACHIKO_AUTO_FEED, 4, thiz);
+        ret = Hachiko_new(&thiz->bms.can_heart_beat, HACHIKO_AUTO_FEED, 1, thiz);
         if ( ret == ERR_OK ) {
             log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_HANDSHACKING"));
             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
