@@ -92,7 +92,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                 thiz->param.buff_size = sizeof(txbuff);
                 thiz->param.evt_param = EVT_RET_INVALID;
                 if ( thiz->bms.can_bms_status & CAN_NORMAL ) {
-                    log_printf(INF, "do EVENT_TX_REQUEST");
                     driver->driver_main_proc(thiz, EVENT_TX_REQUEST, &thiz->param, driver);
                 } else if ( thiz->bms.can_bms_status & CAN_TP_RD ) {
                     switch ( thiz->bms.can_bms_status & 0xF0 ) {
