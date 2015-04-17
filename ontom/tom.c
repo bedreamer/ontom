@@ -144,10 +144,6 @@ void dump(int signum)
     printf("读取MAPS文件失败!\n");
 
     }
-    printf("-------------------------------------------------------------------------\n\n");
-
-    printf("---------------------------进程挂掉时的堆栈信息--------------------------\n");
-
     static int iTime = 0;
 
     if (iTime++ >= 1)
@@ -158,10 +154,96 @@ void dump(int signum)
     abort();
     }
     dumping();
-    printf("-------------------------------------------------------------------------\n\n");
 
     abort();
 }
+
+static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
+
+{
+
+        static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
+
+        int i;
+
+        ucontext_t *ucontext = (ucontext_t*)ptr;
+
+        void *bt[100];
+
+        char **strings;
+
+
+
+        printf("Segmentation Fault Trace:\n");
+
+        printf("info.si_signo = %d\n", signum);
+
+        printf("info.si_errno = %d\n", info->si_errno);
+
+        printf("info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
+
+        printf("info.si_addr  = %p\n", info->si_addr);
+
+
+
+        /*for arm*/
+
+        printf("the arm_fp 0x%3x\n",ucontext->uc_mcontext.arm_fp);
+
+        printf("the arm_ip 0x%3x\n",ucontext->uc_mcontext.arm_ip);
+
+        printf("the arm_sp 0x%3x\n",ucontext->uc_mcontext.arm_sp);
+
+        printf("the arm_lr 0x%3x\n",ucontext->uc_mcontext.arm_lr);
+
+        printf("the arm_pc 0x%3x\n",ucontext->uc_mcontext.arm_pc);
+
+        printf("the arm_cpsr 0x%3x\n",ucontext->uc_mcontext.arm_cpsr);
+
+        printf("the falut_address 0x%3x\n",ucontext->uc_mcontext.fault_address);
+
+
+
+        printf("Stack trace (non-dedicated):");
+
+        int sz = backtrace(bt, 20);
+
+        printf("the stack trace is %d\n",sz);
+
+        strings = backtrace_symbols(bt, sz);
+
+        for(i = 0; i < sz; ++i){
+
+                printf("%s\n", strings[i]);
+
+        }
+
+    _exit (-1);
+
+}
+
+
+static void  catch_sigsegv()
+
+{
+
+       struct sigaction action;
+
+       memset(&action, 0, sizeof(action));
+
+       action.sa_sigaction = sigsegv_handler;
+
+       action.sa_flags = SA_SIGINFO;       // 注意这里，flag 是 SA_SIGINFO，这样信号处理函数就会多一些信息。
+
+       if(sigaction(SIGSEGV, &action, NULL) < 0){
+
+                  perror("sigaction");
+
+    }
+
+}
+
+
 int main()
 {
     const char *user_cfg = NULL;
@@ -177,7 +259,8 @@ int main()
     //act.sa_flags=SA_SIGINFO;
     //act.sa_sigaction=sig_dbg_interrupt;
     //sigaction(SIGSEGV,&act,NULL);
-    signal(SIGSEGV, &dump );
+    //signal(SIGSEGV, &dump );
+    catch_sigsegv();
 
     memset(task, 0, sizeof(struct charge_task));
 
