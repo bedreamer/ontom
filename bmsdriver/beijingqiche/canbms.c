@@ -311,6 +311,9 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 gen_packet_PGN7936(thiz, param);
                 thiz->bms.generator[7].heartbeat = 0;
             }
+            log_printf(INF, "%d:%d, %d:%d",
+                       thiz->bms.generator[0].heartbeat , thiz->bms.generator[0].period,
+                    thiz->bms.generator[7].heartbeat ,thiz->bms.generator[7].period);
             break;
         case CHARGE_STAGE_CONFIGURE:
             if ( thiz->bms.generator[1].heartbeat >= thiz->bms.generator[1].period ) {
@@ -490,7 +493,6 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                 }
             }
         }
-        log_printf(INF, "fasdfadsfdasfadsfdsafds");
     }
 }
 
