@@ -93,6 +93,33 @@ int sql_result(void *param, int nr, char **text, char **name)
     return 0;
 }
 
+void dumping(void)
+{
+ void *buffer[30] = {0};
+ size_t size;
+ char **strings = NULL;
+ size_t i = 0;
+
+
+ size = backtrace(buffer, 30);
+ fprintf(stdout, "Obtained %zd stack frames.nm\n", size);
+ strings = backtrace_symbols(buffer, size);
+ if (strings == NULL)
+ {
+  perror("backtrace_symbols.");
+  exit(EXIT_FAILURE);
+ }
+
+ for (i = 0; i < size; i++)
+ {
+  fprintf(stdout, "%s\n", strings[i]);
+ }
+ free(strings);
+ strings = NULL;
+
+
+}
+
 void dump(int signum)
 {
     /* 动态链接库的映射地址是动态的，需要将maps文件打印出来 */
@@ -130,6 +157,7 @@ void dump(int signum)
 
     abort();
     }
+    dumping();
     printf("-------------------------------------------------------------------------\n\n");
 
     abort();
