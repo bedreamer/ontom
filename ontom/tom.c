@@ -93,26 +93,26 @@ int sql_result(void *param, int nr, char **text, char **name)
     return 0;
 }
 
-void dump(int signo)
+void dump(int signum)
 {
-        char buf[1024];
-        char cmd[1024];
-        FILE *fh;
+    void *array[10];
+    size_t size;
+    char **strings;
+    size_t i, j;
 
-        snprintf(buf, sizeof(buf), "/proc/%d/cmdline", getpid());
-        if(!(fh = fopen(buf, "r")))
-                exit(0);
-        if(!fgets(buf, sizeof(buf), fh))
-                exit(0);
-        fclose(fh);
-        if(buf[strlen(buf) - 1] == '/n')
-                buf[strlen(buf) - 1] = '/0';
-        snprintf(cmd, sizeof(cmd), "gdb %s %d -ex=bt > ./a.txt", buf, getpid());
-        system(cmd);
+    signal(signum, SIG_DFL); /* 还原默认的信号处理handler */
 
-        exit(0);
+    size = backtrace (array, 10);
+    strings = (char **)backtrace_symbols (array, size);
+
+    fprintf(stderr, "widebright received SIGSEGV! Stack trace:\n");
+    for (i = 0; i < size; i++) {
+        fprintf(stderr, "%d %s \n",i,strings[i]);
+    }
+
+    free (strings);
+    exit(1);
 }
-
 int main()
 {
     const char *user_cfg = NULL;
