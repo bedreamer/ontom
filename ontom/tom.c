@@ -95,23 +95,44 @@ int sql_result(void *param, int nr, char **text, char **name)
 
 void dump(int signum)
 {
-    void *array[10];
-    size_t size;
-    char **strings;
-    size_t i, j;
+    /* 动态链接库的映射地址是动态的，需要将maps文件打印出来 */
+    char file[64], buffer[1032];
 
-    signal(signum, SIG_DFL); /* 还原默认的信号处理handler */
+    pid_t pid = getpid();
 
-    size = backtrace (array, 10);
-    strings = (char **)backtrace_symbols (array, size);
+    snprintf(file, sizeof(file), "/proc/%d/maps", pid);
 
-    fprintf(stderr, "widebright received SIGSEGV! Stack trace:\n");
-    for (i = 0; i < size; i++) {
-        fprintf(stderr, "%d %s \n",i,strings[i]);
+    FILE *fp = fopen(file, "r");
+
+    if (NULL != fp)
+    {
+    while(fgets(buffer, 1024, fp))
+    {
+    fputs(buffer, stdout);
+
     }
+    }
+    else
+    {
+    printf("读取MAPS文件失败!\n");
 
-    free (strings);
-    exit(1);
+    }
+    debuging("-------------------------------------------------------------------------\n\n");
+
+    debuging("---------------------------进程挂掉时的堆栈信息--------------------------\n");
+
+    static int iTime = 0;
+
+    if (iTime++ >= 1)
+    { /* 容错处理：如果访问 ucontext_t 结构体时产生错误会进入该分支 */
+
+    debuging("ReEnter %s is not allowed!\n", __FUNCTION__);
+
+    abort();
+    }
+    debuging("-------------------------------------------------------------------------\n\n");
+
+    abort();
 }
 int main()
 {
