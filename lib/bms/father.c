@@ -53,13 +53,20 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     if ( done == NULL ) done = &mydone;
 
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    if ( s == -1 ) {
+        log_printf(ERR, "BMSDRV: 打开CAN失败!");
+    }
 
     strcpy(ifr.ifr_name, "can0" );
-    ioctl(s, SIOCGIFINDEX, &ifr);
+    if ( 0 != ioctl(s, SIOCGIFINDEX, &ifr) ) {
+        log_printf(ERR, "BMSDRV: 配置CAN 失败.");
+    }
 
     addr.can_family = PF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
-    bind(s, (struct sockaddr *)&addr, sizeof(addr));
+    if ( 0 != bind(s, (struct sockaddr *)&addr, sizeof(addr)) ) {
+        log_printf(ERR, "BMSDRV: 绑定CAN 失败.");
+    }
 
     log_printf(INF, "BMS: %s running...s=%d", __FUNCTION__, s);
 
@@ -89,7 +96,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                  * 状态进行判定，当CAN处于CAN_NORMAL时进行普通的写操作，当CAN处于CAN_TP_RD
                  * 时，采用EVENT_TX_REQUEST 当CAN处于CAN_TP_RD时采用EVENT_TX_TP_REQUEST
                  */
-                thiz->param.buff_size = sizeof(txbuff);
+                thiz->param.buff_size = sizeof(thiz->param.buff.tx_buff);
                 thiz->param.evt_param = EVT_RET_INVALID;
                 if ( thiz->bms.can_bms_status & CAN_NORMAL ) {
                     driver->driver_main_proc(thiz, EVENT_TX_REQUEST, &thiz->param, driver);
@@ -241,9 +248,14 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
 
     if ( done == NULL ) done = &mydone;
     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    if ( s == -1 ) {
+        log_printf(ERR, "打开CAN失败!");
+    }
     fcntl(s, F_SETFL, FASYNC);
     strcpy(ifr.ifr_name, "can0" );
-    ioctl(s, SIOCGIFINDEX, &ifr);
+    if ( 0 != ioctl(s, SIOCGIFINDEX, &ifr) ) {
+        log_printf(ERR, "BMSDRV: 配置CAN失败.");
+    }
     addr.can_family = PF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
     bind(s, (struct sockaddr *)&addr, sizeof(addr));
