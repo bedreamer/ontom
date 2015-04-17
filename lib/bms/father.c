@@ -554,7 +554,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
         }
         int l;
         for ( l = 1; l < nr; l ++ ) {
-            drv.generator_copy[l-1].stage = atoi(rst[l * 6 + 0]);
+            drv.generator_copy[l-1].stage = __atoh(rst[l * 6 + 0]);
             drv.generator_copy[l-1].can_pgn = atoi(rst[l * 6 + 1]);
             drv.generator_copy[l-1].prioriy = atoi(rst[l * 6 + 2]);
             drv.generator_copy[l-1].datalen = atoi(rst[l * 6 + 3]);
