@@ -545,7 +545,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
             log_printf(ERR, "没有查询到注册的驱动数据 %s", msg);
             goto die;
         }
-        log_printf(INF, "done %d, ", sizeof(struct can_pack_generator)*nr);
+
         drv.can_pack_gen_nr_copy = nr;
         drv.generator_copy = (struct can_pack_generator*)malloc(sizeof(struct can_pack_generator)*nr);
         if ( drv.generator_copy == NULL ) {
@@ -553,11 +553,16 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
             goto die;
         }
         int l;
-        for ( l = 0; l < nr; l ++ ) {
-            log_printf(INF, "<%s:%s:%s:%s:%s>",
-                       rst[l * 6 + 0], rst[l * 6 + 1],
-                       rst[l * 6 + 2], rst[l * 6 + 3],
-                       rst[l * 6 + 4], rst[l * 6 + 5]);
+        for ( l = 1; l < nr; l ++ ) {
+            drv.generator_copy[l-1].stage = atoi(rst[l * 6 + 0]);
+            drv.generator_copy[l-1].can_pgn = atoi(rst[l * 6 + 1]);
+            drv.generator_copy[l-1].prioriy = atoi(rst[l * 6 + 2]);
+            drv.generator_copy[l-1].datalen = atoi(rst[l * 6 + 3]);
+            drv.generator_copy[l-1].period = atoi(rst[l * 6 + 4]);
+            drv.generator_copy[l-1].can_tolerate_silence = atoi(rst[l * 6 + 5]);
+            drv.generator_copy[l-1].heartbeat = 0;
+            drv.generator_copy[l-1].can_silence = 0;
+            drv.generator_copy[l-1].can_counter = 0;
         }
 
     } while (0);
@@ -577,7 +582,15 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     log_printf(INF, "BMSDRVIER: driver loaded: %s", driver_name);
     return real;
 die:
-    dlclose(drv.handle);
+    if ( drv.generator_copy ) {
+        free(drv.generator_copy);
+    }
+    if ( real ) {
+        free(real);
+    }
+    if ( drv.handle ) {
+        dlclose(drv.handle);
+    }
     return NULL;
 }
 
