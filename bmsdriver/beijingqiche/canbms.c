@@ -311,8 +311,10 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 gen_packet_PGN7936(thiz, param);
                 thiz->bms.generator[7].heartbeat = 0;
             }
-            log_printf(INF, "%d:%d, %d:%d",
+            log_printf(INF, "%d:%d:%d, %d:%d:%d",
+                       thiz->bms.generator[0].stage,
                        thiz->bms.generator[0].heartbeat , thiz->bms.generator[0].period,
+                    thiz->bms.generator[7].stage,
                     thiz->bms.generator[7].heartbeat ,thiz->bms.generator[7].period);
             break;
         case CHARGE_STAGE_CONFIGURE:
