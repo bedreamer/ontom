@@ -120,38 +120,37 @@ void dumping(void)
 
 }
 
-void dump()
+void dump(unsigned int pc)
 {
     /* 动态链接库的映射地址是动态的，需要将maps文件打印出来 */
     char file[64], buffer[1032];
+    char pcstr[32];
 
     pid_t pid = getpid();
 
     snprintf(file, sizeof(file), "/proc/%d/maps", pid);
+    sprintf(pcstr, "%08x", pc);
 
     FILE *fp = fopen(file, "r");
 
-    if (NULL != fp)
-    {
-    while(fgets(buffer, 1024, fp))
-    {
-    fputs(buffer, stdout);
-
-    }
-    }
-    else
-    {
-    printf("读取MAPS文件失败!\n");
-
+    if (NULL != fp) {
+        while(fgets(buffer, 1024, fp)) {
+            if ( 1 <= strcmp(pcstr, buffer ) &&
+                 -1 >= strcmp(pcstr, & buffer[9]) ) {
+                printf(RED("%s"), buffer);
+            } else {
+                fputs(buffer, stdout);
+            }
+        }
+    } else {
+        printf("读取MAPS文件失败!\n");
     }
     static int iTime = 0;
 
-    if (iTime++ >= 1)
-    { /* 容错处理：如果访问 ucontext_t 结构体时产生错误会进入该分支 */
-
-    printf("ReEnter %s is not allowed!\n", __FUNCTION__);
-
-    abort();
+    if (iTime++ >= 1) {
+        /* 容错处理：如果访问 ucontext_t 结构体时产生错误会进入该分支 */
+        printf("ReEnter %s is not allowed!\n", __FUNCTION__);
+        abort();
     }
 
     abort();
@@ -217,8 +216,7 @@ static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
 
         }
 
-
-        dump();
+        dump((unsigned int)ucontext->uc_mcontext.arm_pc);
     _exit (-1);
 
 }
