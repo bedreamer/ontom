@@ -490,6 +490,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                 }
             }
         }
+        log_printf(INF, "fasdfadsfdasfadsfdsafds");
     }
 }
 
