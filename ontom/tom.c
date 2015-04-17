@@ -137,7 +137,7 @@ void dump(unsigned int pc)
         while(fgets(buffer, 1024, fp)) {
             if ( 1 <= strcmp(pcstr, buffer ) &&
                  -1 >= strcmp(pcstr, & buffer[9]) ) {
-                printf(RED("0x%08x  ==>   %s"), buffer);
+                printf(RED("0x%08x  ==>   %s"), pc,  buffer);
             } else {
                 printf("                  %s", buffer);
             }
