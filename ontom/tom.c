@@ -120,7 +120,7 @@ void dumping(void)
 
 }
 
-void dump(int signum)
+void dump()
 {
     /* 动态链接库的映射地址是动态的，需要将maps文件打印出来 */
     char file[64], buffer[1032];
@@ -153,7 +153,6 @@ void dump(int signum)
 
     abort();
     }
-    dumping();
 
     abort();
 }
@@ -218,6 +217,8 @@ static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
 
         }
 
+
+        dump();
     _exit (-1);
 
 }
