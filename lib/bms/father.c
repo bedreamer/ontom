@@ -604,14 +604,15 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
 
     if ( drv->binder[0] ) return ERR_ERR;
 
-    job->bms.can_pack_gen_nr = drv->can_pack_gen_nr_copy;
     job->bms.generator =
-            (struct can_pack_generator*)malloc(sizeof(struct can_pack_generator)*job->bms.can_pack_gen_nr);
+            (struct can_pack_generator*)malloc(sizeof(struct can_pack_generator)*drv->can_pack_gen_nr_copy);
     if ( job->bms.generator == NULL ) {
         log_printf(ERR, "BMSDRVIER: 内存不足，无法拷贝数据包生成器副本.");
-        return ERR_ERR:
+        return ERR_ERR;
     }
-    memcpy(job->bms.generator, drv->generator_copy, sizeof(struct can_pack_generator)*nr);
+    job->bms.can_pack_gen_nr = drv->can_pack_gen_nr_copy;
+    memcpy(job->bms.generator, drv->generator_copy,
+           sizeof(struct can_pack_generator)*drv->can_pack_gen_nr_copy);
 
     drv->binder[0] = job;
     return ERR_OK;
