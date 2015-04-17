@@ -93,6 +93,26 @@ int sql_result(void *param, int nr, char **text, char **name)
     return 0;
 }
 
+void dump(int signo)
+{
+        char buf[1024];
+        char cmd[1024];
+        FILE *fh;
+
+        snprintf(buf, sizeof(buf), "/proc/%d/cmdline", getpid());
+        if(!(fh = fopen(buf, "r")))
+                exit(0);
+        if(!fgets(buf, sizeof(buf), fh))
+                exit(0);
+        fclose(fh);
+        if(buf[strlen(buf) - 1] == '/n')
+                buf[strlen(buf) - 1] = '/0';
+        snprintf(cmd, sizeof(cmd), "gdb %s %d -ex=bt > ./a.txt", buf, getpid());
+        system(cmd);
+
+        exit(0);
+}
+
 int main()
 {
     const char *user_cfg = NULL;
@@ -108,6 +128,7 @@ int main()
     //act.sa_flags=SA_SIGINFO;
     //act.sa_sigaction=sig_dbg_interrupt;
     //sigaction(SIGSEGV,&act,NULL);
+    signal(SIGSEGV, &dump );
 
     memset(task, 0, sizeof(struct charge_task));
 
