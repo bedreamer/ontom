@@ -208,15 +208,20 @@ int gen_packet_PGN7936(struct charge_job * thiz, struct bms_event_struct* param)
 int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                         struct bms_event_struct *param, struct bmsdriver *drv)
 {
+    int ret;
     switch ( ev ) {
     case EVENT_CAN_INIT:
         // 事件循环函数初始化
         thiz->bms.can_bms_status = CAN_NORMAL;
         thiz->bms.can_heart_beat.Hachiko_notify_proc= heart_beart_notify_proc;
-        Hachiko_new(&thiz->bms.can_heart_beat, HACHIKO_AUTO_FEED, 4, thiz);
-        log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_HANDSHACKING"));
-        thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
-        //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
+        ret = Hachiko_new(&thiz->bms.can_heart_beat, HACHIKO_AUTO_FEED, 4, thiz);
+        if ( ret == ERR_OK ) {
+            log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_HANDSHACKING"));
+            thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+            //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
+        } else {
+            log_printf(WRN, "BMS: 启动定时器错误.")
+        }
         break;
     case EVENT_CAN_RESET:
         // 事件循环函数复位
