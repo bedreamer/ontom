@@ -633,3 +633,15 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
     drv->binder[0] = job;
     return ERR_OK;
 }
+
+// 搜索指定PGN的生成器
+struct can_pack_generator *gen_search(struct can_pack_generator *p, unsigned int nr, unsigned int pgn)
+{
+    struct can_pack_generator *gen = NULL;
+
+    for ( ;p && nr; nr --, p ++ ) {
+        if ( p->can_pgn == pgn ) break;
+    }
+
+    return gen;
+}

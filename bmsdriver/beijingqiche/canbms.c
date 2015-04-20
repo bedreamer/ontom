@@ -109,7 +109,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct bms_event_struct* param)
 // 配置-CML-充电机最大输出能力
 int gen_packet_PGN2048(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, pgn2048_CML);
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CML);
     struct pgn2048_CML cml;
 
     cml.spn2824_max_output_voltage = 7500;
@@ -131,7 +131,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct bms_event_struct* param)
 // 配置-CRO-充电机输出准备就绪状态
 int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[3];
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRO);
     struct pgn2560_CRO cro;
 
     cro.spn2830_charger_ready_for_charge = CHARGER_READY_FOR_CHARGE;
@@ -152,7 +152,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 // 充电-CCS-充电机充电状态
 int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[4];
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CCS);
     struct pgn4608_CCS ccs;
 
     ccs.spn3081_output_voltage = 7500;
@@ -175,7 +175,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 // 充电-CST-充电机中止充电
 int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[5];
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST);
     (void)thiz;
     (void)param;
     (void)gen;
@@ -186,7 +186,7 @@ int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
 // 结束-CSD-充电机统计数据
 int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[6];
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CSD);
     (void)thiz;
     (void)param;
     (void)gen;
@@ -197,7 +197,7 @@ int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
 // 错误-CEM-充电机错误报文
 int gen_packet_PGN7936(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[7];
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
     (void)thiz;
     (void)param;
     (void)gen;
@@ -758,43 +758,34 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
         if (BATTERY_CHARGE_CURRENT_LOW ==
              (thiz->bms.bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_LOW)){
-
         }
 
         if (BATTERY_TEMPRATURE_HIGH ==
                 (thiz->bms.bms_battery_status.remote_single&BATTERY_TEMPRATURE_HIGH)){
-
         }
         if (BATTERY_TEMPRATURE_LOW ==
                 (thiz->bms.bms_battery_status.remote_single&BATTERY_TEMPRATURE_LOW)) {
-
         }
 
         if (INSULATION_FAULT ==
                 (thiz->bms.bms_battery_status.remote_single&INSULATION_FAULT)){
-
         }
         if (INSULATION_UNRELIABLE==
                 (thiz->bms.bms_battery_status.remote_single&INSULATION_UNRELIABLE)){
-
         }
 
         if (CONNECTOR_STATUS_FAULT==
                 (thiz->bms.bms_battery_status.remote_single&CONNECTOR_STATUS_FAULT)){
-
         }
         if (CONNECTOR_STATUS_UNRELIABLE==
                 (thiz->bms.bms_battery_status.remote_single&CONNECTOR_STATUS_UNRELIABLE)){
-
         }
 
         if (CHARGE_ALLOWED==
                 (thiz->bms.bms_battery_status.remote_single&CHARGE_ALLOWED)){
-
         }
         if (CHARGE_FORBIDEN==
                 (thiz->bms.bms_battery_status.remote_single&CHARGE_FORBIDEN)){
-
         }
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文

@@ -152,6 +152,9 @@ struct bmsdriver {
     struct bmsdriver *next;
 };
 
+// 搜索指定PGN的生成器
+struct can_pack_generator *gen_search(struct can_pack_generator *p, unsigned int nr, unsigned int pgn);
+
 /* 搜索对应生产商的BMS驱动
  * 先从bms驱动缓存中搜索，如果没有搜索到则到bms驱动目录搜索，若没有则会导致
  * 驱动不匹配而无法充电。
