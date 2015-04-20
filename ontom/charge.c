@@ -1165,6 +1165,8 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->bms.can_dev = "can0";
     thiz->bms.can_bms_status = CAN_INVALID;
     thiz->bms.job = thiz;
+    job->charged_kwh = 0.0f;
+    job->section_kwh = 0.0f;
     list_ini(thiz->job_node);
     thiz->job_url_commit_timestamp = need->url_commit_timestamp;
     thiz->charge_billing.mode = need->biling_mode;
