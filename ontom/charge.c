@@ -775,11 +775,15 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         // 连接完成 立即锁闭电子锁
         if ( job->job_gun_sn == GUN_SN0 ) {
             bit_set(tsk, CMD_GUN_1_LOCK_ON);
-            log_printf(INF, "ZEUS: 电子锁闭合");
+            if ( !bit_read(CMD_GUN_1_LOCK_ON) ) {
+                log_printf(INF, "ZEUS: 电子锁闭合");
+            }
         }
         if ( job->job_gun_sn == GUN_SN1 ) {
             bit_set(tsk, CMD_GUN_2_LOCK_ON);
-            log_printf(INF, "ZEUS: 电子锁闭合");
+            if ( !bit_read(CMD_GUN_2_LOCK_ON) ) {
+                log_printf(INF, "ZEUS: 电子锁闭合");
+            }
         }
 
         // 充电模式为自动充电，需要和BMS通信，此时才需要将辅助电源合闸
