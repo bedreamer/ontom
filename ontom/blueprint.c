@@ -2649,10 +2649,10 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
-        if ( bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+        if ( bit_read(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private)-1) ) {
             log_printf(INF, "UART: "GRN("协议转换盒通信恢复."));
         }
-        bit_clr(task, S_CONVERT_BOX_COMM_DOWN);
+        bit_clr(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private)-1);
         self->master->died = 0;
         break;
     // 串口发送数据请求
@@ -2689,12 +2689,12 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
             self->master->died ++;
         } else {
             //self->master->died ++;
-            if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+            if ( ! bit_read(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private)-1) ) {
             }
             log_printf(ERR, "UART: "RED("%d#模块通信中断, 请排查故障,(%d)"),
                        me->_private,
                        self->master->died);
-            bit_set(task, S_CONVERT_BOX_COMM_DOWN);
+            bit_set(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private)-1 );
         }
         log_printf(WRN, "UART: %s:%d get signal TIMEOUT", __FUNCTION__, evt);
         break;
