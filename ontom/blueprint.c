@@ -2654,6 +2654,14 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         }
         bit_clr(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private)-1);
         self->master->died = 0;
+        do {
+            unsigned int module_sn = (unsigned int)(me->_private) & 0x7FF;
+            if ( task->chargers[0] ) {
+                task->chargers[0]->chargers.charger_v_out[ module_sn ] = param->buff.rx_buff[3] << 8 | param->buff.rx_buff[4];
+                task->chargers[0]->chargers.charge_module_i[ module_sn ] = param->buff.rx_buff[5] << 8 | param->buff.rx_buff[6];
+                task->chargers[0]->chargers.charge_module_t[ module_sn ] = 200;
+            }
+        } while (0);
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
