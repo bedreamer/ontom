@@ -109,14 +109,14 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct bms_event_struct* param)
 // 配置-CML-充电机最大输出能力
 int gen_packet_PGN2048(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[2];
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, pgn2048_CML);
     struct pgn2048_CML cml;
 
     cml.spn2824_max_output_voltage = 7500;
     cml.spn2825_min_output_voltage = 2400;
     cml.spn2826_max_output_current = 3000;
     memset(param->buff.tx_buff, 0xFF, 8);
-    memcpy((void * __restrict__)param->buff.rx_buff, &cml, sizeof(struct pgn2048_CML));
+    memcpy((void * __restrict__)param->buff.tx_buff, &cml, sizeof(struct pgn2048_CML));
 
     param->buff_payload = gen->datalen;
     param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
@@ -160,7 +160,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
     ccs.spn3083_charge_time = 122;
 
     memset(param->buff.tx_buff, 0xFF, 8);
-    memcpy((void * __restrict__)param->buff.rx_buff, &ccs, sizeof(struct pgn4608_CCS));
+    memcpy((void * __restrict__)param->buff.tx_buff, &ccs, sizeof(struct pgn4608_CCS));
 
     param->buff_payload = gen->datalen;
     param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
@@ -209,6 +209,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                         struct bms_event_struct *param, struct bmsdriver *drv)
 {
     int ret;
+
     switch ( ev ) {
     case EVENT_CAN_INIT:
         // 事件循环函数初始化
@@ -303,56 +304,75 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
             param->evt_param = EVT_RET_ERR;
             break;
         case CHARGE_STAGE_HANDSHACKING:
-            if ( thiz->bms.generator[0].heartbeat >= thiz->bms.generator[0].period ) {
-                gen_packet_PGN256(thiz, param);
-                thiz->bms.generator[0].heartbeat = 0;
-            }
-            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
-                gen_packet_PGN7936(thiz, param);
-                thiz->bms.generator[7].heartbeat = 0;
-            }
+            do {
+                struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRM);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN256(thiz, param);
+                    gen->heartbeat = 0;
+                }
+                gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN7936(thiz, param);
+                    gen->heartbeat = 0;
+                }
+            } while (0);
             break;
         case CHARGE_STAGE_CONFIGURE:
-            if ( thiz->bms.generator[1].heartbeat >= thiz->bms.generator[1].period ) {
-                gen_packet_PGN1792(thiz, param);
-                thiz->bms.generator[1].heartbeat = 0;
-            }
-            else if ( thiz->bms.generator[2].heartbeat >= thiz->bms.generator[2].period ) {
-                gen_packet_PGN2048(thiz, param);
-                thiz->bms.generator[2].heartbeat = 0;
-            }
-            else if ( thiz->bms.generator[3].heartbeat >= thiz->bms.generator[3].period ) {
-                gen_packet_PGN2560(thiz, param);
-                thiz->bms.generator[3].heartbeat = 0;
-            }
-            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
-                gen_packet_PGN7936(thiz, param);
-                thiz->bms.generator[7].heartbeat = 0;
-            }
+            do {
+                struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CTS);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN1792(thiz, param);
+                    gen->heartbeat = 0;
+                }
+                else if ( gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CML) &&
+                          gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN2048(thiz, param);
+                    gen->heartbeat = 0;
+                }
+                else if (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRO) &&
+                         gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN2560(thiz, param);
+                    gen->heartbeat = 0;
+                }
+                gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN7936(thiz, param);
+                    gen->heartbeat = 0;
+                }
+            } while (0);
             break;
         case CHARGE_STAGE_CHARGING:
-            if ( thiz->bms.generator[4].heartbeat >= thiz->bms.generator[4].period ) {
-                gen_packet_PGN4608(thiz, param);
-                thiz->bms.generator[4].heartbeat = 0;
-            }
-            else if ( thiz->bms.generator[5].heartbeat >= thiz->bms.generator[5].period ) {
-                gen_packet_PGN6656(thiz, param);
-                thiz->bms.generator[5].heartbeat = 0;
-            }
-            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
-                gen_packet_PGN7936(thiz, param);
-                thiz->bms.generator[7].heartbeat = 0;
-            }
+            do {
+                struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CCS);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN4608(thiz, param);
+                    gen->heartbeat = 0;
+                }
+                else if ( gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST) &&
+                          gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN6656(thiz, param);
+                    gen->heartbeat = 0;
+                }
+                gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN7936(thiz, param);
+                    gen->heartbeat = 0;
+                }
+            } while (0);
             break;
         case CHARGE_STAGE_DONE:
-            if ( thiz->bms.generator[6].heartbeat >= thiz->bms.generator[6].period ) {
-                gen_packet_PGN7424(thiz, param);
-                thiz->bms.generator[6].heartbeat = 0;
-            }
-            if ( thiz->bms.generator[7].heartbeat >= thiz->bms.generator[7].period ) {
-                gen_packet_PGN7936(thiz, param);
-                thiz->bms.generator[7].heartbeat = 0;
-            }
+            do {
+                struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CSD);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN7424(thiz, param);
+                    gen->heartbeat = 0;
+                }
+                gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
+                if ( gen && gen->heartbeat >= gen->period ) {
+                    gen_packet_PGN7936(thiz, param);
+                    gen->heartbeat = 0;
+                }
+            } while (0);
             break;
         default:
             break;
@@ -497,6 +517,8 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
 // CAN数据包接受完成
 int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *param)
 {
+    struct can_pack_generator *gen = NULL;
+
     switch ( param->can_id & 0x00FF00 ) {
     case PGN_CRM :// 0x000100,
         break;
@@ -515,8 +537,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
     case PGN_CEM :// 0x001F00
         break;
     case PGN_BRM :// 0x000200, BMS 车辆辨识报文
-        thiz->bms.generator[I_BRM].can_counter ++;
-        thiz->bms.generator[I_BRM].can_silence = 0;
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BRM);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
@@ -571,8 +596,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         bit_set(thiz, F_BMS_RECOGNIZED);
         break;
     case PGN_BCP :// 0x000600, BMS 配置报文
-        thiz->bms.generator[I_BCP].can_counter ++;
-        thiz->bms.generator[I_BCP].can_silence = 0;
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BCP);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
@@ -631,9 +659,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
                    thiz->bms.bms_config_info.spn2822_total_voltage);
         break;
     case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
-        thiz->bms.generator[I_BRO].can_counter ++;
-        thiz->bms.generator[I_BRO].can_silence = 0;
-
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BRO);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         log_printf(INF, "BMS is %s for charge.",
                    param->buff.rx_buff[0] == 0x00 ?
                     "not ready" :
@@ -650,8 +680,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
-        thiz->bms.generator[I_BCL].can_counter ++;
-        thiz->bms.generator[I_BCL].can_silence = 0;
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BCL);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
@@ -677,9 +710,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
                         CHARGE_WITH_CONST_CURRENT ? "恒流充电" : "无效模式");
         break;
     case PGN_BCS :// 0x001100, BMS 电池充电总状态报文
-        thiz->bms.generator[I_BCS].can_counter ++;
-        thiz->bms.generator[I_BCS].can_silence = 0;
-
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BCS);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         log_printf(INF, "BMS: PGN_BCS fetched.");
         memcpy(&thiz->bms.bms_all_battery_status, param->buff.rx_buff,
                sizeof(struct pgn4352_BCS));
@@ -701,9 +736,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
         break;
     case PGN_BSM :// 0x001300, 动力蓄电池状态信息报文
-        thiz->bms.generator[I_BSM].can_counter ++;
-        thiz->bms.generator[I_BSM].can_silence = 0;
-
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSM);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         log_printf(INF, "BMS: PGN_BSM fetched.");
         memcpy(&thiz->bms.bms_battery_status, param->buff.rx_buff,
                sizeof(struct pgn4864_BSM));
@@ -761,32 +798,45 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
-        thiz->bms.generator[I_BMV].can_counter ++;
-        thiz->bms.generator[I_BMV].can_silence = 0;
-
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BMV);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         log_printf(INF, "BMS: PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
-        thiz->bms.generator[I_BMT].can_counter ++;
-        thiz->bms.generator[I_BMT].can_silence = 0;
-
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BMT);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         log_printf(INF, "BMS: PGN_BMT fetched.");
         break;
     case PGN_BSP :// 0x001700, 动力蓄电池预留报文
-        thiz->bms.generator[I_BSP].can_counter ++;
-        thiz->bms.generator[I_BSP].can_silence = 0;
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSP);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
 
         log_printf(INF, "BMS: PGN_BSP fetched.");
         break;
     case PGN_BST :// 0x001900, BMS 中止充电报文
-        thiz->bms.generator[I_BST].can_counter ++;
-        thiz->bms.generator[I_BST].can_silence = 0;
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BST);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
 
         log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
-        thiz->bms.generator[I_BSD].can_counter ++;
-        thiz->bms.generator[I_BSD].can_silence = 0;
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSD);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
@@ -795,9 +845,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         log_printf(INF, "BMS: PGN_BSD fetched.");
         break;
     case PGN_BEM :// 0x001E00, BMS 错误报文
-        thiz->bms.generator[I_BEM].can_counter ++;
-        thiz->bms.generator[I_BEM].can_silence = 0;
-
+        gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BEM);
+        if ( gen ) {
+            gen->can_counter ++;
+            gen->can_silence = 0;
+        }
         log_printf(INF, "BMS: PGN_BEM fetched.");
         break;
     default:
