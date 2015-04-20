@@ -2657,9 +2657,9 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
         do {
             unsigned int module_sn = (unsigned int)(me->_private) & 0x7FF;
             if ( task->chargers[0] ) {
-                task->chargers[0]->chargers.charge_module_v[ module_sn ] = param->buff.rx_buff[3] << 8 | param->buff.rx_buff[4];
-                task->chargers[0]->chargers.charge_module_i[ module_sn ] = param->buff.rx_buff[5] << 8 | param->buff.rx_buff[6];
-                task->chargers[0]->chargers.charge_module_t[ module_sn ] = 200;
+                task->chargers[0]->chargers.charge_module_v[ module_sn ] = param->buff.rx_buff[4] << 8 | param->buff.rx_buff[3];
+                task->chargers[0]->chargers.charge_module_i[ module_sn ] = param->buff.rx_buff[6] << 8 | param->buff.rx_buff[5];
+                task->chargers[0]->chargers.charge_module_t[ module_sn ] = 200 << 8 ;
             }
         } while (0);
         break;
