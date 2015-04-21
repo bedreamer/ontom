@@ -4523,8 +4523,9 @@ continue_to_send:
                     int tts = 0;
                     tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
                     usleep(tts + thiz->master->swap_time_modify + 50);
-                    log_printf(DBG_LV3, "UART: packet send done. sleep: %d:%d us",
-                               tts, thiz->master->swap_time_modify);
+                    log_printf(DBG_LV3, "UART: packet send done. sleep: %d:%d us, need: %d bytes",
+                               tts, thiz->master->swap_time_modify,
+                               thiz->rx_param.need_bytes);
                 } while (0);
 
                 tcflush(thiz->dev_handle, TCIOFLUSH);
