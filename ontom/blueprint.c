@@ -2835,7 +2835,11 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
+        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
+            buff[ nr ++ ] = 1; // 开机
+        } else {
+            buff[ nr ++ ] = 0; // 开机
+        }
 #else
         buff[ nr ++ ] = 0x10;
         buff[ nr ++ ] = 0x00;
