@@ -1106,6 +1106,40 @@ struct charger_config_10h {
     unsigned short charge_kairu;
     // }}
 };
+// 开机
+static inline int __module_set_on(struct charger_config_10h *p, unsigned int n) {
+    unsigned char *st = (unsigned char *)p->charge_module_status;
+    st[ n ] &= ~0x10;
+    return st[ n ] >> 4;
+}
+// 关机
+static inline int __module_set_off(struct charger_config_10h *p, unsigned int n) {
+    unsigned char *st = (unsigned char *)p->charge_module_status;
+    st[ n ] |= 0x10;
+    return st[ n ] >> 4;
+}
+// 测试模块是否开机
+static inline int __module_is_on(struct charger_config_10h *p, unsigned int n) {
+    unsigned char *st = (unsigned char *)p->charge_module_status;
+    return st[ n ] >> 4;
+}
+// 设置故障位
+static inline int __module_set_err(struct charger_config_10h *p, unsigned int n) {
+    unsigned char *st = (unsigned char *)p->charge_module_status;
+    st[ n ] |= 0x01;
+    return st[ n ] & 0x01;
+}
+// 清除故障位
+static inline int __module_clr_err(struct charger_config_10h *p, unsigned int n) {
+    unsigned char *st = (unsigned char *)p->charge_module_status;
+    st[ n ] &= ~0x0F;
+    return st[ n ] & 0x01;
+}
+// 测试模块是否故障
+static inline int __module_is_err(struct charger_config_10h *p, unsigned int n) {
+    unsigned char *st = (unsigned char *)p->charge_module_status;
+    return st[ n ] & 0x01;
+}
 
 // 通信报文生成依据
 struct can_pack_generator {
