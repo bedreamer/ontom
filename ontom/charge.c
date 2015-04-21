@@ -265,6 +265,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         // }}
         {"00000009", Increase_convert_box_write_evt_handle},
         {"M000000A", Increase_convert_box_read_evt_handle},
+        {"M0000015", Increase_module_write_evt_handle},
         {"0000000B", kwh_meter_read_evt_handle},
         {"0000000C", voltage_meter_read_evt_handle},
         {"I0000010", kwh_meter_install_evt_handle},
