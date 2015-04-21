@@ -2845,7 +2845,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
-#if 1
+#if 0
     #if 1
         buff[ nr ++ ] = 0x06;
         buff[ nr ++ ] = 0x00;
