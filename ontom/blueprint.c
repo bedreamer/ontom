@@ -2738,8 +2738,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-
-        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0xFE;
         buff[ nr ++ ] = 0x10;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
