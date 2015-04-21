@@ -2854,7 +2854,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         buff[ nr ++ ] = 0; // 模块输出电压下限
         buff[ nr ++ ] = 0; // 模块输出电压下限
         buff[ nr ++ ] = 0; // 开机
-        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0 ) {
+        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x80 ) {
             buff[ nr ++ ] = 0; // 开机
         } else {
             buff[ nr ++ ] = 1; // 开机
