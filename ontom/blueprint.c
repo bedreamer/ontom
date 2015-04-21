@@ -2366,7 +2366,6 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
     return ret;
 }
 
-
 // 配置转换盒数据
 int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
@@ -2884,8 +2883,17 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
             buff[ nr ++ ] = 0x06;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+            if ( bit_read(task, CMD_JIAOZHUN_BUS1_V ) ) {
+                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) >> 8;
+                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) & 0xFF;
+            } else if ( bit_read(task, CMD_JIAOZHUN_BUS2_V ) ) {
+                buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) >> 8;
+                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) & 0xFF;
+            } else if (bit_read(task, CMD_JIAOZHUN_BAT_I )) {
+            } else {
+                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+            }
         } else if ( seq == 3 ) {
             buff[ nr ++ ] = 0x10;
             buff[ nr ++ ] = 0x00;
