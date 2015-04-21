@@ -2724,6 +2724,70 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
     return ret;
 }
 
+// 英可瑞模块写
+int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    unsigned char buff[32];
+    int nr = 0, len;
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
+        buff[ nr ++ ] = 0x06;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+
+        len = nr;
+        buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
+        buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+        self->master->time_to_send = param->payload_size * 1000 / 960;
+        self->rx_param.need_bytes = 8;
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+
 // 英可瑞模块协议转换盒设置
 int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
