@@ -2831,7 +2831,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
 int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    static int seq = 0;
+    static int seq = 0, module_seq = 0;
     unsigned char buff[32];
     int nr = 0, len;
     int ret = ERR_ERR;
@@ -2861,7 +2861,11 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        seq ++;
+        module_seq ++;
+        if ( module_seq >= task->modules_nr ) {
+            seq ++;
+            module_seq = 0;
+        }
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
 
         if ( seq > 3 ) seq = 1;
