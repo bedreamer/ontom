@@ -2772,8 +2772,8 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0x2E;
         buff[ nr ++ ] = 0;
         buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = 0x01;
-        buff[ nr ++ ] = 0xF4;
+        buff[ nr ++ ] = 0;
+        buff[ nr ++ ] = 0;
         buff[ nr ++ ] = 0x0A; // 模块输出电压上限
         buff[ nr ++ ] = 0x50; // 模块输出电压上限
         buff[ nr ++ ] = 0x07; // 模块输出电压下限
