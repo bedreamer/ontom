@@ -137,15 +137,15 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
 
     switch (parity)
     {
-        case 'o':
-        case 'O':
+        case 'e':
+        case 'E':
         case 1:
             options.c_cflag |= PARENB;     /* Enable parity */
             options.c_cflag &= ~PARODD;
             break;
 
-        case 'e':
-        case 'E':
+        case 'o':
+        case 'O':
         case 2:
             options.c_cflag |= (PARODD | PARENB);
             break;
