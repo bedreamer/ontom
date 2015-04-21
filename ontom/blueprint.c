@@ -2738,14 +2738,14 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        /*
+
         buff[ nr ++ ] = 0x01;
         buff[ nr ++ ] = 0x10;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x07;
-        buff[ nr ++ ] = 0x0E;
+        buff[ nr ++ ] = 0x06;
+        buff[ nr ++ ] = 0x0C;
         buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
         buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
         buff[ nr ++ ] = 0;
@@ -2758,9 +2758,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0; // 模块输出电压下限
         buff[ nr ++ ] = 0; // 开机
         buff[ nr ++ ] = 0; // 开机
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("初始电压")) >> 8;
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
-        */
+/*
 #if 0
         buff[ nr ++ ] = 0x01;
         buff[ nr ++ ] = 0x10;
@@ -2790,6 +2788,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
 #endif
+*/
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
@@ -2797,7 +2796,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
         self->master->time_to_send = param->payload_size * 1000 / 960;
-        self->rx_param.need_bytes = 8;
+        self->rx_param.need_bytes = 0;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         ret = ERR_OK;
         break;
