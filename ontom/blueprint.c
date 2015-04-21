@@ -4415,9 +4415,56 @@ ___fast_switch_2_rx:
                 } else if ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
                 } else {
-                    // all thing is ok.
-                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
-                    log_printf(INF, "unkown statment.");
+                    ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
+                                              &thiz->rx_param);
+                    thiz->uart_mode = UART_MODE_NORMAL;
+                    switch ( ret ) {
+                    // 数据接收，校验完成, 完成数据接收过程，停止接收
+                    case ERR_OK:
+                        __dump_uart_hex(buff, nr, DBG_LV3);
+                        thiz->status = BP_UART_STAT_WR;
+                        Hachiko_pause(&thiz->rx_seed);
+                        log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
+                        ret = thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
+                                                              &thiz->rx_param);
+                        if ( (unsigned)ret == ERR_NEED_ECHO ) {
+                            thiz->uart_mode = UART_MODE_SESSION;
+                            thiz->continues_nr ++;
+                            if ( thiz->continues_nr < 5 ) {
+                                thiz->sequce --;
+                            } else {
+                                thiz->continues_nr = 0;
+                            }
+                            log_printf(INF, "UART: 需要立即发送回应帧: %d-%d",
+                                       thiz->continues_nr,
+                                       thiz->sequce);
+                        } else {
+                            thiz->continues_nr = 0;
+                        }
+                        //thiz->master->rcv_ok_cnt ++;
+                        break;
+                    // 数据接收完成，但校验失败, 停止接收
+                    case ERR_FRAME_CHECK_ERR:
+                        __dump_uart_hex(buff, nr, DBG_LV3);
+                        thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
+                                                                  &thiz->rx_param);
+                        //thiz->master->check_err_cnt ++;
+                        thiz->status = BP_UART_STAT_WR;
+                        thiz->continues_nr = 0;
+                        Hachiko_pause(&thiz->rx_seed);
+                        log_printf(WRN,
+                                   "UART: lenth fetched but check "RED("faile."));
+                        break;
+                    // 数据接收长度不足，继续接收
+                    case ERR_FRAME_CHECK_DATA_TOO_SHORT:
+                        if ( rd > 0 ) {
+                            thiz->bp_evt_handle(thiz, BP_EVT_RX_DATA, &thiz->rx_param);
+                        }
+                        break;
+                    default:
+                        log_printf(INF, "unkown statment.");
+                        break;
+                    }
                 }
                 thiz->status = BP_UART_STAT_WR;
             }
