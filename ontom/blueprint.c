@@ -2830,12 +2830,32 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
+#if 1
         buff[ nr ++ ] = 0x06;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
-
+#else
+        buff[ nr ++ ] = 0x10;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x06;
+        buff[ nr ++ ] = 0x0C;
+        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+        buff[ nr ++ ] = 0;
+        buff[ nr ++ ] = 0;
+        buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
+        buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
+        buff[ nr ++ ] = 0; // 模块输出电压上限
+        buff[ nr ++ ] = 0; // 模块输出电压上限
+        buff[ nr ++ ] = 0; // 模块输出电压下限
+        buff[ nr ++ ] = 0; // 模块输出电压下限
+        buff[ nr ++ ] = 0; // 开机
+        buff[ nr ++ ] = 0; // 开机
+#endif
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
