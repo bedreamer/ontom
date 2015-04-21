@@ -2663,7 +2663,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
                 task->chargers[0]->chargers.charge_module_i[ module_sn ] = param->buff.rx_buff[6] << 8 | param->buff.rx_buff[5];
                 task->chargers[0]->chargers.charge_module_t[ module_sn ] = 200 << 8;
                 module_onoff = (unsigned char *)task->chargers[0]->chargers.charge_module_status;
-                module_onoff[ module_sn ] = param->buff.rx_buff[14] & 0x01;
+                module_onoff[ module_sn ] = (param->buff.rx_buff[14] & 0x01) << 4;
             }
         } while (0);
         break;
