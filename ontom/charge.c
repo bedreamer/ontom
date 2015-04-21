@@ -505,7 +505,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->bus_2_v_hi = 750.1;
     task->bus_2_v_lo = 240.0;
     task->bat_1_v_hi = 750.1;
-    task->bat_1_v_lo = 240.0;
+    task->bat_1_v_lo = 450.0;
     task->bat_2_v_hi = 750.1;
     task->bat_2_v_lo = 240.0;
     task->bat_1_I_hi = 750.1;
