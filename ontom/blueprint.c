@@ -2761,6 +2761,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = (unsigned int)atoi(config_read("初始电压")) >> 8;
         buff[ nr ++ ] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
         */
+#if 0
         buff[ nr ++ ] = 0x01;
         buff[ nr ++ ] = 0x10;
         buff[ nr ++ ] = 0x00;
@@ -2780,7 +2781,17 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0xBC; // 模块输出电压下限
         buff[ nr ++ ] = 0x00; // 开机
         buff[ nr ++ ] = 0x00; // 开机
+#else
 
+        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x06;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+#endif
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
