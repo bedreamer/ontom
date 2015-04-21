@@ -2284,7 +2284,6 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
         if ( ((box->Flag_run1 & (0x20 | 0x40)) >> 5) == 0 ) {
             if ( ((me_pre->Flag_run1 & (0x20 | 0x40)) >> 5) != 0 ) {
                 log_printf(INF, "采样盒: 1#枪断开连接");
-                need_echo ++;
             }
             bit_clr(task, F_GUN_1_PHY_CONN_STATUS);
             len += sprintf(&infstr[len], "[1#枪未链接] ");
