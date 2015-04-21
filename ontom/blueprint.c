@@ -2820,6 +2820,21 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = Increase_ModbusCRC(param->buff.rx_buff, param->need_bytes-2);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 1 ] |
+                    param->buff.rx_buff[ param->need_bytes - 2] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
@@ -2920,6 +2935,21 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = Increase_ModbusCRC(param->buff.rx_buff, param->need_bytes-2);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 1 ] |
+                    param->buff.rx_buff[ param->need_bytes - 2] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
         break;
     // 串口接收到新数据
     case BP_EVT_RX_DATA:
