@@ -263,6 +263,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000008", ANC01_convert_box_read_evt_handle},
         {"00000013", ANC01_convert_box_module_on_evt_handle},
         {"00000014", ANC01_convert_box_module_off_handle},
+
         // }}
         {"00000009", Increase_convert_box_write_evt_handle},
         {"M000000A", Increase_convert_box_read_evt_handle},

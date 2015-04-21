@@ -2960,7 +2960,6 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
     return ret;
 }
 
-
 // 英可瑞模块协议转换盒设置
 int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
