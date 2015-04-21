@@ -1763,7 +1763,7 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x10;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x01;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 12;
         buff[ nr ++ ] = 24;
