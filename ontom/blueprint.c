@@ -2830,7 +2830,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
-#if 1
+#if 0
         buff[ nr ++ ] = 0x06;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x05;
@@ -2854,10 +2854,10 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         buff[ nr ++ ] = 0; // 模块输出电压下限
         buff[ nr ++ ] = 0; // 模块输出电压下限
         buff[ nr ++ ] = 0; // 开机
-        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x80 ) {
-            buff[ nr ++ ] = 0; // 开机
-        } else {
+        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
             buff[ nr ++ ] = 1; // 开机
+        } else {
+            buff[ nr ++ ] = 0; // 开机
         }
 #endif
         len = nr;
