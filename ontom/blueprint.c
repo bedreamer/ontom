@@ -4416,6 +4416,7 @@ ___fast_switch_2_rx:
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
                 } else {
                     // all thing is ok.
+                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
                     log_printf(INF, "unkown statment.");
                 }
                 thiz->status = BP_UART_STAT_WR;
