@@ -2786,9 +2786,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0x01;
         buff[ nr ++ ] = 0x06;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
 #endif
