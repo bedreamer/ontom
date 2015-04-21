@@ -2779,7 +2779,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0x07; // 模块输出电压下限
         buff[ nr ++ ] = 0xBC; // 模块输出电压下限
         buff[ nr ++ ] = 0x00; // 开机
-        buff[ nr ++ ] = 0x00; // 开机
+        buff[ nr ++ ] = 0x01; // 开机
 
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
