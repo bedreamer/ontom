@@ -2815,7 +2815,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
 int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    static int nr = 0;
+    static int seq = 0;
     unsigned char buff[32];
     int nr = 0, len;
     int ret = ERR_ERR;
@@ -2845,12 +2845,12 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        nr ++;
+        seq ++;
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
 
-        if ( nr > 3 ) nr = 1;
+        if ( seq > 3 ) seq = 1;
 
-        if ( nr == 1 ) {
+        if ( seq == 1 ) {
             buff[ nr ++ ] = 0x06;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x05;
@@ -2860,13 +2860,13 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
             } else {
                 buff[ nr ++ ] = 0; // 开机
             }
-        } else if ( nr == 2 ) {
+        } else if ( seq == 2 ) {
             buff[ nr ++ ] = 0x06;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
             buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-        } else if ( nr == 3 ) {
+        } else if ( seq == 3 ) {
             buff[ nr ++ ] = 0x10;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x00;
@@ -2889,6 +2889,10 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
             } else {
                 buff[ nr ++ ] = 0; // 开机
             }
+        } else {
+            seq = 0;
+            ret = ERR_ERR;
+            break;
         }
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
