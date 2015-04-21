@@ -309,6 +309,8 @@ int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                      struct bp_evt_param *param);
 int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
+int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param);
 int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param);
 int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
