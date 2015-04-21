@@ -2815,6 +2815,7 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
 int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
+    static int nr = 0;
     unsigned char buff[32];
     int nr = 0, len;
     int ret = ERR_ERR;
@@ -2844,49 +2845,51 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
+        nr ++;
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
-#if 0
-    #if 0
-        buff[ nr ++ ] = 0x06;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x05;
-        buff[ nr ++ ] = 0x00;
-        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
-            buff[ nr ++ ] = 1; // 开机
-        } else {
+
+        if ( nr > 3 ) nr = 1;
+
+        if ( nr == 1 ) {
+            buff[ nr ++ ] = 0x06;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x05;
+            buff[ nr ++ ] = 0x00;
+            if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
+                buff[ nr ++ ] = 1; // 开机
+            } else {
+                buff[ nr ++ ] = 0; // 开机
+            }
+        } else if ( nr == 2 ) {
+            buff[ nr ++ ] = 0x06;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+        } else if ( nr == 3 ) {
+            buff[ nr ++ ] = 0x10;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x06;
+            buff[ nr ++ ] = 0x0C;
+            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+            buff[ nr ++ ] = 0;
+            buff[ nr ++ ] = 0;
+            buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
+            buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
+            buff[ nr ++ ] = 0; // 模块输出电压上限
+            buff[ nr ++ ] = 0; // 模块输出电压上限
+            buff[ nr ++ ] = 0; // 模块输出电压下限
+            buff[ nr ++ ] = 0; // 模块输出电压下限
             buff[ nr ++ ] = 0; // 开机
+            if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
+                buff[ nr ++ ] = 1; // 开机
+            } else {
+                buff[ nr ++ ] = 0; // 开机
+            }
         }
-    #else
-        buff[ nr ++ ] = 0x06;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-    #endif
-#else
-        buff[ nr ++ ] = 0x10;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x06;
-        buff[ nr ++ ] = 0x0C;
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
-        buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
-        buff[ nr ++ ] = 0; // 模块输出电压上限
-        buff[ nr ++ ] = 0; // 模块输出电压上限
-        buff[ nr ++ ] = 0; // 模块输出电压下限
-        buff[ nr ++ ] = 0; // 模块输出电压下限
-        buff[ nr ++ ] = 0; // 开机
-        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
-            buff[ nr ++ ] = 1; // 开机
-        } else {
-            buff[ nr ++ ] = 0; // 开机
-        }
-#endif
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
