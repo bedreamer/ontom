@@ -2584,7 +2584,7 @@ int ANC01_convert_box_module_off_handle(struct bp_uart *self, struct bp_user *me
             self->rx_param.need_bytes = 0;
         } else {
             break;
-         }
+        }
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
@@ -2746,8 +2746,10 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
             unsigned char *module_status = NULL;
             module_sn --;
             if ( task->chargers[0] ) {
-                task->chargers[0]->chargers.charge_module_v[ module_sn ] = param->buff.rx_buff[4] << 8 | param->buff.rx_buff[3];
-                task->chargers[0]->chargers.charge_module_i[ module_sn ] = param->buff.rx_buff[6] << 8 | param->buff.rx_buff[5];
+                task->chargers[0]->chargers.charge_module_v[ module_sn ] =
+                        param->buff.rx_buff[4] << 8 | param->buff.rx_buff[3];
+                task->chargers[0]->chargers.charge_module_i[ module_sn ] =
+                        param->buff.rx_buff[6] << 8 | param->buff.rx_buff[5];
                 task->chargers[0]->chargers.charge_module_t[ module_sn ] = 200 << 8;
                 module_status = (unsigned char *)task->chargers[0]->chargers.charge_module_status;
                 module_status[ module_sn ] = (param->buff.rx_buff[14] & 0x01) << 4; // 开关机
@@ -2850,7 +2852,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
 
         if ( seq > 3 ) seq = 1;
 
-        if ( seq == 1 ) {
+        if ( seq == 1 ) { // 开关机
             buff[ nr ++ ] = 0x06;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x05;
@@ -2860,7 +2862,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
             } else {
                 buff[ nr ++ ] = 0; // 开机
             }
-        } else if ( seq == 2 ) {
+        } else if ( seq == 2 ) { // 设置需求电压
             buff[ nr ++ ] = 0x06;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x00;
