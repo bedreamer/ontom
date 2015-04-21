@@ -2868,7 +2868,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         }
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
 
-        if ( seq > 3 ) seq = 1;
+        if ( seq > 2 ) seq = 1;
 
         if ( seq == 1 ) { // 开关机
             buff[ nr ++ ] = 0x06;
