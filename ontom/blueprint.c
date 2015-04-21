@@ -2846,8 +2846,8 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x07;
-        buff[ nr ++ ] = 0xD0;
+        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
     #endif
 #else
         buff[ nr ++ ] = 0x10;
