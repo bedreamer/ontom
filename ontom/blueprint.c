@@ -1676,10 +1676,97 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 13;
-        buff[ nr ++ ] = 26;
+        buff[ nr ++ ] = 1;
+        buff[ nr ++ ] = 2;
         buff[ nr ++ ] = cmd;
         buff[ nr ++ ] = cmd;
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->rx_param.need_bytes = 12;
+        self->master->time_to_send = (param->payload_size + 1) * 1000 / 960 + self->master->swap_time_modify;
+        ret = ERR_OK;
+        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        log_printf(DBG_LV3, "UART: %s packet send done", __FUNCTION__);
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 配置上下限
+int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    int ret = ERR_ERR;
+    unsigned char buff[64];
+    char cmd;
+    int nr = 0, len = 0;
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
+            unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
+                    param->buff.rx_buff[ param->need_bytes - 1] << 8;
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+                       crc, check);
+            if ( crc != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        param->attrib = BP_FRAME_UNSTABLE;
+
+        buff[ nr ++ ] = 0xF0;
+        buff[ nr ++ ] = 0xE1;
+        buff[ nr ++ ] = 0xD2;
+        buff[ nr ++ ] = 0xC3;
+        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 0x10;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 12;
+        buff[ nr ++ ] = 24;
         buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10) >>8;
         buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10);
         buff[ nr ++ ] = double2short(task->bus_1_v_lo, 10) >>8;
