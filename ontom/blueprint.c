@@ -2752,13 +2752,13 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
                 task->chargers[0]->chargers.charge_module_t[ module_sn ] = 200 << 8;
                 if ( param->buff.rx_buff[14] & 0x01 ) {
                     if ( task->modules_on_off[module_sn] == 0x81 ) {
-                        task->modules_on_off[module_sn] = 0;
+                        //task->modules_on_off[module_sn] = 0;
                         log_printf(INF, "UART: #%d 模块已关机", module_sn + 1);
                     }
                     __module_set_off(&task->chargers[0]->chargers, module_sn);
                 } else {
                     if ( task->modules_on_off[module_sn] == 0x80 ) {
-                        task->modules_on_off[module_sn] = 0;
+                        //task->modules_on_off[module_sn] = 0;
                         log_printf(INF, "UART: #%d 模块已开机", module_sn + 1);
                     }
                     __module_set_on(&task->chargers[0]->chargers, module_sn);
