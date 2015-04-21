@@ -249,6 +249,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000001", simple_box_read_evt_handle},
         {"C000000D", simple_box_correct_write_evt_handle},
         {"0000000E", simple_box_write_evt_handle},
+        {"00000016", simple_box_configwrite_evt_handle},
         {"C0000012", simple_box_correct_read_evt_handle},
         {"C0000011", simple_box_correct_refer_V_evt_handle},
         {"00000002", card_reader_handle},
