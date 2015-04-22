@@ -3209,7 +3209,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
             } else {
                 buff[ nr ++ ] = 0; // 开机
             }
-        } else if ( seq == 2 ) { // 设置需求电压
+        } else if ( seq == 9 ) { // 设置需求电压
             buff[ nr ++ ] = 0x06;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x00;
@@ -3224,7 +3224,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
                 buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
                 buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
             }
-        } else if ( seq == 3 ) {
+        } else if ( seq == 2 || seq == 3 ) {
             buff[ nr ++ ] = 0x10;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x00;
