@@ -3035,7 +3035,8 @@ unsigned short Increase_ModbusCRC(unsigned char * pData, unsigned char len)
 }
 
 // 英可瑞模块协议转换盒读取
-int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+// id: M000000A
+int Increase_module_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
@@ -3156,7 +3157,8 @@ int Increase_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *m
     return ret;
 }
 
-// 英可瑞模块写
+// 英可瑞模块写, 开关机
+// id: M0000015
 int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
@@ -3190,72 +3192,17 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        module_seq ++;
-        if ( module_seq >= task->modules_nr ) {
-            seq ++;
-            module_seq = 0;
-        }
-        if ( seq == 2 ) {
-            buff[ nr ++ ] = 0xFF;
+        buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
+        buff[ nr ++ ] = 0x06;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x05;
+        buff[ nr ++ ] = 0x00;
+        if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
+            buff[ nr ++ ] = 1; // 开机
         } else {
-            buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
-        }
-
-        if ( seq > 2 ) seq = 1;
-
-        if ( seq == 1 ) { // 开关机
-            buff[ nr ++ ] = 0x06;
-            buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 0x05;
-            buff[ nr ++ ] = 0x00;
-            if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
-                buff[ nr ++ ] = 1; // 开机
-            } else {
-                buff[ nr ++ ] = 0; // 开机
-            }
-        } else if ( seq == 2 ) { // 设置需求电压
-            buff[ nr ++ ] = 0x06;
-            buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 0x00;
-            if ( bit_read(task, CMD_JIAOZHUN_BUS1_V ) ) {
-                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) >> 8;
-                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) & 0xFF;
-            } else if ( bit_read(task, CMD_JIAOZHUN_BUS2_V ) ) {
-                buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) >> 8;
-                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) & 0xFF;
-            } else if (bit_read(task, CMD_JIAOZHUN_BAT_I )) {
-            } else {
-                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-            }
-        } else if ( seq == 8 || seq == 9 ) {
-            buff[ nr ++ ] = 0x10;
-            buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 0x06;
-            buff[ nr ++ ] = 0x0C;
-            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-            buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-            buff[ nr ++ ] = 0;
-            buff[ nr ++ ] = 0;
-            buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
-            buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
-            buff[ nr ++ ] = 0; // 模块输出电压上限
-            buff[ nr ++ ] = 0; // 模块输出电压上限
-            buff[ nr ++ ] = 0; // 模块输出电压下限
-            buff[ nr ++ ] = 0; // 模块输出电压下限
             buff[ nr ++ ] = 0; // 开机
-            if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
-                buff[ nr ++ ] = 1; // 开机
-            } else {
-                buff[ nr ++ ] = 0; // 开机
-            }
-        } else {
-            seq = 0;
-            ret = ERR_ERR;
-            break;
         }
+
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
@@ -3295,12 +3242,15 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
 }
 
 // 英可瑞模块协议转换盒设置
+// id: 00000009
 int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     unsigned char buff[32];
     int nr = 0, len;
     int ret = ERR_ERR;
+    static unsigned int wrap_V_I = 0;
+
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
         if ( param->payload_size < param->need_bytes ) {
@@ -3327,56 +3277,47 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        buff[ nr ++ ] = 0xFE;
-        buff[ nr ++ ] = 0x10;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x06;
-        buff[ nr ++ ] = 0x0C;
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-        buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) >> 8;
-        buff[ nr ++ ] = ((unsigned short)((10 * (task->running_I))) / task->modules_nr) & 0xFF;
-        buff[ nr ++ ] = 0; // 模块输出电压上限
-        buff[ nr ++ ] = 0; // 模块输出电压上限
-        buff[ nr ++ ] = 0; // 模块输出电压下限
-        buff[ nr ++ ] = 0; // 模块输出电压下限
-        buff[ nr ++ ] = 0; // 开机
-        buff[ nr ++ ] = 0; // 开机
-/*
-#if 0
-        buff[ nr ++ ] = 0x01;
-        buff[ nr ++ ] = 0x10;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x06;
-        buff[ nr ++ ] = 0x0C;
-        buff[ nr ++ ] = 0x09;
-        buff[ nr ++ ] = 0x2E;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = 0;
-        buff[ nr ++ ] = 0x0A; // 模块输出电压上限
-        buff[ nr ++ ] = 0x50; // 模块输出电压上限
-        buff[ nr ++ ] = 0x07; // 模块输出电压下限
-        buff[ nr ++ ] = 0xBC; // 模块输出电压下限
-        buff[ nr ++ ] = 0x00; // 开机
-        buff[ nr ++ ] = 0x00; // 开机
-#else
+        wrap_V_I ++;
+        if ( wrap_V_I > 4 ) {
+            wrap_V_I = 3;
+        }
 
-        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0xFF;
         buff[ nr ++ ] = 0x06;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x05;
-        buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x00;
-#endif
-*/
+
+        if ( wrap_V_I < 3 ) {
+            // 广播开机
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x05;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x00;
+        } else if ( wrap_V_I % 2 ) {
+            // 广播限流值
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x02;
+            if ( bit_read(task, CMD_JIAOZHUN_BAT_I ) ) {
+                buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) >> 8;
+                buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) & 0xFF;
+            } else {
+                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电流")) >> 8;
+                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电流")) & 0xFF;
+            }
+        } else {
+            // 广播限压值
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x00;
+            if ( bit_read(task, CMD_JIAOZHUN_BUS1_V ) ) {
+                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) >> 8;
+                buff[ nr ++ ] = ((unsigned short)task->bus1_correct_V) & 0xFF;
+            } else if ( bit_read(task, CMD_JIAOZHUN_BUS2_V ) ) {
+                buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) >> 8;
+                buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) & 0xFF;
+            } else {
+                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+            }
+        }
+
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
