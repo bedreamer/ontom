@@ -858,6 +858,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     job->charge_begin_timestamp = time(NULL);
                     start ++;
                 }
+                if ( job->charge_mode == CHARGE_AUTO ) {
+                    bit_set(tsk, CMD_GUN_1_ASSIT_PWN_ON);
+                }
                 bit_set(tsk, CMD_GUN_1_OUTPUT_ON);
             }
             if ( ret  == GUN_SN1 ) {
@@ -867,6 +870,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     job->charge_begin_kwh_data = task->meter[0].kwh_zong;
                     job->charge_begin_timestamp = time(NULL);
                     start ++;
+                }
+                if ( job->charge_mode == CHARGE_AUTO ) {
+                    bit_set(tsk, CMD_GUN_1_ASSIT_PWN_ON);
                 }
                 bit_set(tsk, CMD_GUN_2_OUTPUT_ON);
             }
