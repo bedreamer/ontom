@@ -24,27 +24,4 @@ typedef enum {
     PGN_CEM = 0x001F00
 }CAN_PGN;
 
-typedef enum {
-    I_CRM = 0,
-    I_BRM = 1,
-    I_BCP = 2,
-    I_CTS = 3,
-    I_CML = 4,
-    I_BRO = 5,
-    I_CRO = 6,
-    I_BCL = 7,
-    I_BCS = 8,
-    I_CCS = 9,
-    I_BSM = 10,
-    I_BMV = 11,
-    I_BMT = 12,
-    I_BSP = 13,
-    I_BST = 14,
-    I_CST = 15,
-    I_BSD = 16,
-    I_CSD = 17,
-    I_BEM = 18,
-    I_CEM = 19
-}CAN_PGN_STATISTICS;
-
 #endif
