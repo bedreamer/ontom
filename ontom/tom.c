@@ -150,10 +150,7 @@ void dump(unsigned int pc)
     if (iTime++ >= 1) {
         /* 容错处理：如果访问 ucontext_t 结构体时产生错误会进入该分支 */
         printf("ReEnter %s is not allowed!\n", __FUNCTION__);
-        abort();
     }
-
-    abort();
 }
 
 static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
@@ -182,6 +179,8 @@ static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
     printf("the arm_cpsr 0x%3x\n",ucontext->uc_mcontext.arm_cpsr);
     printf("the falut_address 0x%3x\n",ucontext->uc_mcontext.fault_address);
 
+    dump((unsigned int)ucontext->uc_mcontext.arm_pc);
+
     printf("Stack trace (non-dedicated):");
     int sz = backtrace(bt, 20);
     printf("the stack trace is %d\n",sz);
@@ -189,7 +188,6 @@ static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
     for(i = 0; i < sz; ++i){
          printf("%s\n", strings[i]);
     }
-    dump((unsigned int)ucontext->uc_mcontext.arm_pc);
     _exit (-1);
 
 }
