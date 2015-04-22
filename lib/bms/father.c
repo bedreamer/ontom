@@ -618,8 +618,10 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
 {
     if ( !drv || ! job ) return ERR_ERR;
 
-    if ( drv->binder[0] ) return ERR_ERR;
-
+    if ( drv->binder[0] ) {
+        log_printf(ERR, "绑定BMS驱动失败!");
+        return ERR_ERR;
+    }
     job->bms.generator =
             (struct can_pack_generator*)malloc(sizeof(struct can_pack_generator)*drv->can_pack_gen_nr_copy);
     if ( job->bms.generator == NULL ) {
@@ -629,6 +631,8 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
     job->bms.can_pack_gen_nr = drv->can_pack_gen_nr_copy;
     memcpy(job->bms.generator, drv->generator_copy,
            sizeof(struct can_pack_generator)*drv->can_pack_gen_nr_copy);
+
+    log_printf(INF, "绑定BMS驱动成功!");
 
     drv->binder[0] = job;
     return ERR_OK;

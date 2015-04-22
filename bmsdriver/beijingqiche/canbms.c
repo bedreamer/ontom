@@ -222,7 +222,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
             //thiz->charge_stage = CHARGE_STAGE_CONFIGURE;
         } else {
-            log_printf(WRN, "BMS: 启动定时器错误.");
+            log_printf(ERR, "BMS: 启动定时器错误.");
         }
         break;
     case EVENT_CAN_RESET:
