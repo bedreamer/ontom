@@ -797,8 +797,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                         if ( ! bit_read(tsk, CMD_GUN_1_ASSIT_PWN_ON) ) {
                             log_printf(INF, "ZEUS: 1# 充电枪辅助电源开始供电");
                         }
-                        bit_set(tsk, CMD_GUN_1_ASSIT_PWN_ON);
                     }
+                    bit_set(tsk, CMD_GUN_1_ASSIT_PWN_ON);
                 }
             } else {
                 if ( ! bit_read(tsk, F_GUN_2_ASSIT_PWN_SWITCH_STATUS) ) {
@@ -806,8 +806,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                         if ( ! bit_read(tsk, CMD_GUN_2_ASSIT_PWN_ON) ) {
                             log_printf(INF, "ZEUS: 2# 充电枪辅助电源开始供电");
                         }
-                        bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                     }
+                    bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                 }
             }
             if ( ! bit_read(tsk, F_BMS_RECOGNIZED) ) {
