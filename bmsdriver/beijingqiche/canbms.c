@@ -307,15 +307,20 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
         case CHARGE_STAGE_HANDSHACKING:
             #if 1
             do {
-                struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRM);
+                struct can_pack_generator *gen = gen_search(thiz->bms.generator,
+                                                            thiz->bms.can_pack_gen_nr, PGN_CRM);
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN256(thiz, param);
                     gen->heartbeat = 0;
+                } else {
+                    log_printf(DBG_LV0, "BMS: inner error. %d", __LINE__);
                 }
                 gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN7936(thiz, param);
                     gen->heartbeat = 0;
+                } else {
+                    log_printf(DBG_LV0, "BMS: inner error. %d", __LINE__);
                 }
             } while (0);
             #endif
