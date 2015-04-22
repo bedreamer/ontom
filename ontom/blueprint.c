@@ -3195,7 +3195,11 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
             seq ++;
             module_seq = 0;
         }
-        buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
+        if ( seq == 2 ) {
+            buff[ nr ++ ] = 0;
+        } else {
+            buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
+        }
 
         if ( seq > 2 ) seq = 1;
 
