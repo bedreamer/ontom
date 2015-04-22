@@ -872,7 +872,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     start ++;
                 }
                 if ( job->charge_mode == CHARGE_AUTO ) {
-                    bit_set(tsk, CMD_GUN_1_ASSIT_PWN_ON);
+                    bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                 }
                 bit_set(tsk, CMD_GUN_2_OUTPUT_ON);
             }
