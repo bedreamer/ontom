@@ -357,6 +357,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                         thiz->param.buff_payload = thiz->bms.can_tp_param.tp_size;
                         thiz->param.evt_param = EVT_RET_INVALID;
                         thiz->param.can_id = thiz->bms.can_tp_param.tp_pgn;
+                        memcp(thiz->param.buff.rx_buff, tp_buff, thiz->param.buff_payload);
                         log_printf(DBG_LV3,
                                    "BMS: data transfer complete PGN=%08X change to ACK",
                                    thiz->bms.can_tp_param.tp_pgn);
