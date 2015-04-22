@@ -305,6 +305,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
             param->evt_param = EVT_RET_ERR;
             break;
         case CHARGE_STAGE_HANDSHACKING:
+            #if 0
             do {
                 struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRM);
                 if ( gen && gen->heartbeat >= gen->period ) {
@@ -317,6 +318,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                     gen->heartbeat = 0;
                 }
             } while (0);
+            #endif
             break;
         case CHARGE_STAGE_CONFIGURE:
             do {
