@@ -560,7 +560,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
 
         } else {
             log_printf(WRN,
-                  "BMS: BMS not recognized due to invalid BMS VERSION(SPN2565).");
+                  "BMS: BMS not recognized due to invalid BMS VERSION(SPN2565)."
+                       "%02X%02X%02X",
+                       thiz->bms.vehicle_info.spn2565_bms_version[0],
+                       thiz->bms.vehicle_info.spn2565_bms_version[1],
+                       thiz->bms.vehicle_info.spn2565_bms_version[2]);
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
