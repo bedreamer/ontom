@@ -40,8 +40,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
 // 握手-CRM-充电机辨识报文
 int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[0];
-
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRM);
 
     if ( 0 == bit_read(thiz, F_BMS_RECOGNIZED) ) {
         param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
@@ -60,7 +59,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.generator[I_BRM].can_counter ++;
+    gen->can_counter ++;
 
     return 0;
 }
@@ -68,7 +67,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
 // 配置-CTS-充电机发送时间同步信息
 int gen_packet_PGN1792(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = &thiz->bms.generator[1];
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CTS);
     struct pgn1792_CTS cts;
     time_t timep;
     struct tm *p;
@@ -102,7 +101,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct bms_event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.generator[I_CTS].can_counter ++;
+    gen->can_counter ++;
 
     return 0;
 }
@@ -124,7 +123,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct bms_event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.generator[I_CML].can_counter ++;
+    gen->can_counter ++;
 
     return 0;
 }
@@ -145,7 +144,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.generator[I_CRO].can_counter ++;
+    gen->can_counter ++;
 
     return 0;
 }
@@ -168,7 +167,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 
     param->evt_param = EVT_RET_OK;
 
-    thiz->bms.generator[I_CCS].can_counter ++;
+    gen->can_counter ++;
 
     return 0;
 }
