@@ -42,7 +42,6 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = &thiz->bms.generator[0];
 
-    log_printf(DBG_LV0, "BMS: 握手-CRM-充电机辨识报文");
 
     if ( 0 == bit_read(thiz, F_BMS_RECOGNIZED) ) {
         param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
@@ -50,6 +49,8 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
         param->buff.tx_buff[0] = BMS_RECOGNIZED;
         bit_set(thiz, F_VEHICLE_RECOGNIZED);
     }
+    log_printf(DBG_LV3, "BMS: 握手-CRM-充电机辨识报文"RED("%s"),
+               bit_read(thiz, F_BMS_RECOGNIZED)?"未识别":"已识别");
 
     param->buff.tx_buff[1] = 0x01;
     strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
