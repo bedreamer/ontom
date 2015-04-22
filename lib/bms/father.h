@@ -119,6 +119,19 @@ struct bms_event_struct {
     // 缓冲区载荷大小
     unsigned int buff_payload;
 };
+static inline void __dump_can_param(struct bms_event_struct *p) {
+    char fmt[512] = {0};
+    int i;
+    if ( p == NULL ) return;
+    if ( p->buff_payload == 0 ) return;
+
+    sprintf(fmt, "BMS: ");
+    for ( i = 0; i < p->buff_payload; i ++ ) {
+        strcat(fmt, "%02X ", p->buff.rx_buff[i]);
+    }
+
+    log_printf(DBG_LV3, "%s", fmt);
+}
 
 /*
  * BMS 通信驱动接口
