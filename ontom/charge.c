@@ -759,6 +759,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        memset(job->single, 0, sizeof(job->single));
         job->job_status = JOB_STANDBY;
         bit_clr(tsk, F_CHARGE_LED);
         if ( job->charge_mode == CHARGE_AUTO ) {
@@ -810,7 +811,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                 }
             }
-            if ( ! bit_read(tsk, F_BMS_RECOGNIZED) ) {
+            if ( ! bit_read(job, F_BMS_RECOGNIZED) ) {
                 break;
             }
         }
