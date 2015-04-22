@@ -644,7 +644,10 @@ struct can_pack_generator *gen_search(struct can_pack_generator *p, unsigned int
     struct can_pack_generator *gen = NULL;
 
     for ( ;p && nr; nr --, p ++ ) {
-        if ( p->can_pgn == pgn ) break;
+        if ( p->can_pgn == pgn ) {
+            gen = p;
+            break;
+        }
     }
 
     return gen;
