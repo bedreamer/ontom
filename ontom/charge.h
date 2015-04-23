@@ -831,7 +831,7 @@ struct pgn1536_BCP {
     // 单节电池允许最高充电电压, 0.01V 每位， 0-24V
     u16 spn2816_max_charge_volatage_single_battery;
     // 最高允许充电电流, 0.1A每位，-400A偏移 -400A - 0A
-    u16 spn2817_max_charge_current;
+    short spn2817_max_charge_current;
     // 蓄电池标称总能量, 0.1kW。h每位， 0-1000 kW。h
     u16 spn2818_total_energy;
     // 最高允许充电电压, 0.1V 每位， 0-750V
