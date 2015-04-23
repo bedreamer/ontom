@@ -31,7 +31,7 @@ void *fuck_p104_service(void *arg)
     const char *pport = "2404";
     int s_srv = -1, s_cli = -1;
     struct sockaddr_in si_me, si_other;
-    int slen;
+    socklen_t  slen;
 
     srv_port = atoi(pport);
     if ( srv_port <= 2048 ) {
