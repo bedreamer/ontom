@@ -1361,6 +1361,8 @@ struct charge_job {
     // 多包通信参数
     struct bms_event_struct param;
 
+    struct charge_task *tsk;
+
     // 作业状态字
     volatile unsigned char single[8];
 
