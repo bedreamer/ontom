@@ -49,7 +49,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
         bit_set(thiz, F_VEHICLE_RECOGNIZED);
     }
     log_printf(DBG_LV3, "BMS"RED("%s")": 握手-CRM-充电机辨识报文",
-               bit_read(thiz, F_BMS_RECOGNIZED)?"未识别":"已识别");
+               bit_read(thiz, F_BMS_RECOGNIZED)?"已识别":"未识别");
 
     param->buff.tx_buff[1] = 0x01;
     strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
