@@ -3,6 +3,7 @@
 #include "../../thirdpart/sqlite/sqlite3.h"
 #include "../../thirdpart/extso/exso.h"
 #include "../../lib/lj/stdafx.h"
+#include "../../lib/bms/father.h"
 #include "../../ontom/charge.h"
 
 int exso_default_init(void *p)
