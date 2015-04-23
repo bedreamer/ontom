@@ -714,11 +714,17 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         if ( thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f > 750 ) {
             log_printf(WRN, "BMS: spn3072 range 0-750V gave: %d V",
                        thiz->bms.bms_charge_need_now.spn3072_need_voltage);
+        } else {
+            thiz->need_V = thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f;
         }
-        if ( thiz->bms.bms_charge_need_now.spn3073_need_current/10.0f > 400 ) {
+        if ( (thiz->bms.bms_charge_need_now.spn3073_need_current + 400 )/10.0f > 0 ) {
             log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
                        thiz->bms.bms_charge_need_now.spn3073_need_current);
+        } else {
+            thiz->need_I = (thiz->bms.bms_charge_need_now.spn3073_need_current + 400 )/-10.0f;
         }
+
+        log_printf(INF, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
 
         log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
                    thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0,
