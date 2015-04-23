@@ -48,7 +48,7 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
         param->buff.tx_buff[0] = BMS_RECOGNIZED;
         bit_set(thiz, F_VEHICLE_RECOGNIZED);
     }
-    log_printf(DBG_LV3, "BMS: 握手-CRM-充电机辨识报文"RED("%s"),
+    log_printf(DBG_LV3, "BMS"RED("%s")": 握手-CRM-充电机辨识报文",
                bit_read(thiz, F_BMS_RECOGNIZED)?"未识别":"已识别");
 
     param->buff.tx_buff[1] = 0x01;
@@ -853,6 +853,55 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
+        if ( param->buff.rx_buff[0] & 0x01 ) {
+            log_printf(WRN, "BMS: 接收PSN2560=0x00的报文超时");
+        }
+        if ( param->buff.rx_buff[0] & 0x02 ) {
+            log_printf(WRN, "BMS: 接收PSN2560=0x00的报文不可信");
+        }
+
+        if ( param->buff.rx_buff[0] & 0x04 ) {
+            log_printf(WRN, "BMS: 接收PSN2560=0xAA的报文超时");
+        }
+        if ( param->buff.rx_buff[0] & 0x08 ) {
+            log_printf(WRN, "BMS: 接收PSN2560=0xAA的报文不可信");
+        }
+
+        if ( param->buff.rx_buff[1] & 0x01 ) {
+            log_printf(WRN, "BMS: 接收CTS和CML的报文超时");
+        }
+        if ( param->buff.rx_buff[1] & 0x02 ) {
+            log_printf(WRN, "BMS: 接收CTS和CML的报文不可信");
+        }
+
+        if ( param->buff.rx_buff[1] & 0x04 ) {
+            log_printf(WRN, "BMS: 接收充电机完成充电准备的报文超时");
+        }
+        if ( param->buff.rx_buff[1] & 0x08 ) {
+            log_printf(WRN, "BMS: 接收充电机完成充电准备的报文不可信");
+        }
+
+        if ( param->buff.rx_buff[2] & 0x01 ) {
+            log_printf(WRN, "BMS: 接收充电机状态的报文超时");
+        }
+        if ( param->buff.rx_buff[2] & 0x02 ) {
+            log_printf(WRN, "BMS: 接收充电机状态的报文不可信");
+        }
+
+        if ( param->buff.rx_buff[2] & 0x04 ) {
+            log_printf(WRN, "BMS: 接收充电机中止充电的报文超时");
+        }
+        if ( param->buff.rx_buff[2] & 0x08 ) {
+            log_printf(WRN, "BMS: 接收充电机中止充电的报文不可信");
+        }
+
+        if ( param->buff.rx_buff[3] & 0x01 ) {
+            log_printf(WRN, "BMS: 接收充电机充电统计的报文超时");
+        }
+        if ( param->buff.rx_buff[3] & 0x02 ) {
+            log_printf(WRN, "BMS: 接收充电机充电统计的报文不可信");
+        }
+
         log_printf(INF, "BMS: PGN_BEM fetched.");
         break;
     default:
