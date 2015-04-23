@@ -162,7 +162,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
         ccs.spn3081_output_voltage = b2l(task->measure[0]->measure.VinKM1);
         ccs.spn3082_output_current  = b2l(task->measure[0]->measure.IoutBAT1)-4000;
     }
-    ccs.spn3083_charge_time = (job->charged_seconds + job->section_seconds)/60;
+    ccs.spn3083_charge_time = (thiz->charged_seconds + thiz->section_seconds)/60;
 
     memset(param->buff.tx_buff, 0xFF, 8);
     memcpy((void * __restrict__)param->buff.tx_buff, &ccs, sizeof(struct pgn4608_CCS));
