@@ -171,14 +171,14 @@ static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
     printf("info.si_addr  = %p\n", info->si_addr);
 
     /*for arm*/
-    printf("the arm_fp 0x%8x\n",ucontext->uc_mcontext.arm_fp);
-    printf("the arm_ip 0x%8x\n",ucontext->uc_mcontext.arm_ip);
-    printf("the arm_sp 0x%8x\n",ucontext->uc_mcontext.arm_sp);
-    printf("the arm_lr 0x%8x\n",ucontext->uc_mcontext.arm_lr);
-    printf("the arm_pc 0x%8x\n",ucontext->uc_mcontext.arm_pc);
-    printf("the in_code 0x%8x\n", *(unsigned int *)(void*)ucontext->uc_mcontext.arm_pc);
-    printf("the arm_cpsr 0x%38\n",ucontext->uc_mcontext.arm_cpsr);
-    printf("the falut_address 0x%38\n",ucontext->uc_mcontext.fault_address);
+    printf("the arm_fp 0x%x\n",ucontext->uc_mcontext.arm_fp);
+    printf("the arm_ip 0x%x\n",ucontext->uc_mcontext.arm_ip);
+    printf("the arm_sp 0x%x\n",ucontext->uc_mcontext.arm_sp);
+    printf("the arm_lr 0x%x\n",ucontext->uc_mcontext.arm_lr);
+    printf("the arm_pc 0x%x\n",ucontext->uc_mcontext.arm_pc);
+    printf("the in_code 0x%x\n", *(unsigned int *)(void*)ucontext->uc_mcontext.arm_pc);
+    printf("the arm_cpsr 0x%x\n",ucontext->uc_mcontext.arm_cpsr);
+    printf("the falut_address 0x%x\n",ucontext->uc_mcontext.fault_address);
 
     dump((unsigned int)ucontext->uc_mcontext.arm_pc);
 
