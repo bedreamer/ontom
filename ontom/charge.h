@@ -924,7 +924,7 @@ struct pgn4608_CCS {
     // 充电机输出电压，0.1V/位， 0V偏移量，0-750V
     u16 spn3081_output_voltage;
     // 充电机输出电流，0.1A/位，-400A偏移，-400A-0A
-    u16 spn3082_outpu_current;
+    u16 spn3082_output_current;
     // 充电持续时间，1min/位，0偏移，0-600min
     u16 spn3083_charge_time;
 };
