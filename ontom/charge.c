@@ -838,6 +838,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             config_write("初始电压", buff);
             sprintf(buff, "%d", (unsigned int)(job->need_I * 10.0f) );
             config_write("需求电流", buff);
+            log_printf(INF, "fasdfasdfasdfasdfasdfasdfasdfdsaf");
         }
 
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
