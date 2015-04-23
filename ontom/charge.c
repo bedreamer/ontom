@@ -832,7 +832,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
     case JOB_WORKING:
         bit_set(tsk, F_CHARGE_LED);
 
-        if ( job->charge_mode != CHARGE_AUTO ) {
+        if ( job->charge_mode == CHARGE_AUTO ) {
             sprintf(buff, "%d", (unsigned int)(job->need_V * 10.0f) );
             config_write("需求电压", buff);
             config_write("初始电压", buff);
