@@ -330,22 +330,22 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN1792(thiz, param);
                     gen->heartbeat = 0;
-                    log_printf(DBG_LV3, "CTS sent.");
+                    log_printf(DBG_LV2, "CTS sent.");
                 }
                 else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CML)) &&
                           gen->heartbeat >= gen->period ) {
                     gen_packet_PGN2048(thiz, param);
                     gen->heartbeat = 0;
-                    log_printf(DBG_LV3, "CML sent.");
+                    log_printf(DBG_LV2, "CML sent.");
                 }
                 else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRO)) &&
                          gen->heartbeat >= gen->period ) {
                     gen_packet_PGN2560(thiz, param);
                     gen->heartbeat = 0;
-                    log_printf(DBG_LV3, "CRO sent.");
+                    log_printf(DBG_LV2, "CRO sent.");
                 } else {
                     if ( gen == NULL ) {
-                        log_printf(DBG_LV3, "inner error.");
+                        log_printf(DBG_LV2, "inner error.");
                     }
                 }
                 gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
@@ -606,7 +606,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
-        log_printf(DBG_LV3, "BMS: BMS recognized....CAP: %d A.H, VOL: %d V",
+        log_printf(DBG_LV2, "BMS: BMS recognized....CAP: %d A.H, VOL: %d V",
                    thiz->bms.vehicle_info.spn2567_capacity,
                    thiz->bms.vehicle_info.spn2568_volatage);
         if ( ! bit_read(thiz, F_BMS_RECOGNIZED ) ) {
@@ -666,7 +666,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             break;
         }
 
-        log_printf(DBG_LV3, "BMS: BCP done, BSVH: %d V, MAXi: %d A, "
+        log_printf(DBG_LV2, "BMS: BCP done, BSVH: %d V, MAXi: %d A, "
                    "CAP: %d KW.H, M-V-C: %d V, M-T: %d C, CAP-statu: %d %%"
                    "V: %d V",
                    thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery,
@@ -726,7 +726,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
 
         log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
 
-        log_printf(DBG_LV3, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
+        log_printf(DBG_LV2, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
                    thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0,
                    thiz->bms.bms_charge_need_now.spn3073_need_current + 400,
                    thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
