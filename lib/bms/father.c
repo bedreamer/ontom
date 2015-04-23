@@ -518,7 +518,7 @@ struct bmsdriver *bmsdriver_search(struct charge_task *tsk, unsigned int vendor_
     // not found driver in cache, search driver in path next.
     real = NULL;
     errno = 0;
-    sprintf(driver_name, "/usr/zeus/drivers/bmsdrv_%d_%s.so", vendor_id, ver);
+    sprintf(driver_name, "/usr/zeus/bmsdrv_%d_%s.so", vendor_id, ver);
     drv.handle = dlopen(driver_name, RTLD_LAZY);
     if ( drv.handle == NULL ) {
         log_printf(ERR, "BMSDRVIER: 无法加载bms驱动程序: %s, <%s>",
