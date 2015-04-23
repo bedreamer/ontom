@@ -313,14 +313,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                            "BMS: get %dst packet %08X:%02X%02X%02X%02X%02X%02X%02X%02X",
                            dbg_packets,
                            frame.can_id,
-                           frame.data[0],
-                           frame.data[1],
-                           frame.data[2],
-                           frame.data[3],
-                           frame.data[4],
-                           frame.data[5],
-                           frame.data[6],
-                           frame.data[7]);
+                           frame.data[0], frame.data[1], frame.data[2], frame.data[3],
+                           frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
 
                 /*
                  * CAN通信处于普通模式
@@ -357,7 +351,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                         thiz->param.buff_payload = thiz->bms.can_tp_param.tp_size;
                         thiz->param.evt_param = EVT_RET_INVALID;
                         thiz->param.can_id = thiz->bms.can_tp_param.tp_pgn;
-                        memcp(thiz->param.buff.rx_buff, tp_buff, thiz->param.buff_payload);
+                        memcpy(thiz->param.buff.rx_buff, tp_buff, thiz->param.buff_payload);
                         log_printf(DBG_LV3,
                                    "BMS: data transfer complete PGN=%08X change to ACK",
                                    thiz->bms.can_tp_param.tp_pgn);

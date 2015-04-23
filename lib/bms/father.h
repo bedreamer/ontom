@@ -125,12 +125,11 @@ static inline void __dump_can_param(struct bms_event_struct *p) {
     if ( p == NULL ) return;
     if ( p->buff_payload == 0 ) return;
 
-    sprintf(fmt, "BMS: ");
     for ( i = 0; i < p->buff_payload; i ++ ) {
-        strcat(fmt, "%02X ", p->buff.rx_buff[i]);
+        sprintf(fmt, "%02X ", p->buff.rx_buff[i]);
     }
 
-    log_printf(DBG_LV3, "%s", fmt);
+    log_printf(DBG_LV3, "BMS: %s", fmt);
 }
 
 /*
