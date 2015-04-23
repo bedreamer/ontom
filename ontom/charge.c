@@ -987,8 +987,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_ERR_PAUSE:
-        config_write("需求电压", "4000");
-        config_write("初始电压", "4000");
+        config_write("需求电压", "2000");
+        config_write("初始电压", "2000");
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
