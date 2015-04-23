@@ -366,6 +366,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN4608(thiz, param);
                     gen->heartbeat = 0;
+                    log_printf(INF, "CCS sent.");
                 }
                 else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST)) &&
                           gen->heartbeat >= gen->period ) {
