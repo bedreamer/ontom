@@ -1180,6 +1180,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->charged_money = 0.0f;
     thiz->charged_seconds = 0;
     thiz->section_seconds = 0;
+    thiz->tsk = tsk;
     list_ini(thiz->job_node);
     thiz->job_url_commit_timestamp = need->url_commit_timestamp;
     thiz->charge_billing.mode = need->biling_mode;
