@@ -121,7 +121,7 @@ struct bms_event_struct {
 };
 static inline void __dump_can_param(struct bms_event_struct *p) {
     char fmt[512] = {0};
-    int i;
+    unsigned int i;
     if ( p == NULL ) return;
     if ( p->buff_payload == 0 ) return;
 
