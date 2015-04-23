@@ -566,7 +566,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
         bit_clr(thiz, S_BMS_COMM_DOWN);
-        __dump_can_param(param);
+        //__dump_can_param(param);
 
         if ( param->buff_payload == 8 ) {
             memcpy(&thiz->bms.vehicle_info, param->buff.rx_buff, 8);
