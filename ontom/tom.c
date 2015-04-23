@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "charge.h"
+#include <stdint.h>
 
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 extern void * thread_charger_service(void *) ___THREAD_ENTRY___;
