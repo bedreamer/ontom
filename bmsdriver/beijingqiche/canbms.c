@@ -330,16 +330,19 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN1792(thiz, param);
                     gen->heartbeat = 0;
+                    log_printf(INF, "CTS sent.");
                 }
                 else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CML)) &&
                           gen->heartbeat >= gen->period ) {
                     gen_packet_PGN2048(thiz, param);
                     gen->heartbeat = 0;
+                    log_printf(INF, "CML sent.");
                 }
                 else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRO)) &&
                          gen->heartbeat >= gen->period ) {
                     gen_packet_PGN2560(thiz, param);
                     gen->heartbeat = 0;
+                    log_printf(INF, "CRO sent.");
                 } else {
                     if ( gen == NULL ) {
                         log_printf(ERR, "inner error.");
