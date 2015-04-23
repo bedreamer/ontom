@@ -113,7 +113,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct bms_event_struct* param)
     struct pgn2048_CML cml;
 
     cml.spn2824_max_output_voltage = 7500;
-    cml.spn2825_min_output_voltage = 2400;
+    cml.spn2825_min_output_voltage = 2000;
     cml.spn2826_max_output_current = 3000;
     memset(param->buff.tx_buff, 0xFF, 8);
     memcpy((void * __restrict__)param->buff.tx_buff, &cml, sizeof(struct pgn2048_CML));
@@ -660,7 +660,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
 
         log_printf(INF, "BMS: BCP done, BSVH: %d V, MAXi: %d A, "
-                   "CAP: %d KW.H, M-V-C: %d V, M-T: %d C, CAP-statu: %d %%",
+                   "CAP: %d KW.H, M-V-C: %d V, M-T: %d C, CAP-statu: %d %%"
                    "V: %d V",
                    thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery,
                    thiz->bms.bms_config_info.spn2817_max_charge_current,
