@@ -2,7 +2,7 @@ SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
 m-deps+=$(OBJS)
 EX-OBJS+=build-in.a $(WORKDIR)/bmsdrv_1_1.0.so
-EXLDFLAGS+=_L$(WORKDIR) -lbms
+EXLDFLAGS+=-L$(WORKDIR) -lbms
 
 build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"
