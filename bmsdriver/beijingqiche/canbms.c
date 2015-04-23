@@ -331,12 +331,12 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                     gen_packet_PGN1792(thiz, param);
                     gen->heartbeat = 0;
                 }
-                else if ( gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CML) &&
+                else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CML)) &&
                           gen->heartbeat >= gen->period ) {
                     gen_packet_PGN2048(thiz, param);
                     gen->heartbeat = 0;
                 }
-                else if (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRO) &&
+                else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRO)) &&
                          gen->heartbeat >= gen->period ) {
                     gen_packet_PGN2560(thiz, param);
                     gen->heartbeat = 0;
@@ -355,7 +355,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                     gen_packet_PGN4608(thiz, param);
                     gen->heartbeat = 0;
                 }
-                else if ( gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST) &&
+                else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST)) &&
                           gen->heartbeat >= gen->period ) {
                     gen_packet_PGN6656(thiz, param);
                     gen->heartbeat = 0;
