@@ -1007,8 +1007,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_MAN_PAUSE:
-        config_write("需求电压", "4000");
-        config_write("初始电压", "4000");
+        config_write("需求电压", "2000");
+        config_write("初始电压", "2000");
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -1039,8 +1039,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         job->job_status = JOB_WORKING;
         break;
     case JOB_ABORTING:
-        config_write("需求电压", "4000");
-        config_write("初始电压", "4000");
+        config_write("需求电压", "2000");
+        config_write("初始电压", "2000");
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -1048,24 +1048,24 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         job->job_status = JOB_DETACHING;
         break;
     case JOB_DONE:
-        config_write("需求电压", "4000");
-        config_write("初始电压", "4000");
+        config_write("需求电压", "2000");
+        config_write("初始电压", "2000");
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_EXITTING:
-        config_write("需求电压", "4000");
-        config_write("初始电压", "4000");
+        config_write("需求电压", "2000");
+        config_write("初始电压", "2000");
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         break;
     case JOB_DETACHING:
-        config_write("需求电压", "4000");
-        config_write("初始电压", "4000");
+        config_write("需求电压", "2000");
+        config_write("初始电压", "2000");
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         if ( job->job_gun_sn == GUN_SN0 ) {
