@@ -110,7 +110,7 @@ struct bms_event_struct {
         // 发送缓冲区地址， 针对EVENT_TX_REQUEST设置
         unsigned char tx_buff[32];
         // 接收缓冲区地址，针对EVENT_RX_DONE设置
-        const unsigned char rx_buff[256];
+        unsigned char rx_buff[256];
     }buff;
     // 缓冲区大小
     unsigned int buff_size;
