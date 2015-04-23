@@ -309,7 +309,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     continue;
                 }
 
-                debug_log(INF,
+                debug_log(DBG_LV2,
                            "BMS: get %dst packet %08X:%02X%02X%02X%02X%02X%02X%02X%02X",
                            dbg_packets,
                            frame.can_id,
