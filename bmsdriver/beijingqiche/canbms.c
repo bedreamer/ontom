@@ -155,9 +155,14 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
     struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CCS);
     struct pgn4608_CCS ccs;
 
-    ccs.spn3081_output_voltage = 7500;
-    ccs.spn3082_outpu_current  = 1200;
-    ccs.spn3083_charge_time = 122;
+    if ( thiz->job_gun_sn == GUN_SN0 ) {
+        ccs.spn3081_output_voltage = b2l(task->measure[0]->measure.VinKM0);
+        ccs.spn3082_output_current  = b2l(task->measure[0]->measure.IoutBAT0)-4000;
+    } else if ( thiz->job_gun_sn == GUN_SN1 ) {
+        ccs.spn3081_output_voltage = b2l(task->measure[0]->measure.VinKM1);
+        ccs.spn3082_output_current  = b2l(task->measure[0]->measure.IoutBAT1)-4000;
+    }
+    ccs.spn3083_charge_time = (job->charged_seconds + job->section_seconds)/60;
 
     memset(param->buff.tx_buff, 0xFF, 8);
     memcpy((void * __restrict__)param->buff.tx_buff, &ccs, sizeof(struct pgn4608_CCS));
