@@ -606,7 +606,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
-        log_printf(INF, "BMS: BMS recognized....CAP: %d A.H, VOL: %d V",
+        log_printf(DBG_LV3, "BMS: BMS recognized....CAP: %d A.H, VOL: %d V",
                    thiz->bms.vehicle_info.spn2567_capacity,
                    thiz->bms.vehicle_info.spn2568_volatage);
         if ( ! bit_read(thiz, F_BMS_RECOGNIZED ) ) {
@@ -666,7 +666,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             break;
         }
 
-        log_printf(INF, "BMS: BCP done, BSVH: %d V, MAXi: %d A, "
+        log_printf(DBG_LV3, "BMS: BCP done, BSVH: %d V, MAXi: %d A, "
                    "CAP: %d KW.H, M-V-C: %d V, M-T: %d C, CAP-statu: %d %%"
                    "V: %d V",
                    thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery,
@@ -724,9 +724,9 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             thiz->need_I = (thiz->bms.bms_charge_need_now.spn3073_need_current + 400 )/-10.0f;
         }
 
-        log_printf(INF, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
+        log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
 
-        log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
+        log_printf(DBG_LV3, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
                    thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0,
                    thiz->bms.bms_charge_need_now.spn3073_need_current + 400,
                    thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
@@ -740,7 +740,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        log_printf(INF, "BMS: PGN_BCS fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BCS fetched.");
         memcpy(&thiz->bms.bms_all_battery_status, param->buff.rx_buff,
                sizeof(struct pgn4352_BCS));
         if (thiz->bms.bms_all_battery_status.spn3075_charge_voltage/10.0 > 750.0f) {
@@ -766,7 +766,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        log_printf(INF, "BMS: PGN_BSM fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BSM fetched.");
         memcpy(&thiz->bms.bms_battery_status, param->buff.rx_buff,
                sizeof(struct pgn4864_BSM));
         if ( SINGLE_BATTERY_VOLTAGE_HIGH ==
@@ -819,7 +819,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        log_printf(INF, "BMS: PGN_BMV fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BMT);
@@ -827,7 +827,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        log_printf(INF, "BMS: PGN_BMT fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BMT fetched.");
         break;
     case PGN_BSP :// 0x001700, 动力蓄电池预留报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSP);
@@ -836,7 +836,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_silence = 0;
         }
 
-        log_printf(INF, "BMS: PGN_BSP fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BSP fetched.");
         break;
     case PGN_BST :// 0x001900, BMS 中止充电报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BST);
@@ -845,7 +845,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_silence = 0;
         }
 
-        log_printf(INF, "BMS: PGN_BST fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSD);
@@ -858,7 +858,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
         bit_clr(thiz, S_BMS_COMM_DOWN);
 
-        log_printf(INF, "BMS: PGN_BSD fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BSD fetched.");
         break;
     case PGN_BEM :// 0x001E00, BMS 错误报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BEM);
@@ -915,7 +915,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             log_printf(WRN, "BMS: 接收充电机充电统计的报文不可信");
         }
 
-        log_printf(INF, "BMS: PGN_BEM fetched.");
+        log_printf(DBG_LV2, "BMS: PGN_BEM fetched.");
         break;
     default:
         log_printf(WRN, "BMS: un-recognized PGN %08X",
