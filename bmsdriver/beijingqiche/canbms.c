@@ -857,7 +857,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_silence = 0;
         }
         memcpy(&thiz->bms.bms_battery_V, param->buff.rx_buff,
-               sizeof(struct pgn4864_BMV));
+               sizeof(struct pgn5376_BMV));
 
         log_printf(DBG_LV2, "BMS: PGN_BMV fetched.");
         break;
@@ -868,7 +868,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_silence = 0;
         }
         memcpy(&thiz->bms.bms_battery_T, param->buff.rx_buff,
-               sizeof(struct pgn4864_BMT));
+               sizeof(struct pgn5632_BMT));
 
         log_printf(DBG_LV2, "BMS: PGN_BMT fetched.");
         break;
@@ -892,7 +892,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
          */
         bit_set(thiz, F_PCK_BMS_TRM);
         memcpy(&thiz->bms.bms_bst, param->buff.rx_buff,
-               sizeof(struct pgn4864_BST));
+               sizeof(struct pgn6400_BST));
 
         log_printf(DBG_LV2, "BMS: PGN_BST fetched.");
         break;
@@ -907,7 +907,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
         bit_clr(thiz, S_BMS_COMM_DOWN);
         memcpy(&thiz->bms.bms_stop_bsd, param->buff.rx_buff,
-               sizeof(struct pgn4864_BSD));
+               sizeof(struct pgn7168_BSD));
 
         log_printf(DBG_LV2, "BMS: PGN_BSD fetched.");
         break;
