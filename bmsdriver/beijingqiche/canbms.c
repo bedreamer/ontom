@@ -577,6 +577,8 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         bit_set(thiz, F_PCK_TX_CST);
         log_printf(INF, "BMS: PGN_CST 已经发送.");
         thiz->bms.charge_stage = CHARGE_STAGE_DONE;
+        log_printf(INF,
+          "BMS: CHARGER change stage to "RED("CHARGE_STAGE_DONE"));
         break;
     case PGN_CSD :// 0x001D00,
         bit_set(thiz, F_PCK_TX_CSD);
