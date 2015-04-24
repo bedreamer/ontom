@@ -710,7 +710,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         }
 
         log_printf(DBG_LV2, "BMS: BCP done, BSVH: %.2f V, MAXi: %.1f A, "
-                   "CAP: %.1f KW.H, MVC: %.1f V, MT: %d, SOC: %.1f %%, V: %.1f %%",
+                   "CAP: %.1f KW.H, MVC: %.1f V, MT: %d, SOC: %.1f %%, V: %.1f V",
                    thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery/100.0f,
                    (thiz->bms.bms_config_info.spn2817_max_charge_current-4000)/-10.0f,
                    thiz->bms.bms_config_info.spn2818_total_energy/10.0f,
@@ -770,14 +770,11 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
 
         log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
                    thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0,
-                   thiz->bms.bms_charge_need_now.spn3073_need_current + 4000,
+                   (thiz->bms.bms_charge_need_now.spn3073_need_current - 4000)/10.0f,
                    thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
                     CHARGE_WITH_CONST_VOLTAGE ? "恒压充电" :
                    thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
                         CHARGE_WITH_CONST_CURRENT ? "恒流充电" : "无效模式");
-        log_printf(INF, "BMS.BCL: Ineed: %X(HEX), %d(SDEC)",
-                   thiz->bms.bms_charge_need_now.spn3073_need_current,
-                   (((unsigned)thiz->bms.bms_charge_need_now.spn3073_need_current)-4000)/10.0);
         break;
     case PGN_BCS :// 0x001100, BMS 电池充电总状态报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BCS);
