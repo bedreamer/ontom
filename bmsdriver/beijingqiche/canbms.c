@@ -158,16 +158,16 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 
     if ( thiz->job_gun_sn == GUN_SN0 ) {
         ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM0);
-        ccs.spn3082_output_current  = b2l(tsk->measure[0]->measure.IoutBAT0)-4000;
+        ccs.spn3082_output_current  = b2l(tsk->measure[0]->measure.IoutBAT0)+4000;
     } else if ( thiz->job_gun_sn == GUN_SN1 ) {
         ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM1);
-        ccs.spn3082_output_current  = b2l(tsk->measure[0]->measure.IoutBAT1)-4000;
+        ccs.spn3082_output_current  = b2l(tsk->measure[0]->measure.IoutBAT1)+4000;
     }
     ccs.spn3083_charge_time = (thiz->charged_seconds + thiz->section_seconds)/60;
 
     log_printf(INF, "BMS.CCS: %.1f V, %.1f(%X) A",
                (double)ccs.spn3081_output_voltage/10,
-               (((~ccs.spn3082_output_current)+1)-4000)/10,
+               (ccs.spn3082_output_current-4000)/-10.0,
                ccs.spn3082_output_current);
 
     memset(param->buff.tx_buff, 0xFF, 8);
