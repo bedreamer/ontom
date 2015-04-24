@@ -1062,8 +1062,8 @@ struct pgn7168_BSD {
     u8 end_soc;   // 中止SOC
     u16 min_bat_V;// 最低电压
     u16 max_bat_V;// 最高电压
-    u8 min_bat_T; // 最低温度
-    u8 max_bat_T; // 最高温度
+    signed char min_bat_T; // 最低温度
+    signed char max_bat_T; // 最高温度
 };
 
 // 充电机统计数据
