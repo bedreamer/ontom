@@ -896,7 +896,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
 
             //{{ 在这做是否充完判定
             if (job->charge_billing.mode == BILLING_MODE_AS_CAP ) {
-                if ( job->charged_kwh + job->section_kwh >= job->charge_billing.option.set_kwh ) {
+                if ( job->charged_kwh + job->section_kwh >= job->charge_billing.option.set_kwh ||
+                     bit_read(thiz, F_PCK_BMS_TRM) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -910,7 +911,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 }
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
                 double used_kwh = job->charged_kwh + job->section_kwh;
-                if ( used_kwh * task->kwh_price >= job->charge_billing.option.set_money ) {
+                if ( used_kwh * task->kwh_price >= job->charge_billing.option.set_money ||
+                     bit_read(thiz, F_PCK_BMS_TRM) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -924,7 +926,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 }
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_TIME ) {
                 unsigned int used_seconds = job->charged_seconds + job->section_seconds;
-                if ( used_seconds >= job->charge_billing.option.set_time ) {
+                if ( used_seconds >= job->charge_billing.option.set_time ||
+                     bit_read(thiz, F_PCK_BMS_TRM) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -939,7 +942,18 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_FREE ) {
 
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_AUTO ) {
-
+                if ( bit_read(thiz, F_PCK_BMS_TRM) ) {
+                    job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                    job->charge_stop_timestamp = time(NULL);
+                    log_printf(INF,
+                               "ZEUS: 充电结束, 起始电量: %.2f KWH, "
+                               "终止电量: %.2f KWH, 充电电量: %.2f KWH",
+                               job->charge_begin_kwh_data,
+                               task->meter[0].kwh_zong,
+                               used_kwh);
+                    job->job_status = JOB_DONE;
+                    end ++;
+                }
             } else {
 
             }
@@ -1051,14 +1065,21 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        if ( bit_read(job, F_PCK_RX_BSD) &&
+             bit_read(job, F_PCK_TX_CSD) ) {
+            job->job_status = JOB_EXITTING;
+        }
         break;
     case JOB_EXITTING:
         config_write("需求电压", "2000");
         config_write("初始电压", "2000");
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
+        bit_clr(tsk, CMD_GUN_1_ASSIT_PWN_ON);
+        bit_clr(tsk, CMD_GUN_2_ASSIT_PWN_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        job->job_status = JOB_DETACHING;
         break;
     case JOB_DETACHING:
         config_write("需求电压", "2000");
