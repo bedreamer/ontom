@@ -79,6 +79,9 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             for ( i = 0; driver->binder[i] &&
                   i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
+                if ( thiz->job_status == JOB_EXITTING ) {
+                    driver->binder[i] = NULL;
+                }
 
                 if ( 0x7F != thiz->bms.bms_write_init_ok ) {
                     // 进行数据结构的初始化操作
@@ -634,6 +637,7 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
 
     log_printf(INF, "绑定BMS驱动成功!");
 
+    job->bms.driver = drv;
     drv->binder[0] = job;
     return ERR_OK;
 }
