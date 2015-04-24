@@ -329,6 +329,14 @@ typedef enum {
     F_PCK_BAT_STATUS,
     // 接收到BMS终止充电报文
     F_PCK_BMS_TRM,
+    // 充电机主动中止充电报文
+    F_PCK_CHARGER_TRM,
+    // 接收到BSD
+    F_PCK_RX_BSD,
+    // 已经发送CSD
+    F_PCK_TX_CSD,
+    // 已经发送CST
+    F_PCK_TX_CST,
     // 接收电池充电总状态报文超时
     F_PCK_BAT_STATUS_TIMEOUT,
 
@@ -1039,24 +1047,35 @@ enum REASON_PGN6400 {
 //enum FAULT_PGN6400 {};
 
 // 充电机终止充电
-struct pgn6656 {
-
+struct pgn6656_BST {
+    // 中止充电原因
+    u8 reason;
+    // 终止充电故障原因
+    u16 err_reason;
+    // 中止充电错误原因
+    u8 fault_reason;
 };
 
 // 充电结束阶段
 // BMS统计数据
-struct pgn7168 {
-
+struct pgn7168_BSD {
+    u8 end_soc;   // 中止SOC
+    u16 min_bat_V;// 最低电压
+    u16 max_bat_V;// 最高电压
+    u8 min_bat_T; // 最低温度
+    u8 max_bat_T; // 最高温度
 };
 
 // 充电机统计数据
-struct pgn7424 {
-
+struct pgn7424_CSD {
+    u16 total_min; // 充电时长
+    u16 total_kwh; // 充电输出能量
+    u8  charger_sn;// 充电机编号
 };
 
 // 错误报文分类
 // BMS 错误报文
-struct pgn7680 {
+struct pgn7680_CEM {
 
 };
 
@@ -1213,6 +1232,16 @@ struct bms_struct {
     struct pgn4352_BCS bms_all_battery_status;
     // BMS 动力蓄电池状态信息
     struct pgn4864_BSM bms_battery_status;
+    // BMS 动力蓄电池电压信息
+    struct pgn5376_BMV bms_battery_V;
+    // BMS 动力蓄电池温度信息
+    struct pgn5632_BMT bms_battery_T;
+    // BMS 中止充电原因
+    struct pgn6656_BST bms_bst;
+    // BMS 充电统计信息
+    struct pgn7168_BSD bms_stop_bsd;
+    // 充电机统计信息
+    struct pgn7424_CSD charger_csd;
 
     // BMS 驱动
     struct bmsdriver *driver;

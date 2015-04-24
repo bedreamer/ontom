@@ -181,18 +181,43 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 // 充电-CST-充电机中止充电
 int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST);
-    (void)thiz;
-    (void)param;
-    (void)gen;
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator,
+                                                thiz->bms.can_pack_gen_nr, PGN_CST);
+    if ( bit_read(thiz, F_PCK_BMS_TRM) ) {
+        memset(param->buff.tx_buff, 0xFF, 8);
+        memcpy(param->buff.tx_buff, &thiz->bms.bms_bst, sizeof(struct pgn6656_BST));
+        param->buff_payload = gen->datalen;
+        param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+        param->evt_param = EVT_RET_OK;
+    } else if ( bit_read(thiz, F_PCK_CHARGER_TRM) ) {
+        memset(param->buff.tx_buff, 0xFF, 8);
+        memcpy(param->buff.tx_buff, &thiz->bms.bms_bst, sizeof(struct pgn6656_BST));
+        param->buff_payload = gen->datalen;
+        param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+        param->evt_param = EVT_RET_OK;
+    } else param->evt_param = EVT_RET_INVALID;
     return 0;
-
 }
 
 // 结束-CSD-充电机统计数据
 int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CSD);
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator,
+                                                thiz->bms.can_pack_gen_nr, PGN_CSD);
+    if ( bit_read(thiz, F_PCK_BMS_TRM) || bit_read(thiz, F_PCK_CHARGER_TRM) ) {
+        memset(param->buff.tx_buff, 0xFF, 8);
+        thiz->bms.charger_csd.charger_sn = 1;
+        thiz->bms.charger_csd.total_kwh = (u16)(thiz->charged_kwh + thiz->section_kwh);
+        thiz->bms.charger_csd.total_min =
+                (thiz->charged_seconds + thiz->section_seconds) / 60;
+        log_printf(INF, "BMS.CSD: KWH: %d kWH, TIME: %d min",
+                   thiz->bms.charger_csd.total_kwh,
+                   thiz->bms.charger_csd.total_min);
+        memcpy(param->buff.tx_buff, &thiz->bms.charger_csd, sizeof(struct pgn7424_CSD));
+        param->buff_payload = gen->datalen;
+        param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+        param->evt_param = EVT_RET_OK;
+    }
     (void)thiz;
     (void)param;
     (void)gen;
@@ -203,7 +228,8 @@ int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
 // 错误-CEM-充电机错误报文
 int gen_packet_PGN7936(struct charge_job * thiz, struct bms_event_struct* param)
 {
-    struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
+    struct can_pack_generator *gen = gen_search(thiz->bms.generator,
+                                                thiz->bms.can_pack_gen_nr, PGN_CEM);
     (void)thiz;
     (void)param;
     (void)gen;
@@ -550,8 +576,12 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
     case PGN_CCS :// 0x001200,
         break;
     case PGN_CST :// 0x001A00,
+        bit_set(thiz, F_PCK_TX_CST);
+        log_printf(INF, "BMS: PGN_CST 已经发送.");
         break;
     case PGN_CSD :// 0x001D00,
+        bit_set(thiz, F_PCK_TX_CSD);
+        log_printf(INF, "BMS: PGN_CSD 已经发送.");
         break;
     case PGN_CRO :// 0x000A00,
         break;
@@ -826,6 +856,9 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
+        memcpy(&thiz->bms.bms_battery_V, param->buff.rx_buff,
+               sizeof(struct pgn4864_BMV));
+
         log_printf(DBG_LV2, "BMS: PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
@@ -834,6 +867,9 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
+        memcpy(&thiz->bms.bms_battery_T, param->buff.rx_buff,
+               sizeof(struct pgn4864_BMT));
+
         log_printf(DBG_LV2, "BMS: PGN_BMT fetched.");
         break;
     case PGN_BSP :// 0x001700, 动力蓄电池预留报文
@@ -851,6 +887,12 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
+        /*
+         * 接收到中止充电报文，充电机发送CTS，并关闭高压输出
+         */
+        bit_set(thiz, F_PCK_BMS_TRM);
+        memcpy(&thiz->bms.bms_bst, param->buff.rx_buff,
+               sizeof(struct pgn4864_BST));
 
         log_printf(DBG_LV2, "BMS: PGN_BST fetched.");
         break;
@@ -864,6 +906,8 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
         bit_clr(thiz, S_BMS_COMM_DOWN);
+        memcpy(&thiz->bms.bms_stop_bsd, param->buff.rx_buff,
+               sizeof(struct pgn4864_BSD));
 
         log_printf(DBG_LV2, "BMS: PGN_BSD fetched.");
         break;

@@ -289,6 +289,9 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     #if 1
                     log_printf(DBG_LV0, "BMS: id not accept %x", frame.can_id);
                     #endif
+                    if ( (frame.can_id & 0xFFFF) == CAN_TX_ID_MASK ) {
+                        //driver->driver_main_proc(thiz, EVENT_TX_DONE, &thiz->param, driver);
+                    }
                     continue;
                 }
 
