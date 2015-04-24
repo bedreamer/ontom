@@ -897,7 +897,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             //{{ 在这做是否充完判定
             if (job->charge_billing.mode == BILLING_MODE_AS_CAP ) {
                 if ( job->charged_kwh + job->section_kwh >= job->charge_billing.option.set_kwh ||
-                     bit_read(thiz, F_PCK_BMS_TRM) ) {
+                     bit_read(job, F_PCK_BMS_TRM) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -912,7 +912,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
                 double used_kwh = job->charged_kwh + job->section_kwh;
                 if ( used_kwh * task->kwh_price >= job->charge_billing.option.set_money ||
-                     bit_read(thiz, F_PCK_BMS_TRM) ) {
+                     bit_read(job, F_PCK_BMS_TRM) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -927,7 +927,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_TIME ) {
                 unsigned int used_seconds = job->charged_seconds + job->section_seconds;
                 if ( used_seconds >= job->charge_billing.option.set_time ||
-                     bit_read(thiz, F_PCK_BMS_TRM) ) {
+                     bit_read(job, F_PCK_BMS_TRM) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -942,7 +942,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_FREE ) {
 
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_AUTO ) {
-                if ( bit_read(thiz, F_PCK_BMS_TRM) ) {
+                if ( bit_read(job, F_PCK_BMS_TRM) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
