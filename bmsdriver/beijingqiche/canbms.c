@@ -904,9 +904,16 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
             log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
         }
+        thiz->bms.charge_stage = CHARGE_STAGE_DONE;
         bit_clr(thiz, S_BMS_COMM_DOWN);
         memcpy(&thiz->bms.bms_stop_bsd, param->buff.rx_buff,
                sizeof(struct pgn7168_BSD));
+        log_printf(INF, "BMS.BSD: SOC: %d %%, Vmin: %.2f V, Vmax: %.2f V,"
+                   "Tmin: %d, Tmax: %d", thiz->bms.bms_stop_bsd.end_soc,
+                   thiz->bms.bms_stop_bsd.min_bat_V/100.0f,
+                   thiz->bms.bms_stop_bsd.max_bat_V/100.0f,
+                   thiz->bms.bms_stop_bsd.min_bat_T - 50,
+                   thiz->bms.bms_stop_bsd.max_bat_T - 50);
 
         log_printf(DBG_LV2, "BMS: PGN_BSD fetched.");
         break;
