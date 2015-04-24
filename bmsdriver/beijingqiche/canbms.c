@@ -283,14 +283,15 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
              thiz->bms.charge_stage == CHARGE_STAGE_HANDSHACKING) {
             thiz->bms.charge_stage = CHARGE_STAGE_CONFIGURE;
             log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CONFIGURE"));
-        }
-        if ( (param->can_id & 0x00FF0000) == (PGN_CRO << 8) &&
+        } else if ( (param->can_id & 0x00FF0000) == (PGN_CRO << 8) &&
              bit_read(thiz, F_CHARGER_READY) &&
              bit_read(thiz, F_BMS_READY ) &&
              thiz->bms.charge_stage == CHARGE_STAGE_CONFIGURE ) {
             thiz->bms.charge_stage = CHARGE_STAGE_CHARGING;
             log_printf(INF,
               "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CHARGING"));
+        } else {
+            about_packet_reciev_done(thiz, param);
         }
         break;
     case EVENT_TX_PRE:
