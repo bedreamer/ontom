@@ -801,7 +801,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             log_printf(WRN, "BMS: spn3078 range 0%%-100%% gave: %d%%",
                    -(thiz->bms.bms_all_battery_status.spn3078_soc));
         }
-        log_printf(DBG_LV3, "BMS.BCS: CV: %.1f V, CI: %.1f A, gVmax: %d, "
+        log_printf(DBG_LV3, "BMS.BCS: CV: %.1f V, CI: %.1f A, gVmax: %.1f, "
                    "SOC: %d %%, RT: %d min",
                    thiz->bms.bms_all_battery_status.spn3075_charge_voltage/10.0,
                    (thiz->bms.bms_all_battery_status.spn3076_charge_current-4000)/-10.0,
