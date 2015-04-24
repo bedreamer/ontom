@@ -291,6 +291,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
             log_printf(INF,
               "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CHARGING"));
         } else {
+            param->can_id = param->can_id >> 8;
             about_packet_reciev_done(thiz, param);
         }
         break;
