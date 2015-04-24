@@ -3299,6 +3299,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) >> 8;
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) & 0xFF;
             } else {
+                double needI = atof(config_read("需求电流"));
                 buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电流")) >> 8;
                 buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电流")) & 0xFF;
             }
