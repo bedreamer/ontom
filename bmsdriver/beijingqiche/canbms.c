@@ -158,10 +158,10 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 
     if ( thiz->job_gun_sn == GUN_SN0 ) {
         ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM0);
-        ccs.spn3082_output_current  = b2l(tsk->measure[0]->measure.IoutBAT0)+4000;
+        ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT0)-400)*10;
     } else if ( thiz->job_gun_sn == GUN_SN1 ) {
         ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM1);
-        ccs.spn3082_output_current  = b2l(tsk->measure[0]->measure.IoutBAT1)+4000;
+        ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT1)-400)*10;
     }
     ccs.spn3083_charge_time = (thiz->charged_seconds + thiz->section_seconds)/60;
 
@@ -770,7 +770,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
 
         log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %.1f mode: %s",
                    thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0,
-                   (thiz->bms.bms_charge_need_now.spn3073_need_current+400)/10.0f,
+                   (thiz->bms.bms_charge_need_now.spn3073_need_current+400)/-10.0f,
                    thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
                     CHARGE_WITH_CONST_VOLTAGE ? "恒压充电" :
                    thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
