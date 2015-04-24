@@ -165,7 +165,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
     }
     ccs.spn3083_charge_time = (thiz->charged_seconds + thiz->section_seconds)/60;
 
-    log_printf(INF, "BMS.CCS: %.1f V, %.1f(%04X) A",
+    log_printf(INF, "BMS.CCS: %.1f V, %.1f(%X) A",
                ccs.spn3081_output_voltage,
                ccs.spn3082_output_current,
                ccs.spn3082_output_current);
