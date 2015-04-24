@@ -709,7 +709,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             break;
         }
 
-        log_printf(DBG_LV2, "BMS: BCP done, BSVH: %.2f V, MAXi: %d A, "
+        log_printf(DBG_LV2, "BMS: BCP done, BSVH: %.2f V, MAXi: %X A, "
                    "CAP: %.1f KW.H, MVC: %.1f V, MT: %d, SOC: %.1f %%, V: %.1f %%",
                    thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery/100.0f,
                    thiz->bms.bms_config_info.spn2817_max_charge_current,
@@ -717,7 +717,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
                    thiz->bms.bms_config_info.spn2819_max_charge_voltage/10.0f,
                    thiz->bms.bms_config_info.spn2820_max_temprature,
                    thiz->bms.bms_config_info.spn2821_soc/10.0f,
-                   thiz->bms.bms_config_info.spn2822_total_voltage);
+                   thiz->bms.bms_config_info.spn2822_total_voltage/10.0f);
         break;
     case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BRO);
