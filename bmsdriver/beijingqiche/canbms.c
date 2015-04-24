@@ -759,7 +759,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         } else {
             thiz->need_V = thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f;
         }
-        if ( (thiz->bms.bms_charge_need_now.spn3073_need_current + 4000 )/10.0f > 0 ) {
+        if ( (thiz->bms.bms_charge_need_now.spn3073_need_current - 4000 )/-10.0f < 0 ) {
             log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
                        thiz->bms.bms_charge_need_now.spn3073_need_current);
         } else {
