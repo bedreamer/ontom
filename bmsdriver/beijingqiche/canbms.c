@@ -709,7 +709,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             break;
         }
 
-        log_printf(DBG_LV2, "BMS: BCP done, BSVH: %.2f V, MAXi: %X A, "
+        log_printf(DBG_LV2, "BMS: BCP done, BSVH: %.2f V, MAXi: %.1f A, "
                    "CAP: %.1f KW.H, MVC: %.1f V, MT: %d, SOC: %.1f %%, V: %.1f %%",
                    thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery/100.0f,
                    (thiz->bms.bms_config_info.spn2817_max_charge_current-4000)/-10.0f,
