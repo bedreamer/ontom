@@ -185,13 +185,13 @@ int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
                                                 thiz->bms.can_pack_gen_nr, PGN_CST);
     if ( bit_read(thiz, F_PCK_BMS_TRM) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
-        memcpy(param->buff.tx_buff, &thiz->bms.bms_bst, sizeof(struct pgn6656_BST));
+        memcpy(param->buff.tx_buff, &thiz->bms.cms, sizeof(struct pgn6656_CST));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
     } else if ( bit_read(thiz, F_PCK_CHARGER_TRM) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
-        memcpy(param->buff.tx_buff, &thiz->bms.bms_bst, sizeof(struct pgn6656_BST));
+        memcpy(param->buff.tx_buff, &thiz->bms.bms_cst, sizeof(struct pgn6656_CST));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
@@ -206,23 +206,19 @@ int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
                                                 thiz->bms.can_pack_gen_nr, PGN_CSD);
     if ( bit_read(thiz, F_PCK_BMS_TRM) || bit_read(thiz, F_PCK_CHARGER_TRM) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
-        thiz->bms.charger_csd.charger_sn = 1;
-        thiz->bms.charger_csd.total_kwh = (u16)(thiz->charged_kwh + thiz->section_kwh);
-        thiz->bms.charger_csd.total_min =
+        thiz->bms.charger_stop_csd.charger_sn = 1;
+        thiz->bms.charger_stop_csd.total_kwh = (u16)(thiz->charged_kwh + thiz->section_kwh);
+        thiz->bms.charger_stop_csd.total_min =
                 (thiz->charged_seconds + thiz->section_seconds) / 60;
         log_printf(INF, "BMS.CSD: KWH: %d kWH, TIME: %d min",
-                   thiz->bms.charger_csd.total_kwh,
-                   thiz->bms.charger_csd.total_min);
-        memcpy(param->buff.tx_buff, &thiz->bms.charger_csd, sizeof(struct pgn7424_CSD));
+                   thiz->bms.charger_stop_csd.total_kwh,
+                   thiz->bms.charger_stop_csd.total_min);
+        memcpy(param->buff.tx_buff, &thiz->bms.charger_stop_csd, sizeof(struct pgn7424_CSD));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
     }
-    (void)thiz;
-    (void)param;
-    (void)gen;
     return 0;
-
 }
 
 // 错误-CEM-充电机错误报文

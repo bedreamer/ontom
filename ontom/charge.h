@@ -1047,7 +1047,7 @@ enum REASON_PGN6400 {
 //enum FAULT_PGN6400 {};
 
 // 充电机终止充电
-struct pgn6656_BST {
+struct pgn6656_CST {
     // 中止充电原因
     u8 reason;
     // 终止充电故障原因
@@ -1237,9 +1237,11 @@ struct bms_struct {
     // BMS 动力蓄电池温度信息
     struct pgn5632_BMT bms_battery_T;
     // BMS 中止充电原因
-    struct pgn6656_BST bms_bst;
+    struct pgn6400_BST bms_bst;
     // BMS 充电统计信息
     struct pgn7168_BSD bms_stop_bsd;
+    // 充电机 中止充电原因
+    struct pgn6656_CST bms_cst;
     // 充电机统计信息
     struct pgn7424_CSD charger_csd;
 
