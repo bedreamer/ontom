@@ -1079,7 +1079,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_2_ASSIT_PWN_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        job->job_status = JOB_DETACHING;
+        if ( job->bms.driver == NULL ) {
+            job->job_status = JOB_DETACHING;
+        }
         break;
     case JOB_DETACHING:
         config_write("需求电压", "2000");
