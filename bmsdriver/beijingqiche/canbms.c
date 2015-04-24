@@ -769,7 +769,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
 
         log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
 
-        log_printf(DBG_LV2, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
+        log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %d mode: %s",
                    thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0,
                    thiz->bms.bms_charge_need_now.spn3073_need_current + 400,
                    thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
