@@ -158,7 +158,8 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 
     if ( thiz->job_gun_sn == GUN_SN0 ) {
         ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM0);
-        ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT0)-400)*10;
+        ccs.spn3082_output_current = thiz->bms.bms_all_battery_status.spn3076_charge_current;
+        //ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT0)-400)*10;
     } else if ( thiz->job_gun_sn == GUN_SN1 ) {
         ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM1);
         ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT1)-400)*10;
