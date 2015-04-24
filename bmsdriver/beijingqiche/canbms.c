@@ -763,7 +763,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
                        thiz->bms.bms_charge_need_now.spn3073_need_current);
         } else {
-            thiz->need_I = (thiz->bms.bms_charge_need_now.spn3073_need_current + 4000 )/-10.0f;
+            thiz->need_I = (thiz->bms.bms_charge_need_now.spn3073_need_current - 4000 )/-10.0f;
         }
 
         log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
