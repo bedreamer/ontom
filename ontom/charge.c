@@ -950,7 +950,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                "终止电量: %.2f KWH, 充电电量: %.2f KWH",
                                job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
-                               used_kwh);
+                               job->charged_kwh + job->section_kwh);
                     job->job_status = JOB_DONE;
                     end ++;
                 }
