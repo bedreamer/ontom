@@ -1243,7 +1243,7 @@ struct bms_struct {
     // 充电机 中止充电原因
     struct pgn6656_CST bms_cst;
     // 充电机统计信息
-    struct pgn7424_CSD charger_csd;
+    struct pgn7424_CSD charger_stop_csd;
 
     // BMS 驱动
     struct bmsdriver *driver;
