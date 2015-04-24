@@ -185,7 +185,7 @@ int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
                                                 thiz->bms.can_pack_gen_nr, PGN_CST);
     if ( bit_read(thiz, F_PCK_BMS_TRM) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
-        memcpy(param->buff.tx_buff, &thiz->bms.cms, sizeof(struct pgn6656_CST));
+        memcpy(param->buff.tx_buff, &thiz->bms.bms_cst, sizeof(struct pgn6656_CST));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
