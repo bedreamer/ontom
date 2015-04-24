@@ -649,9 +649,9 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             bit_clr(thiz, F_BMS_RECOGNIZED);
             break;
         }
-        log_printf(DBG_LV2, "BMS: BMS recognized....CAP: %d A.H, VOL: %d V",
-                   thiz->bms.vehicle_info.spn2567_capacity,
-                   thiz->bms.vehicle_info.spn2568_volatage);
+        log_printf(DBG_LV2, "BMS: BMS recognized....CAP: %.1f A.H, VOL: %.1f V",
+                   thiz->bms.vehicle_info.spn2567_capacity/10.0f,
+                   thiz->bms.vehicle_info.spn2568_volatage/10.0);
         if ( ! bit_read(thiz, F_BMS_RECOGNIZED ) ) {
             // send recognized event from here.
         }
