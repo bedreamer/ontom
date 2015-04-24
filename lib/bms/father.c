@@ -81,6 +81,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                 thiz = driver->binder[i];
                 if ( thiz->job_status == JOB_EXITTING ) {
                     driver->binder[i] = NULL;
+                    thiz->bms.driver = NULL;
                 }
 
                 if ( 0x7F != thiz->bms.bms_write_init_ok ) {
