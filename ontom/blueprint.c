@@ -3326,7 +3326,8 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                     buff[ nr ++ ] = rat & 0xFF;
                 }
 #endif
-                unsigned int rat = (unsigned int)atoi("need_I1");
+                unsigned int rat = (unsigned int)atoi(config_read("need_I1"));
+                pritf("UART.Increa: %s A", )
                 buff[ nr ++ ] = rat >> 8;
                 buff[ nr ++ ] = rat & 0xFF;
             }
