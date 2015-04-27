@@ -3193,6 +3193,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         buff[ nr ++ ] = (unsigned char)(unsigned int)(me->_private);
+#if 0
         buff[ nr ++ ] = 0x06;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x05;
@@ -3202,7 +3203,14 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         } else {
             buff[ nr ++ ] = 0; // 开机
         }
-
+#else
+        unsigned int rat = (unsigned int)atoi(config_read("need_I1"));
+        buff[ nr ++ ] = 0x06;
+        buff[ nr ++ ] = 0x00;
+        buff[ nr ++ ] = 0x02;
+        buff[ nr ++ ] = rat >> 8;
+        buff[ nr ++ ] = rat & 0xFF;
+#endif
         len = nr;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) >> 8;
         buff[ nr ++ ] = Increase_ModbusCRC(buff, len) ;
