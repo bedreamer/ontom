@@ -3325,7 +3325,8 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                     buff[ nr ++ ] = rat >> 8;
                     buff[ nr ++ ] = rat & 0xFF;
                 }
-#endif          unsigned int rat = (unsigned int)atoi("need_I1");
+#endif
+                unsigned int rat = (unsigned int)atoi("need_I1");
                 buff[ nr ++ ] = rat >> 8;
                 buff[ nr ++ ] = rat & 0xFF;
             }
