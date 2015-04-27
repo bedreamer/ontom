@@ -418,6 +418,8 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN7424(thiz, param);
                     gen->heartbeat = 0;
+                } else if (gen == NULL){
+                    log_printf(DBG_LV3, "fasdfasdfasdfa----------------------");
                 }
                 gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
                 if ( gen && gen->heartbeat >= gen->period ) {
@@ -766,14 +768,14 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
                        thiz->bms.bms_charge_need_now.spn3073_need_current);
         } else {
-            //thiz->need_I = 0;
+            thiz->need_I = 0;
             double fi = (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/10.0;
             fi = fi < 0 ? -fi : fi;
             fi = 400.0 - fi;
             thiz->need_I = fi;
         }
 
-        log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I/10);
+        log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
 
         double fi = (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/10.0;
         log_printf(INF, "BMS.BCL: need I:  %04X, %d, %d, |(NI - 4000)/10|=%.1f A, GBT: %.1f A",
