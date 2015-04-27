@@ -3299,6 +3299,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) >> 8;
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) & 0xFF;
             } else {
+#if 0
                 double maxI = 0;
                 unsigned short rat;
                 if ( task->modules_nr == 0 || task->measure[0]->measure.VinBAT0 < 2000 ) {
@@ -3324,6 +3325,9 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                     buff[ nr ++ ] = rat >> 8;
                     buff[ nr ++ ] = rat & 0xFF;
                 }
+#endif          unsigned int rat = (unsigned int)atoi("need_I1");
+                buff[ nr ++ ] = rat >> 8;
+                buff[ nr ++ ] = rat & 0xFF;
             }
         } else {
             // 广播限压值
