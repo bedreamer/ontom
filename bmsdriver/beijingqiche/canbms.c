@@ -922,7 +922,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         memcpy(&thiz->bms.bms_bst, param->buff.rx_buff,
                sizeof(struct pgn6400_BST));
 
-        log_printf(DBG_LV2, "BMS: PGN_BST fetched.");
+        log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSD);
