@@ -770,10 +770,10 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             double fi = (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/10.0;
             fi = fi < 0 ? -fi : fi;
             fi = 400.0 - fi;
-            thiz->need_I = fi * 10;
+            thiz->need_I = fi;
         }
 
-        log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
+        log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I/10);
 
         double fi = (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/10.0;
         log_printf(INF, "BMS.BCL: need I:  %04X, %d, %d, |(NI - 4000)/10|=%.1f A, GBT: %.1f A",
