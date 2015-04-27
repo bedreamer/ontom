@@ -3311,6 +3311,9 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                     rat = 10;
                 }
 
+                log_printf(DBG_LV3, "UART.NEED_I: %.1f %% %.1f A",
+                           rat / 10.0, maxI * rat/1000.0);
+
                 buff[ nr ++ ] = rat >> 8;
                 buff[ nr ++ ] = rat & 0xFF;
             }
