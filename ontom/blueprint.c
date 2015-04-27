@@ -3299,23 +3299,30 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) >> 8;
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) & 0xFF;
             } else {
-                unsigned int needI = (unsigned int)atof(config_read("需求电流"));
-                needI = needI / task->modules_nr;
-                double maxI = 7500 / task->measure[0]->measure.VinBAT0;
-                unsigned short rat = needI * 1000 / maxI;
+                double maxI = 0;
+                unsigned short rat;
+                if ( task->modules_nr == 0 || task->measure[0]->measure.VinBAT0 < 2000 ) {
+                    buff[ nr ++ ] = 0;
+                    buff[ nr ++ ] = 0;
+                } else {
+                    unsigned int needI = (unsigned int)atof(config_read("需求电流"));
+                    needI = needI / task->modules_nr;
+                    maxI = 7500 / task->measure[0]->measure.VinBAT0;
+                    rat = needI * 1000 / maxI;
 
-                if ( rat >= 1000 ) {
-                    rat = 1000;
+                    if ( rat >= 1000 ) {
+                        rat = 1000;
+                    }
+                    if ( rat <= 10 ) {
+                        rat = 10;
+                    }
+
+                    log_printf(DBG_LV3, "UART.NEED_I: %.1f %% %.1f A",
+                               rat / 10.0, maxI * rat/1000.0);
+
+                    buff[ nr ++ ] = rat >> 8;
+                    buff[ nr ++ ] = rat & 0xFF;
                 }
-                if ( rat <= 10 ) {
-                    rat = 10;
-                }
-
-                log_printf(DBG_LV3, "UART.NEED_I: %.1f %% %.1f A",
-                           rat / 10.0, maxI * rat/1000.0);
-
-                buff[ nr ++ ] = rat >> 8;
-                buff[ nr ++ ] = rat & 0xFF;
             }
         } else {
             // 广播限压值
