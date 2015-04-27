@@ -778,7 +778,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
                    thiz->bms.bms_charge_need_now.spn3073_need_current,
                    (unsigned)thiz->bms.bms_charge_need_now.spn3073_need_current,
                    fi < 0 ? -fi : fi,
-                   (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/-10.0,
+                   (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/-10.0
                    );
 
         log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %.1f mode: %s",
