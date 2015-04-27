@@ -54,12 +54,12 @@ CONFIG_DOMAIN_BEGIN
 {"manufacturer_passwd",         C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"8989889"}},
 {"user_config_file",            C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"user.cfg"}},
 
-{"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
-{"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
+{"初始电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"2000"}},
+{"需求电压",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"2000"}},
 {"需求电流",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
 
-{"INIT_V1",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
-{"INIT_V2",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"4000"}},
+{"INIT_V1",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"2000"}},
+{"INIT_V2",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"2000"}},
 {"need_V1",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
 {"need_V2",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
 {"need_I1",                     C_INT,      yes,    C_VALID,    .cuv.i=14,      {"0"}},
