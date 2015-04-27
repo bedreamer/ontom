@@ -1194,7 +1194,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
         log_printf(ERR, "ZEUS: LOW memory, job create faile, aborted.");
         // 中止作业
     }
-    memset(thiz, 0, s);
+    memset(thiz, 0, sizeof(struct charge_job));
     thiz->bms.can_dev = "can0";
     thiz->bms.can_bms_status = CAN_INVALID;
     thiz->bms.job = thiz;
