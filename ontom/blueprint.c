@@ -3299,8 +3299,18 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) >> 8;
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) & 0xFF;
             } else {
-                int needI = atof(config_read("需求电流")) * 10;
+                unsigned int needI = (unsigned int)atof(config_read("需求电流")) * 10;
                 needI = needI / task->modules_nr;
+                double maxI = 7500 / task->measure[0]->measure.VinBAT0;
+                double rat = needI * 1000 / maxI;
+
+                if ( rat >= 1000 ) {
+                    rat = 1000;
+                }
+                if ( rat <= 10 ) {
+                    rat = 10;
+                }
+
                 buff[ nr ++ ] = needI >> 8;
                 buff[ nr ++ ] = needI & 0xFF;
             }
@@ -3315,8 +3325,8 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                 buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) >> 8;
                 buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) & 0xFF;
             } else {
-                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-                buff[ nr ++ ] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+                buff[ nr ++ ] = (unsigned short)atoi(config_read("需求电压")) >> 8;
+                buff[ nr ++ ] = (unsigned short)atoi(config_read("需求电压")) & 0xFF;
             }
         }
 
