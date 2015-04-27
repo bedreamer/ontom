@@ -417,8 +417,9 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CSD);
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN7424(thiz, param);
+                    log_printf(DBG_LV3, "BMS.CSD: -----------------------------");
                     gen->heartbeat = 0;
-                } else if (gen == NULL){
+                } else {
                     log_printf(DBG_LV3, "fasdfasdfasdfa----------------------");
                 }
                 gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CEM);
