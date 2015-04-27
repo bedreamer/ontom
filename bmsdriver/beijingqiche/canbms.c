@@ -224,6 +224,7 @@ int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
     }
+    log_printf(INF, "-----------------------------");
     return 0;
 }
 
