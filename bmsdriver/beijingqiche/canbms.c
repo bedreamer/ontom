@@ -759,15 +759,18 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             log_printf(WRN, "BMS: spn3072 range 0-750V gave: %d V",
                        thiz->bms.bms_charge_need_now.spn3072_need_voltage);
         } else {
-            thiz->need_V = 10;
-            //thiz->need_V = thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f;
+            //thiz->need_V = 10;
+            thiz->need_V = thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f;
         }
         if ( (thiz->bms.bms_charge_need_now.spn3073_need_current - 4000 )/-10.0f < 0 ) {
             log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
                        thiz->bms.bms_charge_need_now.spn3073_need_current);
         } else {
             //thiz->need_I = 0;
-            thiz->need_I = (thiz->bms.bms_charge_need_now.spn3073_need_current - 4000 )/-10.0f;
+            double fi = (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/10.0;
+            fi = fi < 0 ? -fi : fi;
+            fi = 400.0 - fi;
+            thiz->need_I = fi * 10;
         }
 
         log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
