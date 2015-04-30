@@ -101,6 +101,9 @@ zeus:
 	$(Q)echo "         "`date`
 	$(Q)echo "------------------------------------------"
 
+install:
+	./script/install.sh
+	
 browser:
 	$(Q)$(MAKE) $(MAKEPARAM) -C browser all;
 
