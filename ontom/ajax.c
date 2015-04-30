@@ -2097,7 +2097,9 @@ int ajax_update_proc(struct ajax_xml_struct *thiz)
         system("/usr/zeus/script/update.sh");
     }
 
-    thiz->iobuff[output_len--] = '\0';
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
     output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
     return ERR_OK;
@@ -2115,7 +2117,9 @@ int ajax_export_proc(struct ajax_xml_struct *thiz)
         system("/usr/zeus/script/export.sh");
     }
 
-    thiz->iobuff[output_len--] = '\0';
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
     output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
     return ERR_OK;
