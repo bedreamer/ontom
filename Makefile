@@ -102,7 +102,7 @@ zeus:
 	$(Q)echo "------------------------------------------"
 
 install:
-	./scripts/install.sh
+	$(Q)./scripts/install.sh
 PHONY+=install
 	
 browser:
