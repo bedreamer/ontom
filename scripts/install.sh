@@ -18,10 +18,10 @@ cp ontom.cfg install/usr/zeus/
 cp user.cfg install/usr/zeus/
 
 echo "install UI files"
-cp -r UI_html/* install/srv/www/
+rsync -r UI_html/* install/srv/www/
 
 echo "done"
 
 cd install
 
-tar -cf zeus.update.tar usr/ srv/
+tar --exclude-vcs -cf zeus.update.tar usr/ srv/
