@@ -31,6 +31,8 @@ int ajax_system_config_save_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_proc(struct ajax_xml_struct *thiz);
 int ajax_system_config_options_proc(struct ajax_xml_struct *thiz);
 int ajax_system_about_proc(struct ajax_xml_struct *thiz);
+int ajax_update_proc(struct ajax_xml_struct *thiz);
+int ajax_export_proc(struct ajax_xml_struct *thiz);
 int ajax_query_xml_proc(struct ajax_xml_struct *thiz);
 int ajax_query_json_proc(struct ajax_xml_struct *thiz);
 int ajax_module_query_proc(struct ajax_xml_struct *thiz);
