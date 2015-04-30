@@ -29,6 +29,8 @@ struct xml_generator {
     {"/system/card.json",       ajax_card_init_proc,},
     {"/system/jiaozhun.json",   ajax_jiaozhun_proc,},
     {"/system/auth.json",       ajax_auth_proc,},
+    {"/system/update.json",     ajax_update_proc,},
+    {"/system/export.json",     ajax_export_proc,},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -2079,6 +2081,41 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "]}");
     thiz->xml_len = output_len;
 
+    return ERR_OK;
+}
+
+// 更新系统文件
+int ajax_update_proc(struct ajax_xml_struct *thiz)
+{
+
+    thiz->ct = "application/json";
+    output_len += sprintf(&thiz->iobuff[output_len], "\"update\":{");
+
+    if ( 0 == fork() ) {
+        // 子进程
+        system("/usr/zeus/script/update.sh");
+    }
+
+    thiz->iobuff[output_len--] = '\0';
+    output_len += sprintf(&thiz->iobuff[output_len], "}");
+    thiz->xml_len = output_len;
+    return ERR_OK;
+}
+
+// 导出系统日志
+int ajax_export_proc(struct ajax_xml_struct *thiz)
+{
+    thiz->ct = "application/json";
+    output_len += sprintf(&thiz->iobuff[output_len], "\"export\":{");
+
+    if ( 0 == fork() ) {
+        // 子进程
+        system("/usr/zeus/script/export.sh");
+    }
+
+    thiz->iobuff[output_len--] = '\0';
+    output_len += sprintf(&thiz->iobuff[output_len], "}");
+    thiz->xml_len = output_len;
     return ERR_OK;
 }
 
