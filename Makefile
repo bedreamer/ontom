@@ -103,6 +103,7 @@ zeus:
 
 install:
 	./script/install.sh
+PHONY+=install
 	
 browser:
 	$(Q)$(MAKE) $(MAKEPARAM) -C browser all;
