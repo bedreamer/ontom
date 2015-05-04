@@ -3997,7 +3997,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
 
             buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
 
-            l = n;
+            l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
@@ -4014,7 +4014,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             buff[ nr ++ ] = 0x47;
             buff[ nr ++ ] = 0x01;
             buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
-            l = n;
+            l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
@@ -4049,7 +4049,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 }
             } while (0);
 
-            l = n;
+            l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
@@ -4218,7 +4218,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
             buff[ nr ++ ] = 0x02;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x26;
-            l = n;
+            l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
@@ -4249,7 +4249,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
 
             buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
 
-            l = n;
+            l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
