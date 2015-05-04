@@ -2747,12 +2747,6 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
             buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
 
-            buff[nr ++] = task->modules_nr >> 8;
-            buff[nr ++] = task->modules_nr & 0xFF;
-
-            buff[nr ++] = 0;
-            buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON) || bit_read(task, CMD_GUN_2_OUTPUT_ON)) ? 1 : 0;
-
             self->rx_param.need_bytes = 0;
 
             len = nr;
