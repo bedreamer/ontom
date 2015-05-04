@@ -5014,10 +5014,10 @@ continue_to_send:
     return NULL;
 }
 
+#if 0
 // 生成串口通信统计页面
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
 {
-#if 0
     int output_len = 0, i;
     struct bp_user *me = &down_user[0];
     struct MDATA_ACK *self;
@@ -5258,7 +5258,5 @@ int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
     output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
     return ERR_OK;
-#else
-    return ERR_ERR;
-#endif
 }
+#endif
