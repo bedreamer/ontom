@@ -3630,7 +3630,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         buff[ nr ++ ] = 0x11;
         buff[ nr ++ ] = 0x04;
         buff[ nr ++ ] = 0x00 + 0x33;
-        buff[ nr ++ ] = 0xFF + 0x33;
+        buff[ nr ++ ] = (unsigned char)(0xFF + 0x33);
         buff[ nr ++ ] = 0x01 + 0x33;
         buff[ nr ++ ] = 0x02 + 0x33;
 
@@ -3750,7 +3750,7 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
         buff[ nr ++ ] = 0x11;
         buff[ nr ++ ] = 0x04;
         buff[ nr ++ ] = 0x00 + 0x33;
-        buff[ nr ++ ] = 0xFF + 0x33;
+        buff[ nr ++ ] = (unsigned char)(0xFF + 0x33);
         buff[ nr ++ ] = 0x01 + 0x33;
         buff[ nr ++ ] = 0x02 + 0x33;
 
