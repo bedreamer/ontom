@@ -47,8 +47,6 @@ struct xml_generator {
     {"/debug/commit.html",      ajax_debug_commit},
     {"/debug/singlebit/read.json",    ajax_debug_bit_read},
     {"/debug/singlebit/write.json",   ajax_debug_bit_write},
-    // 生成串口通信统计页面
-    {"/debug/uart.json",        ajax_uart_debug_page},
     {"", NULL}
 };
 
