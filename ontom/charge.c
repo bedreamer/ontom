@@ -1552,7 +1552,7 @@ out:
 }
 
 /* 记录系统操作日志 */
-int system_log(SYSLOG log, const char *fmt, ...)
+int system_log(unsigned short type, const char *fmt, ...)
 {
     char log[512]= {0};
     va_list ap;
