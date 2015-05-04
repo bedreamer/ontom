@@ -27,7 +27,7 @@ PWD=pwd
 WORKDIR=$(shell pwd)
 Q=@
 #Q=
-CFLAGS=-g -c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -W -D_REENTRANT
+CFLAGS=-g -c -DVERSION=$(VER) -pipe -O2 -Wall -Wno-unused-parameter -Wno-strict-aliasing -W -D_REENTRANT
 CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
 CPFLAGS=-I./ontom -I./thirdpart/D8 -I./thirdpart/mongoose -I./thirdpart/sqlite -I./thirdpart/extso -Wl,-O1
