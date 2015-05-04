@@ -2085,7 +2085,7 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
 // 更新系统文件
 int ajax_update_proc(struct ajax_xml_struct *thiz)
 {
-        int nr = 0, output_len = 0;
+        int output_len = 0;
 
     thiz->ct = "application/json";
     output_len += sprintf(&thiz->iobuff[output_len], "\"update\":{");
@@ -2106,7 +2106,7 @@ int ajax_update_proc(struct ajax_xml_struct *thiz)
 // 导出系统日志
 int ajax_export_proc(struct ajax_xml_struct *thiz)
 {
-        int nr = 0, output_len = 0;
+        int output_len = 0;
     thiz->ct = "application/json";
     output_len += sprintf(&thiz->iobuff[output_len], "\"export\":{");
 
