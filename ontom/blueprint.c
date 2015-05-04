@@ -3793,7 +3793,7 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
 }
 
 unsigned char BCC_code(unsigned char *da,size_t len) {
-    int i  = 0;
+    size_t i  = 0;
     unsigned char BCC = 0;
 
     for ( ; i < len; i ++ ) {
@@ -3904,7 +3904,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                     }
 
                     if ( ! faile ) {
-                        unsigned int money = *(unsigned int *)(void*)cd.card.sector_4.data.remain_money;
+                        unsigned int money = *(unsigned int *)(void*)(unsigned int)cd.card.sector_4.data.remain_money;
                         money &= 0x00FFFFFF;
                         log_printf(INF, GRN("UART: 刷卡完成[卡号: %02X%02X%02X%02X, 余额: %.2f]"),
                                    ID[3], ID[2], ID[1], ID[0], money / 100.0f);
