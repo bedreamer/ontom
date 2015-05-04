@@ -3404,7 +3404,7 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
                      struct bp_evt_param *param)
 {
     unsigned char buff[32];
-    int nr = 0;
+    int nr = 0, l;
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -3505,7 +3505,8 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         buff[ nr ++ ] = 0x00 + 0x33;
         buff[ nr ++ ] = 0x00 + 0x33;
 
-        buff[ nr ++ ] = check_sum(&buff[4], nr - 4);
+        l = nr;
+        buff[ nr ++ ] = check_sum(&buff[4], l - 4);
         buff[ nr ++ ] = 0x16;
 
         memcpy(param->buff.tx_buff, buff, nr);
@@ -3556,7 +3557,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
                      struct bp_evt_param *param)
 {
     unsigned char buff[32];
-    int nr = 0;
+    int nr = 0, l;
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -3633,7 +3634,8 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         buff[ nr ++ ] = 0x01 + 0x33;
         buff[ nr ++ ] = 0x02 + 0x33;
 
-        buff[ nr ++ ] = check_sum(&buff[4], nr - 4);
+        l = nr;
+        buff[ nr ++ ] = check_sum(&buff[4], l - 4);
         buff[ nr ++ ] = 0x16;
 
         memcpy(param->buff.tx_buff, buff, nr);
@@ -3675,7 +3677,7 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
                      struct bp_evt_param *param)
 {
     unsigned char buff[32];
-    int nr = 0;
+    int nr = 0, l;
     int ret = ERR_ERR;
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -3752,7 +3754,8 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
         buff[ nr ++ ] = 0x01 + 0x33;
         buff[ nr ++ ] = 0x02 + 0x33;
 
-        buff[ nr ++ ] = check_sum(&buff[4], nr - 4);
+        l = nr;
+        buff[ nr ++ ] = check_sum(&buff[4], l - 4);
         buff[ nr ++ ] = 0x16;
 
         memcpy(param->buff.tx_buff, buff, nr);
