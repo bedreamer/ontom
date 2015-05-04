@@ -2701,6 +2701,7 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 {
     unsigned char buff[32];
     int nr = 0, len;
+    static int seq = 0;
 
     int ret = ERR_ERR;
     switch (evt) {
@@ -2715,57 +2716,83 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        buff[nr ++] = 0xFF;
-        buff[nr ++] = 0x10;
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x09;
-        buff[nr ++] = 0x12;
+        seq ++;
+        if ( seq % 2 ) {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x10;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x04;
+            buff[nr ++] = 0x08;
 
-        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
-        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->max_output_I))) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_max_V))) & 0xFF;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-#if 1
-        buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
-        buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
-        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-#else
-        buff[nr ++] = 6500 >> 8;
-        buff[nr ++] = 6500 & 0xFF;
-        buff[nr ++] = 6500 >> 8;
-        buff[nr ++] = 6500 & 0xFF;
-#endif
-        if ( task->modules_nr == 0 ) {
-            task->modules_nr = 1;
+            // 额定电流值
+            switch ( task->module_model ) {
+            case MODEL_AN10680:
+            default:
+                buff[nr ++] = 100 >> 8;
+                buff[nr ++] = 100;
+                break;
+            }
+
+            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) >> 8;
+            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
+
+            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+
+            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
+            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+
+            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) >> 8;
+            buff[nr ++] = (unsigned int)atoi(config_read("初始电压")) & 0xFF;
+
+            buff[nr ++] = task->modules_nr >> 8;
+            buff[nr ++] = task->modules_nr & 0xFF;
+
+            buff[nr ++] = 0;
+            buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON) || bit_read(task, CMD_GUN_2_OUTPUT_ON)) ? 1 : 0;
+
+            self->rx_param.need_bytes = 0;
+
+            len = nr;
+            buff[ nr ++ ] = load_crc(len, buff);
+            buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+
+            self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
+        } else {
+            buff[nr ++] = 0xFF;
+            buff[nr ++] = 0x10;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x06;
+            buff[nr ++] = 0x00;
+            buff[nr ++] = 0x03;
+            buff[nr ++] = 0x06;
+
+            // 自动充电时的初始电流值
+            buff[nr ++] = 0;
+            buff[nr ++] = 0;
+
+            buff[nr ++] = task->modules_nr >> 8;
+            buff[nr ++] = task->modules_nr & 0xFF;
+
+            buff[nr ++] = 0;
+            buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON) || bit_read(task, CMD_GUN_2_OUTPUT_ON)) ? 1 : 0;
+
+            self->rx_param.need_bytes = 0;
+
+            len = nr;
+            buff[ nr ++ ] = load_crc(len, buff);
+            buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+
+            self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
         }
-        //buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) >> 8;
-        //buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流"))))) / task->modules_nr) & 0xFF;
-        buff[nr ++] = 0;
-        buff[nr ++] = 0x28;
-        buff[nr ++] = task->modules_nr >> 8;
-        buff[nr ++] = task->modules_nr & 0xFF;
-        buff[nr ++] = task->charge_stat >> 8;
-        buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON) ||
-                       bit_read(task, CMD_GUN_2_OUTPUT_ON)) ? 1 : 0;
-
-        self->rx_param.need_bytes = 0;
-
-        len = nr;
-        buff[ nr ++ ] = load_crc(len, buff);
-        buff[ nr ++ ] = load_crc(len, buff) >> 8;
-
-        memcpy(param->buff.tx_buff, buff, nr);
-        param->payload_size = nr;
-
-        self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
-
         ret = ERR_OK;
         break;
     // 串口发送确认
