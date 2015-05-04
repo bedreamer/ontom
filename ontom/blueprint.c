@@ -1726,7 +1726,6 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
 {
     int ret = ERR_ERR;
     unsigned char buff[64];
-    char cmd;
     int nr = 0, len = 0;
 
     switch (evt) {
@@ -3169,7 +3168,6 @@ int Increase_module_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP
 int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    static int seq = 0, module_seq = 0;
     unsigned char buff[32];
     int nr = 0, len;
     int ret = ERR_ERR;
