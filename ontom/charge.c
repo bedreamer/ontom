@@ -1550,3 +1550,19 @@ del:
 out:
     pthread_mutex_unlock (&task->err_list_lck);
 }
+
+/* 记录系统操作日志 */
+int system_log(SYSLOG log, const char *fmt, ...)
+{
+    char log[512]= {0};
+    va_list ap;
+    char sql[1024]= {0};
+
+    vsnprintf(log, sizeof(log), fmt, ap);
+    return ERR_OK;
+}
+
+/* 冲洗系统操作日志缓冲区 */
+void flush_system_log()
+{
+}

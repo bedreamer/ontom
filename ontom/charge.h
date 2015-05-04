@@ -521,7 +521,28 @@ typedef enum {
     S_END
 }ONTOM_FLAG_SINGLE;
 
+typedef enum {
+    /*
+     * 系统日志，包含： 开关机，更新，设置
+     */
+    LOG_SYS = 0x0001,
+    /*
+     * 命令日志，包含： 接触器初始化、合闸分闸，输出限压限流，刷卡操作
+     */
+    LOG_CMD = 0x0002,
+    /*
+     * 作业日志，包含： 作业提交，创建，执行，暂停，中止，销毁过程，计费
+     */
+    LOG_JOB = 0x0004,
+    /*
+     * 故障日志，包含：通信故障，硬件故障，软件故障
+     */
+    LOG_FAULT = 0x0008,
 
+
+    // 立即刷新
+    LOG_FLUSH = 0x8000
+}SYSLOG;
 
 #pragma pack(1)
 /* 卡信息
@@ -1756,6 +1777,11 @@ static inline unsigned short double2short(double df, unsigned int acc) {
 static inline double bytes2double(unsigned char h, unsigned l, unsigned int acc) {
     return (h * 256 + l) / (1.0f * acc);
 }
+
+/* 记录系统操作日志 */
+int system_log(unsigned short type, const char *fmt, ...);
+/* 冲洗系统操作日志缓冲区 */
+void flush_system_log();
 
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);

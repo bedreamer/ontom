@@ -22,12 +22,13 @@ int log_printf(unsigned int level, const char *fmt, ...);
 static inline void __get_timestamp(char *outstring)
 {
     time_t timep;
+    int n;
     struct tm *p;
     timep = time(NULL);
     p =localtime(&timep);
     struct timeval t_start;
     gettimeofday(&t_start, NULL);
-    sprintf(outstring, "%04d-%02d-%02d %02d:%02d:%02d.%03ld",
+    n = sprintf(outstring, "%04d-%02d-%02d %02d:%02d:%02d.%03ld",
             p->tm_year + 1900,
             p->tm_mon + 1,
             p->tm_mday,
@@ -35,6 +36,7 @@ static inline void __get_timestamp(char *outstring)
             p->tm_min,
             p->tm_sec,
             t_start.tv_usec / 1000);
+    outstring[ n ] = 0;
 }
 
 #endif
