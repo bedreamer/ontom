@@ -1,28 +1,51 @@
 #/bin/bash
 
 PACKFILE=zeus.update.tar
+INSTALLDIRS="/usr/zeus /usr/zeus/plugins /usr/zeus/drivers /srv/www"
+CFGS="ontom.db ontom.cfg user.cfg"
+
 
 cd $WORKDIR
 
-echo "install system files...."
-mkdir -p install/usr/zeus
-mkdir -p install/usr/zeus/plugins
-mkdir -p install/usr/zeus/drivers
-mkdir -p install/srv/www
+echo "create system directories...."
+for d in $INSTALLDIRS;do
+	mkdir -p install$d
+	echo "  create ./install$d"	
+done
 
-cp lib*so install/usr/zeus/$f
-cp exso*.so install/usr/zeus/plugins/
-cp bmsdrv_*.so install/usr/zeus/drivers/
-cp `readlink me` install/usr/zeus/zeus
-cp ontom.db install/usr/zeus/
-cp ontom.cfg install/usr/zeus/
-cp user.cfg install/usr/zeus/
+echo "copy depends librarys...."
+for f in `ls lib*.so`;do
+	cp $f 'install/usr/zeus/'
+	echo "  update ./install/usr/zeus/$f"
+done
 
-echo "installing UI files..."
-rsync -r UI_html/* install/srv/www/
+echo "copy extern librarys...."
+for f in `ls exso*.so`;do
+	cp $f 'install/usr/zeus/plugins/'
+	echo "  update ./install/usr/zeus/plugins/$f"
+done
+
+echo "copy bms drivers....."
+for f in `ls bmsdrv_*.so`;do
+	cp $f 'install/usr/zeus/drivers/'
+	echo "  update ./install/usr/zeus/drivers/$f"
+done
+
+echo "copy configuration database and files...."
+for f in $CFGS;do
+	cp $f 'install/usr/zeus/'
+	echo "  update ./install/usr/zeus/$f"
+done
+
+echo "copy main program file `readlink me`"
+cp `readlink me` 'install/usr/zeus/zeus'
+
+echo "copy UI files..."
+rsync -r UI_html/* 'install/srv/www/'
 
 cd install
 
+echo "CREATE INSTALL/UPDATE PACKET: $PACKFILE"
 tar --exclude-vcs -cf $PACKFILE `ls`
-
-printf "`date` \033[31minstall/zeus.update.tar\033[0m packed.\n"
+cp zeus.update.tar /media/sf_E_DRIVE/www/
+printf "`date` \033[31minstall/$PACKFILE\033[0m packed.\n"
