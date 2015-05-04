@@ -3810,7 +3810,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
 
     int ret = ERR_ERR;
     unsigned char buff[64];
-    int nr = 0;
+    int nr = 0, l;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -3965,7 +3965,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             buff[ nr ++ ] = 0x02;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x26;
-            buff[ nr ++ ] = BCC_code(buff, nr);
+            l = n;
+            buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
             memcpy(param->buff.tx_buff, buff, nr);
@@ -3996,7 +3997,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
 
             buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
 
-            buff[ nr ++ ] = BCC_code(buff, nr);
+            l = n;
+            buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
             memcpy(param->buff.tx_buff, buff, nr);
@@ -4012,7 +4014,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             buff[ nr ++ ] = 0x47;
             buff[ nr ++ ] = 0x01;
             buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
-            buff[ nr ++ ] = BCC_code(buff, nr);
+            l = n;
+            buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
             memcpy(param->buff.tx_buff, buff, nr);
@@ -4046,7 +4049,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 }
             } while (0);
 
-            buff[ nr ++ ] = BCC_code(buff, nr);
+            l = n;
+            buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
             memcpy(param->buff.tx_buff, buff, nr);
@@ -4109,7 +4113,7 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
     int ret = ERR_ERR;
     unsigned char buff[64];
     unsigned char public_buff[16];
-    int nr = 0;
+    int nr = 0, l;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -4214,7 +4218,8 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
             buff[ nr ++ ] = 0x02;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 0x26;
-            buff[ nr ++ ] = BCC_code(buff, nr);
+            l = n;
+            buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
             memcpy(param->buff.tx_buff, buff, nr);
@@ -4244,7 +4249,8 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
 
             buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
 
-            buff[ nr ++ ] = BCC_code(buff, nr);
+            l = n;
+            buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
             memcpy(param->buff.tx_buff, buff, nr);
@@ -4260,7 +4266,8 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
             buff[ nr ++ ] = 0x47;
             buff[ nr ++ ] = 0x01;
             buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
-            buff[ nr ++ ] = BCC_code(buff, nr);
+            l = n;
+            buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
 
             memcpy(param->buff.tx_buff, buff, nr);
