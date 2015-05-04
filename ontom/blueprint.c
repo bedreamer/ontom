@@ -1600,7 +1600,7 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
 {
     int ret = ERR_ERR;
     unsigned char buff[64];
-    char cmd;
+    char cmd = 0;
     int nr = 0, len = 0;
 
     switch (evt) {
@@ -4113,7 +4113,6 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
 
     int ret = ERR_ERR;
     unsigned char buff[64];
-    unsigned char public_buff[16];
     int nr = 0, l;
 
     switch (evt) {
@@ -4702,7 +4701,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
          */
 ___fast_switch_2_rx:
         if ( thiz->status == BP_UART_STAT_RD ) {
-            char *buff = thiz->rx_param.buff.rx_buff;
+            char *buff = (char *)thiz->rx_param.buff.rx_buff;
             int rd = 0;
             static int nr = 0;
 
