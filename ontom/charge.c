@@ -235,6 +235,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "work_mode") ) {
         strncpy(task->sys_work_mode, text[1], 32);
         printf("工作模式: %s\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "fenliuqi_xishu") ) {
+        task->flq_xishu = atoi(text[1]);
+        printf("分流器系数: %s\n", text[1]);
     }
     return 0;
 }
@@ -369,6 +372,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->running_I = 0.0;
     task->modules_nr = 14;
     task->charge_stat = 0x0000; // 不充电
+    task->flq_xishu = 150;
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
     bit_read(task, CMD_MODULE_ON);

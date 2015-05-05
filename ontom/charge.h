@@ -1588,6 +1588,8 @@ struct charge_task {
     unsigned char modules_on_off[CONFIG_SUPPORT_CHARGE_MODULE];
     //}}
 
+    // 电流分流器系数
+    unsigned int flq_xishu;
     // {{ 电压电流校准参数
     double bus1_correct_V;
     double bus1_read_V;

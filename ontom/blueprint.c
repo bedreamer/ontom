@@ -1538,7 +1538,7 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x03;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x11;
+        buff[ nr ++ ] = 0x20;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x14;
         len = nr;
@@ -1600,7 +1600,7 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
 {
     int ret = ERR_ERR;
     unsigned char buff[64];
-    char cmd = 0;
+    unsigned short cmd = 0;
     int nr = 0, len = 0;
 
     switch (evt) {
@@ -1667,6 +1667,12 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             cmd &= ~0x80;
         }
 
+        if ( bit_read(task, S_ERROR) ) {
+            cmd |= 0x100;
+        } else {
+            cmd &= ~0x100;
+        }
+
         buff[ nr ++ ] = 0xF0;
         buff[ nr ++ ] = 0xE1;
         buff[ nr ++ ] = 0xD2;
@@ -1676,9 +1682,11 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 1;
-        buff[ nr ++ ] = 2;
+        buff[ nr ++ ] = 0x02;
+        buff[ nr ++ ] = 0x04;
+        buff[ nr ++ ] = cmd >> 8;
         buff[ nr ++ ] = cmd;
+        buff[ nr ++ ] = cmd >> 8;
         buff[ nr ++ ] = cmd;
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
@@ -1762,10 +1770,10 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x10;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x02;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 12;
-        buff[ nr ++ ] = 24;
+        buff[ nr ++ ] = 13;
+        buff[ nr ++ ] = 26;
         buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10) >>8;
         buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10);
         buff[ nr ++ ] = double2short(task->bus_1_v_lo, 10) >>8;
@@ -1790,6 +1798,8 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
         buff[ nr ++ ] = double2short(task->bat_1_insti_ohm_v, 10);
         buff[ nr ++ ] = double2short(task->bat_2_insti_ohm_v, 10) >>8;
         buff[ nr ++ ] = double2short(task->bat_2_insti_ohm_v, 10);
+        buff[ nr ++ ] = task->flq_xishu >> 8;
+        buff[ nr ++ ] = task->flq_xishu;
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
@@ -1881,10 +1891,10 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
             buff[ nr ++ ] = 0x05;
             buff[ nr ++ ] = 0x10;
             buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 13;
+            buff[ nr ++ ] = 15;
             buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 3;
-            buff[ nr ++ ] = 6;
+            buff[ nr ++ ] = 0x03;
+            buff[ nr ++ ] = 0x06;
             buff[ nr ++ ] = 0;
             buff[ nr ++ ] = 0;
             buff[ nr ++ ] = 0;
@@ -1921,7 +1931,7 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
             buff[ nr ++ ] = 0x05;
             buff[ nr ++ ] = 0x10;
             buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 13;
+            buff[ nr ++ ] = 15;
             buff[ nr ++ ] = 0x00;
             buff[ nr ++ ] = 3;
             buff[ nr ++ ] = 6;
@@ -2373,7 +2383,7 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x03;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 0x11;
+        buff[ nr ++ ] = 0x20;
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x14;
         len = nr;
