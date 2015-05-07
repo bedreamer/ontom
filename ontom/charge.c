@@ -427,7 +427,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
      */
     if ( task->sys_charge_group_nr == 1 &&
          task->sys_simple_box_nr == 1   &&
-         task->sys_config_gun_nr == 2 ) {
+         (task->sys_config_gun_nr == 2||task->sys_config_gun_nr == 1) ) {
         struct bp_uart * bp = (struct bp_uart*)malloc(sizeof(struct bp_uart));
         if ( NULL == bp ) {
             ret = ERR_LOW_MEMORY;
