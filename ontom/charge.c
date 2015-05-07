@@ -7,14 +7,6 @@ struct charge_task tom;
 // 充电任务结构
 struct charge_task *task = &tom;
 
-/*
- * 扩展测量数据刷新
- * 刷新数据，标记
- */
-void deal_with_measure_data(struct charge_task *thiz)
-{
-}
-
 int sql_db_config_result(void *param, int nr, char **text, char **name)
 {
     int i = 0;
@@ -147,35 +139,6 @@ _done:
     return 0;
 }
 
-// 获取下一个查询的数据集个数
-int sql_query_result_conter(void *param, int nr, char **text, char **name)
-{
-    if ( param ) {
-        *(int *)param = atoi( text[0] );
-    }
-    return 0;
-}
-
-// 获取BMS数据包生成信息
-int sql_query_BMS_pack_gen(void *param, int nr, char **text, char **name)
-{
-    struct charge_job *thiz = (struct charge_job *)param;
-    struct can_pack_generator *me = NULL;
-    if ( thiz ) {
-        if ( thiz->bms.readed >= thiz->bms.can_pack_gen_nr )
-            return 0;
-        me = thiz->bms.generator + (thiz->bms.readed ++);
-        me->stage = atoh( text[0] );
-        me->can_pgn = atoi( text[1] );
-        me->prioriy = atoi( text[2] );
-        me->datalen = atoi( text[3] );
-        me->period = atoi( text[4] );
-        me->can_tolerate_silence = atoi( text[5] );
-        me->heartbeat = 0;
-    }
-    return 0;
-}
-
 void print_POST_configure()
 {
     unsigned int x = 0, y;
@@ -218,16 +181,34 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
 
     if ( 0 == strcmp(text[0], "system_type") ) {
         task->sys_type = atoi(text[1]);
-        printf("系统类型: %d\n", task->sys_type);
+    } else if ( 0 == strcmp(text[0], "bcd_auth_code") ) {
+        strncpy(task->bcd_auth_code, text[1], 16);
+        printf("产品激活码: %s\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "mac_addr") ) {
+        strncpy(task->mac_addr, text[1], 32);
+        printf("产品MAC地址: %s\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "sys_uart_name") ) {
+        printf("通讯用串口: %s\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "sys_can_name") ) {
+        printf("通讯用CAN接口: %s\n", text[1]);
     } else if ( 0 == strcmp(text[0], "module_kind") ) {
         task->module_model = atoi(text[1]);
         printf("模块型号: %d\n", task->module_model);
     } else if ( 0 == strcmp(text[0], "module_count") ) {
         task->modules_nr = atoi(text[1]);
-        printf("模块个数: %d\n", task->modules_nr);
+        printf("模块个数: %d 个\n", task->modules_nr);
     } else if ( 0 == strcmp(text[0], "kwh_price") ) {
         task->kwh_price = atof(text[1]);
-        printf("单位电价: %.1f\n", task->kwh_price);
+        printf("单位电价: %.1f 元/度\n", task->kwh_price);
+    }  else if ( 0 == strcmp(text[0], "sys_config_gun_nr") ) {
+        task->sys_config_gun_nr = atoi(text[1]);
+        printf("充电枪: %s 把\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "sys_simple_box_nr") ) {
+        task->sys_simple_box_nr = atoi(text[1]);
+        printf("采样盒个数: %s 个\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "sys_charge_group_nr") ) {
+        task->sys_charge_group_nr = atoi(text[1]);
+        printf("充电机组数: %s 组\n", text[1]);
     } else if ( 0 == strcmp(text[0], "kwh_meter_addr") ) {
         memcpy(task->meter[0].addr, text[1], 12);
         task->meter[0].addr[12] = '\0';
@@ -238,6 +219,42 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "fenliuqi_xishu") ) {
         task->flq_xishu = atoi(text[1]);
         printf("分流器系数: %s\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bus_1_v_hi") ) {
+        task->bus_1_v_hi = atof(text[1]);
+        printf("一段母线过压: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bus_1_v_lo") ) {
+        task->bus_1_v_lo = atof(text[1]);
+        printf("一段母线欠压: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_1_v_hi") ) {
+        task->bat_1_v_hi = atof(text[1]);
+        printf("一组电池过压值: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_1_v_lo") ) {
+        task->bat_1_v_lo = atof(text[1]);
+        printf("一组电池欠压值: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_1_I_hi") ) {
+        task->bat_1_I_hi = atof(text[1]);
+        printf("一组电池过流值: %s A\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_1_insti_ohm_v") ) {
+        task->bat_1_I_hi = atof(text[1]);
+        printf("一组电池绝缘告警值: %s ohm/V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bus_2_v_hi") ) {
+        task->bat_1_insti_ohm_v = atof(text[1]);
+        printf("二段母线过压: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bus_2_v_lo") ) {
+        task->bus_2_v_lo = atof(text[1]);
+        printf("二段母线欠压: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_2_v_hi") ) {
+        task->bat_2_v_hi = atoi(text[1]);
+        printf("二组电池过压值: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_2_v_lo") ) {
+        task->bat_2_v_lo = atof(text[1]);
+        printf("二组电池欠压值: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_2_I_hi") ) {
+        task->bat_2_I_hi = atof(text[1]);
+        printf("二组电池过流值: %s A\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "bat_2_insti_ohm_v") ) {
+        task->bat_2_insti_ohm_v = atof(text[1]);
+        printf("二组电池绝缘告警值: %s ohm/V\n", text[1]);
     }
     return 0;
 }
