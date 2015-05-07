@@ -2046,7 +2046,7 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
 
     if ( tag[0] && val[0] ) {
         mg_url_decode(val, 128, de_val, 128, 0);
-        log_printf(DBG_LV1, "WEB SET %s: %s", tag, de_val);
+        log_printf(DBG, "WEB SET %s: %s", tag, de_val);
         if ( de_val[0] ) {
             config_write(tag, val);
         }
