@@ -9,6 +9,6 @@ build-in.a:$(OBJS)
 
 $(WORKDIR)/libbms.so:$(OBJS)
 	$(Q)echo "  **LD**      $@"
-	$(Q)$(LD) -shared $(LDFLAGS) -o $@ $^
+	$(Q)$(LD)  -fPIC -shared $(LDFLAGS) -o $@ $^
 
 include $(WORKDIR)/Rule.make
