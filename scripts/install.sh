@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 prefix="install"
 target="zeus.update.tar"
