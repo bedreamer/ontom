@@ -2085,21 +2085,16 @@ int ajax_debug_json_list(struct ajax_xml_struct *thiz)
 // 更新系统文件
 int ajax_update_proc(struct ajax_xml_struct *thiz)
 {
-        int output_len = 0;
+    int output_len = 0;
 
     thiz->ct = "application/json";
     output_len += sprintf(&thiz->iobuff[output_len], "\"update\":{");
-
-    if ( 0 == fork() ) {
-        // 子进程
-        system("/usr/zeus/script/update.sh");
-    }
-
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
     output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
+    system("/bin/sh /usr/zeus/script/update.sh &");
     return ERR_OK;
 }
 
@@ -2110,10 +2105,7 @@ int ajax_export_proc(struct ajax_xml_struct *thiz)
     thiz->ct = "application/json";
     output_len += sprintf(&thiz->iobuff[output_len], "\"export\":{");
 
-    if ( 0 == fork() ) {
-        // 子进程
-        system("/usr/zeus/script/export.sh");
-    }
+    system("/bin/sh /usr/zeus/script/export.sh &");
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
