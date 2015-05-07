@@ -3,8 +3,8 @@
 prefix="install"
 target="zeus.update.tar"
 copydir="/media/sf_E_DRIVE/www/"
-CFGS="ontom.db ontom.cfg user.cfg scripts/runme.sh scripts/preconfig.sh scripts/upgrade.sh"
-TOOLS="testing/sqlite3-arm scripts/automount.sh"
+CFGS="ontom.db ontom.cfg user.cfg"
+TOOLS="testing/sqlite3-arm scripts/runme.sh scripts/automount.sh scripts/export.sh scripts/upgrade.sh scripts/preconfig.sh"
 VERSION=`svn info $0|grep Revision|grep -o '[0-9]\+'`
 
 config='no'
