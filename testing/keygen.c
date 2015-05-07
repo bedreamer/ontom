@@ -98,7 +98,7 @@ int main(int argc, const char *argv)
 		CALC_PUBLIC_KEY
 	};
 	enum command cmd = INVALID;
-	char mac[32] = {0}, key[64] = {0}, pub_key[32] = {0};
+	unsigned char mac[32] = {0}, key[64] = {0}, pub_key[32] = {0};
 	
 	if ( argc < 2 ) return 1;
 	int i = 1;
