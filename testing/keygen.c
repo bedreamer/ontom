@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-static inline unsigned int __atoh(const char *hex)
+unsigned int __atoh(const char *hex)
 {
     unsigned int v = 0;
 
@@ -22,7 +22,7 @@ static inline unsigned int __atoh(const char *hex)
     return v;
 }
 #define atoh __atoh
-static inline void mac_public_code(unsigned char *obf, unsigned char *mac)
+void mac_public_code(unsigned char *obf, unsigned char *mac)
 {
     unsigned char feed_code[12] = {10, 12, 13, 13,
                                    8, 11, 13, 2,
@@ -55,7 +55,7 @@ static inline void mac_public_code(unsigned char *obf, unsigned char *mac)
     }
 }
 
-static inline void gen_key(unsigned char *key, const unsigned char *mac_pub_key)
+void gen_key(unsigned char *key, const unsigned char *mac_pub_key)
 {
     int i;
     const unsigned char private_key[13] =
@@ -77,7 +77,7 @@ static inline void gen_key(unsigned char *key, const unsigned char *mac_pub_key)
     }
 }
 
-static inline int check_auth(const char *mac, const char *bcdcode)
+int check_auth(const char *mac, const char *bcdcode)
 {
     unsigned char mac_pub_key[13 + 1] = {0};
     unsigned char check_code_bcd[13 + 1] = {0};
@@ -90,7 +90,7 @@ static inline int check_auth(const char *mac, const char *bcdcode)
     return 0;
 }
 
-int main(int argc, const char *argv)
+int main(int argc, const char *argv[])
 {
 	enum command {
 		INVALID = 0,
@@ -99,10 +99,10 @@ int main(int argc, const char *argv)
 	};
 	enum command cmd = INVALID;
 	unsigned char mac[32] = {0}, key[64] = {0}, pub_key[32] = {0};
-	
-	if ( argc < 2 ) return 1;
 	int i = 1;
-	
+
+	if ( argc < 2 ) return 1;
+
 	for ( i = 1; i < argc; i ++ ) {
 		if ( 0 == strcmp("-c", argv[i]) ||
 			 0 == strcmp("-check", argv[i]) ) {

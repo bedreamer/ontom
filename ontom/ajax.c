@@ -1211,7 +1211,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"auth_stat\":\"%s\",", "已激活");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"auth_id\":\"%s\",", "ONAE-7655-7FD0-12EF-0999");
+            "\"auth_id\":\"%s\",", task->bcd_auth_code);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
