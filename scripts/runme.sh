@@ -22,7 +22,7 @@ while [ true ]; do
 		echo "启动到默认页面"
 		browser -qws "http://127.0.0.1:8080/" &
 	fi
-	/usr/zeus/zeus
+	/usr/zeus/zeus >> /tmp/zeus.log
 	echo "检测到程序主动退出, 1秒后自动重启..."
 	sleep 1;
 	echo "重新预配置数据库"
