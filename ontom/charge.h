@@ -1428,9 +1428,9 @@ struct error_history {
     // 故障代码编号
     unsigned int error_id;
     // 故障起始日期, 时间
-    char error_begin[20];
+    char error_begin[32];
     // 故障恢复日期，时间
-    char error_recover[20];
+    char error_recover[32];
     // 故障参数
     char error_string[32];
     // 故障恢复原因
