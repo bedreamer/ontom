@@ -1600,7 +1600,7 @@ struct charge_task {
     // }}
 
     // 授权序号, BCD 码
-    unsigned char bcd_auth_code[16];
+    unsigned char bcd_auth_code[17];
     // 网卡MAC  地址
     unsigned char mac_addr[32];
 };

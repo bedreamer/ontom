@@ -1386,7 +1386,7 @@ die:
 int ajax_system_config_save_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
-    char s[512], sql[256];
+    char s[512]={0}, sql[256];
     char *p = NULL;
     char *errmsg = NULL;
     char key[33], value[33];
