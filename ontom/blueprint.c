@@ -5008,8 +5008,8 @@ continue_to_send:
                 thiz->tx_param.cursor = 0;
                 continue;
             }
-            tcdrain(thiz->dev_handle);
-            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+            //tcdrain(thiz->dev_handle);
+            //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
 
             if ( retval == (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
@@ -5027,7 +5027,7 @@ continue_to_send:
 #else
                 __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
-/*
+
                 do {
                     int tts = 0;
                     tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
@@ -5036,11 +5036,12 @@ continue_to_send:
                                tts, thiz->master->swap_time_modify,
                                thiz->rx_param.need_bytes);
                 } while (0);
-*/
 
-                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
+                if ( thiz->rx_param.need_bytes ) {
+                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                }
                 thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
                     thiz->status = BP_UART_STAT_RD;
