@@ -2659,7 +2659,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
-        buff[nr ++] = 0xff;
+        buff[nr ++] = 0xf0;
 
         memcpy(param->buff.tx_buff, buff, nr);
         self->rx_param.need_bytes = 187;
