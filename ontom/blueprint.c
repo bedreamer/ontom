@@ -2659,7 +2659,6 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
-        buff[nr ++] = 0xf0;
 
         memcpy(param->buff.tx_buff, buff, nr);
         self->rx_param.need_bytes = 187;
@@ -5009,6 +5008,7 @@ continue_to_send:
                     if ( thiz->role == BP_UART_MASTER ) {
                         // 主动设备，需要进行接收超时判定
                         thiz->rx_seed.ttl = thiz->master->ttw;
+                        log_printf(DBG_LV2, "UART: set rx timeout: %d", thiz->master->ttw);
                         Hachiko_resume(&thiz->rx_seed);
                     }
                     goto ___fast_switch_2_rx;
