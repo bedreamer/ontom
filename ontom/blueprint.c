@@ -5026,7 +5026,7 @@ continue_to_send:
 #else
                 __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
-
+/*
                 do {
                     int tts = 0;
                     tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
@@ -5035,7 +5035,7 @@ continue_to_send:
                                tts, thiz->master->swap_time_modify,
                                thiz->rx_param.need_bytes);
                 } while (0);
-
+*/
 
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 tcflush(thiz->dev_handle, TCIOFLUSH);
