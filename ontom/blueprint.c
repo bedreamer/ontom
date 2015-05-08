@@ -5006,7 +5006,7 @@ continue_to_send:
                                thiz->rx_param.need_bytes);
                 } while (0);
                 if ( 0 != fsync(thiz->dev_handle) ) {
-                    log_printf(WRN, "UART.driver: 写数据错误: %s", strerr(errno));
+                    log_printf(WRN, "UART.driver: 写数据错误: %s", strerror(errno));
                 }
 
                 tcflush(thiz->dev_handle, TCIOFLUSH);
