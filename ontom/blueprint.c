@@ -504,6 +504,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         ret = set_gpio_output(self->hw_port, TX_HIGH_LEVEL);
         if ( self->master ) {
             //self->master->seed = 0;
+            self->hw_status = BP_UART_STAT_WR;
         }
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: set uart to TX mode faile");
@@ -516,6 +517,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         ret = set_gpio_output(self->hw_port, RX_LOW_LEVEL);
         if ( self->master ) {
             //self->master->seed = 0;
+            self->hw_status = BP_UART_STAT_RD;
         }
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: set uart to RX mode faile");
