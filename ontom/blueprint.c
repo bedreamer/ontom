@@ -5009,6 +5009,7 @@ continue_to_send:
                 continue;
             }
             tcdrain(thiz->dev_handle);
+            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
 
             if ( retval == (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
