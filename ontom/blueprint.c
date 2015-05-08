@@ -4850,7 +4850,7 @@ ___fast_switch_2_rx:
                     break;
                 }
 
-                usleep(2000);
+                usleep(500);
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
