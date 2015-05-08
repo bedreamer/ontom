@@ -4769,6 +4769,10 @@ ___fast_switch_2_rx:
             int rd = 0;
             static int nr = 0;
 
+            thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+            thiz->tx_param.payload_size = 0;
+            thiz->tx_param.cursor = 0;
+
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 errno = 0;
                 //tcflush(thiz->dev_handle, TCOFLUSH);
