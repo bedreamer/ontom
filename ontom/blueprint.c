@@ -114,11 +114,15 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
 {
     struct termios options;
 
+
     if (tcgetattr(fd, &options) != 0)
     {
         perror("SetupSerial 1");
         return -1;
     }
+    bzero( &options, sizeof( options ) );
+    options.c_cflag  |=  CLOCAL | CREAD;
+    options.c_cflag &= ~CSIZE;
 
     switch (databits)
     {
@@ -140,14 +144,17 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
         case 'e':
         case 'E':
         case 1:
-            options.c_cflag |= PARENB;     /* Enable parity */
+            options.c_iflag |= (INPCK | ISTRIP);
+            options.c_cflag |= PARENB;
             options.c_cflag &= ~PARODD;
             break;
 
         case 'o':
         case 'O':
         case 2:
-            options.c_cflag |= (PARODD | PARENB);
+            options.c_cflag |= PARENB;
+            options.c_cflag |= PARODD;
+            options.c_iflag |= (INPCK | ISTRIP);
             break;
         case 'n':
         case 'N':
@@ -177,10 +184,8 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
 
     log_printf(DBG_LV3, "UART.config: %d %d %d", databits, parity, stopbits);
 
-    options.c_iflag = 0;
-    options.c_oflag = 0;
-    options.c_lflag = 0;
-    options.c_cc[VMIN] = 0; 						// Update the options and do it NOW
+    options.c_cc[VTIME]  = 0;
+    options.c_cc[VMIN] = 0;
 
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
