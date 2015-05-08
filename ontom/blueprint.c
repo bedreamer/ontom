@@ -110,7 +110,7 @@ int set_speed(int fd, int speed)
     return -1;
 }
 
-int set_other_attribute(int fd, int databits, int stopbits, int parity)
+int set_other_attribute(int fd, int speed, int databits, int stopbits, int parity)
 {
     struct termios options;
 
@@ -121,6 +121,35 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
         return -1;
     }
     bzero( &options, sizeof( options ) );
+
+
+    switch(speed){  //设置数据传输率
+    case 2400:
+       cfsetispeed(&options,B2400);
+       cfsetospeed(&options,B2400);
+       break;
+    case 4800:
+       cfsetispeed(&options,B4800);
+       cfsetospeed(&options,B4800);
+       break;
+    case 9600:
+       cfsetispeed(&options,B9600);
+       cfsetospeed(&options,B9600);
+       break;
+    case 115200:
+       cfsetispeed(&options,B115200);
+       cfsetospeed(&options,B115200);
+       break;
+    case 460800:
+       cfsetispeed(&options,B460800);
+       cfsetospeed(&options,B460800);
+       break;
+    default:
+       cfsetispeed(&options,B9600);
+       cfsetospeed(&options,B9600);
+       break;
+    }
+
     options.c_cflag  |=  CLOCAL | CREAD;
     options.c_cflag &= ~CSIZE;
 
@@ -443,12 +472,12 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         }
 #else
         if ( self->hw_port == SERIAL4_CTRL_PIN ) {
-            set_speed(self->dev_handle, 9600);
-            set_other_attribute(self->dev_handle, 8, 1, 'N');
+            //set_speed(self->dev_handle, );
+            set_other_attribute(self->dev_handle, 9600, 8, 1, 'N');
             log_printf(INF, "UART: %s 9600,8,1,N", self->dev_name);
         } else if ( self->hw_port == SERIAL5_CTRL_PIN ) {
-            set_speed(self->dev_handle, 2400);
-            set_other_attribute(self->dev_handle, 8, 1, 'O');
+            //set_speed(self->dev_handle, 2400);
+            set_other_attribute(self->dev_handle, 2400, 8, 1, 'O');
             log_printf(INF, "UART: %s 2400,8,1,O", self->dev_name);
         }
 #endif
@@ -564,13 +593,11 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                  *  通信模式，非要在这里做个兼容，整个串口通信框架被玩的像傻叉一样！！
                  *  FUCK!  FUCK!
                  */
-                if ( self->master->hw_bps != self->hw_bps ) {
-                    set_speed(self->dev_handle, self->master->hw_bps);
-                    self->hw_bps = self->master->hw_bps;
-                }
                 if ( self->master->hw_other != self->hw_other ) {
                     self->hw_other = self->master->hw_other;
+                    self->hw_bps = self->master->hw_bps;
                     set_other_attribute(self->dev_handle,
+                                        self->master->hw_bps,
                                         self->hw_other>>16,
                                         self->hw_other & 0xFF,
                                         (self->hw_other >> 8)&0xFF);
