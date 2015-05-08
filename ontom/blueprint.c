@@ -175,6 +175,8 @@ int set_other_attribute(int fd, int databits, int stopbits, int parity)
             return -1;
     }
 
+    log_printf(DBG_LV3, "UART.config: %d %d %d", databits, parity, stopbits);
+
     options.c_iflag = 0;
     options.c_oflag = 0;
     options.c_lflag = 0;
@@ -2659,8 +2661,6 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
-        buff[nr ++] = 0xFF;
-        buff[nr ++] = 0xFF;
 
         memcpy(param->buff.tx_buff, buff, nr);
         self->rx_param.need_bytes = 187;
