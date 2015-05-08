@@ -5005,6 +5005,7 @@ continue_to_send:
                                tts, thiz->master->swap_time_modify,
                                thiz->rx_param.need_bytes);
                 } while (0);
+                errno = 0;
                 if ( 0 != fsync(thiz->dev_handle) ) {
                     log_printf(WRN, "UART.driver: 写数据错误: %s", strerror(errno));
                 }
