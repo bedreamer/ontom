@@ -5007,8 +5007,9 @@ continue_to_send:
                 } while (0);
 
                 tcdrain(thiz->dev_handle);
-                tcflush(thiz->dev_handle, TCIOFLUSH);
+
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
