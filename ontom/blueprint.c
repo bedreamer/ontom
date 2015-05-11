@@ -4789,8 +4789,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
-            retval = write(thiz->dev_handle,
-                           & thiz->tx_param.buff.tx_buff,
+            retval = write(thiz->dev_handle, thiz->tx_param.buff.tx_buff,
                            thiz->tx_param.payload_size);
             if ( retval <= 0 ) {
                 log_printf(ERR, "UART: send error, TX REQUEST AUTOMATIC ABORTED.");
