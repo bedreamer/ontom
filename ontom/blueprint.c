@@ -4787,7 +4787,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
-            log_printf(INF, "before tcdrain:");
+            log_printf(INF, "before tcdrain %x:", thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-1]);
             retval = write(thiz->dev_handle, thiz->tx_param.buff.tx_buff,
                            thiz->tx_param.payload_size-1);
             if ( retval < thiz->tx_param.payload_size - 1 ) {
