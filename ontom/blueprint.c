@@ -4799,7 +4799,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
             if (tcdrain(thiz->dev_handle) < 0) {
-                log_printf(ERR, "%s\n", explain_tcdrain(thiz->dev_handle));
+                log_printf(ERR, "tcdrain error\n");
             }
             tcflush(thiz->dev_handle, TCIOFLUSH);
             write(thiz->dev_handle, &thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-1], 1);
