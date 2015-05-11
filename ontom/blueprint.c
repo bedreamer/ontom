@@ -4748,7 +4748,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
         if ( thiz->status == BP_UART_STAT_WR ) {
 
-            thiz->evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+            thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
             thiz->tx_param.buff.tx_buff = thiz->tx_buff;
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
             thiz->tx_param.payload_size = 0;
