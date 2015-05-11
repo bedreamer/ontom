@@ -4789,7 +4789,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             log_printf(INF, "before tcdrain:");
             retval = write(thiz->dev_handle, thiz->tx_param.buff.tx_buff,
-                           thiz->tx_param.payload_size);
+                           thiz->tx_param.payload_size-1);
             if ( retval < thiz->tx_param.payload_size ) {
                 log_printf(ERR, "UART: send error, TX REQUEST AUTOMATIC ABORTED.");
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
@@ -4799,6 +4799,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
             tcdrain(thiz->dev_handle);
+            write(thiz->dev_handle, &thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-1],
+                                       1);
             log_printf(INF, "after tcdrain: %d", (int)(thiz->tx_param.payload_size *__usperbyte(thiz)));
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
             __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
