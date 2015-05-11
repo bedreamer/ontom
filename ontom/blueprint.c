@@ -4783,52 +4783,39 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
-            FD_ZERO(&wfds);
-            FD_SET(thiz->dev_handle, &wfds);
-            tv.tv_sec = 0;
-            tv.tv_usec = 500 * 1000;
-            retval = select(thiz->dev_handle+1, NULL, &wfds, NULL, &tv);
-            if ( -1 == retval ) {
-                log_printf(INF, "select error.");
-            } else if ( retval ) {
-                retval = write(thiz->dev_handle,
-                               & thiz->tx_param.buff.tx_buff,
-                               thiz->tx_param.payload_size);
-                if ( retval <= 0 ) {
-                    log_printf(ERR, "UART: send error, TX REQUEST AUTOMATIC ABORTED.");
-                    thiz->tx_param.buff.tx_buff = thiz->tx_buff;
-                    thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
-                    thiz->tx_param.payload_size = 0;
-                    thiz->tx_param.cursor = 0;
-                    continue;
-                }
-                thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
-                tcflush(thiz->dev_handle, TCIOFLUSH);
-                if ( thiz->rx_param.need_bytes ) {
-                    thiz->status = BP_UART_STAT_RD;
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                    if ( thiz->role == BP_UART_MASTER ) {
-                        // 主动设备，需要进行接收超时判定
-                        thiz->rx_seed.ttl = thiz->master->ttw;
-                        thiz->rx_seed.remain = thiz->master->ttw;
-                        log_printf(DBG_LV2, "UART: set rx timeout: %d", thiz->master->ttw);
-                        Hachiko_resume(&thiz->rx_seed);
-                    }
-                } else {
-                    thiz->tx_param.buff.tx_buff = thiz->tx_buff;
-                    thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
-                    thiz->tx_param.payload_size = 0;
-                    thiz->tx_param.cursor = 0;
-                    memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
-                    log_printf(DBG_LV3, "不需要帧回应");
-                    usleep(4 * 1000);
-                }
-            } else {
-                // timeout
-                log_printf(ERR, "ddfdf");
-                usleep(4 * 1000);
+            retval = write(thiz->dev_handle,
+                           & thiz->tx_param.buff.tx_buff,
+                           thiz->tx_param.payload_size);
+            if ( retval <= 0 ) {
+                log_printf(ERR, "UART: send error, TX REQUEST AUTOMATIC ABORTED.");
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
                 continue;
             }
+            thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
+            tcflush(thiz->dev_handle, TCIOFLUSH);
+            if ( thiz->rx_param.need_bytes ) {
+                thiz->status = BP_UART_STAT_RD;
+                thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                if ( thiz->role == BP_UART_MASTER ) {
+                    // 主动设备，需要进行接收超时判定
+                    thiz->rx_seed.ttl = thiz->master->ttw;
+                    thiz->rx_seed.remain = thiz->master->ttw;
+                    log_printf(DBG_LV2, "UART: set rx timeout: %d", thiz->master->ttw);
+                    Hachiko_resume(&thiz->rx_seed);
+                }
+            } else {
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
+                log_printf(DBG_LV3, "不需要帧回应");
+                usleep(4 * 1000);
+            }
+
         }
 
         if ( thiz->status == BP_UART_STAT_RD ) {
