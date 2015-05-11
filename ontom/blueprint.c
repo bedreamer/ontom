@@ -4792,7 +4792,7 @@ ___fast_switch_2_rx:
             thiz->rx_param.buff_size = sizeof(thiz->rx_buff);
             ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
 
-            FD_ZERO(thiz->dev_handle, &rfds);
+            FD_ZERO(thiz->&rfds);
             FD_SET(thiz->dev_handle, &rfds);
             tv.tv_sec = 0;
             tv.tv_usec = thiz->master->ttw * 1000;
