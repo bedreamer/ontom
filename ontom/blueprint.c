@@ -622,6 +622,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                            ret, param->payload_size, hit->sent_frames);
             } else {
                 log_printf(WRN, "UART: 发生程序时序故障");
+                self->master = NULL;
                 self->sequce --;
                 ret = ERR_ERR;
             }
