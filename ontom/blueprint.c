@@ -4825,6 +4825,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 }
             } else {
                 // timeout
+                log_printf(ERR, "ddfdf");
                 usleep(4 * 1000);
                 continue;
             }
