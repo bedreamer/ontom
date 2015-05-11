@@ -4807,7 +4807,7 @@ ___fast_switch_2_rx:
                 if ( -1 == retval ) {
                     log_printf(INF, "select error.");
                 } else if ( retval ) {
-                    log_printf(INF, "data ready.");
+                    //log_printf(INF, "data ready.");
                 } else {
                     ret == ERR_FRAME_CHECK_DATA_TOO_SHORT;
                     log_printf(ERR, "TIMEOUT.");
