@@ -3782,10 +3782,10 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
         }
         break;
     // 串口接收到新数据
-    case BP_EVT_RX_DATA:
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
+    case BP_EVT_RX_DATA:
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -4662,7 +4662,7 @@ int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
     return ret;
 }
 
-oid *thread_uart_service(void *arg) ___THREAD_ENTRY___
+void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
     int mydone = 0;
