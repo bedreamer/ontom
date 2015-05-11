@@ -4777,13 +4777,10 @@ ___fast_switch_2_rx:
 
             if ( thiz->hw_status != BP_UART_STAT_RD ) {
                 errno = 0;
-                //tcflush(thiz->dev_handle, TCOFLUSH);
-                //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 thiz->hw_status = BP_UART_STAT_RD;
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
                 nr = 0;
-                //memset(thiz->rx_buff, 0, sizeof(thiz->rx_buff));
                 log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
@@ -4829,14 +4826,12 @@ ___fast_switch_2_rx:
                     } else {
                         thiz->continues_nr = 0;
                     }
-                    //thiz->master->rcv_ok_cnt ++;
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
                     __dump_uart_hex((unsigned char*)buff, nr, DBG_LV3);
                     thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
                                                               &thiz->rx_param);
-                    //thiz->master->check_err_cnt ++;
                     thiz->status = BP_UART_STAT_WR;
                     thiz->continues_nr = 0;
                     Hachiko_pause(&thiz->rx_seed);
@@ -4856,10 +4851,20 @@ ___fast_switch_2_rx:
             }
             if ( ret == ERR_OK ) {
                 // every thing is ok
+                log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
+                           thiz->rx_param.need_bytes,
+                            thiz->rx_param.payload_size);
             } else if ( ret == ERR_FRAME_CHECK_ERR ) {
                 // every thing is ok
             } else if ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT ) {
                 // recieve timeout.
+                log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
+                           thiz->rx_param.need_bytes,
+                            thiz->rx_param.payload_size/*,
+                           thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
+                        thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
+                        load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
+                __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
                 if ( thiz->rx_param.payload_size == 0 ) {
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
                 } else { // ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
@@ -4870,80 +4875,6 @@ ___fast_switch_2_rx:
                 log_printf(ERR, "UART.driver: Crashed @ %s:%d", __FILE__, __LINE__);
             }
             thiz->status = BP_UART_STAT_WR;
-            continue;
-            if ( ! thiz->rx_seed.remain ) {
-                if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
-                    log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
-                               thiz->rx_param.need_bytes,
-                                thiz->rx_param.payload_size);
-                } else {
-                    log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
-                               thiz->rx_param.need_bytes,
-                                thiz->rx_param.payload_size/*,
-                               thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
-                            thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
-                            load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
-                    __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
-                }
-                if ( thiz->rx_param.payload_size == 0 ) {
-                    thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
-                } else if ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
-                    thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
-                } else {
-                    ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
-                                              &thiz->rx_param);
-                    thiz->uart_mode = UART_MODE_NORMAL;
-                    switch ( ret ) {
-                    // 数据接收，校验完成, 完成数据接收过程，停止接收
-                    case ERR_OK:
-                        __dump_uart_hex((unsigned char*)buff, nr, DBG_LV3);
-                        thiz->status = BP_UART_STAT_WR;
-                        Hachiko_pause(&thiz->rx_seed);
-                        log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
-                        ret = thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
-                                                              &thiz->rx_param);
-                        if ( (unsigned)ret == ERR_NEED_ECHO ) {
-                            thiz->uart_mode = UART_MODE_SESSION;
-                            thiz->continues_nr ++;
-                            if ( thiz->continues_nr < 5 ) {
-                                thiz->sequce --;
-                            } else {
-                                thiz->continues_nr = 0;
-                            }
-                            log_printf(INF, "UART: 需要立即发送回应帧: %d-%d",
-                                       thiz->continues_nr,
-                                       thiz->sequce);
-                        } else {
-                            thiz->continues_nr = 0;
-                        }
-                        //thiz->master->rcv_ok_cnt ++;
-                        break;
-                    // 数据接收完成，但校验失败, 停止接收
-                    case ERR_FRAME_CHECK_ERR:
-                        __dump_uart_hex((unsigned char*)buff, nr, DBG_LV3);
-                        thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
-                                                                  &thiz->rx_param);
-                        //thiz->master->check_err_cnt ++;
-                        thiz->status = BP_UART_STAT_WR;
-                        thiz->continues_nr = 0;
-                        Hachiko_pause(&thiz->rx_seed);
-                        log_printf(WRN,
-                                   "UART: lenth fetched but check "RED("faile."));
-                        break;
-                    // 数据接收长度不足，继续接收
-                    case ERR_FRAME_CHECK_DATA_TOO_SHORT:
-                        if ( rd > 0 ) {
-                            thiz->bp_evt_handle(thiz, BP_EVT_RX_DATA, &thiz->rx_param);
-                        }
-                        break;
-                    default:
-                        log_printf(INF, "unkown statment.");
-                        break;
-                    }
-                }
-                thiz->status = BP_UART_STAT_WR;
-            }
-            continue;
         }
 
         // 程序默认采用9600 的波特率， 大致估算出每发送一个字节耗时1.04ms
@@ -4951,7 +4882,6 @@ ___fast_switch_2_rx:
         if ( thiz->status == BP_UART_STAT_WR ) {
 
             if ( thiz->hw_status != BP_UART_STAT_WR ) {
-                //tcflush(thiz->dev_handle, TCIFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
                 thiz->hw_status = BP_UART_STAT_WR;
                 memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
@@ -5025,8 +4955,6 @@ continue_to_send:
                 thiz->tx_param.cursor = 0;
                 continue;
             }
-            //tcdrain(thiz->dev_handle);
-            //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
 
             if ( retval == (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
