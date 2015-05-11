@@ -4781,10 +4781,10 @@ ___fast_switch_2_rx:
                 thiz->hw_status = BP_UART_STAT_RD;
                 thiz->rx_param.cursor = 0;
                 thiz->rx_param.payload_size = 0;
-                nr = 0;
                 log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
+            nr = 0;
             log_printf(INF, "UART.DBG: %d. <<", thiz->rx_seed.remain);
             thiz->rx_param.payload_size = 0;
             thiz->rx_param.cursor = 0;
