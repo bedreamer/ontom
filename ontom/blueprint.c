@@ -4785,7 +4785,7 @@ ___fast_switch_2_rx:
             }
 
             nr = 0;
-            log_printf(INF, "UART.DBG: %d. <<", thiz->rx_seed.remain);
+            //log_printf(INF, "UART.DBG: %d. <<", thiz->rx_seed.remain);
             thiz->rx_param.payload_size = 0;
             thiz->rx_param.cursor = 0;
             thiz->rx_param.buff.rx_buff = thiz->rx_buff;
@@ -4876,7 +4876,7 @@ ___fast_switch_2_rx:
 
                 usleep(1000);
             }
-            log_printf(INF, "UART.DBG: %d >>.", thiz->rx_seed.remain);
+            //log_printf(INF, "UART.DBG: %d >>.", thiz->rx_seed.remain);
             if ( ret == ERR_OK ) {
                 // every thing is ok
                 log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
