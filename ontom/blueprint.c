@@ -4787,17 +4787,14 @@ ___fast_switch_2_rx:
                 log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
-            do {
+            for (ret == ERR_FRAME_CHECK_DATA_TOO_SHORT;
+                     thiz->status == BP_UART_STAT_RD &&
+                     (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
+                     thiz->rx_seed.remain
+                 ; )
+            {
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
-                /*
-                if ( !FD_ISSET(thiz->dev_handle, &rfds ) ) {
-                    usleep(2000);
-                    continue;
-                }
-                FD_ZERO(&rfds);
-                FD_SET(thiz->dev_handle, &rfds);
-                */
                 rd = read(thiz->dev_handle,
                           &thiz->rx_param.buff.rx_buff[cursor], 32);
                 if ( rd > 0 ) {
@@ -4856,9 +4853,23 @@ ___fast_switch_2_rx:
                 }
 
                 usleep(10000);
-            } while ( thiz->status == BP_UART_STAT_RD &&
-                      (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
-                      thiz->rx_seed.remain );
+            }
+            if ( ret == ERR_OK ) {
+                // every thing is ok
+            } else if ( ret == ERR_FRAME_CHECK_ERR ) {
+                // every thing is ok
+            } else if ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT ) {
+                // recieve timeout.
+                if ( thiz->rx_param.payload_size == 0 ) {
+                    thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
+                } else { // ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
+                    thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
+                }
+            } else {
+                // could not to be here.
+                log_printf(ERR, "UART.driver: Crashed @ %s:%d", __FILE__, __LINE__);
+            }
+            continue;
             if ( ! thiz->rx_seed.remain ) {
                 if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
                     log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
