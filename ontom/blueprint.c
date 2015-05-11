@@ -215,6 +215,8 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
 
     options.c_cc[VTIME]  = 0;
     options.c_cc[VMIN] = 0;
+    options.c_lflag  &= ~(ICANON | ECHO | ECHOE | ISIG);  /*Input*/
+    options.c_oflag  &= ~OPOST;   /*Output*/
 
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
@@ -4845,12 +4847,11 @@ ___fast_switch_2_rx:
                                "UART: lenth fetched but check "RED("faile."));
                     break;
                 // 数据接收长度不足，继续接收
+                default:
                 case ERR_FRAME_CHECK_DATA_TOO_SHORT:
                     if ( rd > 0 ) {
                         thiz->bp_evt_handle(thiz, BP_EVT_RX_DATA, &thiz->rx_param);
                     }
-                    break;
-                default:
                     break;
                 }
 
