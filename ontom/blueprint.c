@@ -4834,7 +4834,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             char *buff = (char *)thiz->rx_param.buff.rx_buff;
             int rd = 0;
             int rddone = 0;
-            static int nr = 0;
+            int nr = 0, cursor = 0;
 
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
             thiz->tx_param.payload_size = 0;
@@ -4940,7 +4940,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
                 usleep(1000);
             }
-            //log_printf(INF, "UART.DBG: %d >>.", thiz->rx_seed.remain);
             if ( ret == ERR_OK ) {
                 // every thing is ok
                 log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
