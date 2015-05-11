@@ -4854,6 +4854,7 @@ ___fast_switch_2_rx:
 
                 usleep(10000);
             }
+            log_printf(INF, "UART.DBG: %d.", thiz->rx_seed.remain);
             if ( ret == ERR_OK ) {
                 // every thing is ok
                 log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
