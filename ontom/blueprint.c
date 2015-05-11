@@ -4787,6 +4787,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
+            log_printf(INF, "before tcdrain:");
             retval = write(thiz->dev_handle, thiz->tx_param.buff.tx_buff,
                            thiz->tx_param.payload_size);
             if ( retval < thiz->tx_param.payload_size ) {
@@ -4798,17 +4799,10 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
             tcdrain(thiz->dev_handle);
+            log_printf(INF, "after tcdrain:");
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
             __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             if ( thiz->rx_param.need_bytes ) {
-                /*do {
-                    int tts = 0;
-                    tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
-                    usleep(tts + thiz->master->swap_time_modify + 50);
-                    log_printf(DBG_LV1, "UART: packet send done. sleep: %d:%d us",
-                               tts, thiz->master->swap_time_modify);
-                } while (0);
-*/
                 thiz->status = BP_UART_STAT_RD;
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 if ( thiz->role == BP_UART_MASTER ) {
