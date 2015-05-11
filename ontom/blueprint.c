@@ -4721,11 +4721,13 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
+            if ( thiz->)
+
             FD_SET(thiz->dev_handle, &rfds);
             if ( thiz->status != BP_UART_STAT_RD &&
                  thiz->status != BP_UART_STAT_WR ) {
-                // 默认采用被动方式
-                thiz->status = BP_UART_STAT_RD;
+                // 默认采用主动方式
+                thiz->status = BP_UART_STAT_WR;
             }
 
             ret = ERR_ERR;
