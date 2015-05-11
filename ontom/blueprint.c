@@ -4789,6 +4789,7 @@ ___fast_switch_2_rx:
             thiz->rx_param.payload_size = 0;
             thiz->rx_param.cursor = 0;
             thiz->rx_param.buff.rx_buff = thiz->rx_buff;
+            thiz->rx_param.buff_size = sizeof(thiz->rx_buff);
             for (ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
                      thiz->status == BP_UART_STAT_RD &&
                      (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
