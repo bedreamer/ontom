@@ -4810,6 +4810,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     log_printf(DBG_LV2, "UART: set rx timeout: %d", thiz->master->ttw);
                     Hachiko_resume(&thiz->rx_seed);
                 }
+                usleep(4 * 1000);
             } else {
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
