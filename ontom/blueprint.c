@@ -4798,7 +4798,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->tx_param.cursor = 0;
                 continue;
             }
-            syncfs(thiz->dev_handle)
+            syncfs(thiz->dev_handle);
             //tcdrain(thiz->dev_handle);
             //tcflush(thiz->dev_handle, TCIOFLUSH);
             write(thiz->dev_handle, &thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-1], 1);
