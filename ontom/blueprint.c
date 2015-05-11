@@ -4797,6 +4797,19 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->tx_param.cursor = 0;
                 continue;
             }
+            FD_ZERO(&wfdf);
+            FD_ZERO(&rfds);
+            FD_SET(thiz->dev_handle, &wfds);
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+            retval = select(thiz->dev_handle+1, NULL, &wfds, NULL, &tv);
+            if ( retval == -1 ) {
+                log_printf(ERR, "data transfer faile.");
+            } else if ( retval ) {
+                log_printf(INF, "data transfer done.");
+            } else {
+                log_printf(WRN, "data transfer crash.");
+            }
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
             __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             tcflush(thiz->dev_handle, TCIOFLUSH);
