@@ -4869,6 +4869,7 @@ ___fast_switch_2_rx:
                 // could not to be here.
                 log_printf(ERR, "UART.driver: Crashed @ %s:%d", __FILE__, __LINE__);
             }
+            thiz->status = BP_UART_STAT_WR;
             continue;
             if ( ! thiz->rx_seed.remain ) {
                 if ( thiz->rx_param.need_bytes == thiz->rx_param.payload_size ) {
