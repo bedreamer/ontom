@@ -5002,9 +5002,9 @@ continue_to_send:
                     thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                     thiz->tx_param.payload_size = 0;
                     thiz->tx_param.cursor = 0;
-                    tcflush(thiz->dev_handle, TCIOFLUSH);
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
-                    thiz->hw_status = BP_UART_STAT_WR;
+                    //tcflush(thiz->dev_handle, TCIOFLUSH);
+                    //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
+                    //thiz->hw_status = BP_UART_STAT_WR;
                     memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
                     log_printf(DBG_LV3, "不需要帧回应");
                     usleep(4 * 1000);
