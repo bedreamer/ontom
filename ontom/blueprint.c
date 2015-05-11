@@ -4797,7 +4797,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->tx_param.cursor = 0;
                 continue;
             }
-            FD_ZERO(&wfdf);
+            FD_ZERO(&wfds);
             FD_ZERO(&rfds);
             FD_SET(thiz->dev_handle, &wfds);
             tv.tv_sec = 1;
