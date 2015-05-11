@@ -4801,6 +4801,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             tcflush(thiz->dev_handle, TCIOFLUSH);
             if ( thiz->rx_param.need_bytes ) {
+                usleep(4 * 1000);
                 thiz->status = BP_UART_STAT_RD;
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 if ( thiz->role == BP_UART_MASTER ) {
@@ -4810,7 +4811,6 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                     log_printf(DBG_LV2, "UART: set rx timeout: %d", thiz->master->ttw);
                     Hachiko_resume(&thiz->rx_seed);
                 }
-                usleep(4 * 1000);
             } else {
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
