@@ -686,7 +686,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 
         log_printf(DBG_LV1, "UART: not all data fetched yet.");
         if ( self->master && self->master->user_evt_handle ) {
-            __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
             ret = self->master->user_evt_handle(self, self->master, BP_EVT_RX_FRAME_TIMEOUT, param);
         } else {
             log_printf(WRN, "UART: "RED("BP_EVT_RX_FRAME_TIMEOUT")" without signal procedure.");
@@ -4864,11 +4863,7 @@ ___fast_switch_2_rx:
             } else if ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT ) {
                 // recieve timeout.
                 log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
-                           thiz->rx_param.need_bytes,
-                            thiz->rx_param.payload_size/*,
-                           thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes-1],
-                        thiz->rx_param.buff.rx_buff[thiz->rx_param.need_bytes],
-                        load_crc(thiz->rx_param.need_bytes-2, thiz->rx_param.buff.rx_buff)*/);
+                           thiz->rx_param.need_bytes, thiz->rx_param.payload_size);
                 __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
                 if ( thiz->rx_param.payload_size == 0 ) {
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
