@@ -4838,6 +4838,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             int rddone = 0;
             int nr = 0, cursor = 0;
 
+            memset(buff, 0, sizeof(thiz->rx_buff));
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
             thiz->tx_param.payload_size = 0;
             thiz->tx_param.cursor = 0;
