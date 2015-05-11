@@ -4791,7 +4791,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
             retval = write(thiz->dev_handle, thiz->tx_param.buff.tx_buff,
                            thiz->tx_param.payload_size);
-            if ( retval <= 0 ) {
+            if ( retval < thiz->tx_param.payload_size ) {
                 log_printf(ERR, "UART: send error, TX REQUEST AUTOMATIC ABORTED.");
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
