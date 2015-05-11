@@ -1,5 +1,6 @@
 #ifndef ___STDAFX_H_
 #define ___STDAFX_H_
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
