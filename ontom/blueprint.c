@@ -4769,6 +4769,7 @@ ___fast_switch_2_rx:
         if ( thiz->status == BP_UART_STAT_RD ) {
             char *buff = (char *)thiz->rx_param.buff.rx_buff;
             int rd = 0;
+            int rddone = 0;
             static int nr = 0;
 
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
@@ -4826,6 +4827,8 @@ ___fast_switch_2_rx:
                     } else {
                         thiz->continues_nr = 0;
                     }
+
+                    rddone ++;
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
@@ -4837,6 +4840,7 @@ ___fast_switch_2_rx:
                     Hachiko_pause(&thiz->rx_seed);
                     log_printf(WRN,
                                "UART: lenth fetched but check "RED("faile."));
+                    rddone ++;
                     break;
                 // 数据接收长度不足，继续接收
                 default:
@@ -4846,6 +4850,7 @@ ___fast_switch_2_rx:
                     }
                     break;
                 }
+                if ( rddone  ) break;
 
                 usleep(10000);
             }
