@@ -4994,7 +4994,7 @@ continue_to_send:
                         log_printf(DBG_LV2, "UART: set rx timeout: %d", thiz->master->ttw);
                         Hachiko_resume(&thiz->rx_seed);
                     }
-                    goto ___fast_switch_2_rx;
+                    //goto ___fast_switch_2_rx;
                 } else {
                     thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                     thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
