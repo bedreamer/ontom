@@ -4799,7 +4799,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
             tcdrain(thiz->dev_handle);
-            log_printf(INF, "after tcdrain:");
+            log_printf(INF, "after tcdrain: %d", (int)(thiz->tx_param.payload_size *__usperbyte(thiz)));
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
             __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             if ( thiz->rx_param.need_bytes ) {
