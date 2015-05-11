@@ -4673,6 +4673,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     log_printf(INF, "UART %s framework start up.              DONE(%ld).",
                thiz->dev_name,
                (unsigned int)pthread_self());
+    if ( thiz ) {
+        // 出错误后尝试的次数
+        thiz->init_magic = 5;
+    }
+
 
     while ( 1 )
     {
@@ -4682,7 +4687,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
         if ( thiz->status == BP_UART_STAT_INVALID ) {
             if ( thiz->init_magic <= 0 ) {
                 thiz->status = BP_UART_STAT_ALIENT;
-                log_printf(ERR, "UART: open UART faile, thread panic.....");
+                log_printf(ERR, "UART: open UART %s faile, thread panic.....", thiz->dev_name);
                 continue;
             }
             // 初始化数据结构, 设定串口的初始状态
