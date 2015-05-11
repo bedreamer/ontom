@@ -4803,6 +4803,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
             tcflush(thiz->dev_handle, TCIOFLUSH);
             write(thiz->dev_handle, &thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-2], 2);
+            if (tcdrain(thiz->dev_handle) < 0) {
+                log_printf(ERR, "tcdrain error\n");
+            }
             log_printf(INF, "after tcdrain: %d:%x", (int)(thiz->tx_param.payload_size *__usperbyte(thiz)),
                        thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-1]);
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
