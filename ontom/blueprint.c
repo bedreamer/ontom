@@ -4800,6 +4800,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
+            __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, nr, DBG_LV3);
             tcflush(thiz->dev_handle, TCIOFLUSH);
             if ( thiz->rx_param.need_bytes ) {
                 thiz->status = BP_UART_STAT_RD;
