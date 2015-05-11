@@ -1,6 +1,6 @@
 #ifndef ___STDAFX_H_
 #define ___STDAFX_H_
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -12,7 +12,6 @@
 #include <ifaddrs.h>
 #include <signal.h>
 #include <netdb.h>
-#include <fcntl.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <errno.h>
