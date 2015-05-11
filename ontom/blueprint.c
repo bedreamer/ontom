@@ -453,7 +453,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口配置
     case BP_EVT_CONFIGURE:
         gpio_export(self->hw_port);
-        self->dev_handle = open(self->dev_name, O_RDWR|O_NOCTTY);
+        self->dev_handle = open(self->dev_name, O_RDWR|O_NOCTTY|O_SYNC);
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         } else {
@@ -4799,8 +4799,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
             tcdrain(thiz->dev_handle);
-            write(thiz->dev_handle, &thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-1],
-                                       1);
+            write(thiz->dev_handle, &thiz->tx_param.buff.tx_buff[thiz->tx_param.payload_size-1], 1);
             log_printf(INF, "after tcdrain: %d", (int)(thiz->tx_param.payload_size *__usperbyte(thiz)));
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
             __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
