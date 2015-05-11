@@ -2696,15 +2696,11 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
-        buff[nr ++] = 0x0;
-        buff[nr ++] = 0x0;
-        buff[nr ++] = 0x0;
-        buff[nr ++] = 0x0;
 
         memcpy(param->buff.tx_buff, buff, nr);
         self->rx_param.need_bytes = 187;
         param->payload_size = nr;
-        self->master->time_to_send = (param->payload_size + -1) * 1000 / 960 /*+ self->master->swap_time_modify*/;
+        self->master->time_to_send = (param->payload_size + 0) * 1000 / 960 /*+ self->master->swap_time_modify*/;
         ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         break;
