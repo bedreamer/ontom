@@ -453,7 +453,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口配置
     case BP_EVT_CONFIGURE:
         gpio_export(self->hw_port);
-        self->dev_handle = open(self->dev_name, O_RDWR|O_NOCTTY);
+        self->dev_handle = open(self->dev_name, O_RDWR|O_NOCTTY|O_DIRECT);
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         } else {
