@@ -4814,7 +4814,7 @@ ___fast_switch_2_rx:
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
                 rd = read(thiz->dev_handle,
-                          &thiz->rx_param.buff.rx_buff[cursor], 32);
+                          &thiz->rx_param.buff.rx_buff[cursor], 1);
                 if ( rd > 0 ) {
                     Hachiko_feed(&thiz->rx_seed);
                     thiz->rx_param.payload_size += rd;
@@ -4872,7 +4872,7 @@ ___fast_switch_2_rx:
                 }
                 if ( rddone  ) break;
 
-                usleep(10000);
+                usleep(1000);
             }
             log_printf(INF, "UART.DBG: %d >>.", thiz->rx_seed.remain);
             if ( ret == ERR_OK ) {
