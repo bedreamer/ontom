@@ -4797,24 +4797,18 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 thiz->tx_param.cursor = 0;
                 continue;
             }
-            FD_ZERO(&wfds);
-            FD_ZERO(&rfds);
-            FD_SET(thiz->dev_handle, &wfds);
-            tv.tv_sec = 1;
-            tv.tv_usec = 0;
-            retval = select(thiz->dev_handle+1, NULL, &wfds, NULL, &tv);
-            if ( retval == -1 ) {
-                log_printf(ERR, "data transfer faile.");
-            } else if ( retval ) {
-                log_printf(INF, "data transfer done.");
-            } else {
-                log_printf(WRN, "data transfer crash.");
-            }
             thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
             __dump_uart_hex((unsigned char*)thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             tcflush(thiz->dev_handle, TCIOFLUSH);
             if ( thiz->rx_param.need_bytes ) {
-                usleep(4 * 1000);
+                do {
+                    int tts = 0;
+                    tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
+                    usleep(tts + thiz->master->swap_time_modify + 50);
+                    log_printf(DBG_LV1, "UART: packet send done. sleep: %d:%d us",
+                               tts, thiz->master->swap_time_modify);
+                } while (0);
+
                 thiz->status = BP_UART_STAT_RD;
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 if ( thiz->role == BP_UART_MASTER ) {
