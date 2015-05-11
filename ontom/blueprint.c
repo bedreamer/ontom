@@ -4987,7 +4987,7 @@ continue_to_send:
                 thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
                     thiz->status = BP_UART_STAT_RD;
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                    //thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                     if ( thiz->role == BP_UART_MASTER ) {
                         // 主动设备，需要进行接收超时判定
                         thiz->rx_seed.ttl = thiz->master->ttw;
