@@ -4981,15 +4981,13 @@ continue_to_send:
                                tts, thiz->master->swap_time_modify,
                                thiz->rx_param.need_bytes);
                 } while (0);
-
-                tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
-                if ( thiz->rx_param.need_bytes ) {
-                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                }
+                tcflush(thiz->dev_handle, TCIOFLUSH);
+
                 thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
                     thiz->status = BP_UART_STAT_RD;
+                    thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                     if ( thiz->role == BP_UART_MASTER ) {
                         // 主动设备，需要进行接收超时判定
                         thiz->rx_seed.ttl = thiz->master->ttw;
