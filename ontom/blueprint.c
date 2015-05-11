@@ -4784,7 +4784,7 @@ ___fast_switch_2_rx:
                 log_printf(DBG_LV0, "UART: switch to RX mode.");
             }
 
-            for (ret == ERR_FRAME_CHECK_DATA_TOO_SHORT;
+            for (ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
                      thiz->status == BP_UART_STAT_RD &&
                      (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                      thiz->rx_seed.remain
