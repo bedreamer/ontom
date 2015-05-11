@@ -4790,7 +4790,22 @@ ___fast_switch_2_rx:
             thiz->rx_param.cursor = 0;
             thiz->rx_param.buff.rx_buff = thiz->rx_buff;
             thiz->rx_param.buff_size = sizeof(thiz->rx_buff);
-            for (ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+
+            FD_ZERO(thiz->dev_handle, &rfds);
+            FD_SET(thiz->dev_handle, &rfds);
+            tv.tv_sec = 0;
+            tv.tv_usec = thiz->master->ttw * 1000;
+            retval = select(thiz->dev_handle+1, &rfds, NULL, NULL, &tv);
+            if ( -1 == retval ) {
+                log_printf(INF, "select error.");
+            } else if ( retval ) {
+                log_printf(INF, "data ready.");
+            } else {
+                log_printf(ERR, "TIMEOUT.");
+            }
+
+            for (;
                      thiz->status == BP_UART_STAT_RD &&
                      (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                      thiz->rx_seed.remain
