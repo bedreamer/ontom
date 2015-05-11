@@ -4748,6 +4748,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 
         if ( thiz->status == BP_UART_STAT_WR ) {
 
+            thiz->evt_handle(thiz, BP_EVT_SWITCH_2_TX, NULL);
             thiz->tx_param.buff.tx_buff = thiz->tx_buff;
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
             thiz->tx_param.payload_size = 0;
@@ -4842,13 +4843,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             }
 
             nr = 0;
-            //log_printf(INF, "UART.DBG: %d. <<", thiz->rx_seed.remain);
             thiz->rx_param.payload_size = 0;
             thiz->rx_param.cursor = 0;
             thiz->rx_param.buff.rx_buff = thiz->rx_buff;
             thiz->rx_param.buff_size = sizeof(thiz->rx_buff);
             ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
-
 
             for (;
                      thiz->status == BP_UART_STAT_RD &&
@@ -4957,9 +4956,9 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
             thiz->status = BP_UART_STAT_WR;
         }
     }
-
 }
 
+//
 void *thread_uart_service_bk(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
