@@ -4981,6 +4981,7 @@ continue_to_send:
                 //usleep(__usperbyte(thiz) / 8 );
                 cursor = 0;
             } while (0);
+            log_printf(INF, "UART: send done. %d", retval);
             if ( retval <= 0 ) {
                 log_printf(ERR, "UART: send error %d, TX REQUEST AUTOMATIC ABORTED. ", retval);
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
@@ -4995,29 +4996,9 @@ continue_to_send:
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
                 thiz->tx_seed.ttl = thiz->master->time_to_send;
-                log_printf(INF, "UART: send done. %d", retval);
-
-#if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
-                Hachiko_resume( & thiz->tx_seed );
-                // 睡眠20us 引起内核线程切换, 快速切换至Hachiko线程
-                usleep(20);
-                log_printf(DBG_LV0, "UART: send data len: %d, TX ttl: %d unit",
-                           thiz->tx_param.payload_size,
-                           thiz->tx_seed.ttl);
-#else
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
-#if 0
-                do {
-                    int tts = 0;
-                    tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
-                    usleep(tts + thiz->master->swap_time_modify);
-                    log_printf(DBG_LV3, "UART: packet send done. sleep: %d:%d us, need: %d bytes",
-                               tts, thiz->master->swap_time_modify,
-                               thiz->rx_param.need_bytes);
-                } while (0);
-#endif
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
-                log_printf(INF, "SWITCH to RX mode/");
+                log_printf(INF, "SWITCH to RX mode.");
                 tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 thiz->tx_param.payload_size = 0;
@@ -5041,7 +5022,6 @@ continue_to_send:
                     log_printf(DBG_LV3, "不需要帧回应");
                     usleep(4 * 1000);
                 }
-#endif
             } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送了一部分
                 thiz->tx_param.cursor = retval;
