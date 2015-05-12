@@ -4805,15 +4805,13 @@ ___fast_switch_2_rx:
                 FD_ZERO(&rfds);
                 FD_SET(thiz->dev_handle, &rfds);
                 tv.tv_sec = 0;
-                tv.tv_usec = thiz->master->ttw * 1000;
+                tv.tv_usec = __usperbyte(thiz) * 10;
                 retval = select(thiz->dev_handle+1, &rfds, NULL, NULL, &tv);
                 if ( -1 == retval ) {
                     log_printf(INF, "select error.");
-                } else if ( retval ) {
-                    //log_printf(INF, "data ready.");
-                } else {
+                } else if ( retval != 0 ) {
+                } else { // 超时s
                     ret == ERR_FRAME_CHECK_DATA_TOO_SHORT;
-                    //log_printf(ERR, "TIMEOUT.");
                     break;
                 }
                 errno = 0;
