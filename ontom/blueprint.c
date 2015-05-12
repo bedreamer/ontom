@@ -925,7 +925,7 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+            log_printf(WRN, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
@@ -1198,7 +1198,7 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+            log_printf(WRN, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
@@ -1654,7 +1654,7 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+            log_printf(WRN, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
@@ -1787,7 +1787,7 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+            log_printf(WRN, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
@@ -1897,7 +1897,7 @@ int simple_box_correct_write_evt_handle(struct bp_uart *self, struct bp_user *me
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+            log_printf(WRN, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
@@ -4886,10 +4886,10 @@ ___fast_switch_2_rx:
                             thiz->rx_param.payload_size);
             } else if ( ret == ERR_FRAME_CHECK_ERR ) {
                 // every thing is ok
-            } else if ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT ) {
-                // recieve timeout.
                 log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
                            thiz->rx_param.need_bytes, thiz->rx_param.payload_size);
+            } else if ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT ) {
+                // recieve timeout.
                 __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
                 if ( thiz->rx_param.payload_size == 0 ) {
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
