@@ -1794,18 +1794,18 @@ static inline void mac_public_code(unsigned char *obf, unsigned char *mac)
     maccode[4] = (unsigned char)atoh(mac[11]);
     maccode[5] = (unsigned char)atoh(mac[14]);
 
-    obf[0] = maccode[0] & 0xF0 | feed_code[0];
-    obf[1] = (maccode[0] << 4) & 0xF0 | feed_code[1];
-    obf[2] = maccode[1] & 0xF0 | feed_code[2];
-    obf[3] = (maccode[1] << 4) & 0xF0 | feed_code[3];
-    obf[4] = maccode[2] & 0xF0 | feed_code[4];
-    obf[5] = (maccode[2] << 4) & 0xF0 | feed_code[5];
-    obf[6] = maccode[3] & 0xF0 | feed_code[6];
-    obf[7] = (maccode[3] << 4) & 0xF0 | feed_code[7];
-    obf[8] = maccode[4] & 0xF0 | feed_code[8];
-    obf[9] = (maccode[4] << 4) & 0xF0 | feed_code[9];
-    obf[10] = maccode[5] & 0xF0 | feed_code[10];
-    obf[11] = (maccode[5] << 4) & 0xF0 | feed_code[11];
+    obf[0] = (maccode[0] & 0xF0) | feed_code[0];
+    obf[1] = ((maccode[0] << 4) & 0xF0) | feed_code[1];
+    obf[2] = (maccode[1] & 0xF0) | feed_code[2];
+    obf[3] = ((maccode[1] << 4) & 0xF0) | feed_code[3];
+    obf[4] = (maccode[2] & 0xF0) | feed_code[4];
+    obf[5] = ((maccode[2] << 4) & 0xF0) | feed_code[5];
+    obf[6] = (maccode[3] & 0xF0) | feed_code[6];
+    obf[7] = ((maccode[3] << 4) & 0xF0) | feed_code[7];
+    obf[8] = (maccode[4] & 0xF0) | feed_code[8];
+    obf[9] = ((maccode[4] << 4) & 0xF0) | feed_code[9];
+    obf[10] = (maccode[5] & 0xF0) | feed_code[10];
+    obf[11] = ((maccode[5] << 4) & 0xF0) | feed_code[11];
 
     obf[12] = 0;
     while ( i < 12 ) {
