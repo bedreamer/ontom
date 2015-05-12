@@ -35,7 +35,7 @@ static inline void __get_timestamp(char *outstring)
             p->tm_hour,
             p->tm_min,
             p->tm_sec,
-            t_start.tv_usec / 1000);
+            t_start.tv_usec);
     outstring[ n ] = 0;
 }
 
