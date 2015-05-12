@@ -4802,7 +4802,7 @@ ___fast_switch_2_rx:
                 FD_ZERO(&rfds);
                 FD_SET(thiz->dev_handle, &rfds);
                 tv.tv_sec = 0;
-                tv.tv_usec = __usperbyte(thiz) * 10;
+                tv.tv_usec = (thiz->rx_param.need_bytes + 10) * __usperbyte(thiz);
                 retval = select(thiz->dev_handle+1, &rfds, NULL, NULL, &tv);
                 if ( -1 == retval ) {
                     log_printf(INF, "select error.");
@@ -4814,7 +4814,7 @@ ___fast_switch_2_rx:
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
                 rd = read(thiz->dev_handle,
-                          &thiz->rx_param.buff.rx_buff[cursor], 8);
+                          &thiz->rx_param.buff.rx_buff[cursor], thiz->rx_param.need_bytes);
                 if ( rd > 0 ) {
                     Hachiko_feed(&thiz->rx_seed);
                     thiz->rx_param.payload_size += rd;
