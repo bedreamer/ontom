@@ -3131,7 +3131,6 @@ int Increase_module_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
-                __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
                 ret = ERR_OK;
@@ -3253,7 +3252,6 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
-                __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
                 ret = ERR_OK;
@@ -3346,7 +3344,6 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
             log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
-                __dump_uart_hex(param->buff.rx_buff, param->need_bytes, WRN);
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
                 ret = ERR_OK;
@@ -4972,6 +4969,7 @@ ___fast_switch_2_rx:
 continue_to_send:
             cursor = thiz->tx_param.cursor;
             retval = 0;
+            __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             do {
                 for ( cursor = 0; cursor < thiz->tx_param.payload_size; cursor ++ ) {
                     retval += write(thiz->dev_handle, & thiz->tx_param.buff.tx_buff[cursor], 1);
@@ -5004,7 +5002,6 @@ continue_to_send:
                            thiz->tx_param.payload_size,
                            thiz->tx_seed.ttl);
 #else
-                __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
 #if 0
                 do {
