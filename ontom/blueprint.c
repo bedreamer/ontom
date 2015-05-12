@@ -4804,8 +4804,8 @@ ___fast_switch_2_rx:
             {
                 FD_ZERO(&rfds);
                 FD_SET(thiz->dev_handle, &rfds);
-                tv.tv_sec = 0;
-                tv.tv_usec = (thiz->rx_param.need_bytes + 10) * __usperbyte(thiz);
+                tv.tv_sec = 1;
+                tv.tv_usec = 0/*(thiz->rx_param.need_bytes + 10) * __usperbyte(thiz)*/;
                 retval = select(thiz->dev_handle+1, &rfds, NULL, NULL, &tv);
                 if ( -1 == retval ) {
                     log_printf(INF, "select error.");
