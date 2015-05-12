@@ -500,6 +500,11 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->master && self->master->user_evt_handle ) {
             ret = self->master->user_evt_handle(self, self->master, BP_EVT_FRAME_CHECK, param);
         }
+        if ( !self->master ) {
+            log_printf(ERR, "UART.DRIVER : self->master == NULL seq-%d", self->sequce);
+        } else if ( ! self->master->user_evt_handle ) {
+            log_printf(ERR, "UART.DRIVER: seq-%d", self->sequce);
+        } else ;
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
@@ -4865,6 +4870,7 @@ ___fast_switch_2_rx:
                 // 数据接收长度不足，继续接收
                 default:
                 case ERR_FRAME_CHECK_DATA_TOO_SHORT:
+                    ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
                     if ( rd > 0 ) {
                         thiz->bp_evt_handle(thiz, BP_EVT_RX_DATA, &thiz->rx_param);
                     }
