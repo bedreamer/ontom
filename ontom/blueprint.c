@@ -4856,7 +4856,7 @@ ___fast_switch_2_rx:
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
-                    __dump_uart_hex((unsigned char*)buff, nr, DBG_LV3);
+                    __dump_uart_hex((unsigned char*)buff, nr, WRN);
                     thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
                                                               &thiz->rx_param);
                     thiz->status = BP_UART_STAT_WR;
