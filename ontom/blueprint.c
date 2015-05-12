@@ -4811,7 +4811,7 @@ ___fast_switch_2_rx:
                     continue;
                 }
                 */
-                usleep((thiz->rx_param.need_bytes + 10) * __usperbyte(thiz));
+                usleep((thiz->rx_param.need_bytes + 30) * __usperbyte(thiz));
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
                 rd = read(thiz->dev_handle,
