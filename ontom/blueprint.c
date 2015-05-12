@@ -4972,7 +4972,7 @@ continue_to_send:
                     retval += write(thiz->dev_handle, & thiz->tx_param.buff.tx_buff[cursor], 1);
                     usleep(99 * __usperbyte(thiz) / 100);
                 }
-                usleep(__usperbyte(thiz) / 2 );
+                usleep(__usperbyte(thiz) / 3 );
                 cursor = 0;
             } while (0);
             if ( retval <= 0 ) {
