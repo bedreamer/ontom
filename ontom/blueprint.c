@@ -4893,7 +4893,7 @@ ___fast_switch_2_rx:
                 }
             } else {
                 // could not to be here.
-                log_printf(ERR, "UART.driver: Crashed @ %s:%d", __FILE__, __LINE__);
+                log_printf(ERR, "UART.driver: Crashed %d@ %s:%d", ret, __FILE__, __LINE__);
             }
             thiz->status = BP_UART_STAT_WR;
         }
