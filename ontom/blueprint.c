@@ -217,6 +217,10 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
     options.c_cc[VMIN] = 0;
     options.c_lflag  &= ~(ICANON | ECHO | ECHOE | ISIG);  /*Input*/
     options.c_oflag  &= ~OPOST;   /*Output*/
+    options.c_oflag &= ~(ONLCR | OCRNL); //添加的
+
+    options.c_iflag &= ~(ICRNL | INLCR);
+    options.c_iflag &= ~(IXON | IXOFF | IXANY); //添加的
 
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
