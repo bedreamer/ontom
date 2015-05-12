@@ -1779,7 +1779,7 @@ static inline unsigned short double2short(double df, unsigned int acc) {
 static inline double bytes2double(unsigned char h, unsigned l, unsigned int acc) {
     return (h * 256 + l) / (1.0f * acc);
 }
-
+#if 0
 static inline void mac_public_code(unsigned char *obf, unsigned char *mac)
 {
     unsigned char feed_code[12] = {10, 12, 13, 13,
@@ -1847,6 +1847,7 @@ static inline int check_auth(const char *mac, const char *bcdcode)
 
     return 0;
 }
+#endif
 
 /* 记录系统操作日志 */
 int system_log(unsigned short type, const char *fmt, ...);
