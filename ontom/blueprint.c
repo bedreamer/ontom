@@ -4970,7 +4970,7 @@ continue_to_send:
             do {
                 for ( cursor = 0; cursor < thiz->tx_param.payload_size; cursor ++ ) {
                     retval += write(thiz->dev_handle, & thiz->tx_param.buff.tx_buff[cursor], 1);
-                    usleep(99 * __usperbyte(thiz) / 100);
+                    usleep(95 * __usperbyte(thiz) / 100);
                 }
                 //usleep(__usperbyte(thiz) / 8 );
                 cursor = 0;
