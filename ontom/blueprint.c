@@ -504,7 +504,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(ERR, "UART.DRIVER : self->master == NULL seq-%d", self->sequce);
         } else if ( ! self->master->user_evt_handle ) {
             log_printf(ERR, "UART.DRIVER: seq-%d", self->sequce);
-        } else ;
+        } else {};
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
