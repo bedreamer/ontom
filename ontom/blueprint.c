@@ -454,7 +454,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     case BP_EVT_CONFIGURE:
         gpio_export(self->hw_port);
         self->dev_handle = open(self->dev_name,
-                                O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
+                                O_RDWR | O_NOCTTY);
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         } else {
@@ -4797,7 +4797,6 @@ ___fast_switch_2_rx:
                      thiz->rx_seed.remain
                  ; )
             {
-                /*
                 FD_ZERO(&rfds);
                 FD_SET(thiz->dev_handle, &rfds);
                 tv.tv_sec = 0;
@@ -4810,12 +4809,11 @@ ___fast_switch_2_rx:
                     ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
                     continue;
                 }
-                */
                 usleep((thiz->rx_param.need_bytes + 30) * __usperbyte(thiz));
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
                 rd = read(thiz->dev_handle,
-                          &thiz->rx_param.buff.rx_buff[cursor], thiz->rx_param.need_bytes);
+                          &thiz->rx_param.buff.rx_buff[cursor], 1);
                 if ( rd > 0 ) {
                     Hachiko_feed(&thiz->rx_seed);
                     thiz->rx_param.payload_size += rd;
