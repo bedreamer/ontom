@@ -1787,12 +1787,12 @@ static inline void mac_public_code(unsigned char *obf, unsigned char *mac)
                                    8, 9, 1, 12};
     int i = 0;
     unsigned char maccode[6 + 1] = {0};
-    maccode[0] = (unsigned char)atoh(mac[0]);
-    maccode[1] = (unsigned char)atoh(mac[3]);
-    maccode[2] = (unsigned char)atoh(mac[6]);
-    maccode[3] = (unsigned char)atoh(mac[8]);
-    maccode[4] = (unsigned char)atoh(mac[11]);
-    maccode[5] = (unsigned char)atoh(mac[14]);
+    maccode[0] = (unsigned char)atoh(&mac[0]);
+    maccode[1] = (unsigned char)atoh(&mac[3]);
+    maccode[2] = (unsigned char)atoh(&mac[6]);
+    maccode[3] = (unsigned char)atoh(&mac[8]);
+    maccode[4] = (unsigned char)atoh(&mac[11]);
+    maccode[5] = (unsigned char)atoh(&mac[14]);
 
     obf[0] = (maccode[0] & 0xF0) | feed_code[0];
     obf[1] = ((maccode[0] << 4) & 0xF0) | feed_code[1];
