@@ -4972,6 +4972,7 @@ ___fast_switch_2_rx:
 continue_to_send:
             cursor = thiz->tx_param.cursor;
             retval = 0;
+            tcflush(thiz->dev_handle, TCIOFLUSH);
             __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             do {
                 for ( cursor = 0; cursor < thiz->tx_param.payload_size; cursor ++ ) {
@@ -4999,7 +5000,6 @@ continue_to_send:
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
                 log_printf(INF, "SWITCH to RX mode.");
-                tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
