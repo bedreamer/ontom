@@ -4852,6 +4852,7 @@ ___fast_switch_2_rx:
                     }
 
                     rddone ++;
+                    ret = ERR_OK;
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
