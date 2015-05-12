@@ -4811,7 +4811,7 @@ ___fast_switch_2_rx:
                     log_printf(INF, "select error.");
                 } else if ( retval != 0 ) {
                 } else { // 超时s
-                    ret == ERR_FRAME_CHECK_DATA_TOO_SHORT;
+                    ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
                     break;
                 }
                 errno = 0;
