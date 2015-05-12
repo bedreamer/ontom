@@ -4804,6 +4804,7 @@ ___fast_switch_2_rx:
                 retval = select(thiz->dev_handle+1, &rfds, NULL, NULL, &tv);
                 if ( -1 == retval ) {
                     log_printf(INF, "select error.");
+                    continue;
                 } else if ( retval != 0 ) {
                 } else { // 超时s
                     ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
