@@ -4809,7 +4809,7 @@ ___fast_switch_2_rx:
                     ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
                     continue;
                 }
-                usleep((thiz->rx_param.need_bytes + 30) * __usperbyte(thiz));
+                //usleep((thiz->rx_param.need_bytes + 30) * __usperbyte(thiz));
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
                 rd = read(thiz->dev_handle,
