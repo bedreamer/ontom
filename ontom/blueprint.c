@@ -4799,6 +4799,7 @@ ___fast_switch_2_rx:
                      thiz->rx_seed.remain
                  ; )
             {
+                /*
                 FD_ZERO(&rfds);
                 FD_SET(thiz->dev_handle, &rfds);
                 tv.tv_sec = 0;
@@ -4811,6 +4812,8 @@ ___fast_switch_2_rx:
                     ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
                     continue;
                 }
+                */
+                usleep((thiz->rx_param.need_bytes + 10) * __usperbyte(thiz));
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
                 rd = read(thiz->dev_handle,
