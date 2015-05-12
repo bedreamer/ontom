@@ -453,7 +453,8 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口配置
     case BP_EVT_CONFIGURE:
         gpio_export(self->hw_port);
-        self->dev_handle = open(self->dev_name, O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
+        self->dev_handle = open(self->dev_name,
+                                O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         } else {
@@ -4851,7 +4852,7 @@ ___fast_switch_2_rx:
                     break;
                 }
 
-                usleep(500);
+                usleep(2000);
             } while ( thiz->status == BP_UART_STAT_RD &&
                       (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
                       thiz->rx_seed.remain );
@@ -4949,11 +4950,17 @@ ___fast_switch_2_rx:
 
 continue_to_send:
             cursor = thiz->tx_param.cursor;
-            retval = write(thiz->dev_handle,
-                           & thiz->tx_param.buff.tx_buff[cursor],
-                           thiz->tx_param.payload_size - cursor);
+            retval = 0;
+            do {
+                for ( cursor = 0; cursor < thiz->tx_param.payload_size; cursor ++ ) {
+                    retval += write(thiz->dev_handle, & thiz->tx_param.buff.tx_buff[cursor], 1);
+                    usleep(99 * __usperbyte(thiz) / 100);
+                }
+                usleep(__usperbyte(thiz) / 2 );
+                cursor = 0;
+            } while (0);
             if ( retval <= 0 ) {
-                log_printf(ERR, "UART: send error, TX REQUEST AUTOMATIC ABORTED.");
+                log_printf(ERR, "UART: send error %d, TX REQUEST AUTOMATIC ABORTED. ", retval);
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                 thiz->tx_param.payload_size = 0;
@@ -4966,6 +4973,7 @@ continue_to_send:
                 // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
                 thiz->tx_seed.ttl = thiz->master->time_to_send;
+                log_printf(INF, "UART: send done. %d", retval);
 
 #if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
                 Hachiko_resume( & thiz->tx_seed );
@@ -4977,17 +4985,18 @@ continue_to_send:
 #else
                 __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
-
+#if 0
                 do {
                     int tts = 0;
                     tts = (int)(thiz->tx_param.payload_size *__usperbyte(thiz));
-                    usleep(tts + thiz->master->swap_time_modify + 50);
-                    log_printf(DBG_LV1, "UART: packet send done. sleep: %d:%d us",
-                               tts, thiz->master->swap_time_modify);
+                    usleep(tts + thiz->master->swap_time_modify);
+                    log_printf(DBG_LV3, "UART: packet send done. sleep: %d:%d us, need: %d bytes",
+                               tts, thiz->master->swap_time_modify,
+                               thiz->rx_param.need_bytes);
                 } while (0);
-
-                tcflush(thiz->dev_handle, TCIOFLUSH);
+#endif
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
@@ -5028,249 +5037,3 @@ continue_to_send:
     }
     return NULL;
 }
-#if 0
-// 生成串口通信统计页面
-int ajax_uart_debug_page(struct ajax_xml_struct *thiz)
-{
-    int output_len = 0, i;
-    struct bp_user *me = &down_user[0];
-    struct MDATA_ACK *self;
-    char errstr[1024] = {0}, infstr[1024] = {0};
-    int errnr = 0, len = 0;
-
-    thiz->ct = "application/json";
-
-    output_len += sprintf(&thiz->iobuff[output_len], "{\"uartusers\":[");
-    for (; me->user_evt_handle; me ++ ) {
-        if (me->user_evt_handle == uart4_charger_module_evt_handle ) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"模块操作\",");
-         } else if (me->user_evt_handle == uart4_charger_config_evt_handle) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控配置\",");
-         } else if (me->user_evt_handle == uart4_charger_date_evt_handle) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"日期配置\",");
-         } else if (me->user_evt_handle == uart4_charger_yaoce_0_49_handle) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信0\",");
-        } else if ( me->user_evt_handle == uart4_charger_yaoce_50_100_handle) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"监控遥信1\",");
-        } else if ( me->user_evt_handle == uart4_simple_box_evt_handle) {
-            output_len += sprintf(&thiz->iobuff[output_len], "{\"obj\":\"综合采样\",");
-         } else {
-            log_printf(ERR, "AJAX: bad request abort UART debug page. %p:(%p:%p:%p:%p)",
-                       me->user_evt_handle,
-                       uart4_charger_module_evt_handle,
-                       uart4_charger_config_evt_handle,
-                       uart4_charger_date_evt_handle,
-                       uart4_charger_yaoce_0_49_handle);
-            return ERR_ERR;
-         }
-        output_len += sprintf(&thiz->iobuff[output_len], "\"freq\":%d,", me->frame_freq);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"seed\":%d,", me->seed);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"died_line\":%d,", me->died_line);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"died\":%d,", me->died);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"died_total\":%d,", me->died_total);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"sent\":%d,", me->sent_frames);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"checkerr\":%d,", me->check_err_cnt);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"check_err_total\":%d,", me->check_err_total);
-        output_len += sprintf(&thiz->iobuff[output_len], "\"recv_cnt\":%d}", me->rcv_ok_cnt);
-        if ( (me + 1)->user_evt_handle ) {
-            output_len += sprintf(&thiz->iobuff[output_len], ",");
-        } else {
-            output_len += sprintf(&thiz->iobuff[output_len], "]");
-        }
-    }
-
-    // 充电机遥信，遥测量
-    output_len += sprintf(&thiz->iobuff[output_len], ", \"chargers\":{");
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_sn\":\"%04X\",", task->chargers.charger_sn);
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_status\":\"%04X\",", task->chargers.charger_status);
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_self_status\":\"%04X\",", task->chargers.charger_self_status);
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_v_out\":%d,", b2l(task->chargers.charger_max_v_out));
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_min_v_out\":%d,", b2l(task->chargers.charger_min_v_out));
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_max_i_out\":%d,", b2l(task->chargers.charger_max_i_out));
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_v_out\":%d,", b2l(task->chargers.charger_v_out));
-    output_len += sprintf(&thiz->iobuff[output_len], "\"charger_i_out\":%d,", b2l(task->chargers.charger_i_out));
-    output_len += sprintf(&thiz->iobuff[output_len], "\"modules\":[");
-    for (i=0; i < CONFIG_SUPPORT_CHARGE_MODULE; i ++ ) {
-        output_len += sprintf(&thiz->iobuff[output_len], "{\"voltage\":%d,", b2l(task->chargers.charge_module_v[i]));
-        output_len += sprintf(&thiz->iobuff[output_len], "\"current\":%d,", b2l(task->chargers.charge_module_i[i]));
-        output_len += sprintf(&thiz->iobuff[output_len], "\"temp\":%d,", b2l(task->chargers.charge_module_t[i]));
-        output_len += sprintf(&thiz->iobuff[output_len], "\"sn\":\"%04X%04X%04X\"}",
-                              b2l(task->chargers.charge_module_sn[i][0]),
-                              b2l(task->chargers.charge_module_sn[i][1]),
-                              b2l(task->chargers.charge_module_sn[i][2]));
-        if ( i != CONFIG_SUPPORT_CHARGE_MODULE - 1 ) {
-            output_len += sprintf(&thiz->iobuff[output_len], ",");
-        }
-    }
-    output_len += sprintf(&thiz->iobuff[output_len], "]");
-    output_len += sprintf(&thiz->iobuff[output_len], "}");
-
-    // 扩展采样盒
-    self = &task->measure;
-    len = 0;
-    i = 0;
-    if ( self->yx_mx_V_high ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 母线过压] \"},", ++errnr);
-    }
-    if ( self->yx_mx_V_low ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 母线欠压] \"},", ++errnr);
-    }
-    if ( self->yx_mx_short_fault ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 母线短路] \"},", ++errnr);
-    }
-
-    if ( self->yx_bat_V_high ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 电池过压] \"},", ++errnr);
-    }
-    if ( self->yx_bat_V_low ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 电池欠压] \"},", ++errnr);
-    }
-    if ( self->yx_bat_short_fault ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 电池链接短路] \"},", ++errnr);
-    }
-    if ( self->yx_bat_revers_conn ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 电池反接] \"},", ++errnr);
-    }
-    if ( self->yx_bat_I_high ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 电池过流] \"},", ++errnr);
-    }
-
-    if ( self->yx_bat_institude_fault ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 电池绝缘接地] \"},", ++errnr);
-    }
-    if ( self->yx_assit_power_stat ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 辅助电源故障] \"},", ++errnr);
-    }
-    if ( self->yx_temprature == 1 ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 温度过高] \"},", ++errnr);
-    } else if ( self->yx_temprature == 2 ) {
-        len += sprintf(&errstr[len], "[%d: 温度过低] \"},", ++errnr);
-    }
-    if ( self->yx_wet_rate == 1 ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len = sprintf(&errstr[len], "[%d: 湿度过高] \"},", ++errnr);
-    } else if ( self->yx_wet_rate == 2 ) {
-        len += sprintf(&errstr[len], "[%d: 湿度过低] \"},", ++errnr);
-    }
-
-    if ( self->yx_rdq ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 总输出熔断器熔断] \"},", ++errnr);
-    }
-    if ( self->yx_dc_output_tiaozha ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 总输出跳闸] \"},", ++errnr);
-    }
-    if ( self->yx_dc_output_tiaozha1 ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 一路输出跳闸] \"},", ++errnr);
-    }
-    if ( self->yx_dc_output_tiaozha2 ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 二路输出跳闸] \"},", ++errnr);
-    }
-    if ( self->yx_flq ) {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 防雷器故障] \"},", ++errnr);
-    }
-    if ( i > 0 ) {
-        errstr[len --] = '\0';
-    } else {
-        len += sprintf(&errstr[len], "{\"no\":%d,\"error\":\"", ++i);
-        len += sprintf(&errstr[len], "[%d: 无故障] \"}", ++errnr);
-    }
-    if ( i ) {
-        output_len += sprintf(&thiz->iobuff[output_len], ",\"errors\":[%s]", errstr);
-    }
-    // 输入状态，遥信
-    len = 0;
-    i = 0;
-    len += sprintf(&infstr[len], ",\"yaoxin\":[{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_ac_hezha ) {
-        len += sprintf(&infstr[len], "[交流合闸] \",\"color\":\"green\"},");
-    } else {
-        len += sprintf(&infstr[len], "[交流分闸] \",\"color\":\"yellow\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_heater_stat ) {
-        len += sprintf(&infstr[len], "[加热] ,\"color\":\"yellow\"},");
-    } else {
-        len += sprintf(&infstr[len], "[未加热] \",\"color\":\"green\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_fan_stat ) {
-        len += sprintf(&infstr[len], "[通风] \",\"color\":\"yellow\"},");
-    } else {
-        len += sprintf(&infstr[len], "[未通风] \",\"color\":\"green\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_dc_output_hz ) {
-        len += sprintf(&infstr[len], "[总输出合闸] \",\"color\":\"green\"},");
-    } else {
-        len += sprintf(&infstr[len], "[总输出分闸] \",\"color\":\"yellow\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_gun_1_hezha_stat ) {
-        len += sprintf(&infstr[len], "[1#枪输出合闸] \",\"color\":\"green\"},");
-    } else {
-        len += sprintf(&infstr[len], "[1#枪输出分闸] \",\"color\":\"yellow\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_gun_1_conn_stat == 0 ) {
-        len += sprintf(&infstr[len], "[1#枪未链接] \",\"color\":\"yellow\"},");
-    } else if (self->yx_gun_1_conn_stat == 1 ) {
-        len += sprintf(&infstr[len], "[1#枪链接保护] \",\"color\":\"yellow\"},");
-    } else if ( self->yx_gun_1_conn_stat == 2 ) {
-        len += sprintf(&infstr[len], "[1#枪连接异常] \",\"color\":\"red\"},");
-    } else if ( self->yx_gun_1_conn_stat == 3 ) {
-        len += sprintf(&infstr[len], "[1#枪链接正常] \",\"color\":\"green\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_gun_1_assit_power_hezha ) {
-        len += sprintf(&infstr[len], "[1#枪辅助电源合闸] \",\"color\":\"green\"},");
-    } else {
-        len += sprintf(&infstr[len], "[1#枪辅助电源分闸] \",\"color\":\"yellow\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_gun_2_hezha_stat ) {
-        len += sprintf(&infstr[len], "[2#枪输出合闸] \",\"color\":\"green\"},");
-    } else {
-        len += sprintf(&infstr[len], "[2#枪输出分闸] \",\"color\":\"yellow\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_gun_2_conn_stat == 0 ) {
-        len += sprintf(&infstr[len], "[2#枪未链接] \",\"color\":\"yellow\"},");
-    } else if (self->yx_gun_2_conn_stat == 1 ) {
-        len += sprintf(&infstr[len], "[2#枪链接保护] \",\"color\":\"yellow\"},");
-    } else if ( self->yx_gun_2_conn_stat == 2 ) {
-        len += sprintf(&infstr[len], "[2#枪连接异常] \",\"color\":\"red\"},");
-    } else if ( self->yx_gun_2_conn_stat == 3 ) {
-        len += sprintf(&infstr[len], "[2#枪链接正常] \",\"color\":\"green\"},");
-    }
-    len += sprintf(&infstr[len], "{\"no\":%d,\"stat\":\"", ++i);
-    if ( self->yx_gun_2_assit_power_hezha ) {
-        len += sprintf(&infstr[len], "[2#枪辅助电源合闸] \",\"color\":\"green\"}");
-    } else {
-        len += sprintf(&infstr[len], "[2#枪辅助电源分闸] \",\"color\":\"yellow\"}");
-    }
-    len += sprintf(&infstr[len], "]");
-
-    output_len += sprintf(&thiz->iobuff[output_len], "%s", infstr);
-
-    // 终结符
-    output_len += sprintf(&thiz->iobuff[output_len], "}");
-    thiz->xml_len = output_len;
-    return ERR_OK;
-}
-#endif

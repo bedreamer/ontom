@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 unsigned int __atoh(const char *hex)
 {
@@ -22,37 +23,39 @@ unsigned int __atoh(const char *hex)
     return v;
 }
 #define atoh __atoh
-void mac_public_code(unsigned char *obf, unsigned char *mac)
+void mac_public_code(unsigned char *bin_pubkey, unsigned char *ch_pubkey, const unsigned char *mac)
 {
     unsigned char feed_code[12] = {10, 12, 13, 13,
                                    8, 11, 13, 2,
                                    8, 9, 1, 12};
+	unsigned char solt[12] = {73,42, 29 ,20, 69, 
+							120, 216, 239, 47, 102, 183,141};
     int i = 0;
     unsigned char maccode[6 + 1] = {0};
-    maccode[0] = atoh(mac[0]);
-    maccode[1] = atoh(mac[3]);
-    maccode[2] = atoh(mac[6]);
-    maccode[3] = atoh(mac[8]);
-    maccode[4] = atoh(mac[11]);
-    maccode[5] = atoh(mac[14]);
+    maccode[0] = atoh(&mac[0]);
+    maccode[1] = atoh(&mac[3]);
+    maccode[2] = atoh(&mac[6]);
+    maccode[3] = atoh(&mac[9]);
+    maccode[4] = atoh(&mac[12]);
+    maccode[5] = atoh(&mac[15]);
 
-    obf[0] = maccode[0] & 0xF0 | feed_code[0];
-    obf[1] = (maccode[0] << 4) & 0xF0 | feed_code[1];
-    obf[2] = maccode[1] & 0xF0 | feed_code[2];
-    obf[3] = (maccode[1] << 4) & 0xF0 | feed_code[3];
-    obf[4] = maccode[2] & 0xF0 | feed_code[4];
-    obf[5] = (maccode[2] << 4) & 0xF0 | feed_code[5];
-    obf[6] = maccode[3] & 0xF0 | feed_code[6];
-    obf[7] = (maccode[3] << 4) & 0xF0 | feed_code[7];
-    obf[8] = maccode[4] & 0xF0 | feed_code[8];
-    obf[9] = (maccode[4] << 4) & 0xF0 | feed_code[9];
-    obf[10] = maccode[5] & 0xF0 | feed_code[10];
-    obf[11] = (maccode[5] << 4) & 0xF0 | feed_code[11];
+	for ( i = 0; i < 12; i = i + 2 ) {
+		bin_pubkey[i] = solt[i] ^ (maccode[i] & 0xF0 | feed_code[i]);
+		bin_pubkey[i + 1] = solt[i + 1] ^ ((maccode[i] << 4) & 0xF0 | feed_code[i + 1]);
+	}
 
-    obf[12] = 0;
+    bin_pubkey[12] = 0;
+	i = 0;
     while ( i < 12 ) {
-        obf[12] += obf[i];
+        bin_pubkey[12] += bin_pubkey[i++];
     }
+
+	if( ch_pubkey ) {
+		while ( i < 13 ) {
+			sprintf(&ch_pubkey[i*2], "%02X", bin_pubkey[i]);
+			i++;
+		}
+	}
 }
 
 void gen_key(unsigned char *key, const unsigned char *mac_pub_key)
@@ -82,7 +85,7 @@ int check_auth(const char *mac, const char *bcdcode)
     unsigned char mac_pub_key[13 + 1] = {0};
     unsigned char check_code_bcd[13 + 1] = {0};
 
-    mac_public_code(mac_pub_key, mac);
+    mac_public_code(mac_pub_key, NULL, mac);
     gen_key(check_code_bcd, mac_pub_key);
 
     if ( 0 == strcmp(check_code_bcd, bcdcode) ) return 1;
@@ -99,6 +102,7 @@ int main(int argc, const char *argv[])
 	};
 	enum command cmd = INVALID;
 	unsigned char mac[32] = {0}, key[64] = {0}, pub_key[32] = {0};
+	unsigned char pub_key_str[64] = {0};
 	int i = 1;
 
 	if ( argc < 2 ) return 1;
@@ -144,9 +148,9 @@ int main(int argc, const char *argv[])
 			printf("need give mac address first!\n");
 			return 1;
 		}
-		mac_public_code(pub_key, mac);
+		mac_public_code(pub_key, pub_key_str, mac);
 		gen_key(key, pub_key);
-		printf("pubkey: %s, key: %s\n", pub_key, key);
+		printf("pubkey: %s, key: %s\n", pub_key_str, key);
 		return 0;
 	}
 
