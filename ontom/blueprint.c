@@ -4811,6 +4811,10 @@ ___fast_switch_2_rx:
                     log_printf(INF, "select error.");
                     continue;
                 } else if ( retval != 0 ) {
+                    if ( ! FD_ISSET(thiz->dev_handle, &rfds) ) {
+                        log_printf(ERR, "UART.DRIVER: somethind happended.");
+                        continue;
+                    }
                 } else { // 超时s
                     ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
                     continue;
