@@ -5012,6 +5012,7 @@ continue_to_send:
                 } while (0);
 #endif
                 thiz->bp_evt_handle(thiz, BP_EVT_SWITCH_2_RX, NULL);
+                log_printf(INF, "SWITCH to RX mode/");
                 tcflush(thiz->dev_handle, TCIOFLUSH);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 thiz->tx_param.payload_size = 0;
