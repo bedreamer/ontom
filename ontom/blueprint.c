@@ -4812,7 +4812,7 @@ ___fast_switch_2_rx:
                 } else if ( retval != 0 ) {
                 } else { // 超时s
                     ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
-                    break;
+                    continue;
                 }
                 errno = 0;
                 cursor = thiz->rx_param.cursor;
