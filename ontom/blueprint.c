@@ -4980,13 +4980,10 @@ continue_to_send:
             retval = 0;
             tcflush(thiz->dev_handle, TCIOFLUSH);
             __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
-            do {
-                for ( cursor = 0; cursor < thiz->tx_param.payload_size; cursor ++ ) {
-                    retval += write(thiz->dev_handle, & thiz->tx_param.buff.tx_buff[cursor], 1);
-                    usleep(99 * __usperbyte(thiz) / 100);
-                }
-                cursor = 0;
-            } while (0);
+            cursor = thiz->tx_param.cursor;
+            retval = write(thiz->dev_handle,
+                           & thiz->tx_param.buff.tx_buff[cursor],
+                           thiz->tx_param.payload_size - cursor);
             log_printf(INF, "UART: send done. %d", retval);
             if ( retval <= 0 ) {
                 log_printf(ERR, "UART: send error %d, TX REQUEST AUTOMATIC ABORTED. ", retval);
