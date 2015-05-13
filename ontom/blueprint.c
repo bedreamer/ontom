@@ -513,7 +513,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
-        ret = set_gpio_output(self->hw_port, TX_HIGH_LEVEL);
+        //ret = set_gpio_output(self->hw_port, TX_HIGH_LEVEL);
         if ( self->master ) {
             //self->master->seed = 0;
             self->hw_status = BP_UART_STAT_WR;
@@ -526,7 +526,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
-        ret = set_gpio_output(self->hw_port, RX_LOW_LEVEL);
+        //ret = set_gpio_output(self->hw_port, RX_LOW_LEVEL);
         if ( self->master ) {
             //self->master->seed = 0;
             self->hw_status = BP_UART_STAT_RD;
