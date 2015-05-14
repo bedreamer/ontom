@@ -4804,26 +4804,11 @@ ___fast_switch_2_rx:
                 log_printf(ERR, "UART.driver: Crashed %X@ %s:%d", ret, __FILE__, __LINE__);
             }
             thiz->status = BP_UART_STAT_WR;
-            thiz->tx_param.buff.tx_buff = thiz->tx_buff;
-            thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
-            thiz->tx_param.payload_size = 0;
-            thiz->tx_param.cursor = 0;
         }
 
         // 程序默认采用9600 的波特率， 大致估算出每发送一个字节耗时1.04ms
         // 抛去程序运行时的延迟，发送延迟，可估计每发送一个字节耗时1.1 ms
         if ( thiz->status == BP_UART_STAT_WR ) {
-            if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
-                 thiz->tx_param.payload_size > 0 ) {
-                // 前一次没有发送完成， 继续发送
-                log_printf(DBG_LV0, "UART: goto continue_to_send");
-                goto continue_to_send;
-            }
-            if ( thiz->tx_param.payload_size ) {
-                log_printf(DBG_LV0, "UART: continue becouse: thiz->tx_param.payload_size > 0");
-                continue;
-            }
-
             thiz->tx_param.buff.tx_buff = thiz->tx_buff;
             thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
             thiz->tx_param.payload_size = 0;
