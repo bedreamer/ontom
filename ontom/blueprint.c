@@ -4726,6 +4726,323 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
                 continue;
             }
 
+            log_printf(INF, "UART: open UART %d:%s correct(%X).",
+                       thiz->dev_handle, thiz->dev_name, thiz->status);
+            continue;
+        }
+
+        /*
+         * 串口在这里扮演的角色必定是主动设备或者从动设备
+         * 因此读取数据是否需要进行计时操作完全取决于扮演的角色类型。
+         *
+         * 如果是主动设备，那么必须要设定超时计时器，以确定接收数据是否超时
+         * 如果是从动设备，设定超时计时器并非是必须的，而是根据是否需要接收
+         * 连续的串口数据流来判定，若不需要连续的数据流，那么就不必要设定
+         * 超时计时器，反之需要设定超时计时器来确定能否在指定时间内收到完整
+         * 的数据帧。
+         */
+___fast_switch_2_rx:
+        if ( thiz->status == BP_UART_STAT_RD ) {
+            char *buff = (char *)thiz->rx_param.buff.rx_buff;
+            int rd = 0;
+            int rddone = 0;
+            int nr = 0, cursor = 0;
+
+            thiz->rx_param.payload_size = 0;
+            thiz->rx_param.cursor = 0;
+            thiz->rx_param.buff.rx_buff = thiz->rx_buff;
+            thiz->rx_param.buff_size = sizeof(thiz->rx_buff);
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+
+            Hachiko_feed(&thiz->rx_seed);
+            for (;
+                     thiz->status == BP_UART_STAT_RD &&
+                     (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
+                     thiz->rx_seed.remain
+                 ; )
+            {
+                FD_ZERO(&rfds);
+                FD_SET(thiz->dev_handle, &rfds);
+                tv.tv_sec = 1;
+                tv.tv_usec = 0;
+                retval = select(thiz->dev_handle+1, &rfds, NULL, NULL, &tv);
+                if ( -1 == retval ) {
+                    log_printf(INF, "select error.");
+                    continue;
+                } else if ( retval != 0 ) {
+                    if ( ! FD_ISSET(thiz->dev_handle, &rfds) ) {
+                        log_printf(ERR, "UART.DRIVER: somethind happended.");
+                        continue;
+                    }
+                } else { // 超时s
+                    ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
+                    continue;
+                }
+                errno = 0;
+                cursor = thiz->rx_param.cursor;
+                rd = read(thiz->dev_handle,
+                          &thiz->rx_param.buff.rx_buff[cursor], 16);
+                if ( rd > 0 ) {
+                    Hachiko_feed(&thiz->rx_seed);
+                    thiz->rx_param.payload_size += rd;
+                    thiz->rx_param.cursor = thiz->rx_param.payload_size;
+                    nr += rd;
+                }
+                ret = thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK,
+                                          &thiz->rx_param);
+                thiz->uart_mode = UART_MODE_NORMAL;
+                switch ( ret ) {
+                // 数据接收，校验完成, 完成数据接收过程，停止接收
+                case ERR_OK:
+                    __dump_uart_hex((unsigned char*)buff, nr, DBG_LV3);
+                    thiz->status = BP_UART_STAT_WR;
+                    Hachiko_pause(&thiz->rx_seed);
+                    log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
+                    ret = thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
+                                                          &thiz->rx_param);
+                    if ( (unsigned)ret == ERR_NEED_ECHO ) {
+                        thiz->uart_mode = UART_MODE_SESSION;
+                        thiz->continues_nr ++;
+                        if ( thiz->continues_nr < 5 ) {
+                            thiz->sequce --;
+                        } else {
+                            thiz->continues_nr = 0;
+                        }
+                        log_printf(INF, "UART: 需要立即发送回应帧: %d-%d",
+                                   thiz->continues_nr,
+                                   thiz->sequce);
+                    } else {
+                        thiz->continues_nr = 0;
+                    }
+
+                    rddone ++;
+                    ret = ERR_OK;
+                    break;
+                // 数据接收完成，但校验失败, 停止接收
+                case ERR_FRAME_CHECK_ERR:
+                    __dump_uart_hex((unsigned char*)buff, nr, WRN);
+                    thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
+                                                              &thiz->rx_param);
+                    thiz->status = BP_UART_STAT_WR;
+                    thiz->continues_nr = 0;
+                    Hachiko_pause(&thiz->rx_seed);
+                    log_printf(WRN,
+                               "UART: lenth fetched but check "RED("faile."));
+                    rddone ++;
+                    break;
+                // 数据接收长度不足，继续接收
+                default:
+                case ERR_FRAME_CHECK_DATA_TOO_SHORT:
+                    ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+                    if ( rd > 0 ) {
+                        thiz->bp_evt_handle(thiz, BP_EVT_RX_DATA, &thiz->rx_param);
+                    }
+                    break;
+                }
+                if ( rddone  ) break;
+            }
+            if ( ret == ERR_OK ) {
+                // every thing is ok
+                log_printf(DBG_LV1, "UART: rx packet TIME-OUT.need: %d, fetched: "GRN("%d"),
+                           thiz->rx_param.need_bytes,
+                            thiz->rx_param.payload_size);
+            } else if ( ret == ERR_FRAME_CHECK_ERR ) {
+                // every thing is ok
+                log_printf(WRN, "UART: rx packet TIME-OUT.need: %d, fetched: "YEL("%d")/*"gave crc: %02X%02X need: %04X"*/,
+                           thiz->rx_param.need_bytes, thiz->rx_param.payload_size);
+            } else if ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT ) {
+                // recieve timeout.
+                __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
+                if ( thiz->rx_param.payload_size == 0 ) {
+                    thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
+                } else { // ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
+                    thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME_TIMEOUT, &thiz->rx_param);
+                }
+            } else {
+                // could not to be here.
+                log_printf(ERR, "UART.driver: Crashed %X@ %s:%d", ret, __FILE__, __LINE__);
+            }
+            thiz->status = BP_UART_STAT_WR;
+        }
+
+        // 程序默认采用9600 的波特率， 大致估算出每发送一个字节耗时1.04ms
+        // 抛去程序运行时的延迟，发送延迟，可估计每发送一个字节耗时1.1 ms
+        if ( thiz->status == BP_UART_STAT_WR ) {
+            if ( thiz->tx_param.cursor < thiz->tx_param.payload_size &&
+                 thiz->tx_param.payload_size > 0 ) {
+                // 前一次没有发送完成， 继续发送
+                log_printf(DBG_LV0, "UART: goto continue_to_send");
+                goto continue_to_send;
+            }
+            if ( thiz->tx_param.payload_size ) {
+                log_printf(DBG_LV0, "UART: continue becouse: thiz->tx_param.payload_size > 0");
+                continue;
+            }
+
+            thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+            thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+            thiz->tx_param.payload_size = 0;
+            thiz->tx_param.cursor = 0;
+
+            if ( thiz->uart_mode == UART_MODE_NORMAL ) {
+                if ( thiz->hw_bps == 2400 ) {
+                    usleep(1500 * 1000);
+                } else {
+                    usleep(120 * 1000);
+                }
+            }
+
+            ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_REQUEST,
+                                      &thiz->tx_param);
+            if ( ret != ERR_OK || thiz->tx_param.payload_size <= 0 ||
+                 thiz->tx_param.payload_size > 255 ) {
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+            ret = thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_CONFIRM,
+                                      &thiz->tx_param);
+            if ( ret != ERR_OK ) {
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+            if ( thiz->tx_param.cursor > thiz->tx_param.payload_size ) {
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+continue_to_send:
+            cursor = thiz->tx_param.cursor;
+            retval = 0;
+            tcflush(thiz->dev_handle, TCIOFLUSH);
+            __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
+            cursor = thiz->tx_param.cursor;
+            retval = write(thiz->dev_handle,
+                           & thiz->tx_param.buff.tx_buff[cursor],
+                           thiz->tx_param.payload_size - cursor);
+            log_printf(INF, "UART: send done. %d", retval);
+            if ( retval <= 0 ) {
+                log_printf(ERR, "UART: send error %d, TX REQUEST AUTOMATIC ABORTED. ", retval);
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+
+            if ( retval == (int)(thiz->tx_param.payload_size - cursor) ) {
+                // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
+                // 此时启动发送计时器，用来确定数据发送完成事件
+                thiz->tx_param.cursor = thiz->tx_param.payload_size;
+                thiz->tx_seed.ttl = thiz->master->time_to_send;
+                memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
+                thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
+                thiz->tx_param.payload_size = 0;
+                if ( thiz->rx_param.need_bytes ) {
+                    thiz->status = BP_UART_STAT_RD;
+                    if ( thiz->role == BP_UART_MASTER ) {
+                        // 主动设备，需要进行接收超时判定
+                        thiz->rx_seed.ttl = thiz->master->ttw;
+                        Hachiko_resume(&thiz->rx_seed);
+                    }
+                    goto ___fast_switch_2_rx;
+                } else {
+                    thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                    thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                    thiz->tx_param.payload_size = 0;
+                    thiz->tx_param.cursor = 0;
+                    tcflush(thiz->dev_handle, TCIOFLUSH);
+                    memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
+                    log_printf(DBG_LV3, "不需要帧回应");
+                    usleep(4 * 1000);
+                }
+            } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
+                // 发送了一部分
+                thiz->tx_param.cursor = retval;
+            } else {
+                // Unexpected. Exception
+                log_printf(ERR, "UART: send error, TX AUTO ABORTED.");
+                thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+                thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+                thiz->tx_param.payload_size = 0;
+                thiz->tx_param.cursor = 0;
+                continue;
+            }
+            continue;
+        }
+    }
+    return NULL;
+}
+
+
+void *thread_uart_service__bk(void *arg) ___THREAD_ENTRY___
+{
+    int *done = (int *)arg;
+    int mydone = 0;
+    int ret = 0;
+    struct bp_uart *thiz = (struct bp_uart *)arg;
+    int retval;
+    size_t cursor;
+    fd_set rfds;
+    struct timeval tv ;
+
+    log_printf(INF, "UART %s framework start up.              DONE(%ld).",
+               thiz->dev_name,
+               (unsigned int)pthread_self());
+
+    if ( done == NULL ) done = &mydone;
+    tv.tv_sec = 2;
+    tv.tv_usec = 0;
+    FD_ZERO(&rfds);
+
+    if ( thiz ) {
+        // 出错误后尝试的次数
+        thiz->init_magic = 5;
+    }
+
+    while ( 1 ) {
+        usleep(5000);
+        if ( thiz == NULL ) continue;
+        if ( thiz->bp_evt_handle == NULL ) continue;
+        if ( thiz->status == BP_UART_STAT_ALIENT ) continue;
+        if ( thiz->status == BP_UART_STAT_INVALID ) {
+            if ( thiz->init_magic <= 0 ) {
+                thiz->status = BP_UART_STAT_ALIENT;
+                log_printf(ERR, "UART: open UART faile, thread panic.....");
+                continue;
+            }
+            // 初始化数据结构, 设定串口的初始状态
+            // 串口的初始状态决定了串口的工作模式
+            thiz->bp_evt_handle(thiz, BP_EVT_INIT, NULL);
+
+            // 打开并配置串口
+            // 如果初始化失败，则会不断的尝试
+            ret = thiz->bp_evt_handle(thiz, BP_EVT_CONFIGURE, NULL);
+            if ( ret == (int)ERR_UART_OPEN_FAILE ) {
+                thiz->status = BP_UART_STAT_INVALID;
+                log_printf(ERR, "UART: try open %s faile.", thiz->dev_name);
+                thiz->init_magic --;
+                continue;
+            }
+            if ( ret == (int)ERR_UART_CONFIG_FAILE ) {
+                thiz->status = BP_UART_STAT_INVALID;
+                // 首先关闭串口，然后才能进行下一次尝试
+                thiz->bp_evt_handle(thiz, BP_EVT_KILLED, NULL);
+                log_printf(ERR, "UART: configure %s faile.", thiz->dev_name);
+                thiz->init_magic --;
+                continue;
+            }
+
             FD_SET(thiz->dev_handle, &rfds);
             if ( thiz->status != BP_UART_STAT_RD &&
                  thiz->status != BP_UART_STAT_WR ) {
