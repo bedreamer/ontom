@@ -4850,11 +4850,11 @@ ___fast_switch_2_rx:
                 thiz->tx_param.cursor = 0;
                 continue;
             }
+            tcflush(thiz->dev_handle, TCIOFLUSH);
 
 continue_to_send:
             cursor = thiz->tx_param.cursor;
             retval = 0;
-            tcflush(thiz->dev_handle, TCIOFLUSH);
             __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             cursor = thiz->tx_param.cursor;
             retval = write(thiz->dev_handle,
@@ -4894,7 +4894,9 @@ continue_to_send:
                 }
             } else if ( retval < (int)(thiz->tx_param.payload_size - cursor) ) {
                 // 发送了一部分
-                thiz->tx_param.cursor = retval;
+                log_printf(INF, "UART.driver: send childs");
+                thiz->tx_param.cursor = thiz->tx_param.cursor + retval;
+                //goto continue_to_send;
             } else {
                 // Unexpected. Exception
                 log_printf(ERR, "UART: send error, TX AUTO ABORTED.");
