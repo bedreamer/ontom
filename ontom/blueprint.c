@@ -434,26 +434,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( ret != ERR_OK ) {
             log_printf(ERR, "UART: create uart reciever's timer faile.");
         }
-#if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
-        self->tx_seed._private = (void*)self;
-        self->tx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
-        self->tx_param.payload_size = 0;
-        self->tx_param.cursor = 0;
-        self->tx_param.buff.tx_buff = self->tx_buff;
-        self->tx_param.buff_size = sizeof(self->tx_buff);
-        ret = _Hachiko_new(&self->tx_seed, HACHIKO_AUTO_FEED,
-                     2, HACHIKO_PAUSE, (void*)self);
-        if ( ret != ERR_OK ) {
-            log_printf(ERR, "UART: create uart transfer's timer faile.");
-        }
-#endif
-        self->tx_speed._private = (void*)self;
-        self->tx_speed.Hachiko_notify_proc = uart4_Hachiko_speed_proc;
-        ret = _Hachiko_new(&self->tx_speed, HACHIKO_AUTO_FEED,
-                     12, HACHIKO_PAUSE, (void*)self);
-        if ( ret != ERR_OK ) {
-            log_printf(ERR, "UART: create uart transfer's speed timer faile.");
-        }
         break;
     // 串口配置
     case BP_EVT_CONFIGURE:
@@ -490,9 +470,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
 #endif
         self->status = BP_UART_STAT_WR;
         self->hw_status = BP_UART_STAT_INVALID;
-
-        // 开始发送节奏计数
-        Hachiko_resume(&self->tx_speed);
         break;
     // 关闭串口
     case BP_EVT_KILLED:
