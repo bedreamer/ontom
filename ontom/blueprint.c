@@ -4804,6 +4804,10 @@ ___fast_switch_2_rx:
                 log_printf(ERR, "UART.driver: Crashed %X@ %s:%d", ret, __FILE__, __LINE__);
             }
             thiz->status = BP_UART_STAT_WR;
+            thiz->tx_param.buff.tx_buff = thiz->tx_buff;
+            thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
+            thiz->tx_param.payload_size = 0;
+            thiz->tx_param.cursor = 0;
         }
 
         // 程序默认采用9600 的波特率， 大致估算出每发送一个字节耗时1.04ms
@@ -4871,7 +4875,6 @@ continue_to_send:
             retval = write(thiz->dev_handle,
                            & thiz->tx_param.buff.tx_buff[cursor],
                            thiz->tx_param.payload_size - cursor);
-            log_printf(INF, "UART: send done. %d", retval);
             if ( retval <= 0 ) {
                 log_printf(ERR, "UART: send error %d, TX REQUEST AUTOMATIC ABORTED. ", retval);
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
@@ -4882,10 +4885,7 @@ continue_to_send:
             }
 
             if ( retval == (int)(thiz->tx_param.payload_size - cursor) ) {
-                // 发送完成，但仅仅是数据写入到发送缓冲区，此时数据没有完全通过传输介质
-                // 此时启动发送计时器，用来确定数据发送完成事件
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
-                thiz->tx_seed.ttl = thiz->master->time_to_send;
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
                 thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
                 thiz->tx_param.payload_size = 0;
