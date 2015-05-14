@@ -445,19 +445,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         } else {
             log_printf(DBG, "UART: self->dev_handle: %d", self->bp_evt_handle);
         }
-#if (CONFIG_SUPPORT_SIGIO > 0)
-        if ( -1 == fcntl(self->dev_handle, F_SETFL, FASYNC) ) {
-            log_printf(ERR,
-                    "UART: set uart to async mode failed!!! errno: %d", errno);
-        }
-#endif
-#if 0
-        ret = configure_uart(self->dev_handle, B9600, 8, 1, 'N');
-        if ( ret == (int)ERR_UART_CONFIG_FAILE ) {
-            log_printf(ERR, "UART: configure uart faile.");
-            return ERR_UART_CONFIG_FAILE;
-        }
-#else
+
         if ( self->hw_port == SERIAL4_CTRL_PIN ) {
             //set_speed(self->dev_handle, );
             set_other_attribute(self->dev_handle, 9600, 8, 1, 'N');
@@ -467,13 +455,11 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             set_other_attribute(self->dev_handle, 2400, 8, 1, 'O');
             log_printf(INF, "UART: %s 2400,8,1,O", self->dev_name);
         }
-#endif
         self->status = BP_UART_STAT_WR;
         self->hw_status = BP_UART_STAT_INVALID;
         break;
     // 关闭串口
     case BP_EVT_KILLED:
-        gpio_unexport(self->hw_port);
         close(self->dev_handle);
         break;
     // 串口数据帧校验
@@ -490,29 +476,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         break;
     // 切换到发送模式
     case BP_EVT_SWITCH_2_TX:
-        //ret = set_gpio_output(self->hw_port, TX_HIGH_LEVEL);
-        if ( self->master ) {
-            //self->master->seed = 0;
-            self->hw_status = BP_UART_STAT_WR;
-        }
-        if ( ret != ERR_OK ) {
-            log_printf(ERR, "UART: set uart to TX mode faile");
-            break;
-        }
-        //log_printf(INF, "UART: switch to TX mode.");
-        break;
-    // 切换到接收模式
     case BP_EVT_SWITCH_2_RX:
-        //ret = set_gpio_output(self->hw_port, RX_LOW_LEVEL);
-        if ( self->master ) {
-            //self->master->seed = 0;
-            self->hw_status = BP_UART_STAT_RD;
-        }
-        if ( ret != ERR_OK ) {
-            log_printf(ERR, "UART: set uart to RX mode faile");
-            break;
-        }
-        //log_printf(INF, "UART: switch to RX mode.");
         break;
 
     // 串口接收到新数据
@@ -2582,7 +2546,7 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
-            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
+            log_printf(WRN, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
