@@ -276,7 +276,7 @@ int write_frame(int dev, void *buff, size_t len)
 	}
 	tcdrain(dev);
 	__dump_uart_hex(dump_buff, buff, ret);
-	printf("TX <%3d>: %s\n", retval, dump_buff);
+	printf("TX <%3d>: %s\n", ret, dump_buff);
 	return ret;
 }
 
