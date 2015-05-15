@@ -129,6 +129,37 @@ void __dump_uart_hex(unsigned char *buff, unsigned char *hex, int len)
     }
 }
 
+double __card_read_remain(const struct user_card *c) {
+    unsigned int imoney = 0;
+
+    imoney += c->card.sector_4.data.remain_money[0];
+    imoney += c->card.sector_4.data.remain_money[1] * 256;
+    imoney += c->card.sector_4.data.remain_money[2] * 256 * 256;
+
+    return imoney / 100.0f;
+}
+
+double __card_write_remain(struct user_card * c, double money) {
+    unsigned int imoney = money * 100;
+    c->card.sector_4.data.remain_money[0] = imoney & 0xFF;
+    c->card.sector_4.data.remain_money[1] = (imoney >> 8) & 0xFF;
+    c->card.sector_4.data.remain_money[2] = (imoney >> 16) & 0xFF;
+    c->card.sector_4.data.remain_sum =
+            check_sum(c->card.sector_4.data.remain_money, 3);
+    return money;
+}
+
+void __card_read_passwd(const struct user_card *c, char *passwd) {
+    sprintf(passwd, "%d%d%d%d%d%d",
+            c->card.sector_4.data.passwd_code[2]>>4,
+            c->card.sector_4.data.passwd_code[2]&0xF,
+            c->card.sector_4.data.passwd_code[1]>>4,
+            c->card.sector_4.data.passwd_code[1]&0xF,
+            c->card.sector_4.data.passwd_code[0]>>4,
+            c->card.sector_4.data.passwd_code[0]&0xF);
+}
+
+
 #if 0
 int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
@@ -645,8 +676,58 @@ int read_card(int dev, unsigned char *id, unsigned char *passwd, unsigned char s
 	return 0;
 }
 
-int format_card(int dev, unsigned char *id, unsigned char *def_passwd, unsigned int money, unsigned int sec)
+int format_card(int dev, unsigned char *id, unsigned char *def_passwd, double money, unsigned int sec)
 {
+	unsigned char buff[32] = {0};
+	unsigned char rx_buff[64] = {0};
+	unsigned char bcc;
+	int l, nr = 0, ret;
+	struct user_card cd={0};
+
+	buff[ nr ++ ] = 0x17;
+	buff[ nr ++ ] = 0x02;
+	buff[ nr ++ ] = 0x48;
+	buff[ nr ++ ] = 0x11;
+	buff[ nr ++ ] = sec; // 写第4扇区
+
+	do {
+		int i = 0;
+		cd.card.sector_4.data.magic = 0x4F4E5057;
+		__card_write_remain(&cd, money);
+		cd.card.sector_4.data.passwd_code[0] = 0x11;
+		cd.card.sector_4.data.passwd_code[2] = 0x11;
+		cd.card.sector_4.data.passwd_code[3] = 0x11;
+		cd.card.sector_4.data.sum = check_sum(cd.card.sector_4.buff, 15);
+		for ( i = 0; i < 16; i ++ ) {
+			buff[ nr ++ ] = cd.card.sector_4.buff[i];
+		}
+	} while (0);
+
+	l = nr;
+	buff[ nr ++ ] = BCC_code(buff, l);
+	buff[ nr ++ ] = 0x03;
+	
+	ret = write(dev, buff, nr);
+	if ( 0 == ret ) {
+		printf("格式化卡失败!\n");
+		return 0;
+	}
+	tcdrain(dev);
+
+	ret = __read_result(dev, rx_buff);
+	if ( ret == 0 ) {
+		return 0;
+	}
+	bcc = BCC_code(rx_buff, ret - 2);
+	if ( bcc != rx_buff[ ret - 2] ) {
+		printf("无法确定认证结果!\n");
+		return 0;
+	}
+	if ( rx_buff[2] == 0x00 ) {
+		printf("格式化成功!\n");
+		return 1;
+	}
+	printf("格式化失败!\n");
 	return 0;
 }
 
