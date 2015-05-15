@@ -103,7 +103,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
 
     if (tcgetattr(fd, &options) != 0)
     {
-        perror("SetupSerial 1");
+        //perror("SetupSerial 1");
         return -1;
     }
     bzero( &options, sizeof( options ) );
@@ -178,7 +178,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
             break;
 
         default:
-            fprintf(stderr,"Unsupported parity\n");
+            //fprintf(stderr,"Unsupported parity\n");
             return -1;
     }
 
@@ -193,7 +193,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
             break;
 
         default:
-            fprintf(stderr,"Unsupported stop bits\n");
+            //fprintf(stderr,"Unsupported stop bits\n");
             return -1;
     }
 
@@ -210,7 +210,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
     cfmakeraw(&options);
 
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
-        perror("SetupSerial 3");
+        //perror("SetupSerial 3");
         return -1;
     }
 
