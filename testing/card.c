@@ -464,6 +464,8 @@ int find_card(int dev, unsigned char *id)
 		printf("寻卡失败!\n");
 		return 0;
 	}
+	tcdrain(dev);
+
 	ret = __read_result(dev, rx_buff);
 	if ( ret == 0 ) {
 		return 0;
@@ -515,7 +517,8 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 		printf("卡认证失败!\n");
 		return 0;
 	}
-	
+	tcdrain(dev);
+
 	ret = __read_result(dev, rx_buff);
 	if ( ret == 0 ) {
 		return 0;
