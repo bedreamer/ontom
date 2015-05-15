@@ -461,7 +461,7 @@ int find_card(int dev, unsigned char *id)
 
 	ret = write(dev, buff, nr);
 	if ( 0 == ret ) {
-		printf("寻卡失败!");
+		printf("寻卡失败!\n");
 		return 0;
 	}
 	ret = __read_result(dev, rx_buff);
@@ -471,7 +471,7 @@ int find_card(int dev, unsigned char *id)
 	
 	bcc = BCC_code(rx_buff, ret - 2);
 	if ( bcc != rx_buff[ ret - 2] ) {
-		printf("无法识别的卡!");
+		printf("无法识别的卡!\n");
 		return 0;
 	}
 
@@ -522,7 +522,7 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 	}
 	bcc = BCC_code(rx_buff, ret - 2);
 	if ( bcc != rx_buff[ ret - 2] ) {
-		printf("无法确定认证结果!");
+		printf("无法确定认证结果!\n");
 		return 0;
 	}
 	if ( rx_buff[2] != 0x00 ) {
