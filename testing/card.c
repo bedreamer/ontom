@@ -98,6 +98,8 @@ typedef enum {
     SEQ_INVALID
 }QUERY_STAT;
 
+unsigned char dump_buff[1024];
+
 unsigned char BCC_code(unsigned char *da,size_t len) {
     size_t i  = 0;
     unsigned char BCC = 0;
@@ -481,7 +483,7 @@ int __read_card_sector(unsigned char *obuf, int dev, unsigned char *id, unsigned
 	l = nr;
 	buff[ nr ++ ] = BCC_code(buff, l);
 	buff[ nr ++ ] = 0x03;
-	ret = write(dev, buff, nr);
+	ret = write_frame(dev, buff, nr);
 	if ( 0 == ret ) {
 		printf("读扇区失败!\n");
 		return 0;
@@ -506,8 +508,25 @@ int __read_result(int dev, unsigned char *obuf)
 	if ( 0 >= retval ) {
 		return 0;
 	}
+	retval = read(dev, obuf, 64);
+	
+	__dump_uart_hex(dump_buff, obuf, retval);
+	printf("RX: %s\n", dump_buff);
+	return retval;
+}
 
-	return read(dev, obuf, 64);
+int write_frame(int dev, void *buff, size_t len)
+{
+	int ret;
+
+	ret = write(dev, buff, len);
+	if ( 0 == ret ) {
+		return 0;
+	}
+	tcdrain(dev);
+	__dump_uart_hex(dump_buff, buff, ret);
+	printf("TX: %s\n", dump_buff);
+	return ret;
 }
 
 int find_card(int dev, unsigned char *id)
@@ -552,6 +571,7 @@ int find_card(int dev, unsigned char *id)
 	return 1;
 }
 
+
 int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char sect)
 {
 	unsigned char buff[32] = {0};
@@ -582,7 +602,7 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 	buff[ nr ++ ] = BCC_code(buff, l);
 	buff[ nr ++ ] = 0x03;
 	
-	ret = write(dev, buff, nr);
+	ret = write_frame(dev, buff, nr);
 	if ( 0 == ret ) {
 		printf("卡认证失败!\n");
 		return 0;
@@ -715,7 +735,7 @@ int format_card(int dev, unsigned char *id, unsigned char *def_passwd, double mo
 		return 0;	
 	}
 	
-	ret = write(dev, buff, nr);
+	ret = write_frame(dev, buff, nr);
 	if ( 0 == ret ) {
 		printf("格式化卡失败!\n");
 		return 0;
