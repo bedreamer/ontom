@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -7,7 +7,7 @@
        #include <fcntl.h>
 
 struct user_card {
-    // ´¥·¢ÈÎÎñÊ±µÄ¿¨ºÅ
+    // è§¦å‘ä»»åŠ¡æ—¶çš„å¡å·
     char triger_card_sn[64];
     struct {
         unsigned char id[16];
@@ -15,14 +15,14 @@ struct user_card {
         union {
             unsigned char buff[16];
             struct {
-                unsigned int magic;           /*°ÂÄÜÄ§Êı 'ONPW', Only-Power 0x4F4E5057 */
-                unsigned char remain_money[3]; /*Óà¶î£¬ ·¶Î§ 0.00 ~ 167772.15 */
-                unsigned char remain_sum;    /*Óà¶îĞ£ÑéÎ» */
-                unsigned char passwd_code[3];  /*6 Î»BCD ÂëÃÜÂë*/
-                unsigned char passwd_sum;    /*ÃÜÂëĞ£ÑéºÍ */
+                unsigned int magic;           /*å¥¥èƒ½é­”æ•° 'ONPW', Only-Power 0x4F4E5057 */
+                unsigned char remain_money[3]; /*ä½™é¢ï¼Œ èŒƒå›´ 0.00 ~ 167772.15 */
+                unsigned char remain_sum;    /*ä½™é¢æ ¡éªŒä½ */
+                unsigned char passwd_code[3];  /*6 ä½BCD ç å¯†ç */
+                unsigned char passwd_sum;    /*å¯†ç æ ¡éªŒå’Œ */
                 unsigned short reserved;
                 unsigned char unuesed;
-                unsigned char sum;            /*Ğ£ÑéºÍ */
+                unsigned char sum;            /*æ ¡éªŒå’Œ */
             }data;
         }sector_4;
     }card;
@@ -30,68 +30,68 @@ struct user_card {
 
 #define SECT   4
 
-// ´®¿ÚIOÊÂ¼ş
+// ä¸²å£IOäº‹ä»¶
 typedef enum {
-    // ´®¿ÚÊı¾İ½á¹¹³õÊ¼»¯
+    // ä¸²å£æ•°æ®ç»“æ„åˆå§‹åŒ–
     BP_EVT_INIT                  = 0x00,
-    // ´®¿ÚÅäÖÃ
+    // ä¸²å£é…ç½®
     BP_EVT_CONFIGURE,
-    // ¹Ø±Õ´®¿Ú
+    // å…³é—­ä¸²å£
     BP_EVT_KILLED,
-    // ´®¿ÚÊı¾İÖ¡Ğ£Ñé
+    // ä¸²å£æ•°æ®å¸§æ ¡éªŒ
     BP_EVT_FRAME_CHECK,
-    // ÇĞ»»µ½·¢ËÍÄ£Ê½
+    // åˆ‡æ¢åˆ°å‘é€æ¨¡å¼
     BP_EVT_SWITCH_2_TX,
-    // ÇĞ»»µ½½ÓÊÕÄ£Ê½
+    // åˆ‡æ¢åˆ°æ¥æ”¶æ¨¡å¼
     BP_EVT_SWITCH_2_RX,
 
-    // ´®¿Ú½ÓÊÕµ½ĞÂÊı¾İ
+    // ä¸²å£æ¥æ”¶åˆ°æ–°æ•°æ®
     BP_EVT_RX_DATA               = 0x10,
-    // ´®¿ÚÊÕµ½ÍêÕûµÄÊı¾İÖ¡
+    // ä¸²å£æ”¶åˆ°å®Œæ•´çš„æ•°æ®å¸§
     BP_EVT_RX_FRAME,
 
-    // ´®¿Ú·¢ËÍÊı¾İÇëÇó
+    // ä¸²å£å‘é€æ•°æ®è¯·æ±‚
     BP_EVT_TX_FRAME_REQUEST      = 0x20,
-    // ´®¿Ú·¢ËÍÈ·ÈÏ
+    // ä¸²å£å‘é€ç¡®è®¤
     BP_EVT_TX_FRAME_CONFIRM,
-    // ´®¿ÚÊı¾İ·¢ËÍÍê³ÉÊÂ¼ş
+    // ä¸²å£æ•°æ®å‘é€å®Œæˆäº‹ä»¶
     BP_EVT_TX_FRAME_DONE,
 
-    // ´®¿Ú½ÓÊÕµ¥¸ö×Ö½Ú³¬Ê±£¬³öÏÖÔÚ½ÓÊÕÖ¡µÄµÚÒ»¸ö×Ö½Ú
+    // ä¸²å£æ¥æ”¶å•ä¸ªå­—èŠ‚è¶…æ—¶ï¼Œå‡ºç°åœ¨æ¥æ”¶å¸§çš„ç¬¬ä¸€ä¸ªå­—èŠ‚
     BP_EVT_RX_BYTE_TIMEOUT       = 0x40,
-    // ´®¿Ú½ÓÊÕÖ¡³¬Ê±, ½ÓÊÜµÄÊı¾İ²»ÍêÕû
+    // ä¸²å£æ¥æ”¶å¸§è¶…æ—¶, æ¥å—çš„æ•°æ®ä¸å®Œæ•´
     BP_EVT_RX_FRAME_TIMEOUT,
 
-    // ´®¿ÚIO´íÎó
+    // ä¸²å£IOé”™è¯¯
     BP_EVT_IO_ERROR              = 0x80,
-    // Ö¡Ğ£ÑéÊ§°Ü
+    // å¸§æ ¡éªŒå¤±è´¥
     BP_EVT_FRAME_CHECK_ERROR
 }BP_UART_EVENT;
 
 typedef enum {
-    // Ñ°¿¨Ä£Ê½
+    // å¯»å¡æ¨¡å¼
     SEQ_FIND_CARD = 0,
-    // ¶ÁÉÈÇøÃÜÂëÈÏÖ¤
+    // è¯»æ‰‡åŒºå¯†ç è®¤è¯
     SEQ_SECTOR_RD_AUTH,
-    // Ğ´ÉÈÇøÃÜÂëÈÏÖ¤
+    // å†™æ‰‡åŒºå¯†ç è®¤è¯
     SEQ_SECTOR_WR_AUTH,
-    // ¶ÁÈ¡¹«¿ªÊı¾İÇø
+    // è¯»å–å…¬å¼€æ•°æ®åŒº
     SEQ_READ_PUBLIC_BLK,
-    // Ğ´Èë¹«¿ªÊı¾İÇø
+    // å†™å…¥å…¬å¼€æ•°æ®åŒº
     SEQ_WRITE_PUBLIC_BLK,
-    // ¶ÁÈ¡Ë½ÃÜÊı¾İÇø1
+    // è¯»å–ç§å¯†æ•°æ®åŒº1
     SEQ_READ_PRIVATE_BLK1,
-    // ¶ÁÈ¡Ë½ÃÜÊı¾İÇø2
+    // è¯»å–ç§å¯†æ•°æ®åŒº2
     SEQ_READ_PRIVATE_BLK2,
-    // ¶ÁÈ¡Ë½ÃÜÊı¾İÇø3
+    // è¯»å–ç§å¯†æ•°æ®åŒº3
     SEQ_READ_PRIVATE_BLK3,
-    // ¶ÁÈ¡Ë½ÃÜÊı¾İÇø4
+    // è¯»å–ç§å¯†æ•°æ®åŒº4
     SEQ_READ_PRIVATE_BLK4,
-    // ¶ÁÈ¡Ë½ÃÜÊı¾İÇø5
+    // è¯»å–ç§å¯†æ•°æ®åŒº5
     SEQ_READ_PRIVATE_BLK5,
-    // ¶ÁÈ¡Ë½ÃÜÊı¾İÇø6
+    // è¯»å–ç§å¯†æ•°æ®åŒº6
     SEQ_READ_PRIVATE_BLK6,
-    // ¶ÁÈ¡Ë½ÃÜÊı¾İÇø7
+    // è¯»å–ç§å¯†æ•°æ®åŒº7
     SEQ_READ_PRIVATE_BLK7,
     SEQ_INVALID
 }QUERY_STAT;
@@ -141,13 +141,13 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             return ERR_FRAME_CHECK_DATA_TOO_SHORT;
         }
         break;
-    // ´®¿Ú½ÓÊÕµ½ĞÂÊı¾İ
+    // ä¸²å£æ¥æ”¶åˆ°æ–°æ•°æ®
     case BP_EVT_RX_DATA:
         break;
-    // ´®¿ÚÊÕµ½ÍêÕûµÄÊı¾İÖ¡
+    // ä¸²å£æ”¶åˆ°å®Œæ•´çš„æ•°æ®å¸§
     case BP_EVT_RX_FRAME:
         if ( bit_read(task, S_CARD_READER_COMM_DOWN) ) {
-            log_printf(INF, "¶Á¿¨Æ÷Í¨ĞÅ»Ö¸´");
+            log_printf(INF, "è¯»å¡å™¨é€šä¿¡æ¢å¤");
             bit_clr(task, S_CARD_READER_COMM_DOWN);
         }
         switch ( query_stat ) {
@@ -155,38 +155,38 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             if ( param->buff.rx_buff[0] <= 8 ) return ERR_OK;
             memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
             id_len = param->buff.rx_buff[7];
-            log_printf(INF, "UART: Ñ°µ½¿¨£¬ID:(%02X%02X%02X%02X).",
+            log_printf(INF, "UART: å¯»åˆ°å¡ï¼ŒID:(%02X%02X%02X%02X).",
                         ID[3], ID[2], ID[1], ID[0]);
             query_stat = SEQ_SECTOR_RD_AUTH;
             ret = ERR_NEED_ECHO;
             break;
         case SEQ_SECTOR_RD_AUTH:
             if ( param->buff.rx_buff[2] == 0x00 ) {
-                // ÈÏÖ¤³É¹¦
-                log_printf(INF, "UART: ¶ÁÈÏÖ¤³É¹¦");
+                // è®¤è¯æˆåŠŸ
+                log_printf(INF, "UART: è¯»è®¤è¯æˆåŠŸ");
                 query_stat = SEQ_READ_PUBLIC_BLK;
                 ret = ERR_NEED_ECHO;
             } else {
-                // ÈÏÖ¤Ê§°Ü
-                log_printf(WRN, "UART: ¶ÁÈÏÖ¤Ê§°Ü");
+                // è®¤è¯å¤±è´¥
+                log_printf(WRN, "UART: è¯»è®¤è¯å¤±è´¥");
                 query_stat = SEQ_FIND_CARD;
             }
             break;
         case SEQ_SECTOR_WR_AUTH:
             if ( param->buff.rx_buff[2] == 0x00 ) {
-                // ÈÏÖ¤³É¹¦
-                log_printf(INF, "UART: Ğ´ÈÏÖ¤³É¹¦");
+                // è®¤è¯æˆåŠŸ
+                log_printf(INF, "UART: å†™è®¤è¯æˆåŠŸ");
                 query_stat = SEQ_WRITE_PUBLIC_BLK;
                 ret = ERR_NEED_ECHO;
             } else {
-                // ÈÏÖ¤Ê§°Ü
-                log_printf(WRN, "UART: Ğ´ÈÏÖ¤Ê§°Ü, ¿Û·ÑÊ§°Ü!");
+                // è®¤è¯å¤±è´¥
+                log_printf(WRN, "UART: å†™è®¤è¯å¤±è´¥, æ‰£è´¹å¤±è´¥!");
                 query_stat = SEQ_FIND_CARD;
             }
             break;
         case SEQ_READ_PUBLIC_BLK:
             if ( param->buff.rx_buff[2] != 0 ) {
-                log_printf(WRN, "UART: ¶Á¿¨Æ÷¶ÁÈ¡Êı¾İÇøÊ§°Ü, ´íÎóÂë: %d",
+                log_printf(WRN, "UART: è¯»å¡å™¨è¯»å–æ•°æ®åŒºå¤±è´¥, é”™è¯¯ç : %d",
                            param->buff.rx_buff[2]);
                 query_stat = SEQ_FIND_CARD;
                 ret = ERR_OK;
@@ -197,28 +197,28 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                 ret = ERR_OK;
                 memcpy(cd.card.sector_4.buff, &param->buff.rx_buff[4], 16);
                 if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
-                    log_printf(WRN, "UART: ÎŞ·¨Ê¶±ğµÄ¿¨ %08X.", cd.card.sector_4.data.magic);
+                    log_printf(WRN, "UART: æ— æ³•è¯†åˆ«çš„å¡ %08X.", cd.card.sector_4.data.magic);
                 } else if ( cd.card.sector_4.data.sum !=
                             check_sum(cd.card.sector_4.buff, 15) ) {
-                    log_printf(WRN, "UART: ¿¨Êı¾İËğ»µ%02X, Ğ£ÑéÊ§°Ü %02X.",
+                    log_printf(WRN, "UART: å¡æ•°æ®æŸå%02X, æ ¡éªŒå¤±è´¥ %02X.",
                                cd.card.sector_4.data.sum, check_sum(cd.card.sector_4.buff, 15));
                 } else {
                     int faile = 0;
                     if ( cd.card.sector_4.data.remain_sum !=
                             check_sum(cd.card.sector_4.data.remain_money, 3) ) {
-                        log_printf(WRN, "UART: ¿¨Êı¾İ×Ö¶Î£º Óà¶îĞ£ÑéÊ§°Ü.");
+                        log_printf(WRN, "UART: å¡æ•°æ®å­—æ®µï¼š ä½™é¢æ ¡éªŒå¤±è´¥.");
                         faile ++;
                     }
                     if ( cd.card.sector_4.data.passwd_sum !=
                                 check_sum(cd.card.sector_4.data.passwd_code, 3) ) {
-                        log_printf(WRN, "UART: ¿¨Êı¾İ×Ö¶Î£º ÃÜÂëĞ£ÑéÊ§°Ü.");
+                        log_printf(WRN, "UART: å¡æ•°æ®å­—æ®µï¼š å¯†ç æ ¡éªŒå¤±è´¥.");
                         faile ++;
                     }
 
                     if ( ! faile ) {
                         unsigned int money = *(unsigned int *)(void*)cd.card.sector_4.data.remain_money;
                         money &= 0x00FFFFFF;
-                        log_printf(INF, GRN("UART: Ë¢¿¨Íê³É[¿¨ºÅ: %02X%02X%02X%02X, Óà¶î: %.2f]"),
+                        log_printf(INF, GRN("UART: åˆ·å¡å®Œæˆ[å¡å·: %02X%02X%02X%02X, ä½™é¢: %.2f]"),
                                    ID[3], ID[2], ID[1], ID[0], money / 100.0f);
                         char buff[32];
                         config_write("card_status", "NORMAL");
@@ -237,14 +237,14 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                         if ( task->uipage == UI_PAGE_JOBS ) {
                             job = job_search(task->ui_job_id);
                             if ( job == NULL ) {
-                                log_printf(WRN, "ÎŞĞ§µÄË¢¿¨.");
+                                log_printf(WRN, "æ— æ•ˆçš„åˆ·å¡.");
                             } else {
                                 if ( 0 == strcmp(job->card.triger_card_sn, buff) ) {
                                     if ( job->charge_job_create_timestamp + 10 > time(NULL) ) {
-                                        log_printf(INF, "UART: Ë¢¿¨Ì«¿ì£¬×÷Òµ±£»¤.");
+                                        log_printf(INF, "UART: åˆ·å¡å¤ªå¿«ï¼Œä½œä¸šä¿æŠ¤.");
                                         return ERR_OK;
                                     } else {
-                                        log_printf(INF, "ÈÎÎñÖĞÖ¹£¬¿ªÊ¼¿Û·Ñ¡£");
+                                        log_printf(INF, "ä»»åŠ¡ä¸­æ­¢ï¼Œå¼€å§‹æ‰£è´¹ã€‚");
                                         query_stat = SEQ_SECTOR_WR_AUTH;
                                         ret = ERR_NEED_ECHO;
                                     }
@@ -260,7 +260,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             }
             break;
         case SEQ_WRITE_PUBLIC_BLK:
-            log_printf(INF, "UART: Ë¢¿¨¿Û·Ñ³É¹¦");
+            log_printf(INF, "UART: åˆ·å¡æ‰£è´¹æˆåŠŸ");
             query_stat = SEQ_FIND_CARD;
             ret = ERR_OK;
             break;
@@ -268,7 +268,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             break;
         }
         break;
-    // ´®¿Ú·¢ËÍÊı¾İÇëÇó
+    // ä¸²å£å‘é€æ•°æ®è¯·æ±‚
     case BP_EVT_TX_FRAME_REQUEST:
         switch ( query_stat ) {
         case SEQ_FIND_CARD:
@@ -294,8 +294,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             buff[ nr ++ ] = 0x12;
             buff[ nr ++ ] = 0x02;
             buff[ nr ++ ] = 0x46;
-            buff[ nr ++ ] = 0x0C;  // 6×Ö½ÚÃÜÔ¿
-            buff[ nr ++ ] = 0x60;  // ÃÜÔ¿A
+            buff[ nr ++ ] = 0x0C;  // 6å­—èŠ‚å¯†é’¥
+            buff[ nr ++ ] = 0x60;  // å¯†é’¥A
             buff[ nr ++ ] = ID[0];
             buff[ nr ++ ] = ID[1];
             buff[ nr ++ ] = ID[2];
@@ -308,7 +308,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             buff[ nr ++ ] = def_passwd[4];
             buff[ nr ++ ] = def_passwd[5];
 
-            buff[ nr ++ ] = 0x04;  // Ä¬ÈÏ´æ·ÅÓÚµÚËÄÉÈÇø
+            buff[ nr ++ ] = 0x04;  // é»˜è®¤å­˜æ”¾äºç¬¬å››æ‰‡åŒº
 
             l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
@@ -326,7 +326,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             buff[ nr ++ ] = 0x02;
             buff[ nr ++ ] = 0x47;
             buff[ nr ++ ] = 0x01;
-            buff[ nr ++ ] = 0x04;  // Ä¬ÈÏ´æ·ÅÓÚµÚËÄÉÈÇø
+            buff[ nr ++ ] = 0x04;  // é»˜è®¤å­˜æ”¾äºç¬¬å››æ‰‡åŒº
             l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
@@ -341,7 +341,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
         case SEQ_WRITE_PUBLIC_BLK:
 
             if ( job == NULL ) {
-                log_printf(WRN, "UART: ¶Á¿¨Æ÷Ê±Ğò´íÂÒ.");
+                log_printf(WRN, "UART: è¯»å¡å™¨æ—¶åºé”™ä¹±.");
                 query_stat = SEQ_FIND_CARD;
                 return ERR_ERR;
             }
@@ -349,11 +349,11 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             buff[ nr ++ ] = 0x02;
             buff[ nr ++ ] = 0x48;
             buff[ nr ++ ] = 0x11;
-            buff[ nr ++ ] = 0x04; // Ğ´µÚ4ÉÈÇø
+            buff[ nr ++ ] = 0x04; // å†™ç¬¬4æ‰‡åŒº
 
             do {
                 int i = 0;
-                // µ÷ÊÔÃ¿´Î¿Û1.5
+                // è°ƒè¯•æ¯æ¬¡æ‰£1.5
                 __card_write_remain(&job->card, __card_read_remain(&job->card) - 1.5f);
                 job->card.card.sector_4.data.sum =
                         check_sum(job->card.card.sector_4.buff, 15);
@@ -378,16 +378,16 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             break;
         }
         break;
-    // ´®¿Ú·¢ËÍÈ·ÈÏ
+    // ä¸²å£å‘é€ç¡®è®¤
     case BP_EVT_TX_FRAME_CONFIRM:
         ret = ERR_OK;
         break;
-    // ´®¿ÚÊı¾İ·¢ËÍÍê³ÉÊÂ¼ş
+    // ä¸²å£æ•°æ®å‘é€å®Œæˆäº‹ä»¶
     case BP_EVT_TX_FRAME_DONE:
         break;
-    // ´®¿Ú½ÓÊÕµ¥¸ö×Ö½Ú³¬Ê±£¬³öÏÖÔÚ½ÓÊÕÖ¡µÄµÚÒ»¸ö×Ö½Ú
+    // ä¸²å£æ¥æ”¶å•ä¸ªå­—èŠ‚è¶…æ—¶ï¼Œå‡ºç°åœ¨æ¥æ”¶å¸§çš„ç¬¬ä¸€ä¸ªå­—èŠ‚
     case BP_EVT_RX_BYTE_TIMEOUT:
-    // ´®¿Ú½ÓÊÕÖ¡³¬Ê±, ½ÓÊÜµÄÊı¾İ²»ÍêÕû
+    // ä¸²å£æ¥æ”¶å¸§è¶…æ—¶, æ¥å—çš„æ•°æ®ä¸å®Œæ•´
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died < self->master->died_line ) {
@@ -396,14 +396,14 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             //self->master->died ++;
             if ( ! bit_read(task, S_CARD_READER_COMM_DOWN) ) {
             }
-            printf("¶Á¿¨Æ÷Í¨ĞÅÖĞ¶Ï, ÇëÅÅ²é¹ÊÕÏ,(%d)");
+            printf("è¯»å¡å™¨é€šä¿¡ä¸­æ–­, è¯·æ’æŸ¥æ•…éšœ,(%d)");
         }
         query_stat = SEQ_FIND_CARD;
         break;
-    // ´®¿ÚIO´íÎó
+    // ä¸²å£IOé”™è¯¯
     case BP_EVT_IO_ERROR:
         break;
-    // Ö¡Ğ£ÑéÊ§°Ü
+    // å¸§æ ¡éªŒå¤±è´¥
     case BP_EVT_FRAME_CHECK_ERROR:
         break;
     default:
@@ -448,7 +448,6 @@ int find_card(int dev, unsigned char *id)
 	unsigned char rx_buff[64] = {0};
 	unsigned char bcc;
 	int l, nr = 0, ret;
-	
 
 	buff[ nr ++ ] = 0x08;
 	buff[ nr ++ ] = 0x02;
@@ -462,7 +461,7 @@ int find_card(int dev, unsigned char *id)
 
 	ret = write(dev, buff, nr);
 	if ( 0 == ret ) {
-		printf("Ñ°¿¨Ê§°Ü!");
+		printf("å¯»å¡å¤±è´¥!");
 		return 0;
 	}
 	ret = __read_result(dev, rx_buff);
@@ -472,7 +471,7 @@ int find_card(int dev, unsigned char *id)
 	
 	bcc = BCC_code(rx_buff, ret - 2);
 	if ( bcc != rx_buff[ ret - 2] ) {
-		printf("ÎŞ·¨Ê¶±ğµÄ¿¨!");
+		printf("æ— æ³•è¯†åˆ«çš„å¡!");
 		return 0;
 	}
 
@@ -491,8 +490,8 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 	buff[ nr ++ ] = 0x12;
 	buff[ nr ++ ] = 0x02;
 	buff[ nr ++ ] = 0x46;
-	buff[ nr ++ ] = 0x0C;  // 6×Ö½ÚÃÜÔ¿
-	buff[ nr ++ ] = 0x60;  // ÃÜÔ¿A
+	buff[ nr ++ ] = 0x0C;  // 6å­—èŠ‚å¯†é’¥
+	buff[ nr ++ ] = 0x60;  // å¯†é’¥A
 	buff[ nr ++ ] = id[0];
 	buff[ nr ++ ] = id[1];
 	buff[ nr ++ ] = id[2];
@@ -505,7 +504,7 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 	buff[ nr ++ ] = passwd[4];
 	buff[ nr ++ ] = passwd[5];
 
-	buff[ nr ++ ] = sect;  // Ä¬ÈÏ´æ·ÅÓÚµÚËÄÉÈÇø
+	buff[ nr ++ ] = sect;  // é»˜è®¤å­˜æ”¾äºç¬¬å››æ‰‡åŒº
 
 	l = nr;
 	buff[ nr ++ ] = BCC_code(buff, l);
@@ -513,7 +512,7 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 	
 	ret = write(dev, buff, nr);
 	if ( 0 == ret ) {
-		printf("¿¨ÈÏÖ¤Ê§°Ü!\n");
+		printf("å¡è®¤è¯å¤±è´¥!\n");
 		return 0;
 	}
 	
@@ -523,15 +522,15 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 	}
 	bcc = BCC_code(rx_buff, ret - 2);
 	if ( bcc != rx_buff[ ret - 2] ) {
-		printf("ÎŞ·¨È·¶¨ÈÏÖ¤½á¹û!");
+		printf("æ— æ³•ç¡®å®šè®¤è¯ç»“æœ!");
 		return 0;
 	}
 	if ( rx_buff[2] != 0x00 ) {
-		printf("ÈÏÖ¤Ê§°Ü£º %d\n", rx_buff[2]);
+		printf("è®¤è¯å¤±è´¥ï¼š %d\n", rx_buff[2]);
 		return 1;
 	}
 
-	printf("¿¨ÈÏÖ¤³É¹¦!\n");
+	printf("å¡è®¤è¯æˆåŠŸ!\n");
 	return 1;
 }
 
@@ -545,11 +544,11 @@ int read_card(int dev, unsigned char *id, unsigned char *passwd, unsigned char s
 	}
 	
 	if ( ! __read_card_sector(rx_buff, dev, id, passwd, sec) ) {
-		printf("¶ÁÈ¡ÉÈÇø%dÊ§°Ü!\n", sec);
+		printf("è¯»å–æ‰‡åŒº%då¤±è´¥!\n", sec);
 		return 0;
 	}
 
-	printf("¶ÁÈ¡³É¹¦!\n");
+	printf("è¯»å–æˆåŠŸ!\n");
 	printf("\t%16s: %02X%02X%02X%02X\n", "ID", id[3], id[2], id[1], id[0]);
 	memcpy(cd.card.sector_4.buff, &rx_buff[4], 16);
 	if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
@@ -711,7 +710,7 @@ int main(int argc, char **argv)
 			sleep(1);
 		}
 	
-		printf("Ñ°µ½¿¨: %s\n", id);
+		printf("å¯»åˆ°å¡: %s\n", id);
 		
 		switch ( mode ) {
 		case READ_CARD:
