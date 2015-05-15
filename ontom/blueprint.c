@@ -4850,6 +4850,7 @@ ___fast_switch_2_rx:
                 thiz->tx_param.cursor = 0;
                 continue;
             }
+            tcdrain(thiz->dev_handle);
             tcflush(thiz->dev_handle, TCIOFLUSH);
 
 continue_to_send:
