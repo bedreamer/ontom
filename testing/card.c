@@ -726,8 +726,8 @@ int format_card(int dev, unsigned char *id, unsigned char *def_passwd, double mo
 		cd.card.sector_4.data.magic = 0x4F4E5057;
 		__card_write_remain(&cd, money);
 		cd.card.sector_4.data.passwd_code[0] = 0x11;
+		cd.card.sector_4.data.passwd_code[1] = 0x11;
 		cd.card.sector_4.data.passwd_code[2] = 0x11;
-		cd.card.sector_4.data.passwd_code[3] = 0x11;
 		cd.card.sector_4.data.sum = check_sum(cd.card.sector_4.buff, 15);
 		for ( i = 0; i < 16; i ++ ) {
 			buff[ nr ++ ] = cd.card.sector_4.buff[i];
