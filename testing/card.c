@@ -5,7 +5,8 @@
        #include <sys/types.h>
        #include <sys/stat.h>
        #include <fcntl.h>
-
+#include <linux/termios.h>
+	   
 #pragma pack(1)
 struct user_card {
     // 触发任务时的卡号
