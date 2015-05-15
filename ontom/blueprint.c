@@ -4877,7 +4877,6 @@ continue_to_send:
                     thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                     thiz->tx_param.payload_size = 0;
                     thiz->tx_param.cursor = 0;
-                    tcflush(thiz->dev_handle, TCIOFLUSH);
                     memset(thiz->tx_buff, 0, sizeof(thiz->tx_buff));
                     log_printf(DBG_LV3, "不需要帧回应");
                     usleep(4 * 1000);
