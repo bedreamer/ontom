@@ -684,7 +684,7 @@ int main(int argc, const char *argv[])
 		
 		switch ( mode ) {
 		case READ_CARD:
-			read_card(dev, id, passswd, SECT);
+			read_card(dev, id, passwd, SECT);
 		break;
 		case FORMAT_CARD:
 		ok = format_card(dev, id, passwd, money, SECT);
