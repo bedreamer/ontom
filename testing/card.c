@@ -414,9 +414,8 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
 }
 #endif
 
-void show_help(int cmd) 
-{
-}
+void show_help(int cmd);
+
 
 int __read_card_sector(unsigned char *obuf, int dev, unsigned char *id, unsigned char *passwd, unsigned char sec)
 {
@@ -621,6 +620,27 @@ typedef enum {
 	WRITE_CARD
 }RUNMOD;
 
+void show_help(int cmd)
+{
+	printf(
+	"Usage:\n"
+	"    card [-D DEVICE] [CMD] {OPTIONS}\n"
+	"DEVICE: tty device.\n"
+	"CMD:\n"
+	"    -r: read card data.\n"
+	"    -f: format a card.\n"
+	"    -w: write card data.\n"
+	"OPTIONS:\n"
+	"    -I: infinite mode.\n"
+	"    -P: password for card auth.\n"
+	"    -M: set new money value to card.\n"
+	"    -h: show this help\n\n"
+	"AUTHOR:\n"
+	"	 LiJie <bedreamer@163.com> 2015/05/15"
+	);
+}
+
+
 int main(int argc, const char *argv[])
 {
 	unsigned char passwd[16] = {255, 255, 255, 255, 255, 255};
@@ -636,7 +656,7 @@ int main(int argc, const char *argv[])
 	char oc;
 	RUNMOD mode = READ_CARD;
 
-	while((oc = getopt(argc, argv, "rfwID:P:M:")) != -1)    
+	while((oc = getopt(argc, argv, "rfwhID:P:M:")) != -1)    
 	{         
 		switch(oc)        
 		{
@@ -666,7 +686,11 @@ int main(int argc, const char *argv[])
 		break;
 		case 'M':
 			money = (int)atof(optarg) * 100;
-		break;                
+		break;
+		case 'h':
+			show_help(0);
+			exit(0);
+		break;
 		default:
 			show_help(1);
 			exit(1);
