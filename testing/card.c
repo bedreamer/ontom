@@ -6,6 +6,7 @@
        #include <sys/stat.h>
        #include <fcntl.h>
 
+#pragma pack(1)
 struct user_card {
     // 触发任务时的卡号
     char triger_card_sn[64];
@@ -27,6 +28,7 @@ struct user_card {
         }sector_4;
     }card;
 };
+#pragma pack()
 
 #define SECT   4
 
@@ -726,7 +728,7 @@ int format_card(int dev, unsigned char *id, unsigned char *def_passwd, double mo
 	}
 	bcc = BCC_code(rx_buff, ret - 2);
 	if ( bcc != rx_buff[ ret - 2] ) {
-		printf("无法确定认证结果!\n");
+		printf("无法确定结果!\n");
 		return 0;
 	}
 	if ( rx_buff[2] == 0x00 ) {
