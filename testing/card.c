@@ -673,8 +673,8 @@ int main(int argc, const char *argv[])
 		break;  
 		}
 	}
-	
-	dev = open(dev, O_RDWR | O_NOCTTY);
+
+	dev = open(device, O_RDWR | O_NOCTTY);
 	if ( dev == -1 ) {
 		printf("open device %s faile!\n", device);
 		exit(1);
