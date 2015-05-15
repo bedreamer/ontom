@@ -553,7 +553,7 @@ void show_help(int cmd)
 int main(int argc, char **argv)
 {
 	unsigned char passwd[16] = {255, 255, 255, 255, 255, 255};
-	int money = 0.0f;
+	double money = 0.0f;
 	char device[256] = {0};
 	unsigned char id[16] = {0};
 	int dev = -1;
@@ -594,7 +594,7 @@ int main(int argc, char **argv)
 			} while ( 0);
 		break;
 		case 'M':
-			money = (int)atof(optarg) * 100;
+			money = atof(optarg);
 		break;
 		case 'h':
 			show_help(0);
