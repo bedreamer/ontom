@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+       #include <sys/types.h>
+       #include <sys/stat.h>
+       #include <fcntl.h>
 
 struct user_card {
     // 触发任务时的卡号
@@ -430,9 +433,7 @@ int __read_result(int dev, unsigned char *obuf)
 		return 0;
 	}
 
-	rd = read(dev, obuf, 64);
-	
-	return rd;
+	return read(dev, obuf, 64);
 }
 
 int find_card(int dev, unsigned char *id)
@@ -625,6 +626,7 @@ int main(int argc, const char *argv[])
 	int done = 0;
 	int inifinal = 0;
 	int ok = 0;
+	char oc;
 	RUNMOD mode = READ_CARD;
 
 	while((oc = getopt(argc, argv, "rfwID:P:M:")) != -1)    
@@ -643,7 +645,7 @@ int main(int argc, const char *argv[])
 		case 'I':
 			inifinal = 1;
 		break;
-		case 'D'
+		case 'D':
 			strncpy(device, optarg, 256);
 		break;
 		case 'P':
@@ -655,7 +657,7 @@ int main(int argc, const char *argv[])
 					passwd[i] = passwd[i] - '0';
 			} while ( 0);
 		break;
-		case 'M'
+		case 'M':
 			money = (int)atof(optarg) * 100;
 		break;                
 		default:
