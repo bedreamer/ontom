@@ -674,14 +674,20 @@ int read_card(int dev, unsigned char *id, unsigned char *passwd, unsigned char s
 			faile ++;
 			printf("\t%16s: %s\n", "Money Check Status", "Untrusted");
 		}
-		printf("\t%16s: %s\n", "Money Check Code", str);		
+		sprintf(str, "OK, gave: %02X, need: %02X", 
+			cd.card.sector_4.data.remain_sum, check_sum(cd.card.sector_4.data.remain_money, 3));
+		printf("\t%16s: %s\n", "Money Check Code", str);
+		
 		if ( cd.card.sector_4.data.passwd_sum !=
 					check_sum(cd.card.sector_4.data.passwd_code, 3) ) {
 			faile ++;
 			printf("\t%16s: %s\n", "Password Check Status", "Untrusted");
 		}
+		sprintf(str, "OK, gave: %02X, need: %02X", 
+			cd.card.sector_4.data.passwd_sum,
+					check_sum(cd.card.sector_4.data.passwd_code, 3));
 		printf("\t%16s: %s\n", "Password Check Code", str);	
-		if ( ! faile ) {
+		if ( 1 ) {
 			unsigned int money = *(unsigned int *)(void*)cd.card.sector_4.data.remain_money;
 			char buff[32];
 			money &= 0x00FFFFFF;
