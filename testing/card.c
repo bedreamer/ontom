@@ -101,7 +101,6 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
 {
     struct termios options;
 
-
     if (tcgetattr(fd, &options) != 0)
     {
         perror("SetupSerial 1");
@@ -613,7 +612,7 @@ int main(int argc, char **argv)
 		printf("open device %s faile!\n", device);
 		exit(1);
 	}
-	set_other_attribute(dev, 9600, 8, 1, 'N');
+	//set_other_attribute(dev, 9600, 8, 1, 'N');
 
 	while ( ! done )
 	{
