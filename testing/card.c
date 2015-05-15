@@ -430,7 +430,7 @@ int __read_result(int dev, unsigned char *obuf)
 		return 0;
 	}
 
-	rd = read(thiz->dev_handle, obuf, 64);
+	rd = read(dev, obuf, 64);
 	
 	return rd;
 }
@@ -597,12 +597,12 @@ int read_card(int dev, unsigned char *id, unsigned char *passwd, unsigned char s
 	return 0;
 }
 
-int format_card(int, dev, unsigned char *id, unsigned char *def_passwd, unsigned int money, unsigned int sec)
+int format_card(int dev, unsigned char *id, unsigned char *def_passwd, unsigned int money, unsigned int sec)
 {
 	return 0;
 }
 
-int write_card(int, dev, unsigned char *id, unsigned char *new_passwd, unsigned int money, unsigned int sec)
+int write_card(int dev, unsigned char *id, unsigned char *new_passwd, unsigned int money, unsigned int sec)
 {
 	return 0;
 }
@@ -652,7 +652,7 @@ int main(int argc, const char *argv[])
 				int len = strlen(passwd);
 				int i;
 				for ( i = 0; i < len; i ++ )
-					passwd[i] = passswd[i] - '0';
+					passwd[i] = passwd[i] - '0';
 			} while ( 0);
 		break;
 		case 'M'
