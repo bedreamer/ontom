@@ -262,7 +262,7 @@ int __read_result(int dev, unsigned char *obuf)
 	retval = read(dev, obuf, 64);
 	
 	__dump_uart_hex(dump_buff, obuf, retval);
-	printf("RX: %s\n", dump_buff);
+	printf("RX <%3d>: %s\n", retval, dump_buff);
 	return retval;
 }
 
@@ -276,7 +276,7 @@ int write_frame(int dev, void *buff, size_t len)
 	}
 	tcdrain(dev);
 	__dump_uart_hex(dump_buff, buff, ret);
-	printf("TX: %s\n", dump_buff);
+	printf("TX <%3d>: %s\n", retval, dump_buff);
 	return ret;
 }
 
