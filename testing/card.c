@@ -641,7 +641,7 @@ void show_help(int cmd)
 }
 
 
-int main(int argc, const char *argv[])
+int main(int argc, char **argv)
 {
 	unsigned char passwd[16] = {255, 255, 255, 255, 255, 255};
 	int money = 0.0f;
