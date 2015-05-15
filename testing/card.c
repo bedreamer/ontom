@@ -720,13 +720,13 @@ int main(int argc, char **argv)
 		case FORMAT_CARD:
 		ok = format_card(dev, id, passwd, money, SECT);
 		if ( ok ) {
-			getch();
+			getchar();
 		}
 		break;
 		case WRITE_CARD:
 		ok = write_card(dev, id, passwd, money, SECT);
 		if ( ok ) {
-			getch();
+			getchar();
 		}
 		break;
 		}
