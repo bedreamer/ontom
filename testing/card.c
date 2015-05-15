@@ -653,7 +653,7 @@ int main(int argc, const char *argv[])
 	int done = 0;
 	int inifinal = 0;
 	int ok = 0;
-	char oc;
+	int oc;
 	RUNMOD mode = READ_CARD;
 
 	while((oc = getopt(argc, argv, "rfwhID:P:M:")) != -1)    
