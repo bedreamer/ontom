@@ -752,7 +752,7 @@ int main(int argc, char **argv)
 			sleep(1);
 		}
 	
-		printf("寻到卡: %s\n", id);
+		printf("寻卡成功.\n");
 		
 		switch ( mode ) {
 		case READ_CARD:
