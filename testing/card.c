@@ -447,7 +447,7 @@ int find_card(int dev, unsigned char *id)
 	unsigned char buff[32] = {0};
 	unsigned char rx_buff[64] = {0};
 	unsigned char bcc;
-	int l, nr, ret;
+	int l, nr = 0, ret;
 	
 
 	buff[ nr ++ ] = 0x08;
@@ -486,7 +486,7 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 	unsigned char buff[32] = {0};
 	unsigned char rx_buff[64] = {0};
 	unsigned char bcc;
-	int l, nr, ret;
+	int l, nr = 0, ret;
 	
 	buff[ nr ++ ] = 0x12;
 	buff[ nr ++ ] = 0x02;
