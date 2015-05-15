@@ -683,6 +683,7 @@ int format_card(int dev, unsigned char *id, unsigned char *def_passwd, double mo
 	unsigned char bcc;
 	int l, nr = 0, ret;
 	struct user_card cd={0};
+	unsigned char init_passwd[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 	buff[ nr ++ ] = 0x17;
 	buff[ nr ++ ] = 0x02;
@@ -706,6 +707,11 @@ int format_card(int dev, unsigned char *id, unsigned char *def_passwd, double mo
 	l = nr;
 	buff[ nr ++ ] = BCC_code(buff, l);
 	buff[ nr ++ ] = 0x03;
+	
+	if ( ! auth_card(dev, id, init_passwd, sec) ) {
+		printf("认证失败, 格式化卡失败!\n");
+		return 0;	
+	}
 	
 	ret = write(dev, buff, nr);
 	if ( 0 == ret ) {
