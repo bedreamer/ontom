@@ -471,6 +471,8 @@ int find_card(int dev, unsigned char *id)
 		return 0;
 	}
 	
+	if ( rx_buff[0] <= 8 ) return 0;
+
 	bcc = BCC_code(rx_buff, ret - 2);
 	if ( bcc != rx_buff[ ret - 2] ) {
 		printf("无法识别的卡!\n");
