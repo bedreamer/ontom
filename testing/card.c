@@ -32,72 +32,6 @@ struct user_card {
 
 #define SECT   4
 
-// 串口IO事件
-typedef enum {
-    // 串口数据结构初始化
-    BP_EVT_INIT                  = 0x00,
-    // 串口配置
-    BP_EVT_CONFIGURE,
-    // 关闭串口
-    BP_EVT_KILLED,
-    // 串口数据帧校验
-    BP_EVT_FRAME_CHECK,
-    // 切换到发送模式
-    BP_EVT_SWITCH_2_TX,
-    // 切换到接收模式
-    BP_EVT_SWITCH_2_RX,
-
-    // 串口接收到新数据
-    BP_EVT_RX_DATA               = 0x10,
-    // 串口收到完整的数据帧
-    BP_EVT_RX_FRAME,
-
-    // 串口发送数据请求
-    BP_EVT_TX_FRAME_REQUEST      = 0x20,
-    // 串口发送确认
-    BP_EVT_TX_FRAME_CONFIRM,
-    // 串口数据发送完成事件
-    BP_EVT_TX_FRAME_DONE,
-
-    // 串口接收单个字节超时，出现在接收帧的第一个字节
-    BP_EVT_RX_BYTE_TIMEOUT       = 0x40,
-    // 串口接收帧超时, 接受的数据不完整
-    BP_EVT_RX_FRAME_TIMEOUT,
-
-    // 串口IO错误
-    BP_EVT_IO_ERROR              = 0x80,
-    // 帧校验失败
-    BP_EVT_FRAME_CHECK_ERROR
-}BP_UART_EVENT;
-
-typedef enum {
-    // 寻卡模式
-    SEQ_FIND_CARD = 0,
-    // 读扇区密码认证
-    SEQ_SECTOR_RD_AUTH,
-    // 写扇区密码认证
-    SEQ_SECTOR_WR_AUTH,
-    // 读取公开数据区
-    SEQ_READ_PUBLIC_BLK,
-    // 写入公开数据区
-    SEQ_WRITE_PUBLIC_BLK,
-    // 读取私密数据区1
-    SEQ_READ_PRIVATE_BLK1,
-    // 读取私密数据区2
-    SEQ_READ_PRIVATE_BLK2,
-    // 读取私密数据区3
-    SEQ_READ_PRIVATE_BLK3,
-    // 读取私密数据区4
-    SEQ_READ_PRIVATE_BLK4,
-    // 读取私密数据区5
-    SEQ_READ_PRIVATE_BLK5,
-    // 读取私密数据区6
-    SEQ_READ_PRIVATE_BLK6,
-    // 读取私密数据区7
-    SEQ_READ_PRIVATE_BLK7,
-    SEQ_INVALID
-}QUERY_STAT;
-
 unsigned char dump_buff[1024];
 
 unsigned char BCC_code(unsigned char *da,size_t len) {
@@ -162,311 +96,128 @@ void __card_read_passwd(const struct user_card *c, char *passwd) {
             c->card.sector_4.data.passwd_code[0]>>4,
             c->card.sector_4.data.passwd_code[0]&0xF);
 }
-
-
-#if 0
-int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
-                     struct bp_evt_param *param)
+int set_other_attribute(int fd, int speed, int databits, int stopbits, int parity)
 {
-    static QUERY_STAT query_stat = SEQ_FIND_CARD;
-    static struct charge_job *job = NULL;
-    static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    struct termios options;
 
-    int ret = ERR_ERR;
-    unsigned char buff[64];
-    int nr = 0, l;
 
-    switch (evt) {
-    case BP_EVT_FRAME_CHECK:
-        if ( param->payload_size > 1 && param->payload_size >= param->buff.rx_buff[0] ) {
-            if ( param->buff.rx_buff[ param->payload_size - 2 ] ==
-                 BCC_code(param->buff.rx_buff, param->payload_size - 2) ) {
-                return ERR_OK;
-            } else {
-                log_printf(DBG_LV2, "UART: SUM check result: need: %02X, gave: %02X",
-                           BCC_code(param->buff.rx_buff, param->payload_size - 1),
-                           param->buff.rx_buff[ param->payload_size - 2 ]);
-                return ERR_FRAME_CHECK_ERR;
-            }
-        } else {
-            return ERR_FRAME_CHECK_DATA_TOO_SHORT;
-        }
-        break;
-    // 串口接收到新数据
-    case BP_EVT_RX_DATA:
-        break;
-    // 串口收到完整的数据帧
-    case BP_EVT_RX_FRAME:
-        if ( bit_read(task, S_CARD_READER_COMM_DOWN) ) {
-            log_printf(INF, "读卡器通信恢复");
-            bit_clr(task, S_CARD_READER_COMM_DOWN);
-        }
-        switch ( query_stat ) {
-        case SEQ_FIND_CARD:
-            if ( param->buff.rx_buff[0] <= 8 ) return ERR_OK;
-            memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
-            id_len = param->buff.rx_buff[7];
-            log_printf(INF, "UART: 寻到卡，ID:(%02X%02X%02X%02X).",
-                        ID[3], ID[2], ID[1], ID[0]);
-            query_stat = SEQ_SECTOR_RD_AUTH;
-            ret = ERR_NEED_ECHO;
-            break;
-        case SEQ_SECTOR_RD_AUTH:
-            if ( param->buff.rx_buff[2] == 0x00 ) {
-                // 认证成功
-                log_printf(INF, "UART: 读认证成功");
-                query_stat = SEQ_READ_PUBLIC_BLK;
-                ret = ERR_NEED_ECHO;
-            } else {
-                // 认证失败
-                log_printf(WRN, "UART: 读认证失败");
-                query_stat = SEQ_FIND_CARD;
-            }
-            break;
-        case SEQ_SECTOR_WR_AUTH:
-            if ( param->buff.rx_buff[2] == 0x00 ) {
-                // 认证成功
-                log_printf(INF, "UART: 写认证成功");
-                query_stat = SEQ_WRITE_PUBLIC_BLK;
-                ret = ERR_NEED_ECHO;
-            } else {
-                // 认证失败
-                log_printf(WRN, "UART: 写认证失败, 扣费失败!");
-                query_stat = SEQ_FIND_CARD;
-            }
-            break;
-        case SEQ_READ_PUBLIC_BLK:
-            if ( param->buff.rx_buff[2] != 0 ) {
-                log_printf(WRN, "UART: 读卡器读取数据区失败, 错误码: %d",
-                           param->buff.rx_buff[2]);
-                query_stat = SEQ_FIND_CARD;
-                ret = ERR_OK;
-            } else {
-                struct user_card cd;
-
-                query_stat = SEQ_FIND_CARD;
-                ret = ERR_OK;
-                memcpy(cd.card.sector_4.buff, &param->buff.rx_buff[4], 16);
-                if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
-                    log_printf(WRN, "UART: 无法识别的卡 %08X.", cd.card.sector_4.data.magic);
-                } else if ( cd.card.sector_4.data.sum !=
-                            check_sum(cd.card.sector_4.buff, 15) ) {
-                    log_printf(WRN, "UART: 卡数据损坏%02X, 校验失败 %02X.",
-                               cd.card.sector_4.data.sum, check_sum(cd.card.sector_4.buff, 15));
-                } else {
-                    int faile = 0;
-                    if ( cd.card.sector_4.data.remain_sum !=
-                            check_sum(cd.card.sector_4.data.remain_money, 3) ) {
-                        log_printf(WRN, "UART: 卡数据字段： 余额校验失败.");
-                        faile ++;
-                    }
-                    if ( cd.card.sector_4.data.passwd_sum !=
-                                check_sum(cd.card.sector_4.data.passwd_code, 3) ) {
-                        log_printf(WRN, "UART: 卡数据字段： 密码校验失败.");
-                        faile ++;
-                    }
-
-                    if ( ! faile ) {
-                        unsigned int money = *(unsigned int *)(void*)cd.card.sector_4.data.remain_money;
-                        money &= 0x00FFFFFF;
-                        log_printf(INF, GRN("UART: 刷卡完成[卡号: %02X%02X%02X%02X, 余额: %.2f]"),
-                                   ID[3], ID[2], ID[1], ID[0], money / 100.0f);
-                        char buff[32];
-                        config_write("card_status", "NORMAL");
-                        sprintf(buff, "%.2f", money / 100.0f);
-                        config_write("card_remaind_money", buff);
-                        sprintf(buff, "%d%d%d%d%d%d",
-                                cd.card.sector_4.data.passwd_code[2]>>4,
-                                cd.card.sector_4.data.passwd_code[2]&0xF,
-                                cd.card.sector_4.data.passwd_code[1]>>4,
-                                cd.card.sector_4.data.passwd_code[1]&0xF,
-                                cd.card.sector_4.data.passwd_code[0]>>4,
-                                cd.card.sector_4.data.passwd_code[0]&0xF);
-                        config_write("card_passwd", buff);
-                        sprintf(buff, "%02X%02X%02X%02X", ID[3], ID[2], ID[1], ID[0]);
-
-                        if ( task->uipage == UI_PAGE_JOBS ) {
-                            job = job_search(task->ui_job_id);
-                            if ( job == NULL ) {
-                                log_printf(WRN, "无效的刷卡.");
-                            } else {
-                                if ( 0 == strcmp(job->card.triger_card_sn, buff) ) {
-                                    if ( job->charge_job_create_timestamp + 10 > time(NULL) ) {
-                                        log_printf(INF, "UART: 刷卡太快，作业保护.");
-                                        return ERR_OK;
-                                    } else {
-                                        log_printf(INF, "任务中止，开始扣费。");
-                                        query_stat = SEQ_SECTOR_WR_AUTH;
-                                        ret = ERR_NEED_ECHO;
-                                    }
-                                }
-                                config_write("triger_card_sn", buff);
-                            }
-                        } else {
-                            config_write("triger_card_sn", buff);
-                            //log_printf(INF, "fasdfafdsfasdfasdfasfasdfsad");
-                        }
-                    }
-                }
-            }
-            break;
-        case SEQ_WRITE_PUBLIC_BLK:
-            log_printf(INF, "UART: 刷卡扣费成功");
-            query_stat = SEQ_FIND_CARD;
-            ret = ERR_OK;
-            break;
-        default:
-            break;
-        }
-        break;
-    // 串口发送数据请求
-    case BP_EVT_TX_FRAME_REQUEST:
-        switch ( query_stat ) {
-        case SEQ_FIND_CARD:
-            buff[ nr ++ ] = 0x08;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x4D;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 0x26;
-            l = nr;
-            buff[ nr ++ ] = BCC_code(buff, l);
-            buff[ nr ++ ] = 0x03;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-            self->master->time_to_send = param->payload_size * 1000 / 960;
-            self->rx_param.need_bytes = 15;
-            log_printf(DBG_LV3, "UART: %s:SEQ_FIND_CARD requested.", __FUNCTION__);
-            ret = ERR_OK;
-            break;
-        case SEQ_SECTOR_WR_AUTH:
-        case SEQ_SECTOR_RD_AUTH:
-            buff[ nr ++ ] = 0x12;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x46;
-            buff[ nr ++ ] = 0x0C;  // 6字节密钥
-            buff[ nr ++ ] = 0x60;  // 密钥A
-            buff[ nr ++ ] = ID[0];
-            buff[ nr ++ ] = ID[1];
-            buff[ nr ++ ] = ID[2];
-            buff[ nr ++ ] = ID[3];
-
-            buff[ nr ++ ] = def_passwd[0];
-            buff[ nr ++ ] = def_passwd[1];
-            buff[ nr ++ ] = def_passwd[2];
-            buff[ nr ++ ] = def_passwd[3];
-            buff[ nr ++ ] = def_passwd[4];
-            buff[ nr ++ ] = def_passwd[5];
-
-            buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
-
-            l = nr;
-            buff[ nr ++ ] = BCC_code(buff, l);
-            buff[ nr ++ ] = 0x03;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-            self->master->time_to_send = (param->payload_size + 1 ) * 1000 / 960;
-            self->rx_param.need_bytes = 7;
-            log_printf(DBG_LV3, "UART: %s:SEQ_SECTOR_RD_AUTH requested.", __FUNCTION__);
-            ret = ERR_OK;
-            break;
-        case SEQ_READ_PUBLIC_BLK:
-            buff[ nr ++ ] = 0x07;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x47;
-            buff[ nr ++ ] = 0x01;
-            buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
-            l = nr;
-            buff[ nr ++ ] = BCC_code(buff, l);
-            buff[ nr ++ ] = 0x03;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-            self->master->time_to_send = param->payload_size * 1000 / 960;
-            self->rx_param.need_bytes = 23;
-            log_printf(DBG_LV3, "UART: %s:SEQ_READ_PUBLIC_BLK requested.", __FUNCTION__);
-            ret = ERR_OK;
-            break;
-        case SEQ_WRITE_PUBLIC_BLK:
-
-            if ( job == NULL ) {
-                log_printf(WRN, "UART: 读卡器时序错乱.");
-                query_stat = SEQ_FIND_CARD;
-                return ERR_ERR;
-            }
-            buff[ nr ++ ] = 0x17;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x48;
-            buff[ nr ++ ] = 0x11;
-            buff[ nr ++ ] = 0x04; // 写第4扇区
-
-            do {
-                int i = 0;
-                // 调试每次扣1.5
-                __card_write_remain(&job->card, __card_read_remain(&job->card) - 1.5f);
-                job->card.card.sector_4.data.sum =
-                        check_sum(job->card.card.sector_4.buff, 15);
-                for ( i = 0; i < 16; i ++ ) {
-                    buff[ nr ++ ] = job->card.card.sector_4.buff[i];
-                }
-            } while (0);
-
-            l = nr;
-            buff[ nr ++ ] = BCC_code(buff, l);
-            buff[ nr ++ ] = 0x03;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-            self->master->time_to_send = (param->payload_size + 1) * 1000 / 960;
-            self->rx_param.need_bytes = 7;
-            log_printf(DBG_LV3, "UART: %s:SEQ_WRITE_PUBLIC_BLK requested.", __FUNCTION__);
-            ret = ERR_OK;
-            break;
-        default:
-            query_stat = SEQ_FIND_CARD;
-            break;
-        }
-        break;
-    // 串口发送确认
-    case BP_EVT_TX_FRAME_CONFIRM:
-        ret = ERR_OK;
-        break;
-    // 串口数据发送完成事件
-    case BP_EVT_TX_FRAME_DONE:
-        break;
-    // 串口接收单个字节超时，出现在接收帧的第一个字节
-    case BP_EVT_RX_BYTE_TIMEOUT:
-    // 串口接收帧超时, 接受的数据不完整
-    case BP_EVT_RX_FRAME_TIMEOUT:
-        //self->master->died ++;
-        if ( self->master->died < self->master->died_line ) {
-            //self->master->died ++;
-        } else {
-            //self->master->died ++;
-            if ( ! bit_read(task, S_CARD_READER_COMM_DOWN) ) {
-            }
-            printf("读卡器通信中断, 请排查故障,(%d)");
-        }
-        query_stat = SEQ_FIND_CARD;
-        break;
-    // 串口IO错误
-    case BP_EVT_IO_ERROR:
-        break;
-    // 帧校验失败
-    case BP_EVT_FRAME_CHECK_ERROR:
-        break;
-    default:
-        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
-        break;
+    if (tcgetattr(fd, &options) != 0)
+    {
+        perror("SetupSerial 1");
+        return -1;
     }
-    return ret;
+    bzero( &options, sizeof( options ) );
+
+
+    switch(speed){  //设置数据传输率
+    case 2400:
+       cfsetispeed(&options,B2400);
+       cfsetospeed(&options,B2400);
+       break;
+    case 4800:
+       cfsetispeed(&options,B4800);
+       cfsetospeed(&options,B4800);
+       break;
+    case 9600:
+       cfsetispeed(&options,B9600);
+       cfsetospeed(&options,B9600);
+       break;
+    case 115200:
+       cfsetispeed(&options,B115200);
+       cfsetospeed(&options,B115200);
+       break;
+    case 460800:
+       cfsetispeed(&options,B460800);
+       cfsetospeed(&options,B460800);
+       break;
+    default:
+       cfsetispeed(&options,B9600);
+       cfsetospeed(&options,B9600);
+       break;
+    }
+
+    options.c_cflag  |=  CLOCAL | CREAD;
+    options.c_cflag &= ~CSIZE;
+
+    switch (databits)
+    {
+        case 7:
+            options.c_cflag |= CS7;
+            break;
+
+        case 8:
+            options.c_cflag |= CS8;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported data size\n");
+            return -1;
+    }
+
+    switch (parity)
+    {
+        case 'e':
+        case 'E':
+        case 1:
+            options.c_iflag |= (INPCK | ISTRIP);
+            options.c_cflag |= PARENB;
+            options.c_cflag &= ~PARODD;
+            break;
+
+        case 'o':
+        case 'O':
+        case 2:
+            options.c_cflag |= PARENB;
+            options.c_cflag |= PARODD;
+            options.c_iflag |= (INPCK | ISTRIP);
+            break;
+        case 'n':
+        case 'N':
+        case 0:
+            options.c_cflag &= ~PARENB;   /* Clear parity enable */
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported parity\n");
+            return -1;
+    }
+
+    switch (stopbits)
+    {
+        case 1:
+            options.c_cflag &= ~CSTOPB;
+            break;
+
+        case 2:
+            options.c_cflag |= CSTOPB;
+            break;
+
+        default:
+            fprintf(stderr,"Unsupported stop bits\n");
+            return -1;
+    }
+
+    printf("UART.config: %d %d %d", databits, parity, stopbits);
+
+    options.c_cc[VTIME]  = 0;
+    options.c_cc[VMIN] = 0;
+    options.c_lflag  &= ~(ICANON | ECHO | ECHOE | ISIG);  /*Input*/
+    options.c_oflag  &= ~OPOST;   /*Output*/
+    options.c_oflag &= ~(ONLCR | OCRNL); //添加的
+
+    options.c_iflag &= ~(ICRNL | INLCR);
+    options.c_iflag &= ~(IXON | IXOFF | IXANY); //添加的
+    cfmakeraw(&options);
+
+    if (tcsetattr(fd,TCSANOW,&options) != 0) {
+        perror("SetupSerial 3");
+        return -1;
+    }
+
+    tcflush(fd,TCIOFLUSH);
+    return 0;
 }
-#endif
-
 void show_help(int cmd);
-
 
 int __read_card_sector(unsigned char *obuf, int dev, unsigned char *id, unsigned char *passwd, unsigned char sec)
 {
@@ -861,6 +612,7 @@ int main(int argc, char **argv)
 		printf("open device %s faile!\n", device);
 		exit(1);
 	}
+	set_other_attribute(dev, 9600, 8, 1, 'N');
 
 	while ( ! done )
 	{
