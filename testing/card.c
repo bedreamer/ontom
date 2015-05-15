@@ -114,7 +114,7 @@ unsigned char check_sum(unsigned char *buff, size_t len) {
     return sum;
 }
 
-void __dump_uart_hex(unsigned char *buff, unsigned char *hex, int len, unsigned int lv)
+void __dump_uart_hex(unsigned char *buff, unsigned char *hex, int len)
 {
     int i = 0 ,l = 0, j =0;
 
@@ -558,6 +558,7 @@ int auth_card(int dev, unsigned char * id, unsigned char *passwd, unsigned char 
 int read_card(int dev, unsigned char *id, unsigned char *passwd, unsigned char sec)
 {
 	unsigned char rx_buff[128]  = {0};
+	unsigned char rx_hex[512] = {0};
 	struct user_card cd;
 
 	if ( ! auth_card(dev, id, passwd, sec) ) {
@@ -570,7 +571,8 @@ int read_card(int dev, unsigned char *id, unsigned char *passwd, unsigned char s
 	}
 
 	memcpy(cd.card.sector_4.buff, &rx_buff[4], 16);
-	printf("读取成功(%s)!\n", __dump_uart_hex(cd.card.sector_4.buff));
+	__dump_uart_hex(rx_hex, cd.card.sector_4.buff, 16);
+	printf("读取成功(%s)!\n", rx_hex);
 	printf("\t%16s: %02X%02X%02X%02X\n", "ID", id[3], id[2], id[1], id[0]);
 	if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
 		printf("\t%16s: %08X\n", "Magic", cd.card.sector_4.data.magic);
