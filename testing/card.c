@@ -435,7 +435,26 @@ void show_help(int cmd);
 
 int __read_card_sector(unsigned char *obuf, int dev, unsigned char *id, unsigned char *passwd, unsigned char sec)
 {
-	
+	unsigned char buff[32] = {0};
+	unsigned char rx_buff[64] = {0};
+	unsigned char bcc;
+	int l, nr = 0, ret;
+
+	buff[ nr ++ ] = 0x07;
+	buff[ nr ++ ] = 0x02;
+	buff[ nr ++ ] = 0x47;
+	buff[ nr ++ ] = 0x01;
+	buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
+	l = nr;
+	buff[ nr ++ ] = BCC_code(buff, l);
+	buff[ nr ++ ] = 0x03;
+	ret = write(dev, buff, nr);
+	if ( 0 == ret ) {
+		printf("读扇区失败!\n");
+		return 0;
+	}
+	tcdrain(dev);
+	return __read_result(dev, obuf);
 }
 
 int __read_result(int dev, unsigned char *obuf)
