@@ -2698,7 +2698,6 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 {
     unsigned char buff[32];
     int nr = 0, len;
-    static int seq = 0;
 
     int ret = ERR_ERR;
     switch (evt) {
@@ -2713,74 +2712,64 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        seq ++;
-        if ( seq % 2 ) {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x10;
+        buff[nr ++] = 0xFF;
+        buff[nr ++] = 0x10;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x00;
+        buff[nr ++] = 0x09;
+        buff[nr ++] = 0x12;
+
+        // 额定电流值
+        switch ( task->module_model ) {
+        case MODEL_AN10680:
+        default:
             buff[nr ++] = 0x00;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x04;
-            buff[nr ++] = 0x08;
-
-            // 额定电流值
-            switch ( task->module_model ) {
-            case MODEL_AN10680:
-            default:
-                buff[nr ++] = 100 >> 8;
-                buff[nr ++] = 100;
-                break;
-            }
-
-            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) >> 8;
-            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
-
-            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-            buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
-
-            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
-            buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
-
-            self->rx_param.need_bytes = 0;
-
-            len = nr;
-            buff[ nr ++ ] = load_crc(len, buff);
-            buff[ nr ++ ] = load_crc(len, buff) >> 8;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-
-            self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
-        } else {
-            buff[nr ++] = 0xFF;
-            buff[nr ++] = 0x10;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x06;
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x03;
-            buff[nr ++] = 0x06;
-
-            // 自动充电时的初始电流值
-            buff[nr ++] = 0;
-            buff[nr ++] = 0;
-
-            buff[nr ++] = task->modules_nr >> 8;
-            buff[nr ++] = task->modules_nr & 0xFF;
-
-            buff[nr ++] = 0;
-            buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON) || bit_read(task, CMD_GUN_2_OUTPUT_ON)) ? 1 : 0;
-
-            self->rx_param.need_bytes = 0;
-
-            len = nr;
-            buff[ nr ++ ] = load_crc(len, buff);
-            buff[ nr ++ ] = load_crc(len, buff) >> 8;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-
-            self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
+            buff[nr ++] = 0x6E;
+            break;
         }
+
+        // 需求电流值
+        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) >> 8;
+        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
+
+        // 需求电压值
+        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
+        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+
+        // 电压下限值
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+
+        // 目标电压值
+        buff[nr ++] = 0x12;
+        buff[nr ++] = 0xC0;
+
+        // 初始电压
+        buff[nr ++] = 0;
+        buff[nr ++] = 0;
+
+        // 当前电流
+        buff[nr ++] = 0;
+        buff[nr ++] = 0;
+
+        // 模块个数
+        buff[nr ++] = (unsigned short)(task->modules_nr) >> 8;
+        buff[nr ++] = (unsigned short)(task->modules_nr) & 0xFF;
+
+        // 充电状态
+        buff[nr ++] = 0;
+        buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON)||bit_read(task, CMD_GUN_2_OUTPUT_ON))?1:0;
+
+        self->rx_param.need_bytes = 0;
+        len = nr;
+        buff[ nr ++ ] = load_crc(len, buff);
+        buff[ nr ++ ] = load_crc(len, buff) >> 8;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+
+        self->master->time_to_send = param->payload_size * 1000 / 960 /*+ self->master->swap_time_modify*/;
         ret = ERR_OK;
         break;
     // 串口发送确认
