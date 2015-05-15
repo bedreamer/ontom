@@ -113,6 +113,22 @@ unsigned char check_sum(unsigned char *buff, size_t len) {
     }
     return sum;
 }
+
+void __dump_uart_hex(unsigned char *buff, unsigned char *hex, int len, unsigned int lv)
+{
+    int i = 0 ,l = 0, j =0;
+
+    while ( i < len) {
+        //if ( j ++ < 20 )
+            l += sprintf(&buff[l], "%02X ", hex[i]);
+        //else {
+            j = 0;
+        //    l += sprintf(&buff[l], "%02X\n", hex[i]);
+       // }
+        i ++;
+    }
+}
+
 #if 0
 int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
@@ -553,9 +569,9 @@ int read_card(int dev, unsigned char *id, unsigned char *passwd, unsigned char s
 		return 0;
 	}
 
-	printf("读取成功!\n");
-	printf("\t%16s: %02X%02X%02X%02X\n", "ID", id[3], id[2], id[1], id[0]);
 	memcpy(cd.card.sector_4.buff, &rx_buff[4], 16);
+	printf("读取成功(%s)!\n", __dump_uart_hex(cd.card.sector_4.buff));
+	printf("\t%16s: %02X%02X%02X%02X\n", "ID", id[3], id[2], id[1], id[0]);
 	if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
 		printf("\t%16s: %08X\n", "Magic", cd.card.sector_4.data.magic);
 		printf("\t%16s: %s\n", "Status", "Unrecognized");
