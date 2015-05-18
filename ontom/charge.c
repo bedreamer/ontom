@@ -805,6 +805,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             job->charge_stop_timestamp = time(NULL);
             end ++;
             log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
+            break;
         }
 
         // 连接完成 立即锁闭电子锁
