@@ -616,12 +616,16 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 job = job_select_wait(task, GUN_SN0);
                 if ( job ) {
                     task->job[0] = job;
+                    log_printf(INF, "ZEUS: 开始执行作业 @ GUN%d:%d",
+                               job->job_gun_sn, task->wait_job_nr);
                     // ...
                 }
 
                 job = job_select_wait(task, GUN_SN1);
                 if ( job ) {
                     task->job[1] = job;
+                    log_printf(INF, "ZEUS: 开始执行作业 @ GUN%d:%d",
+                               job->job_gun_sn, task->wait_job_nr);
                     // ...
                 }
             }
