@@ -797,6 +797,16 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
+        if ( bit_read(job, CMD_JOB_ABORT) ) {
+            bit_clr(job, CMD_JOB_ABORT);
+            job->status_befor_fault = JOB_STANDBY;
+            job->job_status = JOB_ABORTING;
+            job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+            job->charge_stop_timestamp = time(NULL);
+            end ++;
+            log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
+        }
+
         // 连接完成 立即锁闭电子锁
         if ( job->job_gun_sn == GUN_SN0 ) {
             bit_set(tsk, CMD_GUN_1_LOCK_ON);
