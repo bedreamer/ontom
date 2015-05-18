@@ -3479,8 +3479,6 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         buff[ nr ++ ] = 0xFE;
         buff[ nr ++ ] = 0xFE;
         buff[ nr ++ ] = 0xFE;
-        buff[ nr ++ ] = 0xFE;
-        buff[ nr ++ ] = 0xFE;
         buff[ nr ++ ] = 0x68;
 
         // 电表通信地址为 000000000001
@@ -3607,8 +3605,6 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        buff[ nr ++ ] = 0xFE;
-        buff[ nr ++ ] = 0xFE;
         buff[ nr ++ ] = 0xFE;
         buff[ nr ++ ] = 0xFE;
         buff[ nr ++ ] = 0xFE;
