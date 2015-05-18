@@ -1942,16 +1942,16 @@ int ajax_debug_bit_read(struct ajax_xml_struct *thiz)
     int index = 0, i;
     int ret = ERR_OK;
 
-    mg_get_var(thiz->xml_conn, "var", var, 32);
     thiz->ct = "application/json";
-    index = atoi(var);
-    if ( index >=0 && index < FLAG_END ) {
-        for (i=0;i<512;i++)
-         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "%d", bit_read(task, i));
-    } else {
-        ret = ERR_ERR;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{");
+    for (i=S_ERROR;i<S_END;i++) {
+     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+        "$%d:%d,", i, bit_read(task, i));
     }
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");
     return ret;
 }
 
