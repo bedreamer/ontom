@@ -2736,6 +2736,10 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
         buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
 
+        log_printf(DBG_LV3, "UART.ANC-01, 需求电流: %.1f A. 需求电压: %.1f V",
+                   atof(config_read("需求电流")),
+                   atof(config_read("需求电压"))/10.0f);
+
         // 电压下限值
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
