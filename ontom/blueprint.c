@@ -121,7 +121,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
         return -1;
     }
     bzero( &options, sizeof( options ) );
-
+    cfmakeraw(&options);
 
     switch(speed){  //设置数据传输率
     case 2400:
@@ -221,7 +221,6 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
 
     options.c_iflag &= ~(ICRNL | INLCR);
     options.c_iflag &= ~(IXON | IXOFF | IXANY); //添加的
-    cfmakeraw(&options);
 
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
