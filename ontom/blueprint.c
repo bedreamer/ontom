@@ -173,7 +173,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
         case 'e':
         case 'E':
         case 1:
-            options.c_iflag |= (INPCK | ISTRIP);
+            //options.c_iflag |= (INPCK | ISTRIP);
             options.c_cflag |= PARENB;
             options.c_cflag &= ~PARODD;
             break;
@@ -183,7 +183,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
         case 2:
             options.c_cflag |= PARENB;
             options.c_cflag |= PARODD;
-            options.c_iflag |= (INPCK | ISTRIP);
+            //options.c_iflag |= (INPCK | ISTRIP);
             break;
         case 'n':
         case 'N':
