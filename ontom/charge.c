@@ -780,6 +780,18 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+
+        if ( bit_read(job, CMD_JOB_ABORT) ) {
+            bit_clr(job, CMD_JOB_ABORT);
+            job->status_befor_fault = JOB_WAITTING;
+            job->job_status = JOB_ABORTING;
+            job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+            job->charge_stop_timestamp = time(NULL);
+            end ++;
+            log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
+            break;
+        }
+
         memset(job->single, 0, sizeof(job->single));
         job->job_status = JOB_STANDBY;
         bit_clr(tsk, F_CHARGE_LED);
