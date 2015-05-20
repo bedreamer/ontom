@@ -31,6 +31,7 @@ struct xml_generator {
     {"/system/auth.json",       ajax_auth_proc,},
     {"/system/update.json",     ajax_update_proc,},
     {"/system/export.json",     ajax_export_proc,},
+    {"/system/hotrestart.json", ajax_hot_restart_proc},
 
     // 充电作业调用接口
     {"/job/create.json",        ajax_job_create_json_proc},
@@ -2114,6 +2115,14 @@ int ajax_export_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len = output_len;
     return ERR_OK;
 }
+
+// 热重启系统
+int ajax_hot_restart_proc(struct ajax_xml_struct *thiz)
+{
+    exit(0);
+    return ERR_OK;
+}
+
 
 // 提交并跳转
 int ajax_debug_commit(struct ajax_xml_struct *thiz)
