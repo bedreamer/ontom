@@ -4863,7 +4863,7 @@ continue_to_send:
                 thiz->tx_param.cursor = 0;
                 continue;
             }
-            log_printf(INF, "uart %d bytes sent", retval);
+            log_printf(DBG_LV3, "uart %d bytes sent", retval);
             if ( retval == (int)(thiz->tx_param.payload_size - cursor) ) {
                 thiz->tx_param.cursor = thiz->tx_param.payload_size;
                 memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
