@@ -4755,7 +4755,7 @@ ___fast_switch_2_rx:
                     break;
                 // 数据接收完成，但校验失败, 停止接收
                 case ERR_FRAME_CHECK_ERR:
-                    __dump_uart_hex((unsigned char*)buff, nr, WRN);
+                    __dump_uart_hex((unsigned char*)buff, nr, DBG_LV3);
                     thiz->bp_evt_handle(thiz, BP_EVT_FRAME_CHECK_ERROR,
                                                               &thiz->rx_param);
                     thiz->status = BP_UART_STAT_WR;
@@ -4787,7 +4787,7 @@ ___fast_switch_2_rx:
                            thiz->rx_param.need_bytes, thiz->rx_param.payload_size);
             } else if ( ret == ERR_FRAME_CHECK_DATA_TOO_SHORT ) {
                 // recieve timeout.
-                __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, WRN);
+                __dump_uart_hex(thiz->rx_param.buff.rx_buff, thiz->rx_param.need_bytes, DBG_LV3);
                 if ( thiz->rx_param.payload_size == 0 ) {
                     thiz->bp_evt_handle(thiz, BP_EVT_RX_BYTE_TIMEOUT, &thiz->rx_param);
                 } else { // ( thiz->rx_param.payload_size < thiz->rx_param.need_bytes ) {
