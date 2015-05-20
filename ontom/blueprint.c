@@ -451,7 +451,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
             log_printf(INF, "UART: %s 9600,8,1,N", self->dev_name);
         } else if ( self->hw_port == SERIAL5_CTRL_PIN ) {
             //set_speed(self->dev_handle, 2400);
-            set_other_attribute(self->dev_handle, 2400, 8, 1, 'O');
+            set_other_attribute(self->dev_handle, 2400, 8, 1, 'E');
             log_printf(INF, "UART: %s 2400,8,1,O", self->dev_name);
         }
         self->status = BP_UART_STAT_WR;
