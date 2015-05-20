@@ -3538,10 +3538,10 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
             if ( ! bit_read(task, S_KWH_METER_COMM_DOWN) ) {
                 log_printf(ERR, "UART: "RED("电表通信中断, 请排查故障,(%d)"),
                            self->master->died);
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
             }
             bit_set(task, S_KWH_METER_COMM_DOWN);
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -3661,7 +3661,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        //log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
