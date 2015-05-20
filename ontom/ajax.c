@@ -797,7 +797,6 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
 
     // {{ 母线对地电阻
     do {
-        doubl ohm;
         char unit_str[16] = {0};
         if ( task->measure[0]->measure.VinBAT0RESP >= 10000 ) {
             strncpy(unit_str, "> 1MΩ", 16);
