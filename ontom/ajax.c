@@ -812,7 +812,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             sprintf(unit_str, "%.1f KΩ", task->measure[0]->measure.VinBAT0RESN/10.0f);
         }
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
-                "\"bat1_R_N\":\"%.1f KΩ\",", task->measure[0]->measure.VinBAT0RESN/10.0f);
+                "\"bat1_R_N\":\"%s\",", unit_str);
 
         if ( task->measure[0]->measure.VinBAT1RESP >= 10000 ) {
             strncpy(unit_str, "> 1MΩ", 16);
@@ -820,7 +820,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             sprintf(unit_str, "%.1f KΩ", task->measure[0]->measure.VinBAT1RESP/10.0f);
         }
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
-                "\"bat2_R_P\":\"%.1f KΩ\",", task->measure[0]->measure.VinBAT1RESP/10.0f);
+                "\"bat2_R_P\":\"%s\",", unit_str);
 
         if ( task->measure[0]->measure.VinBAT1RESN >= 10000 ) {
             strncpy(unit_str, "> 1MΩ", 16);
@@ -828,7 +828,7 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             sprintf(unit_str, "%.1f KΩ", task->measure[0]->measure.VinBAT1RESN/10.0f);
         }
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
-                "\"bat2_R_N\":\"%.1f KΩ\",", task->measure[0]->measure.VinBAT1RESN/10.0f);
+                "\"bat2_R_N\":\"%s\",", unit_str);
     } while (0);
     // }}
 
