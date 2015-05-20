@@ -795,6 +795,24 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
             "\"aczt\":\"%s\",", task->measure[0]->measure.Flag_run1&0x01?"合闸":"分闸");
     // }}
 
+    // {{ 母线对地电阻
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"bat1_R_P\":\"%.1f KΩ\",", task->measure[0]->measure.VinBAT0RESP/10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"bat1_R_N\":\"%.1f KΩ\",", task->measure[0]->measure.VinBAT0RESN/10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"bat2_R_P\":\"%.1f KΩ\",", task->measure[0]->measure.VinBAT1RESP/10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"bat2_R_N\":\"%.1f KΩ\",", task->measure[0]->measure.VinBAT1RESN/10.0f);
+    // }}
+
+    //{{ 干湿度
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"temprature\":\"%.1f C°\",", task->measure[0]->measure.Temp/10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], // 4# 充电枪连接状态
+            "\"wet_rate\":\"%.1f %%\",", task->measure[0]->measure.Humi/10.0f);
+    //}}
+
     thiz->iobuff[--thiz->xml_len] = '\0';
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "}");
