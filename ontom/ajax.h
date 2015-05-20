@@ -39,6 +39,7 @@ int ajax_query_json_proc(struct ajax_xml_struct *thiz);
 int ajax_module_query_proc(struct ajax_xml_struct *thiz);
 int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_detail_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_edit_json_proc(struct ajax_xml_struct *thiz);
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz);

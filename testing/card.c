@@ -546,7 +546,7 @@ void show_help(int cmd)
 	"    -M: set new money value to card.\n"
 	"    -h: show this help\n\n"
 	"AUTHOR:\n"
-	"	 LiJie <bedreamer@163.com> 2015/05/15"
+	"	 LiJie <bedreamer@163.com> 2015/05/15\n"
 	);
 }
 

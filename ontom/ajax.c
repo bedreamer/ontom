@@ -37,6 +37,7 @@ struct xml_generator {
     {"/job/create.json",        ajax_job_create_json_proc},
     {"/job/delete.json",        ajax_job_delete_json_proc},
     {"/job/query.json",         ajax_job_query_json_proc},
+    {"/job/detail.json",        ajax_job_detail_json_proc},
     {"/job/edit.json",          ajax_job_edit_json_proc},
     {"/job/abort.json",         ajax_job_abort_json_proc},
     {"/job/manpause.json",      ajax_job_manpause_json_proc},
@@ -1810,6 +1811,36 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
 }
 
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
+{
+    int ret = ERR_OK, i;
+    struct list_head *h;
+    struct charge_job *job;
+    thiz->ct = "application/json";
+    thiz->xml_len = 0;
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"jobs\":[");
+    for ( i = 0; i < CONFIG_SUPPORT_CHARGE_JOBS; i ++ ) {
+        if ( task->job[i] == NULL ) continue;
+        job_query_json_fromat(thiz, task->job[i]);
+    }
+    h = task->wait_head;
+    if ( h ) {
+        pthread_mutex_lock(&task->wait_lck);
+        do {
+            job = list_load(struct charge_job, job_node, h);
+            job_query_json_fromat(thiz, job);
+            h = h->next;
+        } while ( h != task->wait_head );
+        thiz->iobuff[--thiz->xml_len] = '\0';
+        pthread_mutex_unlock (&task->wait_lck);
+    }
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
+    return ret;
+}
+
+int ajax_job_detail_json_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK, i;
     struct list_head *h;
