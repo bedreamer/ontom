@@ -220,7 +220,7 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
 
     options.c_iflag &= ~(ICRNL | INLCR);
     options.c_iflag &= ~(IXON | IXOFF | IXANY); //添加的
-    cfmakeraw(&options);
+    //cfmakeraw(&options);
 
     if (tcsetattr(fd,TCSANOW,&options) != 0) {
         perror("SetupSerial 3");
