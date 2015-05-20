@@ -3536,9 +3536,9 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
         } else {
             //self->master->died ++;
             if ( ! bit_read(task, S_KWH_METER_COMM_DOWN) ) {
+                log_printf(ERR, "UART: "RED("电表通信中断, 请排查故障,(%d)"),
+                           self->master->died);
             }
-            log_printf(ERR, "UART: "RED("电表通信中断, 请排查故障,(%d)"),
-                       self->master->died);
             bit_set(task, S_KWH_METER_COMM_DOWN);
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
