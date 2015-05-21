@@ -56,7 +56,7 @@ EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 SEP-DIRS=thirdpart/mongoose thirdpart/sqlite thirdpart/extso
 # must be the last one.
 LAST-DIR=
-BMSDRVIVER=bmsdriver/beijingqiche bmsdriver/guoxuangaoke
+BMSDRVIVER=bmsdriver/GB-T-27930-2011 bmsdriver/beijingqiche bmsdriver/guoxuangaoke
 PLUGINS=plugins/default plugins/104 plugins/demo
 LIBDIR=lib/lj lib/bms
 SUB-DIRS=ontom $(LIBDIR) $(BMSDRVIVER) $(PLUGINS)
