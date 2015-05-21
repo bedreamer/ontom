@@ -123,6 +123,11 @@ if [ $tools == 'yes' ];then
 		echo "  update $prefix/usr/zeus/script/$f"
 	done
 	chmod 777 $prefix/usr/zeus/script/*.sh
+	chmod 777 $prefix/usr/zeus/script/*
+	echo "  install sqlite3...."
+	mkdir $prefix/usr/bin/
+	cp testing/sqlite3-arm $prefix/usr/bin/sqlite3
+	chmod 777 $prefix/usr/bin/sqlite3
 fi
 
 if [ $library == "yes" ];then
@@ -168,6 +173,9 @@ if [ $config == "yes" ];then
 	done
 	chmod 777 $prefix/usr/zeus/*.sh
 	chmod 777 $prefix/usr/zeus/script/*.sh
+	echo "  copy profile to /etc/profile overlaped..."
+	mkdir $prefix/etc/
+	cp scripts/profile $prefix/etc/ 
 fi
 
 if [ $html == "yes" ];then
@@ -194,5 +202,8 @@ cd $prefix
 echo "CREATE INSTALL/UPDATE PACKET: $prefix/$target"
 tar --exclude-vcs -cf $target `ls`
 printf "`date` \033[31m$prefix/$target\033[0m packed.\n"
-cp $target $copydir
-echo "target: $target copyied to $copydir"
+mkdir $copydir$VERSION
+echo $VERSION > $copydir'VERSION'
+echo $copydir"VERSION updated!"
+cp $target $copydir$VERSION/
+echo "target: $target copyied to $copydir$VERSION/"
