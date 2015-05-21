@@ -191,6 +191,10 @@ if [ $qtlib == "yes" ];then
 	mkdir -p $prefix/usr/gui
 	echo "	copy qt library files..."
 	rsync -r testing/gui/* $prefix/usr/gui/
+	chmod 777 $prefix/usr/gui/qt/lib/*.so*
+	#ln -s libQtWebKit.so.4.9.2 $prefix/usr/gui/qt/lib/libQtWebKit.so
+	#ln -s libQtWebKit.so.4.9.2 $prefix/usr/gui/qt/lib/libQtWebKit.so.4
+	#ln -s libQtWebKit.so.4.9.2 $prefix/usr/gui/qt/lib/libQtWebKit.so.4.9
 fi
 
 mkdir -p $prefix/usr/zeus
@@ -200,7 +204,7 @@ cp `readlink me` "$prefix/usr/zeus/zeus"
 cd $prefix
 
 echo "CREATE INSTALL/UPDATE PACKET: $prefix/$target"
-tar --exclude-vcs -cf $target `ls`
+tar --exclude-vcs -czf $target `ls`
 printf "`date` \033[31m$prefix/$target\033[0m packed.\n"
 mkdir $copydir$VERSION
 echo $VERSION > $copydir'VERSION'
