@@ -79,9 +79,12 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             for ( i = 0; driver->binder[i] &&
                   i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
-                if ( thiz->job_status == JOB_EXITTING ) {
+                if ( thiz->job_status == JOB_EXITTING || 
+		     thiz->job_status == JOB_DETACHING ) {
+                    log_printf(INF, "JOB exited, unbind BMS driver automatic!");
                     driver->binder[i] = NULL;
                     thiz->bms.driver = NULL;
+		    continue;
                 }
 
                 if ( 0x7F != thiz->bms.bms_write_init_ok ) {

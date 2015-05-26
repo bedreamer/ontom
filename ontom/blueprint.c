@@ -1578,11 +1578,11 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
     return ret;
 }
 
-#define DC_SWITCH_ON        0x01
-#define GUN1_ASSIT_PWN_ON   0x02
-#define GUN1_OUTPUT_ON      0x04
-#define GUN2_ASSIT_PWN_ON   0x08
-#define GUN2_OUTPUT_ON      0x10
+#define DC_SWITCH_ON        0x0001
+#define GUN1_ASSIT_PWN_ON   0x0002
+#define GUN1_OUTPUT_ON      0x0004
+#define GUN2_ASSIT_PWN_ON   0x0010
+#define GUN2_OUTPUT_ON      0x0020
 int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
@@ -1794,6 +1794,8 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
+	
+	__dump_uart_hex(buff, nr, INF);
 
         self->rx_param.need_bytes = 12;
         self->master->time_to_send = (param->payload_size + 1) * 1000 / 960 + self->master->swap_time_modify;

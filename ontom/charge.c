@@ -235,10 +235,10 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
         task->bat_1_I_hi = atof(text[1]);
         printf("一组电池过流值: %s A\n", text[1]);
     } else if ( 0 == strcmp(text[0], "bat_1_insti_ohm_v") ) {
-        task->bat_1_I_hi = atof(text[1]);
+        task->bat_1_insti_ohm_v = atof(text[1]);
         printf("一组电池绝缘告警值: %s ohm/V\n", text[1]);
     } else if ( 0 == strcmp(text[0], "bus_2_v_hi") ) {
-        task->bat_1_insti_ohm_v = atof(text[1]);
+        task->bus_2_v_hi = atof(text[1]);
         printf("二段母线过压: %s V\n", text[1]);
     } else if ( 0 == strcmp(text[0], "bus_2_v_lo") ) {
         task->bus_2_v_lo = atof(text[1]);
@@ -390,6 +390,19 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->modules_nr = 14;
     task->charge_stat = 0x0000; // 不充电
     task->flq_xishu = 150;
+    task->bus_1_v_hi = 750.1;
+    task->bus_1_v_lo = 190.0;
+    task->bus_2_v_hi = 750.1;
+    task->bus_2_v_lo = 190.0;
+    task->bat_1_v_hi = 750.1;
+    task->bat_1_v_lo = 190.0;
+    task->bat_2_v_hi = 750.1;
+    task->bat_2_v_lo = 199.5;
+    task->bat_1_I_hi = 750.1;
+    task->bat_2_I_hi = 240.0;
+    task->bat_1_insti_ohm_v = 100.0;
+    task->bat_2_insti_ohm_v = 100.0;
+
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
     bit_read(task, CMD_MODULE_ON);
@@ -522,18 +535,6 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         }
     }
 #endif
-    task->bus_1_v_hi = 750.1;
-    task->bus_1_v_lo = 190.0;
-    task->bus_2_v_hi = 750.1;
-    task->bus_2_v_lo = 190.0;
-    task->bat_1_v_hi = 750.1;
-    task->bat_1_v_lo = 190.0;
-    task->bat_2_v_hi = 750.1;
-    task->bat_2_v_lo = 199.5;
-    task->bat_1_I_hi = 750.1;
-    task->bat_2_I_hi = 240.0;
-    task->bat_1_insti_ohm_v = 100.0;
-    task->bat_2_insti_ohm_v = 100.0;
 
     task->commit_head = NULL;
     task->wait_head = NULL;
@@ -706,7 +707,19 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             fault ++;
         }
         if ( bit_read(task, S_BAT_0_INSTITUDE) ) {
-            fault ++;
+	    unsigned int ohm = task->measure[0]->measure.VinBAT0RESP < 
+	      task->measure[0]->measure.VinBAT0RESN ? task->measure[0]->measure.VinBAT0RESP :
+	      task->measure[0]->measure.VinBAT0RESN;
+	    double batv = task->measure[0]->measure.VinBAT0 / 10.0;
+	    
+	    double ohm_v = ohm / batv;
+	    ohm = ohm * 100;
+	    
+	    if ( ohm_v < 500 ) {	  
+		fault ++;
+	    } else {
+	        log_printf(WRN, "institude  protection.");
+	    }
         }
         if ( bit_read(task, S_DC_OUTPUT_0_TRIP) ) {
             fault ++;
@@ -724,8 +737,20 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             fault ++;
         }
         if ( bit_read(task, S_BAT_1_INSTITUDE) ) {
-            fault ++;
-        }
+	    unsigned int ohm = task->measure[0]->measure.VinBAT0RESP < 
+	      task->measure[0]->measure.VinBAT0RESN ? task->measure[0]->measure.VinBAT0RESP :
+	      task->measure[0]->measure.VinBAT0RESN;
+	    double batv = task->measure[0]->measure.VinBAT0 / 10.0;
+	    
+	    double ohm_v = ohm / batv;
+	    ohm = ohm * 100;
+	    
+	    if ( ohm_v < 500 ) {	  
+		fault ++;
+	    } else {
+	        log_printf(WRN, "institude  protection.");
+	    }
+	}
         if ( bit_read(task, S_DC_OUTPUT_1_TRIP) ) {
             fault ++;
         }
@@ -1103,7 +1128,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        job->job_status = JOB_DETACHING;
+        job->job_status = JOB_EXITTING;
         break;
     case JOB_DONE:
         config_write("需求电压", "2000");
