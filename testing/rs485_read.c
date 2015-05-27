@@ -21,7 +21,7 @@
 
 int main(int argc, const char *argv[])
 {
-	int n = 1;
+	int n = 1, i = 0;
 	int dev = -1, retval;
 	unsigned char code[1024] = {0};
 	size_t len = 0;
@@ -46,7 +46,7 @@ int main(int argc, const char *argv[])
 		goto out;
 	}
 	
-	retval = read(def, code, 256);
+	retval = read(dev, code, 256);
 	for ( i = 0; i < retval; i ++ ) {
 		printf("%02X", code[ i ] );
 		if ( i != retval - 1 ) {

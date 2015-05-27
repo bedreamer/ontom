@@ -73,7 +73,7 @@ int main(int argc, const char *argv[])
 		goto out;
 	}
 	
-	write(def, code, len);
+	write(dev, code, len);
 out:
 	close(dev);
 	return 0;
