@@ -1,0 +1,213 @@
+main.o: main.c bcdefs.h ../config.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/stdio.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/features.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/predefs.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/cdefs.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/wordsize.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/gnu/stubs.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include/stddef.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/types.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/typesizes.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/libio.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/_G_config.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/wchar.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include/stdarg.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/stdio_lim.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sys_errlist.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/stdio.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/types.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/time.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/endian.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/endian.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/byteswap.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/select.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/select.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigset.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/time.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/sysmacros.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/pthreadtypes.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/ctype.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/xlocale.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/string.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/string.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/string2.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/stdlib.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include-fixed/limits.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include-fixed/syslimits.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/limits.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/posix1_lim.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/local_lim.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/linux/limits.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/posix2_lim.h \
+ const.h ../h/number.h global.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/signal.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/signum.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/siginfo.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigaction.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigcontext.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm/sigcontext.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigstack.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/ucontext.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/procfs.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/time.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/user.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigthread.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/errno.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/errno.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/linux/errno.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm/errno.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm-generic/errno.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm-generic/errno-base.h \
+ proto.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/unistd.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/posix_opt.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/environments.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/confname.h \
+ ../h/getopt.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/waitflags.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/waitstatus.h \
+ /root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/alloca.h
+
+bcdefs.h:
+
+../config.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/stdio.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/features.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/predefs.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/cdefs.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/wordsize.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/gnu/stubs.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include/stddef.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/types.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/typesizes.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/libio.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/_G_config.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/wchar.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include/stdarg.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/stdio_lim.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sys_errlist.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/stdio.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/types.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/time.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/endian.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/endian.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/byteswap.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/select.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/select.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigset.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/time.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/sysmacros.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/pthreadtypes.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/ctype.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/xlocale.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/string.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/string.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/string2.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/stdlib.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include-fixed/limits.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../lib/gcc/arm-arago-linux-gnueabi/4.5.3/include-fixed/syslimits.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/limits.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/posix1_lim.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/local_lim.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/linux/limits.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/posix2_lim.h:
+
+const.h:
+
+../h/number.h:
+
+global.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/signal.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/signum.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/siginfo.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigaction.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigcontext.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm/sigcontext.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigstack.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/ucontext.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/procfs.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/time.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/sys/user.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/sigthread.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/errno.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/errno.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/linux/errno.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm/errno.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm-generic/errno.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/asm-generic/errno-base.h:
+
+proto.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/unistd.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/posix_opt.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/environments.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/confname.h:
+
+../h/getopt.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/waitflags.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/bits/waitstatus.h:
+
+/root/workspace/arm-arago-linux-gnueabi/bin/../arm-arago-linux-gnueabi/usr/include/alloca.h:
