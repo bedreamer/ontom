@@ -1,5 +1,5 @@
-#£¡/bin/sh
-echo "¿ªÊ¼°²×°¶Á¿¨Æ÷....."
+ï»¿#ï¼/bin/sh
+echo "å¼€å§‹å®‰è£…è¯»å¡å™¨....."
 stty -F /dev/ttyO4 ispeed 19200 ospeed 19200
 ./uartwrite /dev/ttyO4 07 01 48 01 00 b0 03
-echo "¶Á¿¨Æ÷°²×°Íê³É"
+echo "è¯»å¡å™¨å®‰è£…å®Œæˆ"
