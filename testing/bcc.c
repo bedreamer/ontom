@@ -49,7 +49,7 @@ int main(int argc, const char *argv[])
 		code[ len ++ ] = bcc;
 		for ( i = 0; i < len; i ++ ) {
 			printf("%02X", code[ i ] );
-			if ( i != len ) {
+			if ( i != len - 1 ) {
 				printf(" ");
 			} else {
 				printf("\n");
