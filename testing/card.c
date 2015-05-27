@@ -249,7 +249,7 @@ int __read_result(int dev, unsigned char *obuf)
     struct timeval tv ;
 	int retval;
 	
-	usleep(100 * 1000); // 100 ms
+	//usleep(100 * 1000); // 100 ms
 
 	FD_ZERO(&rfds);
 	FD_SET(dev, &rfds);
