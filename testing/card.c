@@ -608,11 +608,12 @@ int main(int argc, char **argv)
 		}
 	}
 
-	dev = open(device, O_RDWR | O_NOCTTY);
+	dev = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
 	if ( dev == -1 ) {
 		printf("open device %s faile!\n", device);
 		exit(1);
 	}
+	fcntl(fd, F_SETFL, 0);
 	//set_other_attribute(dev, 9600, 8, 1, 'N');
 
 	while ( ! done )
