@@ -122,6 +122,8 @@ if [ $tools == 'yes' ];then
 		cp $f "$prefix/usr/zeus/script/"
 		echo "  update $prefix/usr/zeus/script/$f"
 	done
+	cp $prefix/usr/zeus/script/runme.sh $prefix/usr/zeus/runme.sh
+	chmod 777 *.sh
 	chmod 777 $prefix/usr/zeus/script/*.sh
 	chmod 777 $prefix/usr/zeus/script/*
 	echo "  install sqlite3...."

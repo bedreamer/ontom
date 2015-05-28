@@ -613,7 +613,7 @@ int main(int argc, char **argv)
 		printf("open device %s faile!\n", device);
 		exit(1);
 	}
-	fcntl(fd, F_SETFL, 0);
+	fcntl(device, F_SETFL, 0);
 	//set_other_attribute(dev, 9600, 8, 1, 'N');
 
 	while ( ! done )
