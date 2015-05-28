@@ -1,0 +1,68 @@
+# /etc/profile: system-wide .profile file for the Bourne shell (sh(1))
+# and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
+
+PATH="/usr/local/bin:/usr/bin:/bin"
+QTDIR="/usr/gui/qt"
+LD_LIBRARY_PATH="/usr/gui/qt/lib:$LD_LIBRARY_PATH"
+QT_QWS_FONTDIR="/usr/gui/qt/lib/fonts"
+EDITOR="/bin/vi"			# needed for packages like cron
+test -z "$TERM" && TERM="vt100"	# Basic terminal capab. For screen etc.
+
+if [ ! -e /etc/localtime -a ! -e /etc/TZ ]; then
+	TZ="UTC"		# Time Zone. Look at http://theory.uwinnipeg.ca/gnu/glibc/libc_303.html 
+				# for an explanation of how to set this to your local timezone.
+	export TZ
+fi
+
+if [ "`id -u`" -eq 0 ]; then
+   PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
+fi
+if [ "$PS1" ]; then
+# works for bash and ash (no other shells known to be in use here)
+   PS1='\u@\h:\w\$ '
+fi
+
+if [ -d /etc/profile.d ]; then
+  for i in /etc/profile.d/*.sh; do
+    if [ -r $i ]; then
+      . $i
+    fi
+  done
+  unset i
+fi
+
+export PATH PS1 OPIEDIR QPEDIR QTDIR EDITOR TERM LD_LIBRARY_PATH QT_QWS_FONTDIR
+amixer cset numid=1 120
+amixer cset numid=28 90
+
+export LD_LIBRARY_PATH=/usr/zeus:/usr/lib/ts:$LD_LIBRARY_PATH  
+export TSLIB_CONSOLEDEVICE=none
+export TSLIB_FBDEVICE=/dev/fb0
+export TSLIB_TSDEVICE=/dev/input/event0  
+export TSLIB_PLUGINDIR=/usr/lib/ts   
+export TSLIB_CONFFILE=/etc/ts.conf
+export POINTERCAL_FILE=/etc/pointercal
+export TSLIB_CALIBFILE=/etc/pointercal
+export QWS_MOUSE_PROTO=tslib:/dev/input/event0
+
+sync
+
+#[ -f /etc/pointercal ] || /usr/bin/ts_calibrate
+
+#/usr/test/am335x_qt -qws &
+
+umask 022
+export PATH=$PATH:/usr/zeus
+
+#/usr/browser/browser -qws http://127.0.0.1:8080 &
+#/usr/zeus/zeus &
+
+ps > /tmp/pslist
+cat /tmp/pslist | grep zeus >/dev/null 2>&1
+if [ $? -eq 1 ]; then
+        /usr/zeus/runme.sh &
+	/usr/zeus/nock.sh &
+fi
+alias ls='ls --color=auto'
+ip link set can0 type can bitrate 250000
+ip link set can0 up
