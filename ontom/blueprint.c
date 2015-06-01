@@ -4318,12 +4318,9 @@ int card_init_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt
 }
 
 // 读卡器安装
-int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int cardreader_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
-    static QUERY_STAT query_stat = SEQ_FIND_CARD;
-    static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
     int ret = ERR_ERR;
     unsigned char buff[64];
     int nr = 0, l;
@@ -4350,134 +4347,27 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
         break;
     // 串口收到完整的数据帧
     case BP_EVT_RX_FRAME:
-        if ( bit_read(task, S_CARD_READER_COMM_DOWN) ) {
-            log_printf(INF, "读卡器通信恢复");
-            bit_clr(task, S_CARD_READER_COMM_DOWN);
-        }
-        switch ( query_stat ) {
-        case SEQ_FIND_CARD:
-            if ( param->buff.rx_buff[0] <= 8 ) return ERR_OK;
-            memcpy(ID, &param->buff.rx_buff[8], param->buff.rx_buff[7]);
-            id_len = param->buff.rx_buff[7];
-            if ( task->uipage == UI_PAGE_MAIN ) {
-                log_printf(INF, "UART: 寻到新卡，进行读扇区密码验证.");
-                query_stat = SEQ_SECTOR_RD_AUTH;
-            } else if ( task->uipage == UI_PAGE_JOBS ) {
-                query_stat = SEQ_WRITE_PUBLIC_BLK;
+        if ( bit_read(task, F_INSTALL_CARDREADER) ) {
+            if ( param->buff.rx_buff[0] == 0x06 &&
+                 param->buff.rx_buff[5] == 0x03 &&
+                 param->buff.rx_buff[4] == 0xF8 ) {
+                // 安装成功, 将波特率设为 9600
+                me->hw_bps = 9600;
+                bit_clr(task, F_INSTALL_CARDREADER);
+                bit_set(task, F_TEST_CARDREADER);
             }
-            ret = ERR_NEED_ECHO;
-            break;
-        case SEQ_SECTOR_WR_AUTH:
-            if ( param->buff.rx_buff[2] == 0x00 ) {
-                // 认证成功
-                log_printf(INF, "UART: 认证成功");
-                query_stat = SEQ_READ_PUBLIC_BLK;
-                ret = ERR_NEED_ECHO;
-            } else {
-                // 认证失败
-                log_printf(WRN, "UART: 认证失败");
-                query_stat = SEQ_FIND_CARD;
-            }
-            break;
-        case SEQ_WRITE_PUBLIC_BLK:
-            if ( param->buff.rx_buff[2] != 0 ) {
-                log_printf(WRN, "UART: 读卡器读取数据区失败, 错误码: %d",
-                           param->buff.rx_buff[2]);
-            } else {
-                struct user_card cd;
+        } else if ( bit_read(task, F_TEST_CARDREADER) ) {
 
-                memcpy(cd.card.sector_4.buff, param->buff.rx_buff, 16);
-                if ( cd.card.sector_4.data.magic != 0x4F4E5057 ) {
-                    log_printf(WRN, "UART: 无法识别的卡: %08X.", cd.card.sector_4.data.magic);
-                } else if ( cd.card.sector_4.data.sum !=
-                            check_sum(param->buff.rx_buff, 15) ) {
-                    log_printf(WRN, "UART: 卡数据损坏, 校验失败.");
-                } else {
-                    int faile = 0;
-                    if ( cd.card.sector_4.data.remain_sum !=
-                            check_sum(cd.card.sector_4.data.remain_money, 3) ) {
-                        log_printf(WRN, "UART: 卡数据字段： 余额校验失败.");
-                        faile ++;
-                    }
-                    if ( cd.card.sector_4.data.passwd_sum !=
-                                check_sum(cd.card.sector_4.data.passwd_code, 3) ) {
-                        log_printf(WRN, "UART: 卡数据字段： 密码校验失败.");
-                        faile ++;
-                    }
-
-                    if ( ! faile ) {
-                        log_printf(INF, "UART: 刷卡完成[卡号: %02X%02X%02X%02X, 余额: %d]",
-                                   ID[0], ID[1], ID[2], ID[3],
-                                cd.card.sector_4.data.remain_money);
-                    }
-                }
-            }
-            query_stat = SEQ_FIND_CARD;
-            ret = ERR_OK;
-            break;
-        default:
-            break;
         }
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
-        switch ( query_stat ) {
-        case SEQ_FIND_CARD:
-            buff[ nr ++ ] = 0x08;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x4D;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x00;
-            buff[ nr ++ ] = 0x26;
-            l = nr;
-            buff[ nr ++ ] = BCC_code(buff, l);
-            buff[ nr ++ ] = 0x03;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-            self->master->time_to_send = param->payload_size * 1000 / 960;
-            self->rx_param.need_bytes = 15;
-            log_printf(DBG_LV3, "UART: %s:SEQ_FIND_CARD requested.", __FUNCTION__);
-            ret = ERR_OK;
-            break;
-        case SEQ_SECTOR_RD_AUTH:
-            buff[ nr ++ ] = 0x12;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x46;
-            buff[ nr ++ ] = 0x0C;  // 6字节密钥
-            buff[ nr ++ ] = 0x60;  // 密钥A
-            buff[ nr ++ ] = ID[0];
-            buff[ nr ++ ] = ID[1];
-            buff[ nr ++ ] = ID[2];
-            buff[ nr ++ ] = ID[3];
-
-            buff[ nr ++ ] = def_passwd[0];
-            buff[ nr ++ ] = def_passwd[1];
-            buff[ nr ++ ] = def_passwd[2];
-            buff[ nr ++ ] = def_passwd[3];
-            buff[ nr ++ ] = def_passwd[4];
-            buff[ nr ++ ] = def_passwd[5];
-
-            buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
-
-            l = nr;
-            buff[ nr ++ ] = BCC_code(buff, l);
-            buff[ nr ++ ] = 0x03;
-
-            memcpy(param->buff.tx_buff, buff, nr);
-            param->payload_size = nr;
-            self->master->time_to_send = param->payload_size * 1000 / 960;
-            self->rx_param.need_bytes = 7;
-            log_printf(DBG_LV3, "UART: %s:SEQ_SECTOR_RD_AUTH requested.", __FUNCTION__);
-            ret = ERR_OK;
-            ret = ERR_ERR;
-            break;
-        case SEQ_READ_PUBLIC_BLK:
+        if ( bit_read(task, F_INSTALL_CARDREADER) ) {
             buff[ nr ++ ] = 0x07;
-            buff[ nr ++ ] = 0x02;
-            buff[ nr ++ ] = 0x47;
             buff[ nr ++ ] = 0x01;
-            buff[ nr ++ ] = 0x04;  // 默认存放于第四扇区
+            buff[ nr ++ ] = 0x48;
+            buff[ nr ++ ] = 0x01;
+            buff[ nr ++ ] = 0x00;
             l = nr;
             buff[ nr ++ ] = BCC_code(buff, l);
             buff[ nr ++ ] = 0x03;
@@ -4485,13 +4375,12 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
             memcpy(param->buff.tx_buff, buff, nr);
             param->payload_size = nr;
             self->master->time_to_send = param->payload_size * 1000 / 960;
-            self->rx_param.need_bytes = 23;
-            log_printf(DBG_LV3, "UART: %s:SEQ_READ_PUBLIC_BLK requested.", __FUNCTION__);
+            self->rx_param.need_bytes = 6;
             ret = ERR_OK;
-            break;
-        default:
-            query_stat = SEQ_FIND_CARD;
-            break;
+        } else if ( bit_read(task, F_TEST_CARDREADER) ) {
+            ERR_OK;
+        } else {
+            ret = ERR_ERR;
         }
         break;
     // 串口发送确认
@@ -4506,6 +4395,7 @@ int card_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT 
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+
         query_stat = SEQ_FIND_CARD;
         break;
     // 串口IO错误

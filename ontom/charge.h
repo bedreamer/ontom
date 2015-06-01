@@ -414,6 +414,18 @@ typedef enum {
     // BMS通信故障
     S_BMS_COMM_DOWN,
     // }}}
+
+    // {{ 设备安装标志
+    F_INSTALL_CARDREADER,
+    F_TEST_CARDREADER,
+    F_INSTALL_CARDREADER_DONE,
+    F_INSTALL_CARDREADER_FAILE,
+
+    F_INSTALL_METER,
+    F_TEST_METER,
+    F_INSTALL_METER_DONE,
+    F_INSTALL_METER_FAILE,
+    // }}
     FLAG_END,
 
     //总故障, 参照文档 -- 充电桩故障对照表

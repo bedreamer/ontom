@@ -274,7 +274,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"C0000011", simple_box_correct_refer_V_evt_handle},
         {"00000002", card_reader_handle},
         {"00000003", card_init_handle},
-        {"I000000F", card_install_handle},
+        {"I000000F", cardreader_install_handle},
         {"00000004", uart4_charger_config_evt_handle},
         {"00000005", uart4_charger_yaoce_0_49_handle},
         {"00000006", uart4_charger_yaoce_50_100_handle},
