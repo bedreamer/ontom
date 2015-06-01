@@ -4396,7 +4396,6 @@ int cardreader_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
     case BP_EVT_RX_FRAME_TIMEOUT:
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
 
-        query_stat = SEQ_FIND_CARD;
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
