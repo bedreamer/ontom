@@ -3455,6 +3455,12 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
                 hwh_gu += (param->buff.rx_buff[32] >> 4 ) * 100000 + (param->buff.rx_buff[32] & 0x0F ) * 10000;
                 hwh_gu += (param->buff.rx_buff[33] >> 4 ) * 10000000 + (param->buff.rx_buff[33] & 0x0F ) * 1000000;
 
+                hwh_zong = task->meter_I_xishu * task->meter_V_xishu * hwh_zong;
+                hwh_jian = task->meter_I_xishu * task->meter_V_xishu * hwh_jian;
+                hwh_feng = task->meter_I_xishu * task->meter_V_xishu * hwh_feng;
+                hwh_ping = task->meter_I_xishu * task->meter_V_xishu * hwh_ping;
+                hwh_gu = task->meter_I_xishu * task->meter_V_xishu * hwh_gu;
+
                 log_printf(DBG_LV3, "UART: %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH",
                            hwh_zong / 100.0f, hwh_jian / 100.0f, hwh_feng / 100.0f
                            , hwh_ping / 100.0f, hwh_gu / 100.0f);
@@ -3715,7 +3721,7 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
                 log_printf(DBG_LV3, "UART: %.2fV  %.2fV  %.2f V",
                            va / 10.0f, vb / 10.0f, vc / 10.0f);
 
-                task->meter[0].Va = va / 10.0f;
+                task->meter[0].Va = va * / 10.0f;
                 task->meter[0].Vb = vb / 10.0f;
                 task->meter[0].Vc = vc / 10.0f;
                 ret = ERR_OK;

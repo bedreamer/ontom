@@ -1600,6 +1600,10 @@ struct charge_task {
     unsigned char modules_on_off[CONFIG_SUPPORT_CHARGE_MODULE];
     //}}
 
+    // 电能表电压系数比
+    double meter_V_xishu;
+    // 电能表电流系数比
+    double meter_I_xishu;
     // 电流分流器系数
     unsigned int flq_xishu;
     // {{ 电压电流校准参数

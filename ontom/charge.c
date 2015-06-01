@@ -255,6 +255,12 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "bat_2_insti_ohm_v") ) {
         task->bat_2_insti_ohm_v = atof(text[1]);
         printf("二组电池绝缘告警值: %s ohm/V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "meter_V_xishu") ) {
+        task->meter_V_xishu = atof(text[1]);
+        printf("电能表电压系数比: %s \n", text[1]);
+    } else if ( 0 == strcmp(text[0], "meter_I_xishu") ) {
+        task->meter_I_xishu = atof(text[1]);
+        printf("电能表电流系数比: %s \n", text[1]);
     }
     return 0;
 }
@@ -402,6 +408,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->bat_2_I_hi = 240.0;
     task->bat_1_insti_ohm_v = 100.0;
     task->bat_2_insti_ohm_v = 100.0;
+    task->meter_I_xishu = 1.0f;
+    task->meter_V_xishu = 1.0f;
 
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
