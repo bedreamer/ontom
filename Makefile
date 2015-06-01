@@ -77,7 +77,7 @@ PHONY+=reconfig
 
 # FIXME: maybe there is a better way to refresh objects-list files.
 _all:
-	rm ontom/ajax.o ontom/tom.o
+	$(Q)$(OMIT)rm ontom/ajax.o ontom/tom.o
 	$(Q)dd if=/dev/null of=$(yobjs-list) bs=1 count=0 2>/dev/null
 	$(Q)dd if=/dev/null of=$(mobjs-list) bs=1 count=0 2>/dev/null
 	$(Q)dd if=/dev/null of=$(sobjs-list) bs=1 count=0 2>/dev/null
