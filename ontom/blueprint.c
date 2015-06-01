@@ -3721,7 +3721,7 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
                 log_printf(DBG_LV3, "UART: %.2fV  %.2fV  %.2f V",
                            va / 10.0f, vb / 10.0f, vc / 10.0f);
 
-                task->meter[0].Va = va * / 10.0f;
+                task->meter[0].Va = va / 10.0f;
                 task->meter[0].Vb = vb / 10.0f;
                 task->meter[0].Vc = vc / 10.0f;
                 ret = ERR_OK;
