@@ -1,9 +1,9 @@
-﻿#!/bin/bash
+﻿# !/usr/bin/bash
 
 prefix="install"
 target="zeus.update.tar"
 copydir="/media/sf_E_DRIVE/www/"
-installdb="install.db"
+installdb="scripts/install.db"
 VERSION=`svn info $0|grep Revision|grep -o '[0-9]\+'`
 
 config='no'
@@ -125,6 +125,8 @@ if [ $config == "yes" ];then
 				echo "   失败 ($?) !"
 			fi
 		done
-		Fsrc=`sqlite3 $installdb "SELECT src FROM files WHERE class LIKE '%config%'"`
+		Fsrc=`sqlite3 $installdb "SELECT * FROM files WHERE class LIKE '%config%'"`
+		echo $Fsrc | awk -F '|' '{print $1}'
+		echo ${Fsrc[1]}, ${Fsrc[2]}
 	fi
 fi
