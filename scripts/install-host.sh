@@ -112,7 +112,7 @@ if [ ${#WORKDIR} -eq 0 ];then
 fi
 
 if [ $config == "yes" ];then
-	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE '%config%'"`
+	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%config%\""`
 	if [ ${#P} -eq 0 ];then
 		echo "没有找到需要安装的配置文件目录, 忽略{$P}."
 	else
@@ -125,7 +125,7 @@ if [ $config == "yes" ];then
 				echo "   失败 ($?) !"
 			fi
 		done
-		Fsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM files WHERE class LIKE '%config%'"`
+		Fsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM files WHERE class LIKE \"%config%\""`
 		i='0'
 		if (( ${#Fsrc} != 0 ));then
 			for f in $Fsrc;do
@@ -170,9 +170,125 @@ if [ $config == "yes" ];then
 					;;
 				esac
 			done
+			Lsrc=`sqlite3 -separator ' ' $installdb "SELECT target,link,dir FROM links WHERE class LIKE \"%config%\""`
+			i='0'
+			if (( ${#Lsrc} > 0 ))
+				olddir=`pwd`
+				for f in $Lsrc;do
+					case $f in
+						'0') target=$f;i='1';;
+						'1') link=$f;i='2';;
+						'2') newdir=$f;i='3';;
+						'3')
+							cd $prefix/$newdir
+							if (( $? != 0 ));then
+								echo " ** 无法切换到目录$prefix/$newdir, 目录不存在"
+							else
+								echo "    创建链接  $target  --> $target "
+								ln -s $target $link
+								i='0'
+								if (( $? != 0 ));then
+									echo "失败!"
+								else
+									echo "成功."
+								fi
+							fi
+						;;
+				done
+				cd $oldpwd
+			fi
 		fi
-		Lsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM links WHERE class LIKE '%config%'"`
-		i='0'
 		
 	fi
 fi
+
+function do_install() {
+	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%$1%\""`
+	if [ ${#P} -eq 0 ];then
+		echo "没有找到需要安装的配置文件目录, 忽略{$P}."
+	else
+		for d in $P;do
+			printf "创建目录 $d"
+			mkdir -p $prefix/$d
+			if [ $? -eq 0 ];then
+				echo "   成功."
+			else
+				echo "   失败 ($?) !"
+			fi
+		done
+		Fsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM files WHERE class LIKE \"%$1%\""`
+		i='0'
+		if (( ${#Fsrc} != 0 ));then
+			for f in $Fsrc;do
+				case $i in
+					'0') src=$f;i='1';;
+					'1') typ=$f;i='2';;
+					'2') des=$f;i='3';;
+					'3') attr=$f;i='4';;
+					'4') version=$f;i='5';;
+					'5') class=$f;i='6';;
+					'6')
+						comment=$f
+						case $typ in
+							"link")
+								printf "    安装 $comment $prefix/$des"
+								cp `readlink $src` $prefix/$des
+								chmod $attr $prefix/$des
+								if [ -e $prefix/$des ];then
+									echo "成功."
+								else
+									echo "失败!."
+								fi
+							;;
+							"file")
+								printf "    安装 $comment $prefix/$des"
+								cp $src $prefix/$des
+								chmod $attr $prefix/$des
+								if [ -e $prefix/$des ];then
+									echo "成功."
+								else
+									echo "失败!."
+								fi
+							;;
+							*)
+								echo "unsurpport file type. $src"
+							;;
+						esac
+						i='0'
+					;;
+					*)
+						echo "catch exceptions."
+					;;
+				esac
+			done
+			Lsrc=`sqlite3 -separator ' ' $installdb "SELECT target,link,dir FROM links WHERE class LIKE \"%$1%\""`
+			i='0'
+			if (( ${#Lsrc} > 0 ))
+				olddir=`pwd`
+				for f in $Lsrc;do
+					case $f in
+						'0') target=$f;i='1';;
+						'1') link=$f;i='2';;
+						'2') newdir=$f;i='3';;
+						'3')
+							cd $prefix/$newdir
+							if (( $? != 0 ));then
+								echo " ** 无法切换到目录$prefix/$newdir, 目录不存在"
+							else
+								echo "    创建链接  $target  --> $target "
+								ln -s $target $link
+								i='0'
+								if (( $? != 0 ));then
+									echo "失败!"
+								else
+									echo "成功."
+								fi
+							fi
+						;;
+				done
+				cd $oldpwd
+			fi
+		fi
+		
+	fi
+}
