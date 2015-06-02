@@ -1628,6 +1628,7 @@ del:
             thiz->error_begin);
     ret = sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     log_printf(INF, "ZEUS: %s:%d", sql, ret);
+    free(thiz);
 out:
     pthread_mutex_unlock (&task->err_list_lck);
 }
