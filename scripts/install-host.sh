@@ -114,7 +114,7 @@ fi
 if [ $config == "yes" ];then
 	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE '%config%'"`
 	if [ ${#P} -eq 0 ];then
-		echo "没有找到需要安装的配置文件目录, 忽略."
+		echo "没有找到需要安装的配置文件目录, 忽略{$P}."
 	else
 		for d in $P;do
 			printf "创建目录 $d"
