@@ -117,7 +117,7 @@ fi
 function do_install() {
 	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%$1%\""`
 	if [ ${#P} -eq 0 ];then
-		echo "没有找到需要安装的配置文件目录, 忽略{$P}."
+		echo "没有找到需要安装的配置文件目录, 忽略{$P:$1}."
 	else
 		for d in $P;do
 			printf "创建目录 $d"
