@@ -52,17 +52,25 @@ sync
 #/usr/test/am335x_qt -qws &
 
 umask 022
-export PATH=$PATH:/usr/zeus
+export PATH=$PATH:/usr/zeus:/usr/zeus/scripts
 
 #/usr/browser/browser -qws http://127.0.0.1:8080 &
 #/usr/zeus/zeus &
 
+ip link set can0 down
+ip link set can1 down
+ip link set can0 type can bitrate 250000
+ip link set can1 type can bitrate 250000
+ifconfig can0 up
+ifconfig can1 up
+
 ps > /tmp/pslist
 cat /tmp/pslist | grep zeus >/dev/null 2>&1
 if [ $? -eq 1 ]; then
-        /usr/zeus/runme.sh &
-	/usr/zeus/nock.sh &
+    /usr/zeus/runme.sh &
+	if [ -e '/usr/zeus/nock.sh' ];then
+		/usr/zeus/nock.sh &
+	fi
 fi
 alias ls='ls --color=auto'
-ip link set can0 type can bitrate 250000
-ip link set can0 up
+
