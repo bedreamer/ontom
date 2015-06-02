@@ -263,7 +263,7 @@ function do_install() {
 			done
 			Lsrc=`sqlite3 -separator ' ' $installdb "SELECT target,link,dir FROM links WHERE class LIKE \"%$1%\""`
 			i='0'
-			if (( ${#Lsrc} > 0 ));then
+			if (( ${#Lsrc} != 0 ));then
 				olddir=`pwd`
 				for f in $Lsrc;do
 					case $f in
