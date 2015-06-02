@@ -187,7 +187,7 @@ function do_install() {
 							if (( $? != 0 ));then
 								echo " ** 无法切换到目录$prefix$newdir, 目录不存在"
 							else
-								printf "    创建链接  $link  --> $target "
+								printf "    链接  $link  --> $target "
 								ln -s $target $link
 								i='0'
 								if (( $? != 0 ));then
