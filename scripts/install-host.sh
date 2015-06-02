@@ -202,6 +202,9 @@ function do_install() {
 							fi
 							i='0';
 						;;
+						*)
+							echo "exception.."
+						;;
 					esac
 				done
 				cd $oldpwd
