@@ -1575,8 +1575,8 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
 
     log_printf(INF, "ZEUS: 故障总数为: %d", task->err_nr);
 
-    __get_timestamp(timestamp);
-    strcpy(thiz->error_begin, timestamp);
+    //__get_timestamp(timestamp);
+    strcpy(thiz->error_begin, "timestamp""");
     sprintf(sql, "INSERT INTO errors VALUES('%d','%d','%s','%s','ERROR')",
             thiz->error_seqid,
             thiz->error_id,
