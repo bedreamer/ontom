@@ -175,9 +175,9 @@ function do_install() {
 				esac
 			done
 			Lsrc=`sqlite3 -separator ' ' $installdb "SELECT target,link,dir FROM links WHERE class LIKE \"%$1%\""`
-			i='0'
 			if (( ${#Lsrc} != 0 ));then
 				olddir=`pwd`
+				i='0'
 				for f in $Lsrc;do
 					case $i in
 						'0') target=$f;i='1';;
@@ -191,7 +191,7 @@ function do_install() {
 							if (( $? != 0 ));then
 								echo " ** 无法切换到目录$prefix$newdir, 目录不存在"
 							else
-								echo "    创建链接  $target  --> $target "
+								echo "    创建链接  $target  --> $link "
 								ln -s $target $link
 								i='0'
 								if (( $? != 0 ));then
