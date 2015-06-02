@@ -182,8 +182,7 @@ function do_install() {
 					case $i in
 						'0') target=$f;i='1';;
 						'1') link=$f;i='2';;
-						'2') newdir=$f;i='3';;
-						'3')
+						'2') newdir=$f;i='0';;
 							echo $target
 							echo $link
 							echo $newdir
@@ -191,7 +190,7 @@ function do_install() {
 							if (( $? != 0 ));then
 								echo " ** 无法切换到目录$prefix$newdir, 目录不存在"
 							else
-								echo "    创建链接  $link  --> $target "
+								printf "    创建链接  $link  --> $target "
 								ln -s $target $link
 								i='0'
 								if (( $? != 0 ));then
