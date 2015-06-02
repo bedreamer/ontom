@@ -8,6 +8,7 @@ VERSION=`svn info $0|grep Revision|grep -o '[0-9]\+'`
 
 config='no'
 drivers='no'
+database='no'
 ext='no'
 html='no'
 library='no'
@@ -16,12 +17,13 @@ qtlib='no'
 script='no'
 zeus='no'
 
-while getopts acdlpqstuvzhP:T:W:C: param; do
+while getopts acdDlpqstuvzhP:T:W:C: param; do
 	# commands
 	case "$param" in
 	a|-all) # 安装全部
 		config='yes'
 		drivers='yes'
+		database='yes'
 		ext='yes'
 		html='yes'
 		library='yes'
@@ -35,6 +37,9 @@ while getopts acdlpqstuvzhP:T:W:C: param; do
 	;;
 	d|-drivers) # 仅安装驱动
 		drivers='yes';
+	;;
+	D|-database) # 安装数据配置文件
+		database='yes'
 	;;
 	e|-ext) # 仅安装插件
 		ext='yes';
@@ -216,6 +221,10 @@ fi
 
 if [ $drivers == "yes" ];then
 	do_install "drivers"
+fi
+
+if [ $database == "yes" ];then
+	do_install "database"
 fi
 
 if [ $ext == "yes" ];then
