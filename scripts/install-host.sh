@@ -194,6 +194,7 @@ if [ $config == "yes" ];then
 								fi
 							fi
 						;;
+					esac
 				done
 				cd $oldpwd
 			fi
