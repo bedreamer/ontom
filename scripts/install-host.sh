@@ -143,7 +143,7 @@ function do_install() {
 						comment=$f
 						case $typ in
 							"link")
-								printf "    安装 $comment $prefix$des"
+								printf "    安装 $comment $prefix$des  "
 								cp `readlink $src` $prefix/$des
 								chmod $attr $prefix$des
 								if [ -e $prefix$des ];then
@@ -153,7 +153,7 @@ function do_install() {
 								fi
 							;;
 							"file")
-								printf "    安装 $comment $prefix$des"
+								printf "    安装 $comment $prefix$des  "
 								cp $src $prefix$des
 								chmod $attr $prefix$des
 								if [ -e $prefix$des ];then
