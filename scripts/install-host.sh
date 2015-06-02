@@ -292,3 +292,5 @@ function do_install() {
 		fi
 	fi
 }
+
+do_install "qtlib"
