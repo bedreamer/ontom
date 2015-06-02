@@ -183,9 +183,6 @@ function do_install() {
 						'0') target=$f;i='1';;
 						'1') link=$f;i='2';;
 						'2') newdir=$f;i='0';;
-							echo $target
-							echo $link
-							echo $newdir
 							cd $WORKDIR/$prefix$newdir
 							if (( $? != 0 ));then
 								echo " ** 无法切换到目录$prefix$newdir, 目录不存在"
