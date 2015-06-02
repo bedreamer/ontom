@@ -1142,7 +1142,7 @@ int ajax_system_history_proc(struct ajax_xml_struct *thiz)
 {
     int ret = ERR_OK;
     int lf = 0, nr = 12, n;
-    char sql[256] = {0}, *errmsg, buff[32];
+    char sql[512] = {0}, *errmsg, buff[128];
     thiz->ct = "application/json";
 
     mg_get_var(thiz->xml_conn, "p", buff, 8);
