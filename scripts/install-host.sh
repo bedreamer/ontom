@@ -125,21 +125,6 @@ if [ $config == "yes" ];then
 				echo "   Ê§°Ü ($?) !"
 			fi
 		done
-		F=`sqlite3 $(installdb) "SELECT path FROM dirs WHERE class LIKE '%config%'"`
+		Fsrc=`sqlite3 $(installdb) "SELECT src FROM files WHERE class LIKE '%config%'"`
 	fi
 fi
-
-mkdir -p $prefix/usr/zeus
-echo "	copy main program file `readlink me`"
-cp `readlink me` "$prefix/usr/zeus/zeus"
-
-cd $prefix
-
-echo "CREATE INSTALL/UPDATE PACKET: $prefix/$target"
-tar --exclude-vcs -czf $target `ls`
-printf "`date` \033[31m$prefix/$target\033[0m packed.\n"
-mkdir $copydir$VERSION
-echo $VERSION > $copydir'VERSION'
-echo $copydir"VERSION updated!"
-cp $target $copydir$VERSION/
-echo "target: $target copyied to $copydir$VERSION/"
