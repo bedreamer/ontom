@@ -1,4 +1,4 @@
-#!/bin/bash
+ï»¿#!/bin/bash
 
 prefix="install"
 target="zeus.update.tar"
@@ -19,7 +19,7 @@ zeus='no'
 while getopts acdlpqstuvzhP:T:W:C: param; do
 	# commands
 	case "$param" in
-	a|-all) # °²×°È«²¿
+	a|-all) # å®‰è£…å…¨éƒ¨
 		config='yes'
 		drivers='yes'
 		ext='yes'
@@ -33,28 +33,28 @@ while getopts acdlpqstuvzhP:T:W:C: param; do
 	c|-config)
 		config='yes';
 	;;
-	d|-drivers) # ½ö°²×°Çı¶¯
+	d|-drivers) # ä»…å®‰è£…é©±åŠ¨
 		drivers='yes';
 	;;
-	e|-ext) # ½ö°²×°²å¼ş
+	e|-ext) # ä»…å®‰è£…æ’ä»¶
 		ext='yes';
 	;;
-	l|-library) # ½ö°²×°¿âÎÄ¼ş
+	l|-library) # ä»…å®‰è£…åº“æ–‡ä»¶
 		library='yes';
 	;;
-	q|-qtlib) # ½ö°²×°QT¿âÎÄ¼ş
+	q|-qtlib) # ä»…å®‰è£…QTåº“æ–‡ä»¶
 		qtlib='yes';
 	;;
-	s|-script) # ½ö°²×°½Å±¾
+	s|-script) # ä»…å®‰è£…è„šæœ¬
 		script='yes';
 	;;
-	t|-tools) # °²×°¹¤¾ß¼°½Å±¾
+	t|-tools) # å®‰è£…å·¥å…·åŠè„šæœ¬
 		tools='yes';
 	;;
-	u|-html) # ½ö°²×°htmlÎÄ¼ş
+	u|-html) # ä»…å®‰è£…htmlæ–‡ä»¶
 		html='yes';
 	;;
-	u|-zeus) # °²×°³ÌĞò
+	u|-zeus) # å®‰è£…ç¨‹åº
 		zeus='yes';
 	;;
 	v|-version)
@@ -62,25 +62,25 @@ while getopts acdlpqstuvzhP:T:W:C: param; do
 		exit 0;
 	;;
 	h|-help)
-		echo -e "³äµç×®¼à¿ØÏµÍ³ÎÄ¼ş°²×°³ÌĞò\r\n"\
+		echo -e "å……ç”µæ¡©ç›‘æ§ç³»ç»Ÿæ–‡ä»¶å®‰è£…ç¨‹åº\r\n"\
 			"Usage:\r\n"\
 			"    install {COMMANDS}... {OPTIONS}...\r\n"\
 			"COMMANDS:\r\n"\
-			"	-a ==> all: °²×°È«²¿ÏµÍ³ÎÄ¼ş(Çı¶¯£¬¿â£¬UI£¬·şÎñ¶Ë, ¹¤¾ß);\r\n"\
-			"	-c ==> config: °²×°ÅäÖÃÎÄ¼ş¼°ÅäÖÃÊı¾İ¿â;\r\n"\
-			"	-d ==> drivers: °²×°BMSÇı¶¯³ÌĞò;\r\n"\
-			"	-l ==> library: °²×°ÏµÍ³¿âÎÄ¼ş\r\n"\
-			"	-p ==> plugins: °²×°ÏµÍ³²å¼ş\r\n"\
-			"	-q ==> qtlibrary: °²×°QT¿âÎÄ¼ş;\r\n"\
-			"	-t ==> tools: °²×°½Å±¾¹¤¾ß¼¯;\r\n"\
-			"	-u ==> html: °²×°ÏÔÊ¾ÓÃhtmlÎÄ¼ş;\r\n"\
-			"	-h ==> help: ÏÔÊ¾ÕâÌõ°ïÖúĞÅÏ¢;\r\n"\
-			"	-v ==> version: ÏÔÊ¾°²×°Æ÷µÄ°æ±¾\r\n"\
+			"	-a ==> all: å®‰è£…å…¨éƒ¨ç³»ç»Ÿæ–‡ä»¶(é©±åŠ¨ï¼Œåº“ï¼ŒUIï¼ŒæœåŠ¡ç«¯, å·¥å…·);\r\n"\
+			"	-c ==> config: å®‰è£…é…ç½®æ–‡ä»¶åŠé…ç½®æ•°æ®åº“;\r\n"\
+			"	-d ==> drivers: å®‰è£…BMSé©±åŠ¨ç¨‹åº;\r\n"\
+			"	-l ==> library: å®‰è£…ç³»ç»Ÿåº“æ–‡ä»¶\r\n"\
+			"	-p ==> plugins: å®‰è£…ç³»ç»Ÿæ’ä»¶\r\n"\
+			"	-q ==> qtlibrary: å®‰è£…QTåº“æ–‡ä»¶;\r\n"\
+			"	-t ==> tools: å®‰è£…è„šæœ¬å·¥å…·é›†;\r\n"\
+			"	-u ==> html: å®‰è£…æ˜¾ç¤ºç”¨htmlæ–‡ä»¶;\r\n"\
+			"	-h ==> help: æ˜¾ç¤ºè¿™æ¡å¸®åŠ©ä¿¡æ¯;\r\n"\
+			"	-v ==> version: æ˜¾ç¤ºå®‰è£…å™¨çš„ç‰ˆæœ¬\r\n"\
 			"OPTIONS:\r\n"\
-			"	-C ==> copydir: Ö¸¶¨Êä³öÄ¿Â¼(Ä¬ÈÏ: $copydir)\r\n"\
-			"	-P ==> prefix: Ö¸¶¨°²×°Ä¿Â¼(Ä¬ÈÏ: `pwd`/install/);\r\n"\
-			"	-T ==> target: Ö¸¶¨Êä³öÄ¿±êÎÄ¼şÃû(Ä¬ÈÏ: zeus.update.tar);\r\n"\
-			"	-W ==> workdir: Ö¸¶¨µ±Ç°¹¤×÷Ä¿Â¼(Ä¬ÈÏ: `pwd`)\r\n"\
+			"	-C ==> copydir: æŒ‡å®šè¾“å‡ºç›®å½•(é»˜è®¤: $copydir)\r\n"\
+			"	-P ==> prefix: æŒ‡å®šå®‰è£…ç›®å½•(é»˜è®¤: `pwd`/install/);\r\n"\
+			"	-T ==> target: æŒ‡å®šè¾“å‡ºç›®æ ‡æ–‡ä»¶å(é»˜è®¤: zeus.update.tar);\r\n"\
+			"	-W ==> workdir: æŒ‡å®šå½“å‰å·¥ä½œç›®å½•(é»˜è®¤: `pwd`)\r\n"\
 			"AUTHOR:\r\n"\
 			"	LiJie <cuplision@163.com> 2015/05/05 09:00"
 		exit 0;
@@ -99,7 +99,7 @@ while getopts acdlpqstuvzhP:T:W:C: param; do
 		copydir=$OPTARG
 	;;
 	*)
-		echo "ÎŞ·¨Ê¶±ğµÄ²ÎÊı $param=$OPTARG, Ê¹ÓÃinstall -h ²é¿´°ïÖú."
+		echo "æ— æ³•è¯†åˆ«çš„å‚æ•° $param=$OPTARG, ä½¿ç”¨install -h æŸ¥çœ‹å¸®åŠ©."
 		exit 1;
 	;;
 	esac
@@ -107,22 +107,22 @@ done
 shift $(( OPTIND - 1 ));
 
 if [ ${#WORKDIR} -eq 0 ];then
-	echo "Ã»ÓĞÕÒµ½»·¾³±äÁ¿WORKDIR£¬Ê¹ÓÃÄ¬ÈÏÄ¿Â¼`pwd`, ÇëÊ¹ÓÃ-WÖ¸¶¨¹¤×÷Ä¿Â¼"
+	echo "æ²¡æœ‰æ‰¾åˆ°ç¯å¢ƒå˜é‡WORKDIRï¼Œä½¿ç”¨é»˜è®¤ç›®å½•`pwd`, è¯·ä½¿ç”¨-WæŒ‡å®šå·¥ä½œç›®å½•"
 	WORKDIR=`pwd`
 fi
 
 if [ $config == "yes" ];then
 	P=`sqlite3 $(installdb) "SELECT path FROM dirs WHERE class LIKE '%config%'"`
 	if [ ${#P} -eq 0 ];then
-		echo "Ã»ÓĞÕÒµ½ĞèÒª°²×°µÄÅäÖÃÎÄ¼şÄ¿Â¼, ºöÂÔ."
+		echo "æ²¡æœ‰æ‰¾åˆ°éœ€è¦å®‰è£…çš„é…ç½®æ–‡ä»¶ç›®å½•, å¿½ç•¥."
 	else
 		for d in $P;do
-			printf "´´½¨Ä¿Â¼ $d"
+			printf "åˆ›å»ºç›®å½• $d"
 			mkdir -p $prefix/$d
 			if [ $? -eq 0 ];then
-				echo "   ³É¹¦."
+				echo "   æˆåŠŸ."
 			else
-				echo "   Ê§°Ü ($?) !"
+				echo "   å¤±è´¥ ($?) !"
 			fi
 		done
 		Fsrc=`sqlite3 $(installdb) "SELECT src FROM files WHERE class LIKE '%config%'"`
