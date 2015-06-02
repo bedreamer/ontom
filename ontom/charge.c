@@ -1544,7 +1544,7 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
 {
     struct error_history *thiz;
     struct list_head *head;
-    char sql[256], timestamp[128];
+    char sql[256]={0}, timestamp[128]={0};
     int ret;
 
     pthread_mutex_lock(&task->err_list_lck);
@@ -1594,7 +1594,7 @@ void error_history_recover(struct charge_job *job, unsigned int error_id)
 {
     struct error_history *thiz;
     struct list_head *head;
-    char sql[256], errname[128], timestamp[128];
+    char sql[256]={0}, errname[128]={0}, timestamp[128]={0};
     int ret;
 
     pthread_mutex_lock(&task->err_list_lck);
