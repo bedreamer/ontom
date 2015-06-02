@@ -231,20 +231,20 @@ function do_install() {
 						comment=$f
 						case $typ in
 							"link")
-								printf "    安装 $comment $prefix/$des"
+								printf "    安装 $comment $prefix$des"
 								cp `readlink $src` $prefix/$des
-								chmod $attr $prefix/$des
-								if [ -e $prefix/$des ];then
+								chmod $attr $prefix$des
+								if [ -e $prefix$des ];then
 									echo "成功."
 								else
 									echo "失败!."
 								fi
 							;;
 							"file")
-								printf "    安装 $comment $prefix/$des"
-								cp $src $prefix/$des
-								chmod $attr $prefix/$des
-								if [ -e $prefix/$des ];then
+								printf "    安装 $comment $prefix$des"
+								cp $src $prefix$des
+								chmod $attr $prefix$des
+								if [ -e $prefix$des ];then
 									echo "成功."
 								else
 									echo "失败!."
@@ -266,14 +266,14 @@ function do_install() {
 			if (( ${#Lsrc} != 0 ));then
 				olddir=`pwd`
 				for f in $Lsrc;do
-					case $f in
+					case $i in
 						'0') target=$f;i='1';;
 						'1') link=$f;i='2';;
 						'2') newdir=$f;i='3';;
 						'3')
-							cd $prefix/$newdir
+							cd $prefix$newdir
 							if (( $? != 0 ));then
-								echo " ** 无法切换到目录$prefix/$newdir, 目录不存在"
+								echo " ** 无法切换到目录$prefix$newdir, 目录不存在"
 							else
 								echo "    创建链接  $target  --> $target "
 								ln -s $target $link
