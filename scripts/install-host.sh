@@ -42,6 +42,9 @@ while getopts acdlpqstuvzhP:T:W:C: param; do
 	l|-library) # 仅安装库文件
 		library='yes';
 	;;
+	p|-profile) # 系统配置脚本
+		profile='yes'
+	;;
 	q|-qtlib) # 仅安装QT库文件
 		qtlib='yes';
 	;;
@@ -54,7 +57,7 @@ while getopts acdlpqstuvzhP:T:W:C: param; do
 	u|-html) # 仅安装html文件
 		html='yes';
 	;;
-	u|-zeus) # 安装程序
+	z|-zeus) # 安装程序
 		zeus='yes';
 	;;
 	v|-version)
@@ -114,6 +117,39 @@ fi
 if [ $config == "yes" ];then
 	do_install "config"
 fi
+
+if [ $drivers == "yes" ];then
+	do_install "drivers"
+fi
+
+if [ $ext == "yes" ];then
+	do_install "plugins"
+fi
+
+if [ $html == "yes" ];then
+	do_install "html"
+fi
+
+if [ $library == "yes" ];then
+	do_install "library"
+fi
+
+if [ $profile == "yes" ];then
+	do_install "profile"
+fi
+
+if [ $qtlib == "yes" ];then
+	do_install "qtlib"
+fi
+
+if [ $script == "yes" ];then
+	do_install "scripts"
+fi
+
+if [ $zeus == "yes" ];then
+	do_install "program"
+fi
+
 
 function do_install() {
 	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%$1%\""`
@@ -210,4 +246,4 @@ function do_install() {
 	fi
 }
 
-do_install "qtlib"
+exit 0
