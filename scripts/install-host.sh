@@ -125,8 +125,54 @@ if [ $config == "yes" ];then
 				echo "   失败 ($?) !"
 			fi
 		done
-		Fsrc=`sqlite3 $installdb "SELECT * FROM files WHERE class LIKE '%config%'"`
-		echo $Fsrc | awk -F '|' '{print $1}'
-		echo ${Fsrc[1]}, ${Fsrc[2]}
+		Fsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM files WHERE class LIKE '%config%'"`
+		i='0'
+		if [ ${#Fsrc} -eq 0 ];then
+		for f in $Fsrc;do
+			case $i in
+				'0') src=$f;i='1';;
+				'1') typ=$f;i='2';;
+				'2') des=$f;i='3';;
+				'3') attr=$f;i='4';;
+				'4') version=$f;i='5';;
+				'5') class=$f;i='6';;
+				'6')
+					comment=$f
+					case $typ in
+						"link")
+							printf "    安装 $comment $prefix/$des"
+							cp `readlink $src` $prefix/$des
+							chmod $attr $prefix/$des
+							if [ -e $prefix/$des ];then
+								echo "成功."
+							else
+								echo "失败!."
+							fi
+						;;
+						"file")
+							printf "    安装 $comment $prefix/$des"
+							cp $src $prefix/$des
+							chmod $attr $prefix/$des
+							if [ -e $prefix/$des ];then
+								echo "成功."
+							else
+								echo "失败!."
+							fi
+						;;
+						*)
+							echo "unsurpport file type. $src"
+						;;
+					esac
+					i='0'
+				;;
+				*)
+					echo "catch exceptions."
+				;;
+			esac
+		done
+		fi
+		Lsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM links WHERE class LIKE '%config%'"`
+		i='0'
+		
 	fi
 fi
