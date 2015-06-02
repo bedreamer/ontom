@@ -1544,7 +1544,7 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
 {
     struct error_history *thiz;
     struct list_head *head;
-    char sql[256]={0}, timestamp[128]={0};
+    char sql[512]={0}, timestamp[128]={0};
     int ret;
 
     pthread_mutex_lock(&task->err_list_lck);
@@ -1570,13 +1570,13 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
     task->err_nr ++;
     thiz->error_seqid = task->err_seq_id_next ++;
     thiz->error_id = error_id;
-    strncpy(thiz->error_string, error_string, 127);
+    strncpy(thiz->error_string, error_string, 63);
     strcpy(thiz->error_recover, "0000-00-00 00:00:00.000");
 
     log_printf(INF, "ZEUS: 故障总数为: %d", task->err_nr);
 
-    //__get_timestamp(timestamp);
-    strcpy(thiz->error_begin, "timestamp""");
+    __get_timestamp(timestamp);
+    strcpy(thiz->error_begin, timestamp);
     sprintf(sql, "INSERT INTO errors VALUES('%d','%d','%s','%s','ERROR')",
             thiz->error_seqid,
             thiz->error_id,
@@ -1594,7 +1594,7 @@ void error_history_recover(struct charge_job *job, unsigned int error_id)
 {
     struct error_history *thiz;
     struct list_head *head;
-    char sql[256]={0}, errname[128]={0}, timestamp[128]={0};
+    char sql[512]={0}, errname[128]={0}, timestamp[128]={0};
     int ret;
 
     pthread_mutex_lock(&task->err_list_lck);
