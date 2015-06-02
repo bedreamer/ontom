@@ -221,39 +221,39 @@ function do_install() {
 if [ $config == "yes" ];then
 	do_install "config"
 fi
-
+sleep 0.1
 if [ $drivers == "yes" ];then
 	do_install "drivers"
 fi
-
+sleep 0.1
 if [ $database == "yes" ];then
 	do_install "database"
 fi
-
+sleep 0.1
 if [ $ext == "yes" ];then
 	do_install "plugins"
 fi
-
+sleep 0.1
 if [ $html == "yes" ];then
 	do_install "html"
 fi
-
+sleep 0.1
 if [ $library == "yes" ];then
 	do_install "library"
 fi
-
+sleep 0.1
 if [ $profile == "yes" ];then
 	do_install "profile"
 fi
-
+sleep 0.1
 if [ $qtlib == "yes" ];then
 	do_install "qtlib"
 fi
-
+sleep 0.1
 if [ $script == "yes" ];then
 	do_install "scripts"
 fi
-
+sleep 0.1
 if [ $zeus == "yes" ];then
 	do_install "program"
 fi
