@@ -125,6 +125,6 @@ if [ $config == "yes" ];then
 				echo "   失败 ($?) !"
 			fi
 		done
-		Fsrc=`sqlite3 $(installdb) "SELECT src FROM files WHERE class LIKE '%config%'"`
+		Fsrc=`sqlite3 $installdb "SELECT src FROM files WHERE class LIKE '%config%'"`
 	fi
 fi

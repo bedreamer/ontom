@@ -805,7 +805,6 @@ struct MDATA_QRY {
     unsigned short crc;
 };
 
-#pragma pack(1)
 // 握手阶段
 // 充电机辨识报文
 struct pgn256_CRM {
