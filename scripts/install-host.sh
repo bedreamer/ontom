@@ -284,6 +284,7 @@ function do_install() {
 									echo "成功."
 								fi
 							fi
+							i='0';
 						;;
 					esac
 				done
