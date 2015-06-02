@@ -124,6 +124,7 @@ function do_install() {
 	if (( $? != 0 ));then
 		echo "ERR: $?"
 		sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%$1%\""
+		echo $?
 	fi
 	if [ ${#P} -eq 0 ];then
 		echo "没有找到需要安装的配置文件目录, 忽略{$P:$1}."
