@@ -112,7 +112,7 @@ if [ ${#WORKDIR} -eq 0 ];then
 fi
 
 if [ $config == "yes" ];then
-	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%config%\""`
+	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE '%config%'"`
 	if [ ${#P} -eq 0 ];then
 		echo "没有找到需要安装的配置文件目录, 忽略{$P}."
 	else
@@ -125,9 +125,9 @@ if [ $config == "yes" ];then
 				echo "   失败 ($?) !"
 			fi
 		done
-		Fsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM files WHERE class LIKE \"%config%\""`
+		Fsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM files WHERE class LIKE '%config%'"`
 		i='0'
-		if [ ${#Fsrc} -eq 0 ];then
+		if (( ${#Fsrc} != 0 ));then
 			for f in $Fsrc;do
 				case $i in
 					'0') src=$f;i='1';;
@@ -171,7 +171,7 @@ if [ $config == "yes" ];then
 				esac
 			done
 		fi
-		Lsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM links WHERE class LIKE \"%config%\""`
+		Lsrc=`sqlite3 -separator ' ' $installdb "SELECT * FROM links WHERE class LIKE '%config%'"`
 		i='0'
 		
 	fi
