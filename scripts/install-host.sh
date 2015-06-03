@@ -123,7 +123,7 @@ function do_install() {
 	P=`sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%$1%\""`
 	if (( $? != 0 ));then
 		echo "ERR: $?"
-		sqlite3 $installdb "SELECT path FROM dirs WHERE class LIKE \"%$1%\""
+		sqlite3 $installdb "SELECT path FROM dirs"
 		echo $?
 	fi
 	if [ ${#P} -eq 0 ];then
