@@ -260,6 +260,7 @@ if [ $qtlib == "yes" ];then
 	do_install "qtlib"
 fi
 
+cd $WORKDIR/$prefix
 echo "CREATE INSTALL/UPDATE PACKET: $prefix/$target"
 tar --exclude-vcs -czf $target `ls`
 printf "`date` \033[31m$prefix/$target\033[0m packed.\n"
