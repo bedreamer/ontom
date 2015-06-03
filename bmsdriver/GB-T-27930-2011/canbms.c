@@ -48,8 +48,10 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
         param->buff.tx_buff[0] = BMS_RECOGNIZED;
         bit_set(thiz, F_VEHICLE_RECOGNIZED);
     }
-    log_printf(INF, "BMS"RED("%s")": 握手-CRM-充电机辨识报文",
-               bit_read(thiz, F_BMS_RECOGNIZED)?"已识别":"未识别");
+    if ( bit_read(thiz, F_BMS_RECOGNIZED) ) {
+        log_printf(INF, "BMS"RED("%s")": 握手-CRM-充电机辨识报文",
+                   bit_read(thiz, F_BMS_RECOGNIZED)?"已识别":"未识别");
+    }
 
     param->buff.tx_buff[1] = 0x01;
     strcpy((char * __restrict__)&param->buff.tx_buff[2], "ZH-CN");
@@ -166,7 +168,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
     }
     ccs.spn3083_charge_time = (thiz->charged_seconds + thiz->section_seconds)/60;
 
-    log_printf(INF, "BMS.CCS: %.1f V, %.1f(%X) A",
+    log_printf(DBG_LV3, "BMS.CCS: %.1f V, %.1f(%X) A",
                (double)ccs.spn3081_output_voltage/10,
                (ccs.spn3082_output_current-4000)/-10.0,
                ccs.spn3082_output_current);
