@@ -1863,10 +1863,16 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             buff
             );
     if ( job->charge_mode == CHARGE_AUTO ) {
-        // BRO
+        // BRM
         // 动力蓄电池类型
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BRM\":{\"bat_kind\":\"%s\",", bat_kind);
+                "\"BRO\":{\"bat_kind\":\"%s\",", bat_kind);
+        // 蓄电池额定容量
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"spn_\":\"%s\",", bat_temprature);
+        // 蓄电池额定电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
         // 动力蓄电池单体最高电压
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
                 "\"bat_max_v\":\"%s\",", bat_max_v);
@@ -1878,48 +1884,42 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
                 "\"bat_temprature\":\"%s\"},", bat_temprature);
 
         // BCP
-        // 蓄电池额定容量
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BCP\":{\"bat_temprature\":\"%s\",", bat_temprature);
-        // 蓄电池额定电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
         // 单体最高允许电压
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"BCP\":{\"spn2816\":\"%s\",", bat_temprature);
         // 最高允许充电电流
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"spn2817\":\"%s\",", bat_temprature);
         // 蓄电池标称总能量
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"spn2818\":\"%s\",", bat_temprature);
         // 最高允许充电电压
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"spn2819\":\"%s\",", bat_temprature);
         // 最高允许温度
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"spn2820\":\"%s\",", bat_temprature);
         // 初始SOC
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"spn2821\":\"%s\",", bat_temprature);
         // 初始总电压
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\"},", bat_temprature);
+                "\"spn2822\":\"%s\"},", bat_temprature);
 
         // BRO
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BRO\":{\"bat_temprature\":\"%s\"},", bat_temprature);
+                "\"BRO\":{\"spn2829\":\"%s\"},", bat_temprature);
 
         // BCL
         // 电压需求
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BCP\":{\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"BCP\":{\"spn3072\":\"%s\",", bat_temprature);
         // 电流需求
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
+                "\"spn3073\":\"%s\",", bat_temprature);
         // 充电模式
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\"}", bat_temprature);
+                "\"spn3074\":\"%s\"}", bat_temprature);
 
     }
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],"},");
