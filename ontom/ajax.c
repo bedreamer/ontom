@@ -1781,6 +1781,16 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         "自由"
     };
     CHARGE_GUN_SN g = __is_gun_phy_conn_ok(job);
+    char bat_kind[32] = {0};
+    char bat_max_v[8] = {0};
+    char bat_min_v[8] = {0};
+    char bat_temprature[8] = {0};
+
+    strcpy(bat_kind, "N/A");
+    strcpy(bat_max_v, "N/A");
+    strcpy(bat_min_v, "N/A");
+    strcpy(bat_temprature, "N/A");
+
     char buff[16] = {0};
     if ( g == GUN_SN0 ) {
         sprintf(buff, "正常");
@@ -1820,17 +1830,17 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"hwk\":\"%.1f KW.H\"," // 电量
             "\"time\":\"%.d 分钟\","  // 时间
             "\"money\":\"%.1f 元\","  // 金额
-            "\"cid\":\"%s\","          // 卡号ID
+            "\"cid\":\"%s\","         // 卡号ID
             "\"cremain\":\"%.2f 元\"," // 余额
             "\"CV\":\"%.1f V\","       // 充电电压
             "\"CI\":\"%.1f A\","       // 充电电流
             "\"ycdl\":\"%.2f %%\","    // 充电进度
             "\"kwh_price\":\"%.2f\","   // 充电单价
             "\"used_kwh\":\"%.2f\","    // 已充电量
-            "\"used_time\":\"%.2f\","    // 已充时长
-            "\"used_money\":\"%.3f\","    // 已充电费
-            "\"gun_stat\":\"%s\""       // 充电枪连接状态
-            "},",
+            "\"used_time\":\"%.2f\","   // 已充时长
+            "\"used_money\":\"%.3f\","  // 已充电费
+            "\"gun_stat\":\"%s\","      // 充电枪连接状态
+            ,
             status_string[job->job_status],
             (unsigned int)job->job_url_commit_timestamp,
             job->job_gun_sn + 1,
@@ -1852,6 +1862,67 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             job->charged_money,
             buff
             );
+    if ( job->charge_mode == CHARGE_AUTO ) {
+        // BRO
+        // 动力蓄电池类型
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"BRM\":{\"bat_kind\":\"%s\",", bat_kind);
+        // 动力蓄电池单体最高电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_max_v\":\"%s\",", bat_max_v);
+        // 动力蓄电池单体最低电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_min_v\":\"%s\",", bat_min_v);
+        // 动力蓄电池温度);
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\"},", bat_temprature);
+
+        // BCP
+        // 蓄电池额定容量
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"BCP\":{\"bat_temprature\":\"%s\",", bat_temprature);
+        // 蓄电池额定电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 单体最高允许电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 最高允许充电电流
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 蓄电池标称总能量
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 最高允许充电电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 最高允许温度
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 初始SOC
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 初始总电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\"},", bat_temprature);
+
+        // BRO
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"BRO\":{\"bat_temprature\":\"%s\"},", bat_temprature);
+
+        // BCL
+        // 电压需求
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"BCP\":{\"bat_temprature\":\"%s\",", bat_temprature);
+        // 电流需求
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\",", bat_temprature);
+        // 充电模式
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"bat_temprature\":\"%s\"}", bat_temprature);
+
+    }
+    xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],"},");
 }
 
 int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
