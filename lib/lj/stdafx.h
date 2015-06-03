@@ -33,5 +33,6 @@
 #include "config.h"
 #include "Hachiko.h"
 #include "log.h"
+#include "../../thirdpart/sqlite/sqlite3.h"
 
 #endif// _LIB__STDAFX_H_

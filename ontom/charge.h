@@ -1864,11 +1864,6 @@ static inline int check_auth(const char *mac, const char *bcdcode)
 }
 #endif
 
-/* 记录系统操作日志 */
-int system_log(unsigned short type, const char *fmt, ...);
-/* 冲洗系统操作日志缓冲区 */
-void flush_system_log();
-
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);
 void error_history_recover(struct charge_job *job, unsigned int error_id);

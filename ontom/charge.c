@@ -383,6 +383,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     char buff[32] = {0};
     int ret, done = 0;
     char *errmsg;
+    int tsp = 0;
 
     log_printf(DBG_LV1, "ZUES: %s running...sizeof(struct charge_task)=%d",
             __FUNCTION__, sizeof(struct charge_task));
@@ -431,6 +432,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     // 启动八公定时器
     Hachiko_init(config_read("HachikoTTL"));
+
+    // 初始化系统操作日志
+    initlize_system_log(task->database, 16, 8);
 
     // 加载默认的扩展程序
     if ( ! exso_load(&task->exsos, "default", "/usr/zeus/plugins/exso_default.so", task) ) {
@@ -647,6 +651,13 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
             exso_do_mainloop( & task->exsos );
         } while ( 0 );
+
+        tsp ++;
+        // 每30秒主动同步一次操作日志
+        if ( tsp >= 600 ) {
+            sync_system_log();
+            tsp = 0;
+        }
 
         usleep(50000);
     }
@@ -1631,20 +1642,4 @@ del:
     free(thiz);
 out:
     pthread_mutex_unlock (&task->err_list_lck);
-}
-
-/* 记录系统操作日志 */
-int system_log(unsigned short type, const char *fmt, ...)
-{
-    char log[512]= {0};
-    va_list ap;
-    char sql[1024]= {0};
-
-    vsnprintf(log, sizeof(log), fmt, ap);
-    return ERR_OK;
-}
-
-/* 冲洗系统操作日志缓冲区 */
-void flush_system_log()
-{
 }

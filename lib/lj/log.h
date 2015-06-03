@@ -39,4 +39,12 @@ static inline void __get_timestamp(char *outstring)
     outstring[ n ] = 0;
 }
 
+int initlize_system_log(sqlite3 *,unsigned int maxlog, unsigned int sync_triger);
+/* 记录系统操作日志 */
+int system_log(unsigned short type, const char *fmt, ...);
+/* 冲洗系统操作日志缓冲区 */
+int flush_system_log();
+/* 将系统日志写入数据库操作日志缓冲区 */
+int sync_system_log();
+
 #endif
