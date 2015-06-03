@@ -260,5 +260,13 @@ if [ $qtlib == "yes" ];then
 	do_install "qtlib"
 fi
 
+echo "CREATE INSTALL/UPDATE PACKET: $prefix/$target"
+tar --exclude-vcs -czf $target `ls`
+printf "`date` \033[31m$prefix/$target\033[0m packed.\n"
+mkdir $copydir$VERSION
+echo $VERSION > $copydir'VERSION'
+echo $copydir"VERSION updated!"
+cp $target $copydir$VERSION/
+echo "target: $target copyied to $copydir$VERSION/"
 
 exit 0
