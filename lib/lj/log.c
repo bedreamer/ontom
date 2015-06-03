@@ -184,7 +184,10 @@ int sync_system_log()
         pthread_mutex_lock(&log_pool_lck);
         for ( i = 0; i < records_nr ; i ++ ) {
             j = 0;
-            while ( log_pool[i][j ++] != '#' && j < 64 );
+            while ( log_pool[i][j] != '#' && j < 64 ) {
+                tstp[j] = log_pool[i][j];
+                j ++;
+            }
             if ( j < 64 ) {
                 log_pool[i][j - 1] = '\0';
                 j ++;
