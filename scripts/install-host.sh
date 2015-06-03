@@ -220,6 +220,14 @@ function do_install() {
 }
 
 
+sleep 0.1
+if [ $script == "yes" ];then
+	do_install "scripts"
+fi
+sleep 0.1
+if [ $zeus == "yes" ];then
+	do_install "program"
+fi
 if [ $config == "yes" ];then
 	do_install "config"
 fi
@@ -250,14 +258,6 @@ fi
 sleep 0.1
 if [ $qtlib == "yes" ];then
 	do_install "qtlib"
-fi
-sleep 0.1
-if [ $script == "yes" ];then
-	do_install "scripts"
-fi
-sleep 0.1
-if [ $zeus == "yes" ];then
-	do_install "program"
 fi
 
 
