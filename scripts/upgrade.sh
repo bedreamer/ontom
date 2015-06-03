@@ -6,7 +6,7 @@ if [ $# -eq 1 ]; then
 	if [ -e "/tmp/zeus.version" ];then
 		rm /tmp/zeus.version
 	fi
-	wget "http://$1/VERSION" -O /tmp/zeus.version
+	wget "http://$1/www/VERSION" -O /tmp/zeus.version
 	if [ -e "/tmp/zeus.version" ];then
 		if [ -e "/tmp/zeus.update.tar" ];then
 			rm /tmp/zeus.update.tar
