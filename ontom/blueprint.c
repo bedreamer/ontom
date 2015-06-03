@@ -738,9 +738,9 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_YX_1_COMM_DOWN);
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
             log_printf(ERR, "UART: "RED("充电机监控通讯(次要0-49)中断"));
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -837,9 +837,9 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_YX_2_COMM_DOWN);
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
             log_printf(ERR, "UART: "RED("充电机监控通讯(次要50-100)中断"));
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -951,9 +951,9 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
             bit_set(task, S_CHARGER_COMM_DOWN);
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
             log_printf(ERR, "UART: "RED("充电机监控通讯(主要)中断"));
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -4113,10 +4113,10 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
             if ( ! bit_read(task, S_CARD_READER_COMM_DOWN) ) {
                 log_printf(ERR, "UART: "RED("读卡器通信中断, 请排查故障,(%d)"),
                            self->master->died);
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
             }
             bit_set(task, S_CARD_READER_COMM_DOWN);
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         query_stat = SEQ_FIND_CARD;
         break;
     // 串口IO错误
