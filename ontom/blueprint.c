@@ -1560,10 +1560,10 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
             if ( ! bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
                 log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
                                             " 已禁止充电(%d)."), self->master->died);
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
             }
             bit_set(task, S_MEASURE_1_COMM_DOWN);
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -1701,7 +1701,9 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        if ( ! bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        }
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -1815,7 +1817,9 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        if ( ! bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        }
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -2405,12 +2409,12 @@ int simple_box_correct_read_evt_handle(struct bp_uart *self, struct bp_user *me,
         } else {
             //self->master->died ++;
             if ( ! bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
+                log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
+                                            " 已禁止充电(%d)."), self->master->died);
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
             }
-            log_printf(ERR, "UART: "RED("综合采样盒通信中断, 请排查故障,"
-                                        " 已禁止充电(%d)."), self->master->died);
             bit_set(task, S_MEASURE_1_COMM_DOWN);
         }
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -2675,10 +2679,10 @@ int ANC01_convert_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
                 log_printf(ERR, "UART: "RED("协议转换盒通信中断, 请排查故障,(%d:%d)"),
                            self->master->died,
                            self->master->swap_time_modify);
+                log_printf(WRN, "UART: %s:%d get signal TIMEOUT", __FUNCTION__, evt);
             }
             bit_set(task, S_CONVERT_BOX_COMM_DOWN);
         }
-        log_printf(WRN, "UART: %s:%d get signal TIMEOUT", __FUNCTION__, evt);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -2789,7 +2793,9 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+            log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        }
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -2871,7 +2877,9 @@ int ANC01_convert_box_module_on_evt_handle(struct bp_uart *self, struct bp_user 
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+            log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        }
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -2951,7 +2959,9 @@ int ANC01_convert_box_module_off_handle(struct bp_uart *self, struct bp_user *me
     case BP_EVT_RX_BYTE_TIMEOUT:
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
-        log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN ) ) {
+            log_printf(WRN, "UART: %s:d get signal TIMEOUT", __FUNCTION__, evt);
+        }
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -3150,10 +3160,10 @@ int Increase_module_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         } else {
             //self->master->died ++;
             if ( ! bit_read(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private) -1) ) {
+                log_printf(ERR, "UART: "RED("%d#模块通信中断, 请排查故障,(%d)"),
+                           me->_private,
+                           self->master->died);
             }
-            log_printf(ERR, "UART: "RED("%d#模块通信中断, 请排查故障,(%d)"),
-                       me->_private,
-                       self->master->died);
             bit_set(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private) -1 );
         }
         log_printf(WRN, "UART: %s:%d get signal TIMEOUT", __FUNCTION__, evt);
@@ -3246,7 +3256,9 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        }
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -3390,7 +3402,9 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        if ( ! bit_read(task, S_CONVERT_BOX_COMM_DOWN) ) {
+            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        }
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -4097,9 +4111,9 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
         } else {
             //self->master->died ++;
             if ( ! bit_read(task, S_CARD_READER_COMM_DOWN) ) {
+                log_printf(ERR, "UART: "RED("读卡器通信中断, 请排查故障,(%d)"),
+                           self->master->died);
             }
-            log_printf(ERR, "UART: "RED("读卡器通信中断, 请排查故障,(%d)"),
-                       self->master->died);
             bit_set(task, S_CARD_READER_COMM_DOWN);
         }
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
