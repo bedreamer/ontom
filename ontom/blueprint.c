@@ -1795,7 +1795,7 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
         memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = nr;
 	
-	__dump_uart_hex(buff, nr, INF);
+        //__dump_uart_hex(buff, nr, INF);
 
         self->rx_param.need_bytes = 12;
         self->master->time_to_send = (param->payload_size + 1) * 1000 / 960 + self->master->swap_time_modify;
