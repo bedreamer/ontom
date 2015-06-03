@@ -562,6 +562,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
     //memset(task->single, 255, sizeof(task->single));
 
+    system_log(0, "主程序启动");
+
     while ( 1 ) {
         // 清除无效的作业
         job_detach_wait(task);
