@@ -1866,7 +1866,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         // BRM
         // 动力蓄电池类型
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BRO\":{\"bat_kind\":\"%s\",", bat_kind);
+                "\"BRM\":{\"bat_kind\":\"%s\",", bat_kind);
         // 蓄电池额定容量
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
                 "\"spn_\":\"%s\",", bat_temprature);
@@ -1913,7 +1913,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         // BCL
         // 电压需求
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BCP\":{\"spn3072\":\"%s\",", bat_temprature);
+                "\"BCL\":{\"spn3072\":\"%s\",", bat_temprature);
         // 电流需求
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
                 "\"spn3073\":\"%s\",", bat_temprature);
