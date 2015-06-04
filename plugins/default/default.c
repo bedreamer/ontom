@@ -6,14 +6,45 @@
 #include "../../lib/bms/father.h"
 #include "../../ontom/charge.h"
 
+struct charge_task *zeus;
+
+static int automatic_load_plugins(const char *exso_name)
+{
+    char exso_path[256];
+    struct exso_struct *thiz;
+    const char *plugins_path = config_read("exso_path");
+
+    sprintf(exso_path, "%sexso_%s.so", plugins_path, exso_name);
+    thiz = exso_load( &(t->exsos), load_exso_name, exso_path, p);
+    if ( thiz == NULL ) {
+        log_printf(WRN, "EXSO: load <%s:%s> faile!!!!", load_exso_name, exso_path);
+        ret = ERR_ERR;
+    } else {
+        log_printf(INF, "EXSO: <%s:%s> loaded.", load_exso_name, exso_path);
+        ret = ERR_OK;
+    }
+}
+
+int sql_db_settings_result(void *param, int nr, char **text, char **name)
+{
+    if ( nr <= 0 ) return 0;
+    automatic_load_plugins(text[0]);
+    return 0;
+}
+
 int exso_default_init(void *p)
 {
+    char sql[512];
     printf("******  Plugin  default  initialized  ******\n");
     const char *exso_path = config_read("exso_path");
     if ( exso_path == NULL ) {
         exso_path = config_write("exso_path", "/usr/zeus/plugins/");
         if ( exso_path == NULL ) return ERR_ERR;
     }
+
+    zeus = (struct charge_task *)p;
+    sprintf(sql, "SELECT name,so_name FROM plugins WHERE disabled='FALSE'");
+
     return ERR_OK;
 }
 
@@ -27,19 +58,7 @@ int exso_default_main_loop(void *p)
     const char *unload_exso_name = config_read("unload_exso");
 
     if ( load_exso_name != NULL && 0 != strcmp("N/A", load_exso_name) ) {
-        char exso_path[256];
-        struct exso_struct *thiz;
-        const char *plugins_path = config_read("exso_path");
-
-        sprintf(exso_path, "%sexso_%s.so", plugins_path, load_exso_name);
-        thiz = exso_load( &(t->exsos), load_exso_name, exso_path, p);
-        if ( thiz == NULL ) {
-            log_printf(WRN, "EXSO: load <%s:%s> faile!!!!", load_exso_name, exso_path);
-            ret = ERR_ERR;
-        } else {
-            log_printf(INF, "EXSO: <%s:%s> loaded.", load_exso_name, exso_path);
-            ret = ERR_OK;
-        }
+        ret = automatic_load_plugins(load_exso_name);
         config_write("load_exso", "N/A");
         config_write("load_name", "N/A");
     } else if ( unload_exso_name != NULL && 0 != strcmp("N/A", unload_exso_name)  ) {
