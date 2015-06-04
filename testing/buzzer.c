@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#define DEV_NAME  "/dev/am335_buzzer"
+#define DEV_NAME  "/dev/am335x_buzzer"
 
 #define	BEEP_ON			0
 #define	BEEP_OFF		1
@@ -20,7 +20,7 @@ int main(int argc, char * argv)
 	fd = open(DEV_NAME, O_RDWR);
 	if (fd < 0)
 	{
-		printf("can't open /dev/gpio_test!\n");
+		printf("can't open %s!\n", DEV_NAME);
 		exit(1);
 	}
 	
