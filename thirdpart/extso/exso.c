@@ -35,7 +35,7 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
     sprintf(entry, "exso_%s_main_loop", modulename);
     copy.exso_main_loop = (int (*)(void *))dlsym(so_handle, entry);
     if ( dlerror() ) {
-        copy.exso_init_entry = NULL;
+        copy.exso_main_loop = NULL;
     }
 
     sprintf(entry, "exso_%s_exit", modulename);
