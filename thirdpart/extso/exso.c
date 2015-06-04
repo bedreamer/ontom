@@ -69,7 +69,7 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
     t = *head;
 
     while ( t ) {
-        log_printf(DBG_LV2, "EXSO: [%s=> entry: %p, main: %p, exit: %p] ",
+        printf("EXSO: [%s=> entry: %p, main: %p, exit: %p] \n",
                t->exso_name, t->exso_init_entry,
                t->exso_main_loop, t->exso_exit_entry);
         t = t->exso_next;
