@@ -8,7 +8,7 @@
 
 struct charge_task *zeus;
 
-static int automatic_load_plugins(const char *exso_name)
+static int automatic_load_plugins(struct charge_task *t, const char *exso_name)
 {
     char exso_path[256];
     struct exso_struct *thiz;
@@ -28,7 +28,7 @@ static int automatic_load_plugins(const char *exso_name)
 int sql_db_settings_result(void *param, int nr, char **text, char **name)
 {
     if ( nr <= 0 ) return 0;
-    automatic_load_plugins(text[0]);
+    automatic_load_plugins(zeus, text[0]);
     return 0;
 }
 
@@ -58,7 +58,7 @@ int exso_default_main_loop(void *p)
     const char *unload_exso_name = config_read("unload_exso");
 
     if ( load_exso_name != NULL && 0 != strcmp("N/A", load_exso_name) ) {
-        ret = automatic_load_plugins(load_exso_name);
+        ret = automatic_load_plugins(t, load_exso_name);
         config_write("load_exso", "N/A");
         config_write("load_name", "N/A");
     } else if ( unload_exso_name != NULL && 0 != strcmp("N/A", unload_exso_name)  ) {
