@@ -68,7 +68,9 @@ struct exso_struct *exso_load(struct exso_struct **head, const char *modulename,
 
     t = *head;
     while ( t ) {
-        printf("[%s] ", t->exso_name);
+        printf("[%s=> entry: %p, main: %p, exit: %p] ",
+               t->exso_name, t->exso_init_entry,
+               t->exso_main_loop, t->exso_exit_entry);
         t = t->exso_next;
     }
 
