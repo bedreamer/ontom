@@ -17,7 +17,7 @@ qtlib='no'
 script='no'
 zeus='no'
 
-while getopts acdDlpqstuvzhP:T:W:C: param; do
+while getopts acdDelpqstuvzhP:T:W:C: param; do
 	# commands
 	case "$param" in
 	a|-all) # 安装全部
