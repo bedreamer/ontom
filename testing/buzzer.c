@@ -16,6 +16,7 @@ int main(int argc, char * argv)
 {
 	int fd;
 	int i;
+	int o = 0, f = 0;
 
 	fd = open(DEV_NAME, O_RDWR);
 	if (fd < 0)
@@ -24,13 +25,14 @@ int main(int argc, char * argv)
 		exit(1);
 	}
 	
-	printf("buzzer test.\n");
-	for (i = 0; i < 2; i++) 
-	{
-		ioctl(fd, BEEP_ON, 0);
-		sleep(1);		
-		ioctl(fd, BEEP_OFF, 0);
-		sleep(1);
+	while (1) {
+		scanf("%d %d", &o, &f);
+		for (i = 0; i < 2; i++) {
+			ioctl(fd, BEEP_ON, 0);
+			usleep(o);		
+			ioctl(fd, BEEP_OFF, 0);
+			usleep(f);
+		}
 	}
 
 	close(fd);
