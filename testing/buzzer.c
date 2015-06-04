@@ -27,11 +27,11 @@ int main(int argc, char * argv)
 	
 	while (1) {
         scanf("%d", &o);
-        if ( o < 10000 ) {
+        if ( o < 1000 ) {
             ioctl(fd, BEEP_ON, 0);
             usleep(o);
             ioctl(fd, BEEP_OFF, 0);
-            usleep(10000-o);
+            usleep(1000-o);
         }
 	}
 
