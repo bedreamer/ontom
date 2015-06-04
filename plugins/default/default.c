@@ -15,13 +15,13 @@ static int automatic_load_plugins(struct charge_task *t, const char *exso_name)
     const char *plugins_path = config_read("exso_path");
 
     sprintf(exso_path, "%sexso_%s.so", plugins_path, exso_name);
-    thiz = exso_load( &(t->exsos), load_exso_name, exso_path, p);
+    thiz = exso_load( &(t->exsos), load_exso_name, exso_path, t);
     if ( thiz == NULL ) {
         log_printf(WRN, "EXSO: load <%s:%s> faile!!!!", load_exso_name, exso_path);
-        ret = ERR_ERR;
+        return ERR_ERR;
     } else {
         log_printf(INF, "EXSO: <%s:%s> loaded.", load_exso_name, exso_path);
-        ret = ERR_OK;
+        return ERR_OK;
     }
 }
 
