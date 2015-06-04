@@ -409,7 +409,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->bat_2_I_hi = 240.0;
     task->bat_1_insti_ohm_v = 100.0;
     task->bat_2_insti_ohm_v = 100.0;
-    task->meter_I_xishu = 1.0f;
+    task->meter_I_xishu = 100.0f;
     task->meter_V_xishu = 1.0f;
 
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
@@ -526,7 +526,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             task->uarts[1]->dev_name);
 
 #if 1
-    if ( task->uarts[0]->users_nr ) {
+    if ( task->uarts[0] && task->uarts[0]->users_nr ) {
         // 串口通信线程
         ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)task->uarts[0]);
         if ( 0 != ret ) {
@@ -536,7 +536,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             goto __panic;
         }
     }
-    if ( task->uarts[1]->users_nr ) {
+    if ( task->uarts[1] && task->uarts[1]->users_nr ) {
         // 串口通信线程
         ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)task->uarts[1]);
         if ( 0 != ret ) {

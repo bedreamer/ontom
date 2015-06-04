@@ -533,6 +533,20 @@ typedef enum {
     S_END
 }ONTOM_FLAG_SINGLE;
 
+// 硬件配置信息
+typedef enum {
+    // 交流电能表
+    HW_AC_KWH_METER = 0,
+    // 直流电能表
+    HW_DC_KWH_METER,
+    // 周立功读卡器
+    HW_ZLG600SP_CARD_READER,
+    // 故障蜂鸣器
+    HW_ERR_BUZZER,
+    // 操作提示蜂鸣器
+    HW_OP_BUZZER
+}ONTOM_HW_CONFIG;
+
 typedef enum {
     /*
      * 系统日志，包含： 开关机，更新，设置
@@ -1618,6 +1632,9 @@ struct charge_task {
     unsigned char bcd_auth_code[17];
     // 网卡MAC  地址
     unsigned char mac_addr[32];
+
+    // 硬件配置映射表
+    unsigned char hw_config[8];
 };
 
 static inline unsigned char check_sum(unsigned char *buff, size_t len) {
