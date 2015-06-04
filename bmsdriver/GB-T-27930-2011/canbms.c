@@ -95,7 +95,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct bms_event_struct* param)
     cts.spn2823_bcd_year_l = (((p->tm_year / 10 ) & 0x0F ) << 4) |
             ((p->tm_year % 10) & 0x0F);
 
-    memset(param->buff.tx_buff, 0xFF, 8);
+    memset(param->buff.tx_buff, 0xFF, 8);c
     memcpy(param->buff.tx_buff, &cts, sizeof(struct pgn1792_CTS));
 
     param->buff_payload = gen->datalen;
