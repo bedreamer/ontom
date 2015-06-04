@@ -74,13 +74,27 @@ void * buzzer_thread_proc(void *p)
     log_printf(INF, "buzzer test running.");
 
     while ( 1 ) {
-        for (i = 0; i < 2; i++)
-        {
+        if ( __bit_read(zeus->h_s_ware_config, HW_CMD_BUZZER_BEEP_OK) ) {
+            ioctl(fd, BEEP_ON, 0);
+            usleep(500 * 1000);
+            ioctl(fd, BEEP_OFF, 0);
+            __bit_clr(zeus->h_s_ware_config, HW_CMD_BUZZER_BEEP_OK);
+        } else if (__bit_read(zeus->h_s_ware_config, HW_CMD_BUZZER_BEEP_ERR) ) {
+            ioctl(fd, BEEP_ON, 0);
+            usleep(500 * 1000);
+            ioctl(fd, BEEP_OFF, 0);
+            usleep(200 * 1000);
+            ioctl(fd, BEEP_ON, 0);
+            usleep(500 * 1000);
+            ioctl(fd, BEEP_OFF, 0);
+            __bit_clr(zeus->h_s_ware_config, HW_CMD_BUZZER_BEEP_ERR);
+        } else if (__bit_read(zeus->h_s_ware_config, HW_CMD_BUZZER_BEEP_STARTUP) ) {
             ioctl(fd, BEEP_ON, 0);
             sleep(1);
             ioctl(fd, BEEP_OFF, 0);
-            sleep(1);
+            __bit_clr(zeus->h_s_ware_config, HW_CMD_BUZZER_BEEP_STARTUP);
         }
+        usleep(100 * 1000);
     }
 
     close(fd);

@@ -535,16 +535,27 @@ typedef enum {
 
 // 硬件配置信息
 typedef enum {
-    // 交流电能表
+    // 交流电能表存在
     HW_AC_KWH_METER = 0,
-    // 直流电能表
+    // 直流电能表存在
     HW_DC_KWH_METER,
-    // 周立功读卡器
+    // 周立功读卡器存在
     HW_ZLG600SP_CARD_READER,
-    // 故障蜂鸣器
+    // 故障蜂鸣器存在
     HW_ERR_BUZZER,
-    // 操作提示蜂鸣器
-    HW_OP_BUZZER
+    // 操作提示蜂鸣器存在
+    HW_OP_BUZZER,
+    // 操作日志模块存在
+    SW_LOG_MODULE,
+
+    // HW_SW_CMD_BEGIN
+    HW_SW_CMD_BEGIN = 32,
+    HW_CMD_BUZZER_BEEP_OK,
+    HW_CMD_BUZZER_BEEP_ERR,
+    HW_CMD_BUZZER_BEEP_STARTUP,
+
+    // HW_SW_CMD_END
+    HW_SW_CMD_END
 }ONTOM_HW_CONFIG;
 
 typedef enum {
@@ -1633,8 +1644,8 @@ struct charge_task {
     // 网卡MAC  地址
     unsigned char mac_addr[32];
 
-    // 硬件配置映射表
-    unsigned char hw_config[8];
+    // 硬件软件配置映射表
+    volatile unsigned char h_s_ware_config[8];
 };
 
 static inline unsigned char check_sum(unsigned char *buff, size_t len) {

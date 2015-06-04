@@ -3960,6 +3960,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                                         log_printf(INF, "UART: 刷卡太快，作业保护.");
                                         return ERR_OK;
                                     } else {
+                                        __bit_set(task->h_s_ware_config, HW_CMD_BUZZER_BEEP_OK);
                                         log_printf(INF, "任务中止，开始扣费。");
                                         query_stat = SEQ_SECTOR_WR_AUTH;
                                         ret = ERR_NEED_ECHO;
@@ -3968,6 +3969,7 @@ int card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT e
                                 config_write("triger_card_sn", buff);
                             }
                         } else {
+                            __bit_set(task->h_s_ware_config, HW_CMD_BUZZER_BEEP_OK);
                             config_write("triger_card_sn", buff);
                             //log_printf(INF, "fasdfafdsfasdfasdfasfasdfsad");
                         }

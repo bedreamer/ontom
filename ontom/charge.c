@@ -415,6 +415,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
     bit_read(task, CMD_MODULE_ON);
+    __bit_set(task->h_s_ware_config, HW_CMD_BUZZER_BEEP_STARTUP);
 
     sprintf(sql, "SELECT * FROM configs");
     ret = sqlite3_exec(task->database, sql, sql_db_config_result, &done, &errmsg);
