@@ -72,12 +72,15 @@ void * buzzer_thread_proc(void *p)
     }
 
     log_printf(INF, "buzzer test running.");
-    for (i = 0; i < 2; i++)
-    {
-        ioctl(fd, BEEP_ON, 0);
-        sleep(1);
-        ioctl(fd, BEEP_OFF, 0);
-        sleep(1);
+
+    while ( 1 ) {
+        for (i = 0; i < 2; i++)
+        {
+            ioctl(fd, BEEP_ON, 0);
+            sleep(1);
+            ioctl(fd, BEEP_OFF, 0);
+            sleep(1);
+        }
     }
 
     close(fd);
