@@ -25,7 +25,7 @@ static int automatic_load_plugins(struct charge_task *t, const char *exso_name)
     }
 }
 
-int sql_db_settings_result(void *param, int nr, char **text, char **name)
+int sql_db_ext_result(void *param, int nr, char **text, char **name)
 {
     if ( nr <= 0 ) return 0;
     automatic_load_plugins(zeus, text[0]);
@@ -35,6 +35,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
 int exso_default_init(void *p)
 {
     char sql[512];
+    char *msg;
+    int ret;
+
     printf("******  Plugin  default  initialized  ******\n");
     const char *exso_path = config_read("exso_path");
     if ( exso_path == NULL ) {
@@ -44,6 +47,10 @@ int exso_default_init(void *p)
 
     zeus = (struct charge_task *)p;
     sprintf(sql, "SELECT name,so_name FROM plugins WHERE disabled='FALSE'");
+    ret = sqlite3_exec(zeus->database, sql, sql_db_ext_result, NULL, &msg);
+    if ( ret != 0 ) {
+        log_printf(INF, "EXT: %s", msg);
+    }
 
     return ERR_OK;
 }
