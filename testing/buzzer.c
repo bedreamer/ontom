@@ -26,13 +26,13 @@ int main(int argc, char * argv)
 	}
 	
 	while (1) {
-		scanf("%d %d", &o, &f);
-		for (i = 0; i < 2; i++) {
-			ioctl(fd, BEEP_ON, 0);
-			usleep(o);		
-			ioctl(fd, BEEP_OFF, 0);
-			usleep(f);
-		}
+        scanf("%d", &o);
+        if ( o < 10000 ) {
+            ioctl(fd, BEEP_ON, 0);
+            usleep(o);
+            ioctl(fd, BEEP_OFF, 0);
+            usleep(10000-o);
+        }
 	}
 
 	close(fd);
