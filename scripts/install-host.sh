@@ -5,6 +5,7 @@ target="zeus.update.tar"
 copydir="/media/sf_E_DRIVE/www/"
 installdb="scripts/install.db"
 VERSION=`svn info $0|grep Revision|grep -o '[0-9]\+'`
+CMDCACHE=".instal.cache"
 
 config='no'
 drivers='no'
