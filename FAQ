@@ -1,7 +1,135 @@
-﻿* 命名规则
+﻿* 无刷卡器的情况下如何进行程序逻辑测试？
+	通过命令行工具创建作业即可
+	$ curl "http://$IP:8081/job/create.json?t=$timestamp&cid=$cardid&gun=$gunsn&remain=$remainmoney&passwd=$passwd&c_mode=$cmode{&set_V=$setI&set_I=$setI}&b_mode=$bmode&$b_mode_opt=$value"
+	参数说明:
+		$timestamp:  创建作业的时间戳，大于0即可
+		$cardid: 创建作业的卡片ID
+		$gunsn: 充电枪序号, 0 或 1
+		$remainmoney: 卡片内剩余余额
+		$passwd: 卡片验证密码
+		$c_mode: 充电模式, 可选项为: 
+			auto: 全自动充电;
+			BV:   恒压手动充电;
+			BI    恒流手动充电;
+		$set_V: 手动充电设置的充电电压
+		$set_I: 手动充电设置的充电电流
+		$b_mode: 计费模式。可选项为:
+			auto: 自动计费，按照充满为止，若是人工充电，则需要手动中止充电.
+			kwh: 按电能计费
+			cap: 同kwh
+			time: 按时间充电计费，单位为分钟
+			money: 按金额充电计费
+		$b_mode_opt: 计费中止选项, 可选项为：
+			b_money：按金额计费
+			b_kwh: 按电能计费
+			b_time: 按时间计费
+		$value: 计费中止值，仅在 $b_mode_opt != auto 下有效
+	例如：
+	IP: 192.168.1.61, 卡号为988766, 余额为234.5元, 密码为: 000000, 手动充电，设定充电模式为恒压充电(560.3V, 21A)，计费模式为按时间充电计费，共计充电60分钟
+	$ curl "http://192.168.1.61:8081/job/create.json?t=423434&cid=988766&gun=0&remain=234.5&passwd=000000&c_mode=BV&set_V=560.3&set_I=21&b_mode=time&b_time=60"
+	返回 status=PEDDING 或 status=OK, 标识创建作业成功, 此时可通过监控的查询作业页面看到创建好的充电作业。
+		
+* 关于如何处理傻逼的需求更改问题
+	目前需求在不停地更改，为了更好的适应这种频繁的更改，避免过度的重构代码造成的精神及身体压力，目前整个程序框架结构按照模块思路设计。
+	* 模块：			从历来的直流系统工程看来，整流模块极有可能是外购产品，因此在RS485通信方面做了相关的工作，只需要按照串口框架给出每种设备的通信数据处理过程即可。
+	* 协议：
+	这可能是整个系统最为复杂的一块内容，充电桩本身是不直接和后台通信的，但不可避免的是会出现傻逼要求公司的产品直接通过网口和后台通信，为了实现这个过程，并且使这个过程显得好看，优雅，这里采用了插件式的扩展接口，只需要给定三种函数接口即可。
+	分别是 初始化接口： exso_$(name)_init             --> 必须
+			主循环接口: exso_$(name)_main_loop        --> 可选
+			退出接口：  exso_$(name)_exit             --> 必须
+	若是你需要在每次循环中都要进行一次处理则给定主循环接口。
+	若需要自主实现相关过程，则在初始化时创建线程即可, 需要在扩展退出时主动释放线程资源
+
+* 关于RS485设备 /dev/ttyO4, /dev/ttyO5
+	由于ANC-01返回数据较快(500us)以内，在应用程序逻辑内无法快速切换RS485转换芯片的工作模式为接收状态，因此通过修改驱动程序来
+	实现发送和发送完成后转换芯片工作模式的快速切换。
+* 关于读卡器SP600+
+	默认状态下，SP600+的默认工作速度是19200bps, 现将读卡器工作波特率设定为9600bps
+	发送指令如下：
+		07 01 48 01 00 BCC 03
+	读卡器回应:
+		06 01 00 00 F8 03 标识成功
+	给读卡器断电重启，此时使用9600的波特率通信即可。
+* 关于开卡
+	开卡需要使用testing/card 程序，具体方式参见 ./card -h
+* 关于电能表
+	目前采用的是华立3相多功能电能表，程序中只需要设定电表地址即可
+* 关于首次安装程序的流程
+	首次安装时，目标板上只有空的系统，但该系统无法被直接使用，需要重新烧写系统内核，安装QT库文件，
+	程序文件
+	* 准备
+		* 配置tftp服务器，假设地址为192.168.1.8
+		* 将开发目录 linux-3.2.0-overlay/arch/arm/boot/uImage放置于tftp根目录
+	* 安装系统内核
+		* 使用RS232接口连接至目标板后，进入超级终端，给目标板上电
+		* 进入uboot界面后打断程序运行，开始手工安装系统内核
+			# set serverip 192.168.1.8
+			# ping 192.168.1.8
+			注： 上述命令执行提示host is alive 后执行下一步，否则检查网络连接
+			# run loadkernel
+			# reset
+			等待重新启动
+		* 不要按任何按键，等待系统启动
+		* 检查屏幕显示是否有图片显示，若没有则说明内核烧写失败，
+				检查tftp服务是否配置正确；
+				检查uImage是否正确放置；
+	* 安装应用程序
+		* 系统启动后进入命令提示行, 执行下列命令
+			# mkdir /usr/zeus
+			# mkdir /usr/zeus/drivers/
+			# mkdir /usr/zeus/plugins/
+			# cd /usr/zeus/
+			# wget http://192.168.1.8:8080/www/VERSION -O zeus.version
+			# wget http://192.168.1.8:8080/www/`cat zeus.version`/zeus.update.tar -O zeus.tar 192.168.1.8
+			# tar -C / -xvf zeus.tar
+			# rm zeus.tar
+			# sync   
+			注： 最后一步非常重要，必须等待再次出现命令提示行后方可掉电。
+		* 重启，检查安装结果
+* 关于安装
+	安装流程如下：
+	* 切换至工程根目录
+	* 编译zeus
+	* 执行安装脚本, 视需要选择要安装的文件
+		# ./script/install-host.sh -zdl
+		注： 执行上述命令会将主程序browser/browser, zeus安装到安装目录 install/usr/zeus/目录中
+		     也可以通过命令选择其他的安装内容，具体信息可以执行下方命令查看:
+		     # ./script/install-host.sh -h
+	* 执行完成后会在install/目录中生成 zeus.update.tar 打包文件
+* 关于添加安装文件
+	目前可自动安装的文件类型支持 符号链接，目录，文件三种
+	* 安装符号链接
+		#　./scripts/install-register-link.sh -C demo -L demo -T /usr/zeus/zeus -P /usr/zeus/
+		上述命令会在目标板的/usr/zeus/目录中创建一个指向/usr/zeus/zeus名字为demo的软连接，具体使用方式
+		参阅 ./scripts/install-register-link.sh -h
+	* 安装目录
+		#　./scripts/install-register-dir.sh -C "demo" -P /usr/zeus/demo
+		上述命令会在目标板的/目录中创建 /usr/, /usr/zeus/ /usr/zeus/demo/ 三个目录，具体使用方式
+		参阅 ./scripts/install-register-dir.sh -h
+	* 安装文件
+		#　./scripts/install-register-file.sh -s zeus -t /usr/zeus -f demo -a 777 -C progma -M "demo程序"
+		上述命令会将当前目录中的zeus,安装到目标板的/usr/zeus/demo，具体使用方式
+		参阅 ./scripts/install-register-dir.sh -h
+* 关于更新安装文件到目标板
+	* 在主机中配置WEB服务并在WEB服务根目录中创建www目录，假设系统的WEB服务目录为 /srv/www/
+		# cd /srv/www/
+		# mkdir www
+	* 创建版本目录，假设当前需要更新的版本为3456, 并将打包好的zeus.update.tar 拷贝到该目录。
+		# cd /srv/www/
+		# mkdir 3456
+		# cp ~/workspace/install/zeus.update.tar 3456/
+	* 创建版本链接，便于板子自动升级更新
+		# cd /srv/www/
+		# echo "3456" > VERSION
+	* 进入目标板，切换至程序工作目录, 执行更新
+		# cd /usr/zeus
+		# ./script/upgrade.sh 192.168.1.8:8080
+		即可完成自动更新文件
+		注： 首次安装程序请参与 章节：关于首次安装程序的流程
+
+* 命名规则
 	古希腊众神名录
 	早期 
-
 	赫卡忒（Hecate）：夜之女神，也是幽灵和魔法的女神；最早出现的神，世界的缔造者之一，创造了地狱。代表了世界的黑暗面。 
 	该亚（Gaea）：大地女神，紧随夜之女神出现的神，世界的缔造者之一，创造了大地，海洋和天空。 
 	尤拉诺斯（Uranus）：天之神。该亚的长子和丈夫，第一任神王。被他儿子推翻。 
@@ -199,60 +327,3 @@
 	赫西俄涅（Hesione）：普里阿摩斯的姊妹,被赫拉克剌斯从海怪手中救出,嫁给忒拉蒙. 
 	墨勒阿革洛斯（Meleager）：狩猎卡吕冬野猪的著名英雄. 
 	墨涅拉俄斯（Menelaus）：阿特柔斯之子,阿伽门农的弟弟,海伦的丈夫;特洛亚战争中的希腊高级将领.
-
-* 无刷卡器的情况下如何进行程序逻辑测试？
-	通过命令行工具创建作业即可
-	$ curl "http://$IP:8081/job/create.json?t=$timestamp&cid=$cardid&gun=$gunsn&remain=$remainmoney&passwd=$passwd&c_mode=$cmode{&set_V=$setI&set_I=$setI}&b_mode=$bmode&$b_mode_opt=$value"
-	参数说明:
-		$timestamp:  创建作业的时间戳，大于0即可
-		$cardid: 创建作业的卡片ID
-		$gunsn: 充电枪序号, 0 或 1
-		$remainmoney: 卡片内剩余余额
-		$passwd: 卡片验证密码
-		$c_mode: 充电模式, 可选项为: 
-			auto: 全自动充电;
-			BV:   恒压手动充电;
-			BI    恒流手动充电;
-		$set_V: 手动充电设置的充电电压
-		$set_I: 手动充电设置的充电电流
-		$b_mode: 计费模式。可选项为:
-			auto: 自动计费，按照充满为止，若是人工充电，则需要手动中止充电.
-			kwh: 按电能计费
-			cap: 同kwh
-			time: 按时间充电计费，单位为分钟
-			money: 按金额充电计费
-		$b_mode_opt: 计费中止选项, 可选项为：
-			b_money：按金额计费
-			b_kwh: 按电能计费
-			b_time: 按时间计费
-		$value: 计费中止值，仅在 $b_mode_opt != auto 下有效
-	例如：
-	IP: 192.168.1.61, 卡号为988766, 余额为234.5元, 密码为: 000000, 手动充电，设定充电模式为恒压充电(560.3V, 21A)，计费模式为按时间充电计费，共计充电60分钟
-	$ curl "http://192.168.1.61:8081/job/create.json?t=423434&cid=988766&gun=0&remain=234.5&passwd=000000&c_mode=BV&set_V=560.3&set_I=21&b_mode=time&b_time=60"
-	返回 status=PEDDING 或 status=OK, 标识创建作业成功, 此时可通过监控的查询作业页面看到创建好的充电作业。
-		
-* 关于如何处理傻逼的需求更改问题
-	目前需求在不停地更改，为了更好的适应这种频繁的更改，避免过度的重构代码造成的精神及身体压力，目前整个程序框架结构按照模块思路设计。
-	* 模块：			从历来的直流系统工程看来，整流模块极有可能是外购产品，因此在RS485通信方面做了相关的工作，只需要按照串口框架给出每种设备的通信数据处理过程即可。
-	* 协议：
-	这可能是整个系统最为复杂的一块内容，充电桩本身是不直接和后台通信的，但不可避免的是会出现傻逼要求公司的产品直接通过网口和后台通信，为了实现这个过程，并且使这个过程显得好看，优雅，这里采用了插件式的扩展接口，只需要给定三种函数接口即可。
-	分别是 初始化接口： exso_$(name)_init             --> 必须
-			主循环接口: exso_$(name)_main_loop        --> 可选
-			退出接口：  exso_$(name)_exit             --> 必须
-	若是你需要在每次循环中都要进行一次处理则给定主循环接口。
-	若需要自主实现相关过程，则在初始化时创建线程即可, 需要在扩展退出时主动释放线程资源
-
-* 关于RS485设备 /dev/ttyO4, /dev/ttyO5
-	由于ANC-01返回数据较快(500us)以内，在应用程序逻辑内无法快速切换RS485转换芯片的工作模式为接收状态，因此通过修改驱动程序来
-	实现发送和发送完成后转换芯片工作模式的快速切换。
-* 关于读卡器SP600+
-	默认状态下，SP600+的默认工作速度是19200bps, 现将读卡器工作波特率设定为9600bps
-	发送指令如下：
-		07 01 48 01 00 BCC 03
-	读卡器回应:
-		06 01 00 00 F8 03 标识成功
-	给读卡器断电重启，此时使用9600的波特率通信即可。
-* 关于开卡
-	开卡需要使用testing/card 程序，具体方式参见 ./card -h
-* 关于电能表
-	目前采用的是华立3相多功能电能表，程序中只需要设定电表地址即可
