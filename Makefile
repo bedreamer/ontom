@@ -57,7 +57,7 @@ SEP-DIRS=thirdpart/mongoose thirdpart/sqlite thirdpart/extso
 # must be the last one.
 LAST-DIR=
 BMSDRVIVER=bmsdriver/GB-T-27930-2011 bmsdriver/beijingqiche bmsdriver/guoxuangaoke
-PLUGINS=plugins/default plugins/104 plugins/demo plugins/buzzer
+PLUGINS=plugins/default plugins/104 plugins/demo plugins/buzzer plugins/Q-GDW-11177.2-2014
 LIBDIR=lib/lj lib/bms
 SUB-DIRS=ontom $(LIBDIR) $(BMSDRVIVER) $(PLUGINS)
 EX-OBJS=
