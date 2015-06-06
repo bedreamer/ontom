@@ -2739,8 +2739,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         need_I = atof(config_read("需求电流"));
         if ( (need_I / task->modules_nr) > task->single_module_max_I ) {
             need_I = task->single_module_max_I * task->modules_nr * 10;
-            buff[nr ++] = ((unsigned short)(need_I) >> 8;
-            buff[nr ++] = ((unsigned short)(need_I) & 0xFF;
+            buff[nr ++] = (unsigned short)(need_I) >> 8;
+            buff[nr ++] = (unsigned short)(need_I) & 0xFF;
         } else {
             buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) >> 8;
             buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
