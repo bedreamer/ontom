@@ -270,6 +270,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "single_module_max_I") ) {
         task->single_module_max_I = atof(text[1]);
         printf("单台模块最高允许电流: %s A\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "charge_triger_V") ) {
+        task->charge_triger_V = atof(text[1]);
+        printf("充电触发电压: %s V\n", text[1]);
     }
     return 0;
 }
