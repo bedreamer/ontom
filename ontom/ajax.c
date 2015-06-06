@@ -1758,6 +1758,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         "设置",
         "等待",
         "就绪",
+        "初始化"
         "在充",
         "因故暂停",
         "人工暂停",

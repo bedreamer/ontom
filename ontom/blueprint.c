@@ -2703,6 +2703,7 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 {
     unsigned char buff[32];
     int nr = 0, len;
+    unsigned int need_V, need_I;
 
     int ret = ERR_ERR;
     switch (evt) {
@@ -2735,8 +2736,15 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         }
 
         // 需求电流值
-        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) >> 8;
-        buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
+        need_I = atof(config_read("需求电流"));
+        if ( (need_I / task->modules_nr) > task->single_module_max_I ) {
+            need_I = task->single_module_max_I * task->modules_nr * 10;
+            buff[nr ++] = ((unsigned short)(need_I) >> 8;
+            buff[nr ++] = ((unsigned short)(need_I) & 0xFF;
+        } else {
+            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) >> 8;
+            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
+        }
 
         // 需求电压值
         buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
@@ -2768,7 +2776,11 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 
         // 充电状态
         buff[nr ++] = 0;
-        buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON)||bit_read(task, CMD_GUN_2_OUTPUT_ON))?1:0;
+        if ( task->chargers[0]->cstats == CHARGER_WORK ) {
+            buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON)||bit_read(task, CMD_GUN_2_OUTPUT_ON))?1:0;
+        } else {
+            buff[nr ++] = 0;
+        }
 
         self->rx_param.need_bytes = 0;
         len = nr;

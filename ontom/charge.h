@@ -202,6 +202,16 @@ typedef enum {
     COMM_M_DIED = 3
 }COMM_M_STRUCT_STATUS;
 
+// 充电机控制状态
+typedef enum {
+    // 空闲
+    CHARGER_IDLE,
+    // 初始化
+    CHARGER_INIT,
+    // 充电工作中
+    CHARGER_WORK
+}CHARGER_STATUS;
+
 // 充电作业状态
 typedef enum {
     // 作业状态为空
@@ -213,6 +223,8 @@ typedef enum {
     // 作业就绪等待
     JOB_STANDBY,
 
+    // 充电初始化
+    JOB_CHARGER_INITLIZE,
     // 作业正在执行
     JOB_WORKING,
     // 作业因故暂停
@@ -1339,6 +1351,8 @@ struct measure_struct {
 // 充电机 通讯管理描述结构，JOB的下属成员结构
 struct charger_struct {
     COMM_M_STRUCT_STATUS status;
+    // 充电机状态
+    CHARGER_STATUS  cstats;
     // 充电屏信息
     struct charger_config_10h chargers;
 };
@@ -1630,8 +1644,14 @@ struct charge_task {
     double meter_I_xishu;
     // 电流分流器系数
     unsigned int flq_xishu;
-    // module power fact
-    double modult_power_fact;
+    // 模块功率因数
+    double module_power_fact;
+    // 单台模块功率
+    double single_module_power;
+    // 单台模块最大允许电流
+    double single_module_max_I;
+    // 充电触发压差
+    double charge_triger_V;
     // {{ 电压电流校准参数
     double bus1_correct_V;
     double bus1_read_V;
@@ -1649,6 +1669,18 @@ struct charge_task {
     // 硬件软件配置映射表
     volatile unsigned char h_s_ware_config[8];
 };
+
+static inline unsigned int system_power(struct charge_task *tsk) {
+    switch ( task->module_model ) {
+    default:
+    case MODEL_AN10680:
+        return 10 * task->modules_nr;
+        break;
+    case MODEL_INCREASE:
+        return 10 * task->modules_nr;
+        break;
+    }
+}
 
 static inline unsigned char check_sum(unsigned char *buff, size_t len) {
     unsigned int i = 0;

@@ -262,8 +262,14 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
         task->meter_I_xishu = atof(text[1]);
         printf("电能表电流系数比: %s \n", text[1]);
     } else if ( 0 == strcmp(text[0], "module_power_fact") ) {
-        task->modult_power_fact = atof(text[1]);
+        task->module_power_fact = atof(text[1]);
         printf("模块功率因数: %s\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "single_module_power") ) {
+        task->single_module_power = atof(text[1]);
+        printf("单台模块功率: %s KW\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "single_module_max_I") ) {
+        task->single_module_max_I = atof(text[1]);
+        printf("单台模块最高允许电流: %s A\n", text[1]);
     }
     return 0;
 }
@@ -414,6 +420,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->bat_2_insti_ohm_v = 100.0;
     task->meter_I_xishu = 100.0f;
     task->meter_V_xishu = 1.0f;
+    task->charge_triger_V = 5.0V;
 
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
@@ -854,6 +861,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_STANDBY:
+        task->chargers[0]->cstats = CHARGER_IDLE;
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
@@ -921,14 +929,69 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
-        job->job_status = JOB_WORKING;
-        sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
-                job->job_status, job->job_url_commit_timestamp);
-        (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
-        log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
+        if ( job->charge_mode == CHARGE_AUTO ) {{
+            job->job_status = JOB_CHARGER_INITLIZE;
+            sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
+                    job->job_status, job->job_url_commit_timestamp);
+            (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+            log_printf(INF, "***** ZEUS(关键): 作业即将执行, 正在初始化充电机.");
+        } else {
+            job->job_status = JOB_WORKING;
+            sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
+                    job->job_status, job->job_url_commit_timestamp);
+            (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+            log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
+        }
+        break;
+    case JOB_CHARGER_INITLIZE:
+         task->chargers[0]->cstats = CHARGER_INIT;
+
+        if (job->job_gun_sn == GUN_SN0 ) {
+            // 没有电压不控制
+            if ( task->measure[0]->measure.VinBAT0 < 100 ) {
+                break;
+            }
+            sprintf(buff, "%d",
+                    task->measure[0]->measure.VinBAT0 -
+                        (unsigned short)(task->charge_triger_V * 10) );
+        } else if ( job->job_gun_sn == GUN_SN1 ) {
+            // 没有电压不控制
+            if ( task->measure[0]->measure.VinBAT1 < 100 ) {
+                break;
+            }
+            sprintf(buff, "%d",
+                    task->measure[0]->measure.VinBAT1 -
+                        (unsigned short)(task->charge_triger_V * 10));
+        } else {
+            sprintf(buff, "%d", 4000 );
+        }
+        config_write("需求电压", buff);
+        config_write("初始电压", buff);
+        config_write("需求电流", "0");
+        if ( job->job_gun_sn == GUN_SN0 &&
+             task->measure[0]->measure.VinKM0 >=
+                 task->measure[0]->measure.VinBAT1 -
+                 (unsigned short)(task->charge_triger_V * 10) ) {
+            job->job_status = JOB_WORKING;
+            sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
+                    job->job_status, job->job_url_commit_timestamp);
+            (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+            log_printf(INF, "***** ZEUS(关键): 充电机初始化完成, 正在执行.");
+        } else if ( job->job_gun_sn == GUN_SN1 &&
+                    task->measure[0]->measure.VinKM1 >=
+                        task->measure[0]->measure.VinBAT1 -
+                        (unsigned short)(task->charge_triger_V * 10) ) {
+            job->job_status = JOB_WORKING;
+            sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
+                    job->job_status, job->job_url_commit_timestamp);
+            (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+            log_printf(INF, "***** ZEUS(关键): 充电机初始化完成, 正在执行.");
+        }
+
         break;
     case JOB_WORKING:
         bit_set(tsk, F_CHARGE_LED);
+        task->chargers[0]->cstats = CHARGER_WORK;
 
         //if ( job->charge_mode == CHARGE_AUTO ) {
             sprintf(buff, "%d", (unsigned int)(job->need_V * 10.0f) );
@@ -1171,6 +1234,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         config_write("需求电压", "2000");
         config_write("初始电压", "2000");
         config_write("需求电流", "0");
+        task->chargers[0]->cstats = CHARGER_IDLE;
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_ASSIT_PWN_ON);
         bit_clr(tsk, CMD_GUN_2_ASSIT_PWN_ON);
@@ -1179,11 +1243,13 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         if ( job->bms.driver == NULL ) {
             job->job_status = JOB_DETACHING;
         }
+
         break;
     case JOB_DETACHING:
         config_write("需求电压", "2000");
         config_write("初始电压", "2000");
         config_write("需求电流", "0");
+        task->chargers[0]->cstats = CHARGER_IDLE;
         bit_clr(tsk, F_CHARGE_LED);
         if ( job->job_gun_sn == GUN_SN0 ) {
             bit_clr(tsk, CMD_GUN_1_LOCK_ON);
