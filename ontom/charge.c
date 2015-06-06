@@ -423,7 +423,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->bat_2_insti_ohm_v = 100.0;
     task->meter_I_xishu = 100.0f;
     task->meter_V_xishu = 1.0f;
-    task->charge_triger_V = 5.0V;
+    task->charge_triger_V = 5.0f;
 
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
@@ -932,7 +932,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
-        if ( job->charge_mode == CHARGE_AUTO ) {{
+        if ( job->charge_mode == CHARGE_AUTO ) {
             job->job_status = JOB_CHARGER_INITLIZE;
             sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
                     job->job_status, job->job_url_commit_timestamp);
