@@ -1630,6 +1630,8 @@ struct charge_task {
     double meter_I_xishu;
     // 电流分流器系数
     unsigned int flq_xishu;
+    // module power fact
+    double modult_power_fact;
     // {{ 电压电流校准参数
     double bus1_correct_V;
     double bus1_read_V;

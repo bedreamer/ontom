@@ -261,6 +261,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "meter_I_xishu") ) {
         task->meter_I_xishu = atof(text[1]);
         printf("电能表电流系数比: %s \n", text[1]);
+    } else if ( 0 == strcmp(text[0], "module_power_fact") ) {
+        task->modult_power_fact = atof(text[1]);
+        printf("模块功率因数: %s\n", text[1]);
     }
     return 0;
 }
