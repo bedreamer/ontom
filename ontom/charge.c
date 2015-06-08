@@ -856,7 +856,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
-        memset(job->single, 0, sizeof(job->single));
+        memset((void*)job->single, 0, sizeof(job->single));
         job->job_status = JOB_STANDBY;
         bit_clr(tsk, F_CHARGE_LED);
         if ( job->charge_mode == CHARGE_AUTO ) {
