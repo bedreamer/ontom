@@ -1082,6 +1082,8 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
     struct list_head *head;
     char errname[32];
     char *errmsg;
+    char tp[64];
+    int i;
 
     thiz->ct = "application/json";
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"errors\":[");
@@ -1095,11 +1097,15 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
             sprintf(errname, "E%04X", te->error_id);
             char sql[256];
 
+            sprintf(tp, "%s", te->error_begin);
+            i = 0;
+            while ( tp[i] != '.' && tp[i] && i < 64 ) i ++;
+            tp[i] = '\0';
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
                     "{\"eid\":\"%d\","
                     "\"ebt\":\"%s\",",
                     te->error_id,
-                    te->error_begin);
+                    tp);
             sprintf(sql,
                     "select errordefine.comment from errordefine "
                     "where errordefine.dec_val='%d'", te->error_id);
@@ -1121,18 +1127,29 @@ int ajax_system_error_proc(struct ajax_xml_struct *thiz)
 
 int sql_history_result(void *param, int nr, char **text, char **name)
 {
+    char tp[64] = {0};
+    int i;
     struct ajax_xml_struct *thiz = (struct ajax_xml_struct *)param;
     if ( nr <=0 ) return 0;
+
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"hid\":\"%s\",", text[0]);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"eid\":\"%s\",", text[1]);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"estr\":\"%s\",", text[5]);
+    sprintf(tp, "%s", text[2]);
+    i = 0;
+    while ( tp[i] != '.' && tp[i] && i < 64 ) i ++;
+    tp[i] = '\0';
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"ebt\":\"%s\",", text[2]);
+            "\"ebt\":\"%s\",", tp);
+    sprintf(tp, "%s", text[3]);
+    i = 0;
+    while ( tp[i] != '.' && tp[i] && i < 64 ) i ++;
+    tp[i] = '\0';
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"rbt\":\"%s\"},", text[3]);
+            "\"rbt\":\"%s\"},", tp);
 
     return 0;
 }
