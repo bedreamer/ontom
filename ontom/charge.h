@@ -223,8 +223,6 @@ typedef enum {
     // 作业就绪等待
     JOB_STANDBY,
 
-    // 充电初始化
-    JOB_CHARGER_INITLIZE,
     // 作业正在执行
     JOB_WORKING,
     // 作业因故暂停

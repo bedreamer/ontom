@@ -932,19 +932,12 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
-        if ( job->charge_mode == CHARGE_AUTO ) {
-            job->job_status = JOB_CHARGER_INITLIZE;
-            sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
-                    job->job_status, job->job_url_commit_timestamp);
-            (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
-            log_printf(INF, "***** ZEUS(关键): 作业即将执行, 正在初始化充电机.");
-        } else {
-            job->job_status = JOB_WORKING;
-            sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
-                    job->job_status, job->job_url_commit_timestamp);
-            (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
-            log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
-        }
+        job->job_status = JOB_WORKING;
+        sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
+                job->job_status, job->job_url_commit_timestamp);
+        (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
+        log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
+
         break;
     case JOB_CHARGER_INITLIZE:
          task->chargers[0]->cstats = CHARGER_INIT;
