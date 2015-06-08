@@ -153,7 +153,7 @@ struct bp_user {
     //  bit[8:15]:  校验位
     //  bit[16:23]: 数据位
     // }}
-#define MAKE_UART_CFG(d, c, s) (((((d)&0xFF) <<16) | (((c)&0xFF) << 8) | (s)&0xFF)&0x00FFFFFF)
+#define MAKE_UART_CFG(d, c, s) (((((d)&0xFF) <<16) | (((c)&0xFF) << 8) | ((s)&0xFF))&0x00FFFFFF)
     // 对应的作业
     struct charge_job *job;
     // 对应的充电机管理单元
