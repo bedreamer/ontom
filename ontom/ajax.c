@@ -2086,8 +2086,7 @@ int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
 
 int ajax_debug_bit_read(struct ajax_xml_struct *thiz)
 {
-    char var[32]={0};
-    int index = 0, i;
+    int i;
     int ret = ERR_OK;
 
     thiz->ct = "application/json";
