@@ -6,8 +6,9 @@ echo "执行数据库预配置..."
 echo "开始启动主程序..."
 
 while [ true ]; do
-	kill -9 `pidof browser`
-	kill -9 `pidof zeus`
+	for PID in `pidof browser` `pidof zeus`;do
+		kill -9 $PID
+	done
 	workmode=`sqlite3 /usr/zeus/ontom.db "SELECT current_value FROM settings WHERE key='work_mode'"`
 	if [ $workmode == "normal" ]; then
 		echo "启动到主页面"
