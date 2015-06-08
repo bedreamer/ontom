@@ -2240,7 +2240,7 @@ int ajax_update_proc(struct ajax_xml_struct *thiz)
     }
     output_len += sprintf(&thiz->iobuff[output_len], "}");
     thiz->xml_len = output_len;
-    system("/bin/sh /usr/zeus/script/update.sh &");
+    system("/bin/sh /usr/zeus/script/upgrade.sh &");
     return ERR_OK;
 }
 
