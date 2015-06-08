@@ -182,10 +182,10 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     if ( 0 == strcmp(text[0], "system_type") ) {
         task->sys_type = atoi(text[1]);
     } else if ( 0 == strcmp(text[0], "bcd_auth_code") ) {
-        strncpy(task->bcd_auth_code, text[1], 16);
+        strncpy((char *)task->bcd_auth_code, text[1], 16);
         printf("产品激活码: %s\n", text[1]);
     } else if ( 0 == strcmp(text[0], "mac_addr") ) {
-        strncpy(task->mac_addr, text[1], 32);
+        strncpy((char *)task->mac_addr, text[1], 32);
         printf("产品MAC地址: %s\n", text[1]);
     } else if ( 0 == strcmp(text[0], "sys_uart_name") ) {
         printf("通讯用串口: %s\n", text[1]);
