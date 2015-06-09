@@ -94,20 +94,23 @@ fi
 DONE="FALSE"
 if [ ! "U_USB" = $MODE ]; then
 	while [ "FALSE" = $DONE ];do
-		if [ -e "/tmp/zeus.version" ];then
-			rm /tmp/zeus.version
+		if [ -e "/dev/shm/zeus.version" ];then
+			rm /dev/shm/zeus.version
 		fi
-		wget "http://$HOST/$UPATH/VERSION" -O /tmp/zeus.version >/dev/null 2>&1
-		if [ -e "/tmp/zeus.version" ];then
-			if [ -e "/tmp/zeus.update.tar" ];then
-				rm /tmp/zeus.update.tar
+		wget "http://$HOST/$UPATH/VERSION" -O /dev/shm/zeus.version >/dev/null 2>&1
+		if [ -e "/dev/shm/zeus.version" ];then
+			if [ -e "/dev/shm/zeus.update.tar" ];then
+				rm /dev/shm/zeus.update.tar
 			fi
-			wget http://$HOST/$UPATH/`cat /tmp/zeus.version`/zeus.update.tar \
-								-O /tmp/zeus.update.tar > /dev/null 2>&1
-			if [ -e "/tmp/zeus.version" ];then
-				tar -C / -xvf /tmp/zeus.update.tar > /usr/zeus/update.log
-				echo "Upgrade success version "`cat /tmp/zeus.version`
-				mv /tmp/zeus.version /usr/zeus/zeus.version
+			wget http://$HOST/$UPATH/`cat /dev/shm/zeus.version`/zeus.update.tar \
+								-O /dev/shm/zeus.update.tar > /dev/null 2>&1
+			if [ -e "/dev/shm/zeus.version" ];then
+				cd /
+				tar -C / -xvf /dev/shm/zeus.update.tar > /usr/zeus/update.log
+				rm /dev/shm/zeus.update.tar
+				echo "Upgrade success version "`cat /dev/shm/zeus.version`
+				cd /usr/zeus
+				mv /dev/shm/zeus.version /usr/zeus/zeus.version
 			else
 				echo "fetch zeus.update.tar from $HOST failed!"
 			fi
@@ -123,7 +126,9 @@ if [ ! "U_USB" = $MODE ]; then
 else
 	for d in `ls /media`;do
 		if [ -e /media/$d/$updatefile ];then
+			cd /
 			tar -C / -xvf /media/$d/$updatefile > /usr/zeus/update.log
+			cd /usr/zeus
 			echo "Upgrade success."
 			exit 0
 		fi
