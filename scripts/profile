@@ -57,13 +57,6 @@ export PATH=$PATH:/usr/zeus:/usr/zeus/scripts
 #/usr/browser/browser -qws http://127.0.0.1:8080 &
 #/usr/zeus/zeus &
 
-ip link set can0 down
-ip link set can1 down
-ip link set can0 type can bitrate 250000
-ip link set can1 type can bitrate 250000
-ifconfig can0 up
-ifconfig can1 up
-
 ps > /tmp/pslist
 cat /tmp/pslist | grep zeus >/dev/null 2>&1
 if [ $? -eq 1 ]; then

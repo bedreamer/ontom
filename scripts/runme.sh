@@ -25,6 +25,12 @@ while [ true ]; do
 	for PID in `pidof browser` `pidof zeus`;do
 		kill -9 $PID
 	done
+	ip link set can0 down
+    ip link set can1 down
+    ip link set can0 type can bitrate 250000
+    ip link set can1 type can bitrate 250000
+    ifconfig can0 up
+    ifconfig can1 up
 	workmode=`sqlite3 /usr/zeus/ontom.db "SELECT current_value FROM settings WHERE key='work_mode'"`
 	if [ $workmode == "normal" ]; then
 		echo "启动到主页面"
