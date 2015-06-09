@@ -273,6 +273,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "charge_triger_V") ) {
         task->charge_triger_V = atof(text[1]);
         printf("充电触发电压: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "default_bms") ) {
+        strncpy((char *)task->bms_vendor_version, text[1], 16);
+        printf("默认车载BMS驱动: %s V\n", text[1]);
     }
     return 0;
 }
@@ -393,6 +396,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 {
     char sql[256];
     char buff[32] = {0};
+    int bms_vendor_id;
+    char bms_version[32] = {0};
     int ret, done = 0;
     char *errmsg;
     int tsp = 0;
@@ -424,6 +429,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->meter_I_xishu = 100.0f;
     task->meter_V_xishu = 1.0f;
     task->charge_triger_V = 5.0f;
+    strcpy(task->bms_vendor_version, "0_1.0");
 
     memset(task->modules_on_off, 0x80, sizeof(task->modules_on_off)); // 全开机
     task->uipage = UI_PAGE_MAIN;
@@ -571,7 +577,11 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     pthread_mutex_init(&task->err_list_lck, NULL);
 
     task->bmsdriver = NULL;
-    task->bmsdriver = bmsdriver_search(task, 0, "1.0");
+    bms_vendor_id = __string_to_bms_vendor(task->bms_vendor_version);
+    if ( 0 == __string_to_bms_version(task->bms_vendor_version, bms_version ) ) {
+        task->bmsdriver = bmsdriver_search(task, bms_vendor_id, bms_version);
+        log_printf(INF, "ZEUS: Load default BMS %d %s", bms_vendor_id, bms_version);
+    }
     bmsdriver_init(task);
 
     //memset(task->single, 255, sizeof(task->single));
@@ -1167,7 +1177,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        job->job_status = JOB_EXITTING;
+        job->job_status = JOB_DONE;
+        bit_set(thiz, F_PCK_CHARGER_TRM);
         break;
     case JOB_DONE:
         config_write("需求电压", "2000");
