@@ -1737,7 +1737,7 @@ static inline int __string_to_bms_version(const char *bmsv, char *ver) {
     if ( bmsv[i] !='_' ) return ERR_ERR;
     i ++;
     while ( bmsv[i] ) {
-        ver[i] = bmsv[i];
+        *ver++ = bmsv[i];
         i ++;
     }
     return ERR_OK;
