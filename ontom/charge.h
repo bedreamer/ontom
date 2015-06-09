@@ -1569,6 +1569,8 @@ struct charge_task {
     double kwh_price;
     // 系统模式模式
     char sys_work_mode[32];
+    // BMS 默认驱动厂商及版本
+    char bms_vendor_version[32];
     // }}
 
     // 以下适用于采样盒配置值
@@ -1706,6 +1708,41 @@ static inline void __card_write_passwd(struct user_card * c, const char* passwd)
     c->card.sector_4.data.passwd_sum =
             check_sum(c->card.sector_4.data.passwd_code, 3);
 }
+
+/* 从BMS版本描述字串中截取BMS厂商号
+ */
+static inline int __string_to_bms_vendor(const char *bmsv) {
+    char buff[16] = {0};
+    int i = 0;
+
+    if ( bmsv == NULL ) return 0;
+    while ( bmsv[i] && bmsv[i] >= '0' && bmsv[i] <= '9' ) {
+        buff[ i ] = bmsv[i];
+        i ++;
+    }
+    return atoi(buff);
+}
+
+/* 从BMS版本描述字串中截取BMS版本号
+ */
+static inline int __string_to_bms_version(const char *bmsv, char *ver) {
+    char buff[16] = {0};
+    int i = 0;
+
+    if ( bmsv == NULL ) return 0;
+    while ( bmsv[i] && bmsv[i] >= '0' && bmsv[i] <= '9' ) {
+        buff[ i ] = bmsv[i];
+        i ++;
+    }
+    if ( bmsv[i] !='_' ) return ERR_ERR;
+    i ++;
+    while ( bmsv[i] ) {
+        ver[i] = bmsv[i];
+        i ++;
+    }
+    return ERR_OK;
+}
+
 
 
 // 位设置
