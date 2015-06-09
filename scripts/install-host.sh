@@ -219,6 +219,7 @@ function do_install() {
 	fi
 }
 
+rm install/* -rf
 
 sleep 0.1
 if [ $script == "yes" ];then
