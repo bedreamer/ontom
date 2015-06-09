@@ -276,6 +276,14 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "default_bms") ) {
         strncpy((char *)task->bms_vendor_version, text[1], 16);
         printf("默认车载BMS驱动: %s V\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "need_billing") ) {
+        if ( text[1][0] == '0' ) {
+            bit_clr(task, F_NEED_BILLING);
+        } else {
+            bit_set(task, F_NEED_BILLING);
+        }
+        printf("是否需要刷卡扣费: %s V\n",
+               bit_read(task, F_NEED_BILLING) ? "需要" : "不需要");
     }
     return 0;
 }
@@ -460,7 +468,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     if ( ! exso_load(&task->exsos, "default", "/usr/zeus/plugins/exso_default.so", task) ) {
         log_printf(WRN, "ZEUS: load default plugin faile.");
     } else {
-        log_printf(WRN, "ZEUS: default plugin loaded.");
+        log_printf(INF, "ZEUS: default plugin loaded.");
     }
 
     /* 方案1：
