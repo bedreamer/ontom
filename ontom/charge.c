@@ -1178,7 +1178,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         job->job_status = JOB_DONE;
-        bit_set(thiz, F_PCK_CHARGER_TRM);
+        bit_set(job, F_PCK_CHARGER_TRM);
         break;
     case JOB_DONE:
         config_write("需求电压", "2000");
