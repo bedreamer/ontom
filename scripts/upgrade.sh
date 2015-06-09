@@ -105,7 +105,7 @@ if [ ! "U_USB" = $MODE ]; then
 			wget http://$HOST/$UPATH/`cat /tmp/zeus.version`/zeus.update.tar \
 								-O /tmp/zeus.update.tar > /dev/null 2>&1
 			if [ -e "/tmp/zeus.version" ];then
-#				tar -C / -xvf /tmp/zeus.update.tar > /usr/zeus/update.log
+				tar -C / -xvf /tmp/zeus.update.tar > /usr/zeus/update.log
 				echo "Upgrade success version "`cat /tmp/zeus.version`
 				mv /tmp/zeus.version /usr/zeus/zeus.version
 			else
@@ -123,7 +123,7 @@ if [ ! "U_USB" = $MODE ]; then
 else
 	for d in `ls /media`;do
 		if [ -e /media/$d/$updatefile ];then
-#			tar -C / -xvf /media/$d/$updatefile > /usr/zeus/update.log
+			tar -C / -xvf /media/$d/$updatefile > /usr/zeus/update.log
 			echo "Upgrade success."
 			exit 0
 		fi

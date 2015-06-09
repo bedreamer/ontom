@@ -189,7 +189,7 @@ function do_install() {
 				i='0'
 				for f in $Lsrc;do
 					case $i in
-						'0') target=$f;i='1';;
+						'0') tag=$f;i='1';;
 						'1') link=$f;i='2';;
 						'2') 
 							newdir=$f
@@ -197,15 +197,15 @@ function do_install() {
 							if (( $? != 0 ));then
 								echo " ** 无法切换到目录$prefix$newdir, 目录不存在"
 							else
-								printf "    链接  $link  --> $target "
-								ln -s $target $link
+								printf "    链接  $link  --> $tag "
 								i='0'
+								ln -s $tag $link
 								if (( $? != 0 ));then
 									echo "失败!"
 								else
 									echo "成功."
 								fi
-								cd -
+								cd - > /dev/null
 							fi
 							i='0';
 						;;
@@ -262,6 +262,7 @@ fi
 
 cd $WORKDIR/$prefix
 echo "CREATE INSTALL/UPDATE PACKET: $prefix/$target"
+pwd
 tar --exclude-vcs -czf $target `ls`
 printf "`date` \033[31m$prefix/$target\033[0m packed.\n"
 mkdir $copydir$VERSION
