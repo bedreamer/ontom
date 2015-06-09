@@ -326,6 +326,9 @@ typedef enum {
     // 创建BMS读线程完成
     F_BMS_FORK_READ_DONE,
 
+    // 系统需要刷卡扣费，用户站不用扣费
+    F_NEED_BILLING,
+
     //{{{ 状态标记
     // BMS 已经识别
     F_BMS_RECOGNIZED,
