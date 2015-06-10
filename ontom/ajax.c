@@ -9,14 +9,6 @@ struct xml_generator {
     int (*xml_gen_proc)(struct ajax_xml_struct *);
 }xmls[]={
     {"/query.json",             ajax_query_json_proc},
-    {"/query.xml",              ajax_query_xml_proc},
-    {"/deal.xml",               ajax_deal_xml_proc},
-    {"/chargestatus.xml",       ajax_charge_status_xml_proc},
-    {"/battrystatus.xml",       ajax_battery_status_xml_proc},
-    {"/alarm.xml",              ajax_alarm_xml_proc},
-    {"/version.xml",            ajax_version_xml_proc},
-    {"/autheticate.xml",        ajax_autheticate_xml_proc},
-    {"/confirm.xml",            ajax_confirm_charge_xml_proc},
     {"/system/query.json",      ajax_system_query_json_proc},
     {"/system/error.json",      ajax_system_error_proc},
     {"/system/history.json",    ajax_system_history_proc},
@@ -51,6 +43,17 @@ struct xml_generator {
     {"/debug/singlebit/write.json",   ajax_debug_bit_write},
     {"", NULL}
 };
+
+int ajax_search_file(const char *fn)
+{
+    struct xml_generator *cursor = xmls;
+
+    for ( ; cursor->xml_gen_proc ; cursor ++ ) {
+        if ( 0 != strcmp(fn, cursor->xml_name) ) continue;
+        return ERR_OK;
+    }
+    return ERR_ERR;
+}
 
 // 生成xml文件
 int ajax_gen_xml(struct ajax_xml_struct *thiz)
