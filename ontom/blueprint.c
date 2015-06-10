@@ -2758,9 +2758,25 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
 
+        if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
+            need_V = task->measure[0]->measure.VinBAT0;
+            need_V = need_V - (task->charge_triger_V * 10);
+            if ( need_V >= task->measure[0]->measure.VinBAT0 ) {
+                need_V = task->measure[0]->measure.VinBAT0;
+            }
+        } else if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
+            need_V = task->measure[0]->measure.VinBAT1;
+            need_V = need_V - (task->charge_triger_V * 10);
+            if ( need_V >= task->measure[0]->measure.VinBAT1 ) {
+                need_V = task->measure[0]->measure.VinBAT1;
+            }
+        } else {
+            need_V = 4800;
+        }
+
         // 目标电压值
-        buff[nr ++] = 0x12;
-        buff[nr ++] = 0xC0;
+        buff[nr ++] = need_V >> 8;
+        buff[nr ++] = need_V & 0xFF;
 
         // 初始电压
         buff[nr ++] = 0;
