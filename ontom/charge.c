@@ -1199,10 +1199,16 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         if ( job->charge_mode == CHARGE_AUTO ) {
             if ( bit_read(job, F_PCK_RX_BSD) &&
                  bit_read(job, F_PCK_TX_CSD) ) {
-                job->job_status = JOB_EXITTING;
+                if ( bit_read(task, F_NEED_BILLING) ) {
+                } else {
+                    job->job_status = JOB_EXITTING;
+                }
             }
         } else {
-            job->job_status = JOB_EXITTING;
+            if ( bit_read(task, F_NEED_BILLING) ) {
+            } else {
+                job->job_status = JOB_EXITTING;
+            }
         }
         break;
     case JOB_EXITTING:
