@@ -1,7 +1,7 @@
 #ifndef _AJAX_DEF_INCLUDED_H
 #define _AJAX_DEF_INCLUDED_H
 
-#define XML_IO_SIZE   8*1024  // 4K
+#define XML_IO_SIZE   16*1024  // 4K
 
 #include "../thirdpart/mongoose/mongoose.h"
 
@@ -20,6 +20,7 @@ struct ajax_xml_struct {
 	char iobuff[XML_IO_SIZE];
 };
 
+int ajax_search_file(const char *fn);
 int ajax_version_xml_proc(struct ajax_xml_struct *);
 int ajax_uart_debug_page(struct ajax_xml_struct *thiz);
 int ajax_system_query_json_proc(struct ajax_xml_struct *thiz);
