@@ -1260,7 +1260,7 @@ static inline double __module_max_voltage(struct charger_cnofig_10h *p, unsigned
         }
     }
 
-    return moudule_v;
+    return module_v;
 }
 
 // 通信报文生成依据
