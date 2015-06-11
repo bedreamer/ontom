@@ -1247,15 +1247,16 @@ static inline int __module_is_err(struct charger_config_10h *p, unsigned int n) 
 }
 
 // 获取模块最高电压
-static inline double __module_max_voltage(struct charger_cnofig_10h *p, unsigned int moudle_nr) {
+static inline double __module_max_voltage(struct charger_cnofig_10h *p, unsigned int module_nr) {
     int nr = 0;
     double max_v = 0.0f;
-    double moudule_v;
+    double module_v;
 
-    for ( nr = 0; nr < moudle_nr && nr < CONFIG_SUPPORT_CHARGE_MODULE; nr ++ ) {
-        moudule_v = b2l(p->charge_module_v[nr])/10.0f;
-        if (  moudule_v > max_v ) {
-            max_v = moudule_v;
+    for ( nr = 0; nr < module_nr &&
+          nr < CONFIG_SUPPORT_CHARGE_MODULE; nr ++ ) {
+        module_v = b2l(p->charge_module_v[nr])/10.0f;
+        if (  module_v > max_v ) {
+            max_v = module_v;
         }
     }
 
