@@ -1246,23 +1246,6 @@ static inline int __module_is_err(struct charger_config_10h *p, unsigned int n) 
     return st[ n ] & 0x01;
 }
 
-// 获取模块最高电压
-static inline double __module_max_voltage(struct charger_cnofig_10h *p, unsigned int module_nr) {
-    int nr = 0;
-    double max_v = 0.0f;
-    double module_v;
-
-    for ( nr = 0; nr < module_nr &&
-          nr < CONFIG_SUPPORT_CHARGE_MODULE; nr ++ ) {
-        module_v = b2l(p->charge_module_v[nr])/10.0f;
-        if (  module_v > max_v ) {
-            max_v = module_v;
-        }
-    }
-
-    return module_v;
-}
-
 // 通信报文生成依据
 struct can_pack_generator {
     // 所属阶段
@@ -1971,6 +1954,22 @@ static inline int check_auth(const char *mac, const char *bcdcode)
     return 0;
 }
 #endif
+// 获取模块最高电压
+static inline double __module_max_voltage(struct charger_cnofig_10h *p, unsigned int module_nr) {
+    int nr = 0;
+    double max_v = 0.0f;
+    double module_v;
+
+    for ( nr = 0; nr < module_nr &&
+          nr < CONFIG_SUPPORT_CHARGE_MODULE; nr ++ ) {
+        module_v = b2l(p->charge_module_v[nr])/10.0f;
+        if (  module_v > max_v ) {
+            max_v = module_v;
+        }
+    }
+
+    return module_v;
+}
 
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string);
