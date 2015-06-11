@@ -1186,8 +1186,42 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        job->job_status = JOB_DONE;
         bit_set(job, F_PCK_CHARGER_TRM);
+        if ( job->charge_mode == CHARGE_AUTO ) {
+            /*
+             * 中止自动充电
+             * BMS通信阶段，是否计费
+             **/
+            if ( bit_read(task, F_NEED_BILLING) &&
+                 bit_read(task, F_BILLING_DONE) ) {
+                job->job_status = JOB_EXITTING;
+            } else if ( ! bit_read(task, F_NEED_BILLING ) ) {
+                job->job_status = JOB_EXITTING;
+            } else if ( bit_read(task, F_NEED_BILLING) &&
+                        bit_rad(task, F_BILING_TIMEOUT) ){
+                job->job_status = JOB_EXITTING;
+            } else {
+
+            }
+        } else {
+            /*
+             * 中止手动充电
+             * 如果需要计费，那么需要等待计费完成，或计费超时才能退出作业
+             * 如果不需要计费，则直接退出.
+             * 否则等待计费完成指令
+             */
+            if ( bit_read(task, F_NEED_BILLING) &&
+                 bit_read(task, F_BILLING_DONE) ) {
+                job->job_status = JOB_EXITTING;
+            } else if ( ! bit_read(task, F_NEED_BILLING ) ) {
+                job->job_status = JOB_EXITTING;
+            } else if ( bit_read(task, F_NEED_BILLING) &&
+                        bit_rad(task, F_BILING_TIMEOUT) ){
+                job->job_status = JOB_EXITTING;
+            } else {
+
+            }
+        }
         break;
     case JOB_DONE:
         config_write("需求电压", "2000");
