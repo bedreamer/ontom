@@ -1265,7 +1265,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     freeifaddrs(ifaddr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"k\":\"版本\",\"v\":\"%d\"},", VERSION);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"k\":\"系统类型\":\"v\":\"%s\"},",
+            "{\"k\":\"系统类型\",\"v\":\"%s\"},",
             task->sys_type == SYSTEM_YITISHI ? "一体式":
             task->sys_type == SYSTEM_FENTISHI ? "分体式" : "未知");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
