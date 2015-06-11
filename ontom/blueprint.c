@@ -1630,13 +1630,15 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         } else {
             cmd &= ~GUN2_ASSIT_PWN_ON;
         }
-        if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
+        if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) &&
+             bit_read(task, F_VOL1_SET_OK) ) {
             cmd |= GUN1_OUTPUT_ON;
             cmd &= ~GUN2_OUTPUT_ON;
         } else {
             cmd &= ~GUN1_OUTPUT_ON;
         }
-        if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
+        if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) &&
+             bit_read(task, F_VOL2_SET_OK)  ) {
             cmd |= GUN2_OUTPUT_ON;
             cmd &= ~GUN1_OUTPUT_ON;
         } else {
@@ -2704,6 +2706,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     unsigned char buff[32];
     int nr = 0, len;
     unsigned int need_V, need_I;
+    double bus_v, bat_v;
+    int charge_mode = 0;
 
     int ret = ERR_ERR;
     switch (evt) {
@@ -2746,9 +2750,34 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
         }
 
+        bus_v = __module_max_voltage(&task->chargers[0]->chargers,task->modules_nr);
+        if ( bit_read(task, F_GUN1_CHARGE) ) {
+            bat_v = task->measure[0]->measure.VinBAT0;
+        } else if ( bit_read(task, F_GUN2_CHARGE) ) {
+            bat_v = task->measure[0]->measure.VinBAT1;
+        } else {
+            bat_v = 400.0f;
+        }
+
+        if ( bus_v + task->charge_triger_V < bat_v ) {
+            // 电压还未达到，继续调压
+            charge_mode = 0;
+            need_V = (int)((bat_v - task->charge_triger_V) * 10.0f);
+        } else if ( bit_read(task, F_GUN1_CHARGE) ) {
+            charge_mode = 1;
+            need_V = atoi(config_read("需求电压"));
+            bit_set(task, F_VOL1_SET_OK);
+        } else if ( bit_read(task, F_GUN2_CHARGE) ) {
+            charge_mode = 1;
+            need_V = atoi(config_read("需求电压"));
+            bit_set(task, F_VOL1_SET_OK);
+        } else {
+            charge_mode = 0;
+            need_V = atoi(config_read("需求电压"));
+        }
         // 需求电压值
-        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) >> 8;
-        buff[nr ++] = (unsigned int)atoi(config_read("需求电压")) & 0xFF;
+        buff[nr ++] = need_V >> 8;
+        buff[nr ++] = need_V & 0xFF;
 
         log_printf(DBG_LV3, "UART.ANC-01, 需求电流: %.1f A. 需求电压: %.1f V",
                    atof(config_read("需求电流")),
@@ -2758,25 +2787,9 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
 
-        if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ) {
-            need_V = task->measure[0]->measure.VinBAT0;
-            need_V = need_V - (task->charge_triger_V * 10);
-            if ( need_V >= task->measure[0]->measure.VinBAT0 ) {
-                need_V = task->measure[0]->measure.VinBAT0;
-            }
-        } else if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
-            need_V = task->measure[0]->measure.VinBAT1;
-            need_V = need_V - (task->charge_triger_V * 10);
-            if ( need_V >= task->measure[0]->measure.VinBAT1 ) {
-                need_V = task->measure[0]->measure.VinBAT1;
-            }
-        } else {
-            need_V = 4800;
-        }
-
         // 目标电压值
-        buff[nr ++] = need_V >> 8;
-        buff[nr ++] = need_V & 0xFF;
+        buff[nr ++] = 4800 >> 8;
+        buff[nr ++] = 4800 & 0xFF;
 
         // 初始电压
         buff[nr ++] = 0;
@@ -2792,7 +2805,16 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 
         // 充电状态
         buff[nr ++] = 0;
-        buff[nr ++] = (bit_read(task, CMD_GUN_1_OUTPUT_ON)||bit_read(task, CMD_GUN_2_OUTPUT_ON))?1:0;
+        if ( charge_mode == 1 &&
+             (bit_read(task, CMD_GUN_1_OUTPUT_ON)
+              ||
+              bit_read(task, CMD_GUN_2_OUTPUT_ON)
+             )
+           ) {
+            buff[nr ++] = 1;
+        } else {
+            buff[nr ++] = 0;
+        }
 
         self->rx_param.need_bytes = 0;
         len = nr;

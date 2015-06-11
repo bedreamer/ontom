@@ -333,6 +333,18 @@ typedef enum {
     // 扣费超时
     F_BILING_TIMEOUT,
 
+    // {{
+    // 1#枪充电
+    F_GUN1_CHARGE,
+    // 2#枪充电
+    F_GUN2_CHARGE,
+
+    // 充电枪1电压抬高完成
+    F_VOL1_SET_OK,
+    // 充电枪2电压抬高完成
+    F_VOL2_SET_OK,
+    //
+
     //{{{ 状态标记
     // BMS 已经识别
     F_BMS_RECOGNIZED,
@@ -1232,6 +1244,22 @@ static inline int __module_clr_err(struct charger_config_10h *p, unsigned int n)
 static inline int __module_is_err(struct charger_config_10h *p, unsigned int n) {
     unsigned char *st = (unsigned char *)p->charge_module_status;
     return st[ n ] & 0x01;
+}
+
+// 获取模块最高电压
+static inline double __module_max_voltage(struct charger_cnofig_10h *p, unsigned int moudle_nr) {
+    int nr = 0;
+    double max_v = 0.0f;
+    double moudule_v;
+
+    for ( nr = 0; nr < moudle_nr && nr < CONFIG_SUPPORT_CHARGE_MODULE; nr ++ ) {
+        moudule_v = b2l(p->charge_module_v[nr])/10.0f;
+        if (  moudule_v > max_v ) {
+            max_v = moudule_v;
+        }
+    }
+
+    return moudule_v;
 }
 
 // 通信报文生成依据
