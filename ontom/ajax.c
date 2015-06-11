@@ -1258,26 +1258,48 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
             getnameinfo(ifa->ifa_addr,
                         sizeof(struct sockaddr_in),
                         host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"k\":\"%s\",\"v\":\"%s\"},",
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"k\":\"网口%s\",\"v\":\"%s\"},",
                     ifa->ifa_name, host);
         }
     }
     freeifaddrs(ifaddr);
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"k\":\"ver\",\"v\":\"%d\"},", VERSION);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"k\":\"版本\",\"v\":\"%d\"},", VERSION);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"k\":\"sys\":\"v\":\"%s\"},",
+            "{\"k\":\"系统类型\":\"v\":\"%s\"},",
             task->sys_type == SYSTEM_YITISHI ? "一体式":
             task->sys_type == SYSTEM_FENTISHI ? "分体式" : "未知");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"k\":\"gun_nr\",\"v\":\"%d 把\"},", task->sys_config_gun_nr);
+            "{\"k\":\"充电枪\",\"v\":\"%d 把\"},", task->sys_config_gun_nr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"k\":\"module_nr\",\"v\":\"%d 个\"},", task->modules_nr);
+            "{\"k\":\"整流模块\",\"v\":\"%d 个\"},", task->modules_nr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"k\":\"section_nr\",\"v\":\"%d 段\"},", task->sys_charge_group_nr);
+            "{\"k\":\"母线\",\"v\":\"%d 段\"},", task->sys_charge_group_nr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"k\":\"auth_stat\",\"v\":\"%s\"},", "已激活");
+            "{\"k\":\"授权\",\"v\":\"%s\"},", "已激活");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "{\"k\":\"auth_id\",\"v\":\"%s\"},", task->bcd_auth_code);
+            "{\"k\":\"授权码\",\"v\":\"%s\"},", task->bcd_auth_code);
+
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"电能(总)\",\"v\":\"%.1f KW.H\"},",
+            task->meter[0].kwh_zong);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"电能(尖)\",\"v\":\"%.1f KW.H\"},",
+            task->meter[0].kwh_jian);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"电能(峰)\",\"v\":\"%.1f KW.H\"},",
+            task->meter[0].kwh_feng);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"电能(平)\",\"v\":\"%.1f KW.H\"},",
+            task->meter[0].kwh_ping);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"电能(谷)\",\"v\":\"%.1f KW.H\"},",
+            task->meter[0].kwh_gu);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"电池1电压\",\"v\":\"%.1f V\"},",
+            task->measure[0]->measure.VinBAT0/10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"电池2电压\",\"v\":\"%.1f V\"},",
+            task->measure[0]->measure.VinBAT1/10.0f);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
