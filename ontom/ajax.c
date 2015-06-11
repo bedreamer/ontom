@@ -1942,6 +1942,9 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
                 "\"spn3074\":\"%s\"}", bat_temprature);
 
     }
+    if (thiz->iobuff[thiz->xml_len-1] == ',') {
+        thiz->iobuff[--thiz->xml_len] = '\0';
+    }
     xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],"},");
 }
 
