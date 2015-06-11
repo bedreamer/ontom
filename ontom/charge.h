@@ -1955,8 +1955,8 @@ static inline int check_auth(const char *mac, const char *bcdcode)
 }
 #endif
 // 获取模块最高电压
-static inline double __module_max_voltage(struct charger_cnofig_10h *p, unsigned int module_nr) {
-    int nr = 0;
+static inline double __module_max_voltage(struct charger_config_10h *p, unsigned int module_nr) {
+    unsigned int nr = 0;
     double max_v = 0.0f;
     double module_v;
 
