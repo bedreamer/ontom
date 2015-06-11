@@ -2763,6 +2763,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             // 电压还未达到，继续调压
             charge_mode = 0;
             need_V = (int)((bat_v - task->charge_triger_V) * 10.0f);
+            bit_clr(task, F_VOL1_SET_OK);
+            bit_clr(task, F_VOL2_SET_OK);
         } else if ( bit_read(task, F_GUN1_CHARGE) ) {
             charge_mode = 1;
             need_V = atoi(config_read("需求电压"));
@@ -2788,8 +2790,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
 
         // 目标电压值
-        buff[nr ++] = need_V >> 8;
-        buff[nr ++] = need_V & 0xFF;
+        buff[nr ++] = 4800 >> 8;
+        buff[nr ++] = 4800 & 0xFF;
 
         // 初始电压
         buff[nr ++] = 0;
