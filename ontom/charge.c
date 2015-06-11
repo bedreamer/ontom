@@ -1198,7 +1198,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( ! bit_read(task, F_NEED_BILLING ) ) {
                 job->job_status = JOB_EXITTING;
             } else if ( bit_read(task, F_NEED_BILLING) &&
-                        bit_rad(task, F_BILING_TIMEOUT) ){
+                        bit_read(task, F_BILING_TIMEOUT) ){
                 job->job_status = JOB_EXITTING;
             } else {
 
