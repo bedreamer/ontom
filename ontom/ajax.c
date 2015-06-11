@@ -1249,7 +1249,7 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     char host[128];
 
     thiz->ct = "application/json";
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"about\":{");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"about\":[");
 
     getifaddrs(&ifaddr);
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
@@ -1258,31 +1258,31 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
             getnameinfo(ifa->ifa_addr,
                         sizeof(struct sockaddr_in),
                         host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"%s\":\"%s\",",
+            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"k\":\"%s\",\"v\":\"%s\"},",
                     ifa->ifa_name, host);
         }
     }
     freeifaddrs(ifaddr);
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"ver\":\"%d\",", VERSION);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"k\":\"ver\",\"v\":\"%d\"},", VERSION);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"sys\":\"%s\",",
+            "{\"k\":\"sys\":\"v\":\"%s\"},",
             task->sys_type == SYSTEM_YITISHI ? "一体式":
             task->sys_type == SYSTEM_FENTISHI ? "分体式" : "未知");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"gun_nr\":\"%d 把\",", task->sys_config_gun_nr);
+            "{\"k\":\"gun_nr\",\"v\":\"%d 把\"},", task->sys_config_gun_nr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"module_nr\":\"%d 个\",", task->modules_nr);
+            "{\"k\":\"module_nr\",\"v\":\"%d 个\"},", task->modules_nr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"section_nr\":\"%d 段\",", task->sys_charge_group_nr);
+            "{\"k\":\"section_nr\",\"v\":\"%d 段\"},", task->sys_charge_group_nr);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"auth_stat\":\"%s\",", "已激活");
+            "{\"k\":\"auth_stat\",\"v\":\"%s\"},", "已激活");
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"auth_id\":\"%s\",", task->bcd_auth_code);
+            "{\"k\":\"auth_id\",\"v\":\"%s\"},", task->bcd_auth_code);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
     }
-    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}}");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "]}");
     return ret;
 }
 
