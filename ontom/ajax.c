@@ -1296,10 +1296,10 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
             task->meter[0].kwh_gu);
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"k\":\"电池1电压\",\"v\":\"%.1f V\"},",
-            task->measure[0]->measure.VinBAT0/10.0f);
+            __bytes2double(b2l(task->measure[0]->measure.VinBAT0)));
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"k\":\"电池2电压\",\"v\":\"%.1f V\"},",
-            task->measure[0]->measure.VinBAT1/10.0f);
+            __bytes2double(b2l(task->measure[0]->measure.VinBAT1)));
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
