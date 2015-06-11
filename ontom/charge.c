@@ -878,7 +878,15 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         job->job_status = JOB_STANDBY;
         bit_clr(tsk, F_CHARGE_LED);
         if ( job->charge_mode == CHARGE_AUTO ) {
-            bind_bmsdriver(bmsdriver_search(task, 0, "1.0"), job);
+            int bms_vendor_id;
+            char bms_version[32] = {0};
+
+            bms_vendor_id = __string_to_bms_vendor(task->bms_vendor_version);
+            if ( 0 == __string_to_bms_version(task->bms_vendor_version, bms_version ) ) {
+                task->bmsdriver = bmsdriver_search(task, bms_vendor_id, bms_version);
+                log_printf(INF, "ZEUS: Load default BMS %d %s", bms_vendor_id, bms_version);
+            }
+            bind_bmsdriver(bmsdriver_search(task, bms_vendor_id, bms_version), job);
         }
         break;
     case JOB_STANDBY:
