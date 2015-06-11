@@ -2752,9 +2752,9 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 
         bus_v = __module_max_voltage(&task->chargers[0]->chargers,task->modules_nr);
         if ( bit_read(task, F_GUN1_CHARGE) ) {
-            bat_v = task->measure[0]->measure.VinBAT0;
+            bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT0));
         } else if ( bit_read(task, F_GUN2_CHARGE) ) {
-            bat_v = task->measure[0]->measure.VinBAT1;
+            bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT1));
         } else {
             bat_v = 400.0f;
         }
@@ -2770,7 +2770,7 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         } else if ( bit_read(task, F_GUN2_CHARGE) ) {
             charge_mode = 1;
             need_V = atoi(config_read("需求电压"));
-            bit_set(task, F_VOL1_SET_OK);
+            bit_set(task, F_VOL2_SET_OK);
         } else {
             charge_mode = 0;
             need_V = atoi(config_read("需求电压"));
