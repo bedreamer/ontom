@@ -328,6 +328,10 @@ typedef enum {
 
     // 系统需要刷卡扣费，用户站不用扣费
     F_NEED_BILLING,
+    // 扣费完成
+    F_BILLING_DONE,
+    // 扣费超时
+    F_BILING_TIMEOUT,
 
     //{{{ 状态标记
     // BMS 已经识别

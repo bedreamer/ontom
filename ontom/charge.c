@@ -1200,12 +1200,30 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             if ( bit_read(job, F_PCK_RX_BSD) &&
                  bit_read(job, F_PCK_TX_CSD) ) {
                 if ( bit_read(task, F_NEED_BILLING) ) {
+                    if (bit_read(job, F_BILLING_DONE) ) {
+                        job->job_status = JOB_EXITTING;
+                    } else {
+                        if (bit_read(job, F_BILING_TIMEOUT)) {
+
+                        } else {
+
+                        }
+                    }
                 } else {
                     job->job_status = JOB_EXITTING;
                 }
             }
         } else {
             if ( bit_read(task, F_NEED_BILLING) ) {
+                if (bit_read(job, F_BILLING_DONE) ) {
+                    job->job_status = JOB_EXITTING;
+                } else {
+                    if (bit_read(job, F_BILING_TIMEOUT)) {
+
+                    } else {
+
+                    }
+                }
             } else {
                 job->job_status = JOB_EXITTING;
             }
