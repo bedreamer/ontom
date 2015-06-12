@@ -2759,7 +2759,10 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             bat_v = 400.0f;
         }
 
-        if ( bus_v + task->charge_triger_V < bat_v ) {
+        if ( bus_v + task->charge_triger_V < bat_v &&
+             ( !bit_read(task, F_VOL1_SET_OK) ||
+               !bit_read(task, F_VOL2_SET_OK)
+             ) )  {
             // 电压还未达到，继续调压
             charge_mode = 0;
             need_V = (int)((bat_v - task->charge_triger_V) * 10.0f);
