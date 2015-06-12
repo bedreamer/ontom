@@ -890,13 +890,6 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_STANDBY:
-        if ( job->job_gun_sn == GUN_SN0 ) {
-            bit_set(task, F_GUN1_CHARGE);
-        } else if ( job->job_gun_sn == GUN_SN1 ) {
-            bit_set(task, F_GUN2_CHARGE);
-        } else {
-
-        }
         task->chargers[0]->cstats = CHARGER_IDLE;
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -994,6 +987,14 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             log_printf(WRN, "ZEUS: 系统发生关键故障, 自动暂停作业(JOB_WORKING)");
             break;
         } else {
+            if ( job->job_gun_sn == GUN_SN0 ) {
+                bit_set(task, F_GUN1_CHARGE);
+            } else if ( job->job_gun_sn == GUN_SN1 ) {
+                bit_set(task, F_GUN2_CHARGE);
+            } else {
+
+            }
+
             bit_set(tsk, CMD_DC_OUTPUT_SWITCH_ON);
             ret = __is_gun_phy_conn_ok(job);
             if ( ret  == GUN_SN0 ) {
