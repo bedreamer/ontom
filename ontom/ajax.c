@@ -1306,6 +1306,12 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"k\":\"需求电流\",\"v\":\"%.1f A\"},",
             atof(config_read("需求电流"))/10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"1#枪开关\",\"v\":\"%s\"},",
+            bit_read(task, CMD_GUN_1_OUTPUT_ON)?"合闸":"分闸");
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"2#枪开关\",\"v\":\"%s\"},",
+            bit_read(task, CMD_GUN_2_OUTPUT_ON)?"合闸":"分闸");
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
