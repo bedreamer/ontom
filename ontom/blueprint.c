@@ -2767,7 +2767,12 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
              ) )  {
             // 电压还未达到，继续调压
             charge_mode = 0;
-            need_V = (int)((bat_v - task->charge_triger_V) * 10.0f);
+            if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ||
+                 bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
+                need_V = (int)((bat_v - task->charge_triger_V) * 10.0f);
+            } else {
+                need_V = atoi(config_read("需求电压"));
+            }
             bit_clr(task, F_VOL1_SET_OK);
             bit_clr(task, F_VOL2_SET_OK);
         } else if ( bit_read(task, F_GUN1_CHARGE) ) {
