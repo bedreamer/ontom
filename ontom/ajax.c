@@ -1300,6 +1300,12 @@ int ajax_system_about_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "{\"k\":\"电池2电压\",\"v\":\"%.1f V\"},",
             __bytes2double(b2l(task->measure[0]->measure.VinBAT1)));
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"需求电压\",\"v\":\"%.1f V\"},",
+            atof(config_read("需求电压"))/10.0f);
+    thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
+            "{\"k\":\"需求电流\",\"v\":\"%.1f A\"},",
+            atof(config_read("需求电流"))/10.0f);
 
     if (thiz->iobuff[thiz->xml_len-1] == ',') {
         thiz->iobuff[--thiz->xml_len] = '\0';
