@@ -876,6 +876,16 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
+        if ( job->job_gun_sn == GUN_SN0 ) {
+            if ( __bytes2double(b2l(task->measure[0]->measure.VinKM0)) > 450 ) {
+                break;
+            }
+        } else if ( job->job_gun_sn == GUN_SN1 ) {
+            if ( __bytes2double(b2l(task->measure[0]->measure.VinKM1)) > 450 ) {
+                break;
+            }
+        }
+
         memset((void*)job->single, 0, sizeof(job->single));
         job->job_status = JOB_STANDBY;
         bit_clr(tsk, F_CHARGE_LED);
