@@ -2752,8 +2752,10 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 
         bus_v = __module_max_voltage(&task->chargers[0]->chargers,task->modules_nr);
         if ( bit_read(task, F_GUN1_CHARGE) ) {
+            bus_v = __bytes2double(b2l(task->measure[0]->measure.VinKM0));
             bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT0));
         } else if ( bit_read(task, F_GUN2_CHARGE) ) {
+            bus_v = __bytes2double(b2l(task->measure[0]->measure.VinKM1));
             bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT1));
         } else {
             bat_v = 400.0f;
