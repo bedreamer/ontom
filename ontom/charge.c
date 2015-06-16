@@ -1377,6 +1377,11 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
 
 }
 
+// 作业销毁程序
+void job_destroy(struct charge_job *job)
+{
+}
+
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd)
 {
     struct job_commit_data *thiz = NULL;

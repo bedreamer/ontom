@@ -2047,7 +2047,7 @@ unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, 
 void error_history_recover(struct charge_job *job, unsigned int error_id);
 void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thiz);
 void job_running(struct charge_task *, struct charge_job *);
-void job_running(struct charge_task *tsk, struct charge_job *thiz);
+void job_destroy(struct charge_job *);
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
 int job_exsit(time_t id);
 struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *need);
