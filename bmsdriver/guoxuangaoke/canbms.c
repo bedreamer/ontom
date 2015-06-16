@@ -195,12 +195,14 @@ int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
+	log_printf(INF, "BMS.CST: BMS terminal charge procedure.");
     } else if ( bit_read(thiz, F_PCK_CHARGER_TRM) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
         memcpy(param->buff.tx_buff, &thiz->bms.bms_cst, sizeof(struct pgn6656_CST));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
+	log_printf(INF, "BMS.CST: CHARGER terminal charge procedure.");
     } else param->evt_param = EVT_RET_INVALID;
     return 0;
 }
@@ -357,6 +359,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 } else {
                     //log_printf(DBG_LV0, "BMS: inner error. %d", __LINE__);
                 }
+                bit_clr(thiz, F_PCK_BMS_TRM);
             } while (0);
             #endif
             break;
@@ -389,6 +392,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                     gen_packet_PGN7936(thiz, param);
                     gen->heartbeat = 0;
                 }
+                   bit_clr(thiz, F_PCK_BMS_TRM);
             } while (0);
             break;
         case CHARGE_STAGE_CHARGING:
@@ -492,7 +496,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
         unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)_private;
         struct can_pack_generator *gen, *me;
-        for ( i = 0; i < thiz->bms.can_pack_gen_nr; i++ ) {
+        for ( i = 0; thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             gen = & thiz->bms.generator[i];
             if ( gen->stage == thiz->bms.charge_stage ) {
                 if ( gen->heartbeat < gen->period ) {
@@ -513,7 +517,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
          *
          * BEM和CEM不在超时统计范围内
          */
-        for ( i = 0; i < thiz->bms.can_pack_gen_nr; i++ ) {
+        for ( i = 0;thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             me = &thiz->bms.generator[i];
             if ((bit_read(thiz, F_GUN_1_PHY_CONN_STATUS)&&
                  bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))
@@ -914,14 +918,13 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        /*
-         * 接收到中止充电报文，充电机发送CTS，并关闭高压输出
-         */
-        bit_set(thiz, F_PCK_BMS_TRM);
-        memcpy(&thiz->bms.bms_bst, param->buff.rx_buff,
+             /*
+              * 接收到中止充电报文，充电机发送CTS，并关闭高压输出
+              */
+             bit_set(thiz, F_PCK_BMS_TRM);
+             memcpy(&thiz->bms.bms_bst, param->buff.rx_buff,
                sizeof(struct pgn6400_BST));
-
-        log_printf(INF, "BMS: PGN_BST fetched.");
+             log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSD);

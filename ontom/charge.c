@@ -10,7 +10,6 @@ struct charge_task *task = &tom;
 int sql_db_config_result(void *param, int nr, char **text, char **name)
 {
     int i = 0;
-
     if ( nr > 0 && text ) {
         log_printf(DBG_LV1, "ZEUS: DB READ [%s=%s]", text[1], text[3]);
         if ( 0 == strcmp(text[1], "sys_conflict_map") ) {
@@ -629,7 +628,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 if ( task->job[ i ] == NULL ) continue;
                 job_running(task, task->job[ i ]);
                 if ( task->job[i]->job_status == JOB_DETACHING ) {
-                    free(task->job[i]);
+                    //free(task->job[i]);
                     log_printf(INF, "ZEUS: 作业中止");
                     task->job[i] = NULL;
                     continue;
@@ -1108,7 +1107,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
                                job->charged_kwh + job->section_kwh);
-                    job->job_status = JOB_DONE;
+                    //job->job_status = JOB_DONE;
+		    bit_set(job, CMD_JOB_ABORT);
                     end ++;
                 }
             } else {
@@ -1258,6 +1258,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+	/*
         if ( job->charge_mode == CHARGE_AUTO ) {
             if ( bit_read(job, F_PCK_RX_BSD) &&
                  bit_read(job, F_PCK_TX_CSD) ) {
@@ -1286,10 +1287,10 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
 
                     }
                 }
-            } else {
+            } else {*/
                 job->job_status = JOB_EXITTING;
-            }
-        }
+        //    }
+        //}
         break;
     case JOB_EXITTING:
         config_write("需求电压", "2000");
