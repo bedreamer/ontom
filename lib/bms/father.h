@@ -81,7 +81,10 @@ typedef enum {
     EVENT_CAN_INIT   = 11,
 
     // CAN 消息复位。再次执行初始化操作。
-    EVENT_CAN_RESET  = 12
+    EVENT_CAN_RESET  = 12,
+    
+    // 销毁事件
+    EVENT_CAN_DESTROY= 13
 }BMS_EVENT_CAN;
 
 // 事件通知返回/传入参数

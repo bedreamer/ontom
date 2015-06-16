@@ -1374,12 +1374,19 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 job->job_url_commit_timestamp);
         (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     }
-
 }
 
 // 作业销毁程序
 void job_destroy(struct charge_job *job)
 {
+    static struct charge_job *junk = NULL;
+    
+    if ( junk == NULL ) {
+        junk = job;
+    } else {
+        list_ini(&job->job_node);
+        list_inserttail(&junk->job_node, &job->job_node);
+    }
 }
 
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd)

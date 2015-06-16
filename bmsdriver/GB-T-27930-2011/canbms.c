@@ -497,7 +497,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
         unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)_private;
         struct can_pack_generator *gen, *me;
-        for ( i = 0; i < thiz->bms.can_pack_gen_nr; i++ ) {
+        for ( i = 0; thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             gen = & thiz->bms.generator[i];
             if ( gen->stage == thiz->bms.charge_stage ) {
                 if ( gen->heartbeat < gen->period ) {
@@ -518,7 +518,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
          *
          * BEM和CEM不在超时统计范围内
          */
-        for ( i = 0; i < thiz->bms.can_pack_gen_nr; i++ ) {
+        for ( i = 0; thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             me = &thiz->bms.generator[i];
             if ((bit_read(thiz, F_GUN_1_PHY_CONN_STATUS)&&
                  bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))

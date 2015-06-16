@@ -79,12 +79,14 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
             for ( i = 0; driver->binder[i] &&
                   i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
-                if ( thiz->job_status == JOB_EXITTING || 
-		     thiz->job_status == JOB_DETACHING ) {
-                    log_printf(INF, "JOB exited, unbind BMS driver automatic!");
-                    driver->binder[i] = NULL;
-                    thiz->bms.driver = NULL;
-		    continue;
+                if ( thiz->job_status == JOB_EXITTING || thiz->job_status == JOB_DETACHING ) {
+                    if ( thiz->bms.driver ) {
+                        log_printf(INF, "JOB exited, unbind BMS driver automatic!");
+                        driver->driver_main_proc(thiz, EVENT_CAN_DESTROY, &thiz->param, driver);
+                        driver->binder[i] = NULL;
+                        thiz->bms.driver = NULL;
+                    }
+                    continue;
                 }
 
                 if ( 0x7F != thiz->bms.bms_write_init_ok ) {
@@ -280,10 +282,14 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
             for ( i = 0; driver->binder[i] &&
                   i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
                 thiz = driver->binder[i];
-                if ( thiz->job_status == JOB_EXITTING|| 
-		     thiz->job_status == JOB_DETACHING ) {
-                    driver->binder[i] = NULL;
-                    thiz->bms.driver = NULL;
+                if ( thiz->job_status == JOB_EXITTING || thiz->job_status == JOB_DETACHING ) {
+                    if ( thiz->bms.driver ) {
+                        log_printf(INF, "JOB exited, unbind BMS driver automatic!");
+                        driver->driver_main_proc(thiz, EVENT_CAN_DESTROY, &thiz->param, driver);
+                        driver->binder[i] = NULL;
+                        thiz->bms.driver = NULL;
+                    }
+                    continue;
                 }
 
                 if ( thiz->bms.can_bms_status  == CAN_INVALID ) {
