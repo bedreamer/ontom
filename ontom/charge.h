@@ -562,6 +562,77 @@ typedef enum {
     S_END
 }ONTOM_FLAG_SINGLE;
 
+// 作业信号
+typedef enum {
+    J_BEGIN = 0x00,
+
+    // 1: 自动充电， 0: 手动充电
+    JF_AUTO_CHARGE = 0x01,
+
+    // 1: BMS驱动已经绑定，0: 未绑定
+    JF_BMS_DRV_BINDED,
+
+    // 1: 已经接收到BRM，0：还未接收到BRM
+    JF_BMS_RX_BRM,
+    // 1: 接收BRM超时，0: 正常
+    JS_BMS_RX_BRM_TIMEOUT,
+    // 1: 已经发送CRM，0: 还未发送CRM
+    JF_BMS_TX_CRM,
+
+    // 1: 已经接收到BCP, 0: 还未接收到BCP
+    JF_BMS_RX_BCP,
+    // 1: 接收BCP超时，0：正常
+    JS_BMS_RX_BCP_TIMEOUT,
+    // 1: 已经接收到BRO, 0: 还未接收到BRO
+    JF_BMS_RX_BRO,
+    // 1: 接收BRO超时，0：正常
+    JS_BMS_RX_BRO_TIMEOUT,
+    // 1: 已经发送CTS，0:还未发送CTS
+    JF_BMS_TX_CTS,
+    // 1: 已经发送CML，0:还未发送CTS
+    JF_BMS_TX_CML,
+    // 1: 已经发送CRO，0:还未发送CTS
+    JF_BMS_TX_CRO,
+
+    // 1: 已经接收到BCL, 0: 还未接收到BCL
+    JF_BMS_RX_BCL,
+    // 1: 接收BCP超时，0：正常
+    JS_BMS_RX_BCL_TIMEOUT,
+    // 1: 已经接收到BCS, 0: 还未接收到BCS
+    JF_BMS_RX_BCS,
+    // 1: 接收BRO超时，0：正常
+    JS_BMS_RX_BCS_TIMEOUT,
+    // 1: 已经接收到BSM, 0: 还未接收到BSM
+    JF_BMS_RX_BSM,
+    // 1: 接收BSM超时，0：正常
+    JS_BMS_RX_BSM_TIMEOUT,
+    // 1: 已经接收到BMV, 0: 还未接收到BMV
+    JF_BMS_RX_BMV,
+    // 1: 接收BMV超时，0：正常
+    JS_BMS_RX_BMV_TIMEOUT,
+    // 1: 已经接收到BMT, 0: 还未接收到BMT
+    JF_BMS_RX_BMT,
+    // 1: 接收BMT超时，0：正常
+    JS_BMS_RX_BMT_TIMEOUT,
+    // 1: 已经接收到BST, 0: 还未接收到BST
+    JF_BMS_RX_BST,
+    // 1: 接收BST超时，0：正常
+    JS_BMS_RX_BST_TIMEOUT,
+    // 1: 已经发送CTS，0:还未发送CTS
+    JF_BMS_TX_CCS,
+    // 1: 已经发送CST，0:还未发送CST
+    JF_BMS_TX_CST,
+
+    // 1: 已经接收到BSD, 0: 还未接收到BSD
+    JF_BMS_RX_BSD,
+    // 1: 接收BSD超时，0：正常
+    JS_BMS_RX_BSD_TIMEOUT,
+    // 1: 已经发送CSD，0:还未发送CSD
+    JF_BMS_TX_CSD,
+
+    J_END
+}JOB_FLAG_SINGLE;
+
 // 硬件配置信息
 typedef enum {
     // 交流电能表存在
