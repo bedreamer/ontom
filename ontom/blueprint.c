@@ -2708,6 +2708,7 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
     unsigned int need_V, need_I;
     double bus_v, bat_v;
     int charge_mode = 0;
+    double err_v;
 
     int ret = ERR_ERR;
     switch (evt) {
@@ -2769,7 +2770,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
             charge_mode = 0;
             if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ||
                  bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
-                need_V = (int)((bat_v - task->charge_triger_V) * 10.0f);
+                err_v = (bat_v + task->charge_triger_V) * 5 / 1000;
+                need_V = (int)((bat_v - task->charge_triger_V + err_v ) * 10.0f);
             } else {
                 need_V = atoi(config_read("需求电压"));
             }
