@@ -6,11 +6,1490 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXFileReference section */
+		6A0D47DB1B32EFEE00ED385B /* ajax.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ajax.c; sourceTree = "<group>"; };
+		6A0D47DC1B32EFEE00ED385B /* ajax.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ajax.h; sourceTree = "<group>"; };
+		6A0D47DD1B32EFEE00ED385B /* blueprint.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = blueprint.c; sourceTree = "<group>"; };
+		6A0D47DE1B32EFEE00ED385B /* blueprint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = blueprint.h; sourceTree = "<group>"; };
+		6A0D47DF1B32EFEE00ED385B /* charge.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = charge.c; sourceTree = "<group>"; };
+		6A0D47E01B32EFEE00ED385B /* charge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = charge.h; sourceTree = "<group>"; };
+		6A0D47E11B32EFEE00ED385B /* error.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
+		6A0D47E21B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D47E31B32EFEE00ED385B /* ontom.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = ontom.xcodeproj; sourceTree = "<group>"; };
+		6A0D47E61B32EFEE00ED385B /* stdafx.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stdafx.c; sourceTree = "<group>"; };
+		6A0D47E71B32EFEE00ED385B /* stdafx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		6A0D47E81B32EFEE00ED385B /* tom.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tom.c; sourceTree = "<group>"; };
+		6A0D47E91B32EFEE00ED385B /* tom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tom.h; sourceTree = "<group>"; };
+		6A0D47EC1B32EFEE00ED385B /* aclocal.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; path = aclocal.m4; sourceTree = "<group>"; };
+		6A0D47ED1B32EFEE00ED385B /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
+		6A0D47F01B32EFEE00ED385B /* bc.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = bc.Po; sourceTree = "<group>"; };
+		6A0D47F11B32EFEE00ED385B /* execute.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = execute.Po; sourceTree = "<group>"; };
+		6A0D47F21B32EFEE00ED385B /* global.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = global.Po; sourceTree = "<group>"; };
+		6A0D47F31B32EFEE00ED385B /* load.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = load.Po; sourceTree = "<group>"; };
+		6A0D47F41B32EFEE00ED385B /* main.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.Po; sourceTree = "<group>"; };
+		6A0D47F51B32EFEE00ED385B /* scan.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = scan.Po; sourceTree = "<group>"; };
+		6A0D47F61B32EFEE00ED385B /* storage.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = storage.Po; sourceTree = "<group>"; };
+		6A0D47F71B32EFEE00ED385B /* util.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = util.Po; sourceTree = "<group>"; };
+		6A0D47F81B32EFEE00ED385B /* warranty.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = warranty.Po; sourceTree = "<group>"; };
+		6A0D47F91B32EFEE00ED385B /* bc */ = {isa = PBXFileReference; lastKnownFileType = file; path = bc; sourceTree = "<group>"; };
+		6A0D47FA1B32EFEE00ED385B /* bc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bc.c; sourceTree = "<group>"; };
+		6A0D47FB1B32EFEE00ED385B /* bc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bc.h; sourceTree = "<group>"; };
+		6A0D47FC1B32EFEE00ED385B /* bc.y */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.yacc; path = bc.y; sourceTree = "<group>"; };
+		6A0D47FD1B32EFEE00ED385B /* bcdefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bcdefs.h; sourceTree = "<group>"; };
+		6A0D47FE1B32EFEE00ED385B /* const.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = const.h; sourceTree = "<group>"; };
+		6A0D47FF1B32EFEE00ED385B /* execute.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = execute.c; sourceTree = "<group>"; };
+		6A0D48001B32EFEE00ED385B /* fix-libmath_h */ = {isa = PBXFileReference; lastKnownFileType = text; path = "fix-libmath_h"; sourceTree = "<group>"; };
+		6A0D48011B32EFEE00ED385B /* global.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = global.c; sourceTree = "<group>"; };
+		6A0D48021B32EFEE00ED385B /* global.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global.h; sourceTree = "<group>"; };
+		6A0D48031B32EFEE00ED385B /* libmath.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = libmath.b; sourceTree = "<group>"; };
+		6A0D48041B32EFEE00ED385B /* libmath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libmath.h; sourceTree = "<group>"; };
+		6A0D48051B32EFEE00ED385B /* load.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = load.c; sourceTree = "<group>"; };
+		6A0D48061B32EFEE00ED385B /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		6A0D48071B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D48081B32EFEE00ED385B /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		6A0D48091B32EFEE00ED385B /* Makefile.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
+		6A0D480A1B32EFEE00ED385B /* proto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = proto.h; sourceTree = "<group>"; };
+		6A0D480B1B32EFEE00ED385B /* sbc.y */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.yacc; path = sbc.y; sourceTree = "<group>"; };
+		6A0D480C1B32EFEE00ED385B /* scan.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = scan.c; sourceTree = "<group>"; };
+		6A0D480D1B32EFEE00ED385B /* scan.l */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.lex; path = scan.l; sourceTree = "<group>"; };
+		6A0D480E1B32EFEE00ED385B /* storage.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = storage.c; sourceTree = "<group>"; };
+		6A0D480F1B32EFEE00ED385B /* util.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = util.c; sourceTree = "<group>"; };
+		6A0D48101B32EFEE00ED385B /* warranty.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = warranty.c; sourceTree = "<group>"; };
+		6A0D48111B32EFEE00ED385B /* ChangeLog */ = {isa = PBXFileReference; lastKnownFileType = text; path = ChangeLog; sourceTree = "<group>"; };
+		6A0D48121B32EFEE00ED385B /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		6A0D48131B32EFEE00ED385B /* config.h.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.h.in; sourceTree = "<group>"; };
+		6A0D48141B32EFEE00ED385B /* config.log */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.log; sourceTree = "<group>"; };
+		6A0D48151B32EFEE00ED385B /* config.status */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = config.status; sourceTree = "<group>"; };
+		6A0D48161B32EFEE00ED385B /* configure */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = configure; sourceTree = "<group>"; };
+		6A0D48171B32EFEE00ED385B /* configure.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = configure.in; sourceTree = "<group>"; };
+		6A0D48181B32EFEE00ED385B /* COPYING */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
+		6A0D48191B32EFEE00ED385B /* COPYING.LIB */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYING.LIB; sourceTree = "<group>"; };
+		6A0D481C1B32EFEE00ED385B /* array.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = array.Po; sourceTree = "<group>"; };
+		6A0D481D1B32EFEE00ED385B /* dc.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = dc.Po; sourceTree = "<group>"; };
+		6A0D481E1B32EFEE00ED385B /* eval.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = eval.Po; sourceTree = "<group>"; };
+		6A0D481F1B32EFEE00ED385B /* misc.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = misc.Po; sourceTree = "<group>"; };
+		6A0D48201B32EFEE00ED385B /* numeric.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = numeric.Po; sourceTree = "<group>"; };
+		6A0D48211B32EFEE00ED385B /* stack.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = stack.Po; sourceTree = "<group>"; };
+		6A0D48221B32EFEE00ED385B /* string.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = string.Po; sourceTree = "<group>"; };
+		6A0D48231B32EFEE00ED385B /* array.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = array.c; sourceTree = "<group>"; };
+		6A0D48241B32EFEE00ED385B /* dc */ = {isa = PBXFileReference; lastKnownFileType = file; path = dc; sourceTree = "<group>"; };
+		6A0D48251B32EFEE00ED385B /* dc-proto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dc-proto.h"; sourceTree = "<group>"; };
+		6A0D48261B32EFEE00ED385B /* dc-regdef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dc-regdef.h"; sourceTree = "<group>"; };
+		6A0D48271B32EFEE00ED385B /* dc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dc.c; sourceTree = "<group>"; };
+		6A0D48281B32EFEE00ED385B /* dc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dc.h; sourceTree = "<group>"; };
+		6A0D48291B32EFEE00ED385B /* eval.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = eval.c; sourceTree = "<group>"; };
+		6A0D482A1B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D482B1B32EFEE00ED385B /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		6A0D482C1B32EFEE00ED385B /* Makefile.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
+		6A0D482D1B32EFEE00ED385B /* misc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = misc.c; sourceTree = "<group>"; };
+		6A0D482E1B32EFEE00ED385B /* numeric.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = numeric.c; sourceTree = "<group>"; };
+		6A0D482F1B32EFEE00ED385B /* stack.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
+		6A0D48301B32EFEE00ED385B /* string.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = string.c; sourceTree = "<group>"; };
+		6A0D48311B32EFEE00ED385B /* TODO */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
+		6A0D48321B32EFEE00ED385B /* depcomp */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = depcomp; sourceTree = "<group>"; };
+		6A0D48341B32EFEE00ED385B /* bc.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = bc.1; sourceTree = "<group>"; };
+		6A0D48351B32EFEE00ED385B /* bc.info */ = {isa = PBXFileReference; lastKnownFileType = text; path = bc.info; sourceTree = "<group>"; };
+		6A0D48361B32EFEE00ED385B /* bc.texi */ = {isa = PBXFileReference; lastKnownFileType = text; path = bc.texi; sourceTree = "<group>"; };
+		6A0D48371B32EFEE00ED385B /* dc.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = dc.1; sourceTree = "<group>"; };
+		6A0D48381B32EFEE00ED385B /* dc.info */ = {isa = PBXFileReference; lastKnownFileType = text; path = dc.info; sourceTree = "<group>"; };
+		6A0D48391B32EFEE00ED385B /* dc.texi */ = {isa = PBXFileReference; lastKnownFileType = text; path = dc.texi; sourceTree = "<group>"; };
+		6A0D483A1B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D483B1B32EFEE00ED385B /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		6A0D483C1B32EFEE00ED385B /* Makefile.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
+		6A0D483D1B32EFEE00ED385B /* texi-ver.incl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "texi-ver.incl"; sourceTree = "<group>"; };
+		6A0D483E1B32EFEE00ED385B /* texi-ver.incl.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = "texi-ver.incl.in"; sourceTree = "<group>"; };
+		6A0D483F1B32EFEE00ED385B /* texinfo.tex */ = {isa = PBXFileReference; lastKnownFileType = text; path = texinfo.tex; sourceTree = "<group>"; };
+		6A0D48411B32EFEE00ED385B /* ckbook.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = ckbook.b; sourceTree = "<group>"; };
+		6A0D48421B32EFEE00ED385B /* pi.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = pi.b; sourceTree = "<group>"; };
+		6A0D48431B32EFEE00ED385B /* primes.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = primes.b; sourceTree = "<group>"; };
+		6A0D48441B32EFEE00ED385B /* twins.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = twins.b; sourceTree = "<group>"; };
+		6A0D48451B32EFEE00ED385B /* FAQ */ = {isa = PBXFileReference; lastKnownFileType = text; path = FAQ; sourceTree = "<group>"; };
+		6A0D48471B32EFEE00ED385B /* getopt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = getopt.h; sourceTree = "<group>"; };
+		6A0D48481B32EFEE00ED385B /* number.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = number.h; sourceTree = "<group>"; };
+		6A0D48491B32EFEE00ED385B /* INSTALL */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTALL; sourceTree = "<group>"; };
+		6A0D484A1B32EFEE00ED385B /* install-sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-sh"; sourceTree = "<group>"; };
+		6A0D484D1B32EFEE00ED385B /* getopt.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = getopt.Po; sourceTree = "<group>"; };
+		6A0D484E1B32EFEE00ED385B /* getopt1.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = getopt1.Po; sourceTree = "<group>"; };
+		6A0D484F1B32EFEE00ED385B /* number.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = number.Po; sourceTree = "<group>"; };
+		6A0D48501B32EFEE00ED385B /* vfprintf.Po */ = {isa = PBXFileReference; lastKnownFileType = text; path = vfprintf.Po; sourceTree = "<group>"; };
+		6A0D48511B32EFEE00ED385B /* getopt.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = getopt.c; sourceTree = "<group>"; };
+		6A0D48521B32EFEE00ED385B /* getopt1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = getopt1.c; sourceTree = "<group>"; };
+		6A0D48531B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D48541B32EFEE00ED385B /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		6A0D48551B32EFEE00ED385B /* Makefile.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
+		6A0D48561B32EFEE00ED385B /* number.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = number.c; sourceTree = "<group>"; };
+		6A0D48571B32EFEE00ED385B /* testmul.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = testmul.c; sourceTree = "<group>"; };
+		6A0D48581B32EFEE00ED385B /* vfprintf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vfprintf.c; sourceTree = "<group>"; };
+		6A0D48591B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D485A1B32EFEE00ED385B /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		6A0D485B1B32EFEE00ED385B /* Makefile.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
+		6A0D485C1B32EFEE00ED385B /* missing */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = missing; sourceTree = "<group>"; };
+		6A0D485D1B32EFEE00ED385B /* NEWS */ = {isa = PBXFileReference; lastKnownFileType = text; path = NEWS; sourceTree = "<group>"; };
+		6A0D485E1B32EFEE00ED385B /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		6A0D485F1B32EFEE00ED385B /* stamp-h1 */ = {isa = PBXFileReference; lastKnownFileType = text; path = "stamp-h1"; sourceTree = "<group>"; };
+		6A0D48611B32EFEE00ED385B /* array.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = array.b; sourceTree = "<group>"; };
+		6A0D48621B32EFEE00ED385B /* arrayp.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = arrayp.b; sourceTree = "<group>"; };
+		6A0D48631B32EFEE00ED385B /* aryprm.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = aryprm.b; sourceTree = "<group>"; };
+		6A0D48641B32EFEE00ED385B /* atan.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = atan.b; sourceTree = "<group>"; };
+		6A0D48651B32EFEE00ED385B /* BUG.bc */ = {isa = PBXFileReference; lastKnownFileType = text; path = BUG.bc; sourceTree = "<group>"; };
+		6A0D48661B32EFEE00ED385B /* checklib.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = checklib.b; sourceTree = "<group>"; };
+		6A0D48671B32EFEE00ED385B /* div.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = div.b; sourceTree = "<group>"; };
+		6A0D48681B32EFEE00ED385B /* exp.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = exp.b; sourceTree = "<group>"; };
+		6A0D48691B32EFEE00ED385B /* fact.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = fact.b; sourceTree = "<group>"; };
+		6A0D486A1B32EFEE00ED385B /* jn.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = jn.b; sourceTree = "<group>"; };
+		6A0D486B1B32EFEE00ED385B /* ln.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = ln.b; sourceTree = "<group>"; };
+		6A0D486C1B32EFEE00ED385B /* mul.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = mul.b; sourceTree = "<group>"; };
+		6A0D486D1B32EFEE00ED385B /* raise.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = raise.b; sourceTree = "<group>"; };
+		6A0D486E1B32EFEE00ED385B /* signum */ = {isa = PBXFileReference; lastKnownFileType = text; path = signum; sourceTree = "<group>"; };
+		6A0D486F1B32EFEE00ED385B /* sine.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = sine.b; sourceTree = "<group>"; };
+		6A0D48701B32EFEE00ED385B /* sqrt.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = sqrt.b; sourceTree = "<group>"; };
+		6A0D48711B32EFEE00ED385B /* sqrt1.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = sqrt1.b; sourceTree = "<group>"; };
+		6A0D48721B32EFEE00ED385B /* sqrt2.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = sqrt2.b; sourceTree = "<group>"; };
+		6A0D48731B32EFEE00ED385B /* testfn.b */ = {isa = PBXFileReference; lastKnownFileType = text; path = testfn.b; sourceTree = "<group>"; };
+		6A0D48741B32EFEE00ED385B /* timetest */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = timetest; sourceTree = "<group>"; };
+		6A0D48751B32EFEE00ED385B /* bc_1.06.95-2ubuntu1.diff.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = "bc_1.06.95-2ubuntu1.diff.gz"; sourceTree = "<group>"; };
+		6A0D48761B32EFEE00ED385B /* bc_1.06.95-2ubuntu1.dsc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "bc_1.06.95-2ubuntu1.dsc"; sourceTree = "<group>"; };
+		6A0D48771B32EFEE00ED385B /* bc_1.06.95.orig.tar.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = bc_1.06.95.orig.tar.gz; sourceTree = "<group>"; };
+		6A0D48791B32EFEE00ED385B /* libD8U.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libD8U.a; sourceTree = "<group>"; };
+		6A0D487A1B32EFEE00ED385B /* libD8usb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libD8usb.a; sourceTree = "<group>"; };
+		6A0D487B1B32EFEE00ED385B /* librf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = librf.h; sourceTree = "<group>"; };
+		6A0D487D1B32EFEE00ED385B /* exso.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = exso.c; sourceTree = "<group>"; };
+		6A0D487E1B32EFEE00ED385B /* exso.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = exso.h; sourceTree = "<group>"; };
+		6A0D487F1B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D48801B32EFEE00ED385B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6A0D48821B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D48831B32EFEE00ED385B /* mongoose.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mongoose.c; sourceTree = "<group>"; };
+		6A0D48841B32EFEE00ED385B /* mongoose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mongoose.h; sourceTree = "<group>"; };
+		6A0D48861B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D48871B32EFEE00ED385B /* sqlite3.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sqlite3.c; sourceTree = "<group>"; };
+		6A0D48881B32EFEE00ED385B /* sqlite3.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = sqlite3.exe; sourceTree = "<group>"; };
+		6A0D48891B32EFEE00ED385B /* sqlite3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
+		6A0D488A1B32EFEE00ED385B /* user.cfg */ = {isa = PBXFileReference; lastKnownFileType = text; name = user.cfg; path = ../user.cfg; sourceTree = "<group>"; };
+		6A0D488D1B32EFEE00ED385B /* canbms.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = canbms.c; sourceTree = "<group>"; };
+		6A0D488E1B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D488F1B32EFEE00ED385B /* pgn.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pgn.h; sourceTree = "<group>"; };
+		6A0D48911B32EFEE00ED385B /* canbms.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = canbms.c; sourceTree = "<group>"; };
+		6A0D48921B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D48931B32EFEE00ED385B /* pgn.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pgn.h; sourceTree = "<group>"; };
+		6A0D48951B32EFEE00ED385B /* canbms.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = canbms.c; sourceTree = "<group>"; };
+		6A0D48961B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D48971B32EFEE00ED385B /* pgn.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pgn.h; sourceTree = "<group>"; };
+		6A0D48991B32EFEE00ED385B /* ontom.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = ontom.sql; sourceTree = "<group>"; };
+		6A0D489A1B32EFEE00ED385B /* ontom.sql.README */ = {isa = PBXFileReference; lastKnownFileType = text; path = ontom.sql.README; sourceTree = "<group>"; };
+		6A0D489B1B32EFEE00ED385B /* DIAGNOSIS */ = {isa = PBXFileReference; lastKnownFileType = text; name = DIAGNOSIS; path = ../DIAGNOSIS; sourceTree = "<group>"; };
+		6A0D489D1B32EFEE00ED385B /* can.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = can.txt; sourceTree = "<group>"; };
+		6A0D489E1B32EFEE00ED385B /* CN203377620U.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = CN203377620U.pdf; sourceTree = "<group>"; };
+		6A0D489F1B32EFEE00ED385B /* DL-T 645-2007 多功能电能表通信协议.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "DL-T 645-2007 多功能电能表通信协议.pdf"; sourceTree = "<group>"; };
+		6A0D48A01B32EFEE00ED385B /* DL-T 645-2007 多功能电能表通信协议（最终版）.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DL-T 645-2007 多功能电能表通信协议（最终版）.doc"; sourceTree = "<group>"; };
+		6A0D48A11B32EFEE00ED385B /* DLT 634.5104-2009 远动设备及系统 第5-104部分：传输规约 采用标准传输规约集的IEC 60870-5-101网络访问.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "DLT 634.5104-2009 远动设备及系统 第5-104部分：传输规约 采用标准传输规约集的IEC 60870-5-101网络访问.pdf"; sourceTree = "<group>"; };
+		6A0D48A21B32EFEE00ED385B /* DLT 645-2007.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "DLT 645-2007.pdf"; sourceTree = "<group>"; };
+		6A0D48A31B32EFEE00ED385B /* GBT 18657.1-2002远动设备及系统 第5部分：传输远约 第1篇.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "GBT 18657.1-2002远动设备及系统 第5部分：传输远约 第1篇.pdf"; sourceTree = "<group>"; };
+		6A0D48A41B32EFEE00ED385B /* GBT 18657.2-2002远动设备及系统 第5部分传输规约 第2篇.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "GBT 18657.2-2002远动设备及系统 第5部分传输规约 第2篇.pdf"; sourceTree = "<group>"; };
+		6A0D48A51B32EFEE00ED385B /* GBT 27930-2011 电动汽车非车载传导式充电机与电池管理系统之间的通信协议.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "GBT 27930-2011 电动汽车非车载传导式充电机与电池管理系统之间的通信协议.pdf"; sourceTree = "<group>"; };
+		6A0D48A61B32EFEE00ED385B /* IEC 870-5-101 华东电网应用规范.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "IEC 870-5-101 华东电网应用规范.pdf"; sourceTree = "<group>"; };
+		6A0D48A71B32EFEE00ED385B /* IEC60870-5-104.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "IEC60870-5-104.pdf"; sourceTree = "<group>"; };
+		6A0D48A81B32EFEE00ED385B /* ISO7816-1234.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "ISO7816-1234.pdf"; sourceTree = "<group>"; };
+		6A0D48A91B32EFEE00ED385B /* log_tom_clut224.ppm */ = {isa = PBXFileReference; lastKnownFileType = text; path = log_tom_clut224.ppm; sourceTree = "<group>"; };
+		6A0D48AA1B32EFEE00ED385B /* Modbus_Application_Protocol_V1_1b3.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Modbus_Application_Protocol_V1_1b3.pdf; sourceTree = "<group>"; };
+		6A0D48AB1B32EFEE00ED385B /* Modbus_over_serial_line_V1_02.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Modbus_over_serial_line_V1_02.pdf; sourceTree = "<group>"; };
+		6A0D48AC1B32EFEE00ED385B /* NB_T 33003-2010_____________________________.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NB_T 33003-2010_____________________________.doc"; sourceTree = "<group>"; };
+		6A0D48AD1B32EFEE00ED385B /* NBT《电动汽车充换电服务网络运营管理系统通信规约：系统与离散充电桩通信规约》.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NBT《电动汽车充换电服务网络运营管理系统通信规约：系统与离散充电桩通信规约》.doc"; sourceTree = "<group>"; };
+		6A0D48AE1B32EFEE00ED385B /* NBT《电动汽车充换电服务网络运营管理系统通信规约：系统与站级监控系统通信规约》.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NBT《电动汽车充换电服务网络运营管理系统通信规约：系统与站级监控系统通信规约》.doc"; sourceTree = "<group>"; };
+		6A0D48AF1B32EFEE00ED385B /* PI_MBUS_300.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = PI_MBUS_300.pdf; sourceTree = "<group>"; };
+		6A0D48B01B32EFEE00ED385B /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		6A0D48B11B32EFEE00ED385B /* README.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = README.html; sourceTree = "<group>"; };
+		6A0D48B21B32EFEE00ED385B /* sae j1939-21-2006.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "sae j1939-21-2006.pdf"; sourceTree = "<group>"; };
+		6A0D48B31B32EFEE00ED385B /* SAE J1939-21.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "SAE J1939-21.pdf"; sourceTree = "<group>"; };
+		6A0D48B41B32EFEE00ED385B /* SERVER  CLIENT.vsd */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SERVER  CLIENT.vsd"; sourceTree = "<group>"; };
+		6A0D48B51B32EFEE00ED385B /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
+		6A0D48B61B32EFEE00ED385B /* splash.psd */ = {isa = PBXFileReference; lastKnownFileType = file; path = splash.psd; sourceTree = "<group>"; };
+		6A0D48B81B32EFEE00ED385B /* CAN-RS485(PA1D5Z)协议转换器用户手册.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "CAN-RS485(PA1D5Z)协议转换器用户手册.doc"; sourceTree = "<group>"; };
+		6A0D48B91B32EFEE00ED385B /* CAN-RS485-RS422(PA2D5Z)协议转换器用户手册.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "CAN-RS485-RS422(PA2D5Z)协议转换器用户手册.doc"; sourceTree = "<group>"; };
+		6A0D48BA1B32EFEE00ED385B /* 英可瑞240V_336V高压直流模块CAN通讯协议V1.0.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "英可瑞240V_336V高压直流模块CAN通讯协议V1.0.pdf"; sourceTree = "<group>"; };
+		6A0D48BB1B32EFEE00ED385B /* 英可瑞整流模块MODBUS协议V1.3.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "英可瑞整流模块MODBUS协议V1.3.doc"; sourceTree = "<group>"; };
+		6A0D48BC1B32EFEE00ED385B /* 英可瑞整流模块MODBUS协议V1.3.rar */ = {isa = PBXFileReference; lastKnownFileType = file; path = "英可瑞整流模块MODBUS协议V1.3.rar"; sourceTree = "<group>"; };
+		6A0D48BD1B32EFEE00ED385B /* ZLG522S系列模块的应用.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ZLG522S系列模块的应用.doc"; sourceTree = "<group>"; };
+		6A0D48BE1B32EFEE00ED385B /* ~$直流充电机-通用技术规范.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "~$直流充电机-通用技术规范.doc"; sourceTree = "<absolute>"; };
+		6A0D48BF1B32EFEE00ED385B /* 【20150127】充电站后台监控说明表格.xls */ = {isa = PBXFileReference; lastKnownFileType = file; path = "【20150127】充电站后台监控说明表格.xls"; sourceTree = "<group>"; };
+		6A0D48C01B32EFEE00ED385B /* 【20150318】一体式直流充电桩技术手册.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "【20150318】一体式直流充电桩技术手册.doc"; sourceTree = "<group>"; };
+		6A0D48C11B32EFEE00ED385B /* 【奥能电源】充电站智能管理系统软件.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "【奥能电源】充电站智能管理系统软件.doc"; sourceTree = "<group>"; };
+		6A0D48C21B32EFEE00ED385B /* 万向电动汽车电池管理系统内网通信协议V2.02.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "万向电动汽车电池管理系统内网通信协议V2.02.pdf"; sourceTree = "<group>"; };
+		6A0D48C61B32EFEE00ED385B /* CanShu.hch */ = {isa = PBXFileReference; lastKnownFileType = text; path = CanShu.hch; sourceTree = "<group>"; };
+		6A0D48C71B32EFEE00ED385B /* db1东方电表维护软件.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = "db1东方电表维护软件.exe"; sourceTree = "<group>"; };
+		6A0D48C81B32EFEE00ED385B /* db1东方电表维护软件.exe.manifest */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "db1东方电表维护软件.exe.manifest"; sourceTree = "<group>"; };
+		6A0D48C91B32EFEE00ED385B /* Shiduan.hch */ = {isa = PBXFileReference; lastKnownFileType = file; path = Shiduan.hch; sourceTree = "<group>"; };
+		6A0D48CA1B32EFEE00ED385B /* W508三相智能电能表说明书.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "W508三相智能电能表说明书.pdf"; sourceTree = "<group>"; };
+		6A0D48CB1B32EFEE00ED385B /* 电能表维护软件说明书 .pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电能表维护软件说明书 .pdf"; sourceTree = "<group>"; };
+		6A0D48CC1B32EFEE00ED385B /* 交流充电桩在线交易指令.docx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "交流充电桩在线交易指令.docx"; sourceTree = "<group>"; };
+		6A0D48CF1B32EFEE00ED385B /* QQ截图20150128092631.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "QQ截图20150128092631.png"; sourceTree = "<group>"; };
+		6A0D48D11B32EFEE00ED385B /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
+		6A0D48D21B32EFEE00ED385B /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
+		6A0D48D31B32EFEE00ED385B /* 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3.png; sourceTree = "<group>"; };
+		6A0D48D41B32EFEE00ED385B /* 4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 4.png; sourceTree = "<group>"; };
+		6A0D48D51B32EFEE00ED385B /* 5-自动手动充电模式.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "5-自动手动充电模式.png"; sourceTree = "<group>"; };
+		6A0D48D61B32EFEE00ED385B /* 6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 6.png; sourceTree = "<group>"; };
+		6A0D48D71B32EFEE00ED385B /* 7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 7.png; sourceTree = "<group>"; };
+		6A0D48D91B32EFEE00ED385B /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
+		6A0D48DA1B32EFEE00ED385B /* QQ截图20150204101948.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "QQ截图20150204101948.png"; sourceTree = "<group>"; };
+		6A0D48DC1B32EFEE00ED385B /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
+		6A0D48DD1B32EFEE00ED385B /* 10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 10.png; sourceTree = "<group>"; };
+		6A0D48DE1B32EFEE00ED385B /* 11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 11.png; sourceTree = "<group>"; };
+		6A0D48DF1B32EFEE00ED385B /* 12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 12.png; sourceTree = "<group>"; };
+		6A0D48E01B32EFEE00ED385B /* 13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 13.png; sourceTree = "<group>"; };
+		6A0D48E11B32EFEE00ED385B /* 14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 14.png; sourceTree = "<group>"; };
+		6A0D48E21B32EFEE00ED385B /* 15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 15.png; sourceTree = "<group>"; };
+		6A0D48E31B32EFEE00ED385B /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
+		6A0D48E41B32EFEE00ED385B /* 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3.png; sourceTree = "<group>"; };
+		6A0D48E51B32EFEE00ED385B /* 4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 4.png; sourceTree = "<group>"; };
+		6A0D48E61B32EFEE00ED385B /* 5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5.png; sourceTree = "<group>"; };
+		6A0D48E71B32EFEE00ED385B /* 6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 6.png; sourceTree = "<group>"; };
+		6A0D48E81B32EFEE00ED385B /* 7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 7.png; sourceTree = "<group>"; };
+		6A0D48E91B32EFEE00ED385B /* 8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 8.png; sourceTree = "<group>"; };
+		6A0D48EA1B32EFEE00ED385B /* 9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 9.png; sourceTree = "<group>"; };
+		6A0D48EB1B32EFEE00ED385B /* 充电任务状态机转移图.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "充电任务状态机转移图.png"; sourceTree = "<group>"; };
+		6A0D48EC1B32EFEE00ED385B /* 充电机CAN-RS485协议转换盒RS485端协议.xls */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电机CAN-RS485协议转换盒RS485端协议.xls"; sourceTree = "<group>"; };
+		6A0D48ED1B32EFEE00ED385B /* 充电机MODBUS通信协议.xls */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电机MODBUS通信协议.xls"; sourceTree = "<group>"; };
+		6A0D48EE1B32EFEE00ED385B /* 充电桩一机四枪可行性方案.docx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩一机四枪可行性方案.docx"; sourceTree = "<group>"; };
+		6A0D48EF1B32EFEE00ED385B /* 充电桩充电逻辑转移图.vsd */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩充电逻辑转移图.vsd"; sourceTree = "<group>"; };
+		6A0D48F01B32EFEE00ED385B /* 充电桩参数配置表.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩参数配置表.xlsx"; sourceTree = "<group>"; };
+		6A0D48F11B32EFEE00ED385B /* 充电桩监控系统组织结构.vsd */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩监控系统组织结构.vsd"; sourceTree = "<group>"; };
+		6A0D48F21B32EFEE00ED385B /* 充电桩相关信息.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩相关信息.xlsx"; sourceTree = "<group>"; };
+		6A0D48F31B32EFEE00ED385B /* 充电桩管理逻辑流程图.vsd */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩管理逻辑流程图.vsd"; sourceTree = "<group>"; };
+		6A0D48F41B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0(1).doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩采样盒与直流充电桩总监控通讯协议V1.0(1).doc"; sourceTree = "<group>"; };
+		6A0D48F51B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0(2).doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩采样盒与直流充电桩总监控通讯协议V1.0(2).doc"; sourceTree = "<group>"; };
+		6A0D48F61B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0t1.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩采样盒与直流充电桩总监控通讯协议V1.0t1.doc"; sourceTree = "<group>"; };
+		6A0D48F71B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0t2.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩采样盒与直流充电桩总监控通讯协议V1.0t2.doc"; sourceTree = "<group>"; };
+		6A0D48F81B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0t3.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "充电桩采样盒与直流充电桩总监控通讯协议V1.0t3.doc"; sourceTree = "<group>"; };
+		6A0D48FA1B32EFEE00ED385B /* 电动汽车充换电服务网络运营监控系统通信规约-系统与离散充电桩.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车充换电服务网络运营监控系统通信规约-系统与离散充电桩.pdf"; sourceTree = "<group>"; };
+		6A0D48FB1B32EFEE00ED385B /* 电动汽车充换电服务网络运营监控系统通信规约-系统与站级监控系统 .pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车充换电服务网络运营监控系统通信规约-系统与站级监控系统 .pdf"; sourceTree = "<group>"; };
+		6A0D48FC1B32EFEE00ED385B /* 电动汽车充电接口规范：第一部分通用要求1234.1.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车充电接口规范：第一部分通用要求1234.1.pdf"; sourceTree = "<group>"; };
+		6A0D48FD1B32EFEE00ED385B /* 电动汽车充电接口规范：第三部分-直流充电接口1234.3.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车充电接口规范：第三部分-直流充电接口1234.3.pdf"; sourceTree = "<group>"; };
+		6A0D48FE1B32EFEE00ED385B /* 电动汽车非车载充电机-通信协议1235.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车非车载充电机-通信协议1235.pdf"; sourceTree = "<group>"; };
+		6A0D48FF1B32EFEE00ED385B /* 电动汽车非车载充电机通用要求1233.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车非车载充电机通用要求1233.pdf"; sourceTree = "<group>"; };
+		6A0D49001B32EFEE00ED385B /* 国网物资采购标准-高速公路城际互联快充站非车载充电机-通用技术规范-20140513.1.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "国网物资采购标准-高速公路城际互联快充站非车载充电机-通用技术规范-20140513.1.doc"; sourceTree = "<group>"; };
+		6A0D49011B32EFEE00ED385B /* 整车直流充电机-通用技术规范.doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "整车直流充电机-通用技术规范.doc"; sourceTree = "<group>"; };
+		6A0D49021B32EFEE00ED385B /* 测试实验记录表格.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "测试实验记录表格.xlsx"; sourceTree = "<group>"; };
+		6A0D49031B32EFEE00ED385B /* 电动汽车主站和电池仓充电仓集中器通讯规约(V1.0)20110415.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车主站和电池仓充电仓集中器通讯规约(V1.0)20110415.pdf"; sourceTree = "<group>"; };
+		6A0D49041B32EFEE00ED385B /* 电动汽车主站和终端通讯规约(V1.1).pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车主站和终端通讯规约(V1.1).pdf"; sourceTree = "<group>"; };
+		6A0D49051B32EFEE00ED385B /* 电动汽车充电对电网影响的综述.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车充电对电网影响的综述.pdf"; sourceTree = "<group>"; };
+		6A0D49061B32EFEE00ED385B /* 电动汽车非车载传导式充电机与电池管理.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车非车载传导式充电机与电池管理.pdf"; sourceTree = "<group>"; };
+		6A0D49071B32EFEE00ED385B /* 电动汽车非载传导式充机与池管理 系统通信协议2010.12.02.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "电动汽车非载传导式充机与池管理 系统通信协议2010.12.02.pdf"; sourceTree = "<group>"; };
+		6A0D49081B32EFEE00ED385B /* 电度表倍率计算公式.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "电度表倍率计算公式.png"; sourceTree = "<group>"; };
+		6A0D49091B32EFEE00ED385B /* 直流充电桩监控开发时间表.docx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "直流充电桩监控开发时间表.docx"; sourceTree = "<group>"; };
+		6A0D490A1B32EFEE00ED385B /* 直流充电桩监控系统设计细节.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "直流充电桩监控系统设计细节.xlsx"; sourceTree = "<group>"; };
+		6A0D490B1B32EFEE00ED385B /* 答疑会纪要 .doc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "答疑会纪要 .doc"; sourceTree = "<group>"; };
+		6A0D490C1B32EFEE00ED385B /* 终止充电条件转移图.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "终止充电条件转移图.png"; sourceTree = "<group>"; };
+		6A0D490E1B32EFEE00ED385B /* ZLG600S_130820.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ZLG600S_130820.pdf; sourceTree = "<group>"; };
+		6A0D49121B32EFEE00ED385B /* GlobalDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GlobalDefine.h; sourceTree = "<group>"; };
+		6A0D49131B32EFEE00ED385B /* StatusCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusCode.h; sourceTree = "<group>"; };
+		6A0D49141B32EFEE00ED385B /* ZLG522S DLL Test.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ZLG522S DLL Test.exe"; sourceTree = "<group>"; };
+		6A0D49151B32EFEE00ED385B /* ZLG522S.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = ZLG522S.dll; sourceTree = "<group>"; };
+		6A0D49161B32EFEE00ED385B /* ZLG522S.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZLG522S.h; sourceTree = "<group>"; };
+		6A0D49171B32EFEE00ED385B /* ZLG522S.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = ZLG522S.lib; sourceTree = "<group>"; };
+		6A0D49181B32EFEE00ED385B /* 读我.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "读我.txt"; sourceTree = "<group>"; };
+		6A0D491A1B32EFEE00ED385B /* GlobalDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GlobalDefine.h; sourceTree = "<group>"; };
+		6A0D491B1B32EFEE00ED385B /* StatusCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusCode.h; sourceTree = "<group>"; };
+		6A0D491C1B32EFEE00ED385B /* ZLG522S.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = ZLG522S.dll; sourceTree = "<group>"; };
+		6A0D491D1B32EFEE00ED385B /* ZLG522S.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZLG522S.h; sourceTree = "<group>"; };
+		6A0D491E1B32EFEE00ED385B /* ZLG522S.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = ZLG522S.lib; sourceTree = "<group>"; };
+		6A0D49201B32EFEE00ED385B /* AutoDetectRes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AutoDetectRes.cpp; sourceTree = "<group>"; };
+		6A0D49211B32EFEE00ED385B /* AutoDetectRes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoDetectRes.h; sourceTree = "<group>"; };
+		6A0D49221B32EFEE00ED385B /* BSEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BSEdit.cpp; sourceTree = "<group>"; };
+		6A0D49231B32EFEE00ED385B /* BSEdit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSEdit.h; sourceTree = "<group>"; };
+		6A0D49241B32EFEE00ED385B /* GlobalDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GlobalDefine.h; sourceTree = "<group>"; };
+		6A0D49251B32EFEE00ED385B /* HexEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HexEdit.cpp; sourceTree = "<group>"; };
+		6A0D49261B32EFEE00ED385B /* HexEdit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HexEdit.h; sourceTree = "<group>"; };
+		6A0D49271B32EFEE00ED385B /* ReadMe.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
+		6A0D49291B32EFEE00ED385B /* ZLG522S DLL Test.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ZLG522S DLL Test.exe"; sourceTree = "<group>"; };
+		6A0D492A1B32EFEE00ED385B /* ZLG522S.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = ZLG522S.dll; sourceTree = "<group>"; };
+		6A0D492C1B32EFEE00ED385B /* ZLG522S DLL Test.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = "ZLG522S DLL Test.ico"; sourceTree = "<group>"; };
+		6A0D492D1B32EFEE00ED385B /* ZLG522S DLL Test.rc2 */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ZLG522S DLL Test.rc2"; sourceTree = "<group>"; };
+		6A0D492E1B32EFEE00ED385B /* resource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
+		6A0D492F1B32EFEE00ED385B /* SetModuleMode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SetModuleMode.cpp; sourceTree = "<group>"; };
+		6A0D49301B32EFEE00ED385B /* SetModuleMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SetModuleMode.h; sourceTree = "<group>"; };
+		6A0D49311B32EFEE00ED385B /* StatusCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusCode.h; sourceTree = "<group>"; };
+		6A0D49321B32EFEE00ED385B /* StdAfx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StdAfx.cpp; sourceTree = "<group>"; };
+		6A0D49331B32EFEE00ED385B /* StdAfx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StdAfx.h; sourceTree = "<group>"; };
+		6A0D49341B32EFEE00ED385B /* ZLG522S DLL Test.aps */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ZLG522S DLL Test.aps"; sourceTree = "<group>"; };
+		6A0D49351B32EFEE00ED385B /* ZLG522S DLL Test.clw */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ZLG522S DLL Test.clw"; sourceTree = "<group>"; };
+		6A0D49361B32EFEE00ED385B /* ZLG522S DLL Test.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ZLG522S DLL Test.cpp"; sourceTree = "<group>"; };
+		6A0D49371B32EFEE00ED385B /* ZLG522S DLL Test.dsp */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ZLG522S DLL Test.dsp"; sourceTree = "<group>"; };
+		6A0D49381B32EFEE00ED385B /* ZLG522S DLL Test.dsw */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ZLG522S DLL Test.dsw"; sourceTree = "<group>"; };
+		6A0D49391B32EFEE00ED385B /* ZLG522S DLL Test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZLG522S DLL Test.h"; sourceTree = "<group>"; };
+		6A0D493A1B32EFEE00ED385B /* ZLG522S DLL Test.opt */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ZLG522S DLL Test.opt"; sourceTree = "<group>"; };
+		6A0D493B1B32EFEE00ED385B /* ZLG522S DLL Test.plg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ZLG522S DLL Test.plg"; sourceTree = "<group>"; };
+		6A0D493C1B32EFEE00ED385B /* ZLG522S DLL Test.rc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ZLG522S DLL Test.rc"; sourceTree = "<group>"; };
+		6A0D493D1B32EFEE00ED385B /* ZLG522S DLL Test.suo */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ZLG522S DLL Test.suo"; sourceTree = "<group>"; };
+		6A0D493E1B32EFEE00ED385B /* ZLG522S DLL TestDlg.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ZLG522S DLL TestDlg.cpp"; sourceTree = "<group>"; };
+		6A0D493F1B32EFEE00ED385B /* ZLG522S DLL TestDlg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZLG522S DLL TestDlg.h"; sourceTree = "<group>"; };
+		6A0D49401B32EFEE00ED385B /* ZLG522S.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = ZLG522S.dll; sourceTree = "<group>"; };
+		6A0D49411B32EFEE00ED385B /* ZLG522S.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZLG522S.h; sourceTree = "<group>"; };
+		6A0D49421B32EFEE00ED385B /* ZLG522S.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = ZLG522S.lib; sourceTree = "<group>"; };
+		6A0D49431B32EFEE00ED385B /* ZLG522S_ISO14443A.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ZLG522S_ISO14443A.cpp; sourceTree = "<group>"; };
+		6A0D49441B32EFEE00ED385B /* ZLG522S_ISO14443A.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZLG522S_ISO14443A.h; sourceTree = "<group>"; };
+		6A0D49451B32EFEE00ED385B /* ZLG522S_Mifare.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ZLG522S_Mifare.cpp; sourceTree = "<group>"; };
+		6A0D49461B32EFEE00ED385B /* ZLG522S_Mifare.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZLG522S_Mifare.h; sourceTree = "<group>"; };
+		6A0D49471B32EFEE00ED385B /* ZLG522S_PlusCPU.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ZLG522S_PlusCPU.cpp; sourceTree = "<group>"; };
+		6A0D49481B32EFEE00ED385B /* ZLG522S_PlusCPU.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZLG522S_PlusCPU.h; sourceTree = "<group>"; };
+		6A0D49491B32EFEE00ED385B /* 使用说明.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "使用说明.txt"; sourceTree = "<group>"; };
+		6A0D494A1B32EFEE00ED385B /* ZLG600S_test.rar */ = {isa = PBXFileReference; lastKnownFileType = file; path = ZLG600S_test.rar; sourceTree = "<group>"; };
+		6A0D494E1B32EFEE00ED385B /* zlg522sp.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = zlg522sp.dll; sourceTree = "<group>"; };
+		6A0D494F1B32EFEE00ED385B /* MF1Plus.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = MF1Plus.exe; sourceTree = "<group>"; };
+		6A0D49501B32EFEE00ED385B /* MF1Plus.ini */ = {isa = PBXFileReference; lastKnownFileType = text; path = MF1Plus.ini; sourceTree = "<group>"; };
+		6A0D49511B32EFEE00ED385B /* ZLG600SP_soft.rar */ = {isa = PBXFileReference; lastKnownFileType = file; path = ZLG600SP_soft.rar; sourceTree = "<group>"; };
+		6A0D49521B32EFEE00ED385B /* 读卡器配置流程.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "读卡器配置流程.txt"; sourceTree = "<group>"; };
+		6A0D49531B32EFEE00ED385B /* FAQ */ = {isa = PBXFileReference; lastKnownFileType = text; name = FAQ; path = ../FAQ; sourceTree = "<group>"; };
+		6A0D49561B32EFEE00ED385B /* father.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = father.c; sourceTree = "<group>"; };
+		6A0D49571B32EFEE00ED385B /* father.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = father.h; sourceTree = "<group>"; };
+		6A0D49581B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D495A1B32EFEE00ED385B /* config.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = config.c; sourceTree = "<group>"; };
+		6A0D495B1B32EFEE00ED385B /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		6A0D495C1B32EFEE00ED385B /* Hachiko.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Hachiko.c; sourceTree = "<group>"; };
+		6A0D495D1B32EFEE00ED385B /* Hachiko.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Hachiko.h; sourceTree = "<group>"; };
+		6A0D495E1B32EFEE00ED385B /* list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		6A0D495F1B32EFEE00ED385B /* log.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
+		6A0D49601B32EFEE00ED385B /* log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		6A0D49611B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D49621B32EFEE00ED385B /* stdafx.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stdafx.c; sourceTree = "<group>"; };
+		6A0D49631B32EFEE00ED385B /* stdafx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		6A0D49681B32EFEE00ED385B /* uImage */ = {isa = PBXFileReference; lastKnownFileType = file; path = uImage; sourceTree = "<group>"; };
+		6A0D496C1B32EFEE00ED385B /* omap-serial.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "omap-serial.c"; sourceTree = "<group>"; };
+		6A0D496D1B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = "<group>"; };
+		6A0D496E1B32EFEE00ED385B /* ontom.cfg */ = {isa = PBXFileReference; lastKnownFileType = text; name = ontom.cfg; path = ../ontom.cfg; sourceTree = "<group>"; };
+		6A0D496F1B32EFEE00ED385B /* ontom.db */ = {isa = PBXFileReference; lastKnownFileType = file; name = ontom.db; path = ../ontom.db; sourceTree = "<group>"; };
+		6A0D49701B32EFEE00ED385B /* ontom.pro */ = {isa = PBXFileReference; lastKnownFileType = text; name = ontom.pro; path = ../ontom.pro; sourceTree = "<group>"; };
+		6A0D49711B32EFEE00ED385B /* ontom.pro.user */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = ontom.pro.user; path = ../ontom.pro.user; sourceTree = "<group>"; };
+		6A0D49741B32EFEE00ED385B /* 104.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = 104.c; sourceTree = "<group>"; };
+		6A0D49751B32EFEE00ED385B /* 104.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = 104.h; sourceTree = "<group>"; };
+		6A0D49761B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D49781B32EFEE00ED385B /* buzzer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = buzzer.c; sourceTree = "<group>"; };
+		6A0D49791B32EFEE00ED385B /* buzzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = buzzer.h; sourceTree = "<group>"; };
+		6A0D497A1B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D497C1B32EFEE00ED385B /* default.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = default.c; sourceTree = "<group>"; };
+		6A0D497D1B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D497F1B32EFEE00ED385B /* demo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = demo.c; sourceTree = "<group>"; };
+		6A0D49801B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D49821B32EFEE00ED385B /* libtcc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtcc.a; sourceTree = "<group>"; };
+		6A0D49831B32EFEE00ED385B /* libtcc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libtcc.h; sourceTree = "<group>"; };
+		6A0D49851B32EFEE00ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D49861B32EFEE00ED385B /* upcom.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = upcom.c; sourceTree = "<group>"; };
+		6A0D49871B32EFEE00ED385B /* upcom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = upcom.h; sourceTree = "<group>"; };
+		6A0D49881B32EFEE00ED385B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		6A0D49891B32EFEE00ED385B /* Rule.make */ = {isa = PBXFileReference; lastKnownFileType = text; name = Rule.make; path = ../Rule.make; sourceTree = "<group>"; };
+		6A0D498B1B32EFEE00ED385B /* automount.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = automount.sh; sourceTree = "<group>"; };
+		6A0D498C1B32EFEE00ED385B /* autoupgrade.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = autoupgrade.sh; sourceTree = "<group>"; };
+		6A0D498D1B32EFEE00ED385B /* export.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = export.sh; sourceTree = "<group>"; };
+		6A0D498E1B32EFEE00ED385B /* findarm.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = findarm.sh; sourceTree = "<group>"; };
+		6A0D498F1B32EFEE00ED385B /* hellhound.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = hellhound.sh; sourceTree = "<group>"; };
+		6A0D49901B32EFEE00ED385B /* install-host.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-host.sh"; sourceTree = "<group>"; };
+		6A0D49911B32EFEE00ED385B /* install-register-dir.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-register-dir.sh"; sourceTree = "<group>"; };
+		6A0D49921B32EFEE00ED385B /* install-register-file.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-register-file.sh"; sourceTree = "<group>"; };
+		6A0D49931B32EFEE00ED385B /* install-register-link.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-register-link.sh"; sourceTree = "<group>"; };
+		6A0D49941B32EFEE00ED385B /* install.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = install.db; sourceTree = "<group>"; };
+		6A0D49951B32EFEE00ED385B /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
+		6A0D49961B32EFEE00ED385B /* installcard.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = installcard.sh; sourceTree = "<group>"; };
+		6A0D49971B32EFEE00ED385B /* nock.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = nock.sh; sourceTree = "<group>"; };
+		6A0D49981B32EFEE00ED385B /* preconfig.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = preconfig.sh; sourceTree = "<group>"; };
+		6A0D49991B32EFEE00ED385B /* profile */ = {isa = PBXFileReference; lastKnownFileType = text; path = profile; sourceTree = "<group>"; };
+		6A0D499A1B32EFEE00ED385B /* runme.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = runme.sh; sourceTree = "<group>"; };
+		6A0D499B1B32EFEE00ED385B /* runzeus.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = runzeus.sh; sourceTree = "<group>"; };
+		6A0D499C1B32EFEE00ED385B /* upgrade.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = upgrade.sh; sourceTree = "<group>"; };
+		6A0D499E1B32EFEE00ED385B /* 1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = 1.txt; sourceTree = "<group>"; };
+		6A0D499F1B32EFEE00ED385B /* bcc */ = {isa = PBXFileReference; lastKnownFileType = file; path = bcc; sourceTree = "<group>"; };
+		6A0D49A01B32EFEE00ED385B /* bcc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bcc.c; sourceTree = "<group>"; };
+		6A0D49A11B32EFEE00ED385B /* BMS测试报文-国轩高科BMS抓取.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "BMS测试报文-国轩高科BMS抓取.txt"; sourceTree = "<group>"; };
+		6A0D49A21B32EFEE00ED385B /* buzzer */ = {isa = PBXFileReference; lastKnownFileType = file; path = buzzer; sourceTree = "<group>"; };
+		6A0D49A31B32EFEE00ED385B /* buzzer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = buzzer.c; sourceTree = "<group>"; };
+		6A0D49A41B32EFEE00ED385B /* can.log */ = {isa = PBXFileReference; lastKnownFileType = text; path = can.log; sourceTree = "<group>"; };
+		6A0D49A51B32EFEE00ED385B /* card */ = {isa = PBXFileReference; lastKnownFileType = file; path = card; sourceTree = "<group>"; };
+		6A0D49A61B32EFEE00ED385B /* card.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = card.c; sourceTree = "<group>"; };
+		6A0D49A71B32EFEE00ED385B /* db_tes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = db_tes.c; sourceTree = "<group>"; };
+		6A0D49AC1B32EFEE00ED385B /* simsun_100_50.qpf */ = {isa = PBXFileReference; lastKnownFileType = file; path = simsun_100_50.qpf; sourceTree = "<group>"; };
+		6A0D49AD1B32EFEE00ED385B /* simsun_120_50.qpf */ = {isa = PBXFileReference; lastKnownFileType = file; path = simsun_120_50.qpf; sourceTree = "<group>"; };
+		6A0D49AE1B32EFEE00ED385B /* simsun_140_50.qpf */ = {isa = PBXFileReference; lastKnownFileType = file; path = simsun_140_50.qpf; sourceTree = "<group>"; };
+		6A0D49AF1B32EFEE00ED385B /* simsun_160_50.qpf */ = {isa = PBXFileReference; lastKnownFileType = file; path = simsun_160_50.qpf; sourceTree = "<group>"; };
+		6A0D49B01B32EFEE00ED385B /* wqy-microhei.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "wqy-microhei.ttc"; sourceTree = "<group>"; };
+		6A0D49B11B32EFEE00ED385B /* libQtCore.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtCore.la; sourceTree = "<group>"; };
+		6A0D49B21B32EFEE00ED385B /* libQtCore.prl */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtCore.prl; sourceTree = "<group>"; };
+		6A0D49B31B32EFEE00ED385B /* libQtCore.so.4.8.2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtCore.so.4.8.2; sourceTree = "<group>"; };
+		6A0D49B41B32EFEE00ED385B /* libQtGui.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtGui.la; sourceTree = "<group>"; };
+		6A0D49B51B32EFEE00ED385B /* libQtGui.prl */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtGui.prl; sourceTree = "<group>"; };
+		6A0D49B61B32EFEE00ED385B /* libQtGui.so.4.8.2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtGui.so.4.8.2; sourceTree = "<group>"; };
+		6A0D49B71B32EFEE00ED385B /* libQtNetwork.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtNetwork.la; sourceTree = "<group>"; };
+		6A0D49B81B32EFEE00ED385B /* libQtNetwork.prl */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtNetwork.prl; sourceTree = "<group>"; };
+		6A0D49B91B32EFEE00ED385B /* libQtNetwork.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtNetwork.so; sourceTree = "<group>"; };
+		6A0D49BA1B32EFEE00ED385B /* libQtNetwork.so.4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtNetwork.so.4; sourceTree = "<group>"; };
+		6A0D49BB1B32EFEE00ED385B /* libQtNetwork.so.4.8 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtNetwork.so.4.8; sourceTree = "<group>"; };
+		6A0D49BC1B32EFEE00ED385B /* libQtNetwork.so.4.8.2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtNetwork.so.4.8.2; sourceTree = "<group>"; };
+		6A0D49BD1B32EFEE00ED385B /* libQtOpenVG.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtOpenVG.la; sourceTree = "<group>"; };
+		6A0D49BE1B32EFEE00ED385B /* libQtOpenVG.prl */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtOpenVG.prl; sourceTree = "<group>"; };
+		6A0D49BF1B32EFEE00ED385B /* libQtOpenVG.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtOpenVG.so; sourceTree = "<group>"; };
+		6A0D49C01B32EFEE00ED385B /* libQtOpenVG.so.4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtOpenVG.so.4; sourceTree = "<group>"; };
+		6A0D49C11B32EFEE00ED385B /* libQtOpenVG.so.4.8 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtOpenVG.so.4.8; sourceTree = "<group>"; };
+		6A0D49C21B32EFEE00ED385B /* libQtOpenVG.so.4.8.2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtOpenVG.so.4.8.2; sourceTree = "<group>"; };
+		6A0D49C31B32EFEE00ED385B /* libQtTest.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtTest.la; sourceTree = "<group>"; };
+		6A0D49C41B32EFEE00ED385B /* libQtTest.prl */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtTest.prl; sourceTree = "<group>"; };
+		6A0D49C51B32EFEE00ED385B /* libQtTest.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtTest.so; sourceTree = "<group>"; };
+		6A0D49C61B32EFEE00ED385B /* libQtTest.so.4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtTest.so.4; sourceTree = "<group>"; };
+		6A0D49C71B32EFEE00ED385B /* libQtTest.so.4.8 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtTest.so.4.8; sourceTree = "<group>"; };
+		6A0D49C81B32EFEE00ED385B /* libQtTest.so.4.8.2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtTest.so.4.8.2; sourceTree = "<group>"; };
+		6A0D49C91B32EFEE00ED385B /* libQtWebKit.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtWebKit.la; sourceTree = "<group>"; };
+		6A0D49CA1B32EFEE00ED385B /* libQtWebKit.prl */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtWebKit.prl; sourceTree = "<group>"; };
+		6A0D49CB1B32EFEE00ED385B /* libQtWebKit.so.4.9.2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtWebKit.so.4.9.2; sourceTree = "<group>"; };
+		6A0D49CC1B32EFEE00ED385B /* libQtXml.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtXml.la; sourceTree = "<group>"; };
+		6A0D49CD1B32EFEE00ED385B /* libQtXml.prl */ = {isa = PBXFileReference; lastKnownFileType = text; path = libQtXml.prl; sourceTree = "<group>"; };
+		6A0D49CE1B32EFEE00ED385B /* libQtXml.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtXml.so; sourceTree = "<group>"; };
+		6A0D49CF1B32EFEE00ED385B /* libQtXml.so.4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtXml.so.4; sourceTree = "<group>"; };
+		6A0D49D01B32EFEE00ED385B /* libQtXml.so.4.8 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtXml.so.4.8; sourceTree = "<group>"; };
+		6A0D49D11B32EFEE00ED385B /* libQtXml.so.4.8.2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = libQtXml.so.4.8.2; sourceTree = "<group>"; };
+		6A0D49D31B32EFEE00ED385B /* QtCore.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtCore.pc; sourceTree = "<group>"; };
+		6A0D49D41B32EFEE00ED385B /* QtGui.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtGui.pc; sourceTree = "<group>"; };
+		6A0D49D51B32EFEE00ED385B /* QtNetwork.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtNetwork.pc; sourceTree = "<group>"; };
+		6A0D49D61B32EFEE00ED385B /* QtOpenVG.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtOpenVG.pc; sourceTree = "<group>"; };
+		6A0D49D71B32EFEE00ED385B /* QtSql.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtSql.pc; sourceTree = "<group>"; };
+		6A0D49D81B32EFEE00ED385B /* QtTest.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtTest.pc; sourceTree = "<group>"; };
+		6A0D49D91B32EFEE00ED385B /* QtWebKit.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtWebKit.pc; sourceTree = "<group>"; };
+		6A0D49DA1B32EFEE00ED385B /* QtXml.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = QtXml.pc; sourceTree = "<group>"; };
+		6A0D49DB1B32EFEE00ED385B /* gui.tar.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = gui.tar.gz; sourceTree = "<group>"; };
+		6A0D49DC1B32EFEE00ED385B /* keygen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = keygen.c; sourceTree = "<group>"; };
+		6A0D49DD1B32EFEE00ED385B /* onconfig.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = onconfig.c; sourceTree = "<group>"; };
+		6A0D49DE1B32EFEE00ED385B /* rs485_read.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rs485_read.c; sourceTree = "<group>"; };
+		6A0D49DF1B32EFEE00ED385B /* rs485_send.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rs485_send.c; sourceTree = "<group>"; };
+		6A0D49E01B32EFEE00ED385B /* sqlite3 */ = {isa = PBXFileReference; lastKnownFileType = file; path = sqlite3; sourceTree = "<group>"; };
+		6A0D49E11B32EFEE00ED385B /* sqlite3-arm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "sqlite3-arm"; sourceTree = "<group>"; };
+		6A0D49E21B32EFEE00ED385B /* sqlite3.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = sqlite3.exe; sourceTree = "<group>"; };
+		6A0D49E31B32EFEE00ED385B /* sqlite3_analyzer */ = {isa = PBXFileReference; lastKnownFileType = file; path = sqlite3_analyzer; sourceTree = "<group>"; };
+		6A0D49E41B32EFEE00ED385B /* uartread */ = {isa = PBXFileReference; lastKnownFileType = file; path = uartread; sourceTree = "<group>"; };
+		6A0D49E51B32EFEE00ED385B /* uartwrite */ = {isa = PBXFileReference; lastKnownFileType = file; path = uartwrite; sourceTree = "<group>"; };
+		6A0D49E61B32EFEE00ED385B /* unit_test.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = unit_test.c; sourceTree = "<group>"; };
+		6A0D49E71B32EFEE00ED385B /* 充电机与BMS报文 - 副本.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "充电机与BMS报文 - 副本.txt"; sourceTree = "<group>"; };
+		6A0D49E81B32EFEE00ED385B /* 国轩高科BMS抓取.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "国轩高科BMS抓取.txt"; sourceTree = "<group>"; };
+		6A0D49E91B32EFEE00ED385B /* 新国标充电流程CAN报文CAN2_3360_1.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "新国标充电流程CAN报文CAN2_3360_1.xlsx"; sourceTree = "<group>"; };
+		6A0D49EA1B32EFEE00ED385B /* VERSION */ = {isa = PBXFileReference; lastKnownFileType = text; name = VERSION; path = ../VERSION; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		6A0D41AB1B30343900ED385B = {
 			isa = PBXGroup;
 			children = (
+				6A0D47DA1B32EFEE00ED385B /* ontom */,
+				6A0D47EA1B32EFEE00ED385B /* thirdpart */,
+				6A0D488A1B32EFEE00ED385B /* user.cfg */,
+				6A0D488B1B32EFEE00ED385B /* bmsdriver */,
+				6A0D48981B32EFEE00ED385B /* config */,
+				6A0D489B1B32EFEE00ED385B /* DIAGNOSIS */,
+				6A0D489C1B32EFEE00ED385B /* DOCS */,
+				6A0D49531B32EFEE00ED385B /* FAQ */,
+				6A0D49541B32EFEE00ED385B /* lib */,
+				6A0D49641B32EFEE00ED385B /* linux-3.2.0-overlay */,
+				6A0D496D1B32EFEE00ED385B /* Makefile */,
+				6A0D496E1B32EFEE00ED385B /* ontom.cfg */,
+				6A0D496F1B32EFEE00ED385B /* ontom.db */,
+				6A0D49701B32EFEE00ED385B /* ontom.pro */,
+				6A0D49711B32EFEE00ED385B /* ontom.pro.user */,
+				6A0D49721B32EFEE00ED385B /* plugins */,
+				6A0D49881B32EFEE00ED385B /* README.md */,
+				6A0D49891B32EFEE00ED385B /* Rule.make */,
+				6A0D498A1B32EFEE00ED385B /* scripts */,
+				6A0D499D1B32EFEE00ED385B /* testing */,
+				6A0D49EA1B32EFEE00ED385B /* VERSION */,
 			);
+			sourceTree = "<group>";
+		};
+		6A0D47DA1B32EFEE00ED385B /* ontom */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D47DB1B32EFEE00ED385B /* ajax.c */,
+				6A0D47DC1B32EFEE00ED385B /* ajax.h */,
+				6A0D47DD1B32EFEE00ED385B /* blueprint.c */,
+				6A0D47DE1B32EFEE00ED385B /* blueprint.h */,
+				6A0D47DF1B32EFEE00ED385B /* charge.c */,
+				6A0D47E01B32EFEE00ED385B /* charge.h */,
+				6A0D47E11B32EFEE00ED385B /* error.h */,
+				6A0D47E21B32EFEE00ED385B /* Makefile */,
+				6A0D47E31B32EFEE00ED385B /* ontom.xcodeproj */,
+				6A0D47E61B32EFEE00ED385B /* stdafx.c */,
+				6A0D47E71B32EFEE00ED385B /* stdafx.h */,
+				6A0D47E81B32EFEE00ED385B /* tom.c */,
+				6A0D47E91B32EFEE00ED385B /* tom.h */,
+			);
+			name = ontom;
+			sourceTree = "<group>";
+		};
+		6A0D47E41B32EFEE00ED385B /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6A0D47EA1B32EFEE00ED385B /* thirdpart */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D47EB1B32EFEE00ED385B /* bc-1.06.95 */,
+				6A0D48751B32EFEE00ED385B /* bc_1.06.95-2ubuntu1.diff.gz */,
+				6A0D48761B32EFEE00ED385B /* bc_1.06.95-2ubuntu1.dsc */,
+				6A0D48771B32EFEE00ED385B /* bc_1.06.95.orig.tar.gz */,
+				6A0D48781B32EFEE00ED385B /* D8 */,
+				6A0D487C1B32EFEE00ED385B /* extso */,
+				6A0D48811B32EFEE00ED385B /* mongoose */,
+				6A0D48851B32EFEE00ED385B /* sqlite */,
+			);
+			name = thirdpart;
+			path = ../thirdpart;
+			sourceTree = "<group>";
+		};
+		6A0D47EB1B32EFEE00ED385B /* bc-1.06.95 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D47EC1B32EFEE00ED385B /* aclocal.m4 */,
+				6A0D47ED1B32EFEE00ED385B /* AUTHORS */,
+				6A0D47EE1B32EFEE00ED385B /* bc */,
+				6A0D48111B32EFEE00ED385B /* ChangeLog */,
+				6A0D48121B32EFEE00ED385B /* config.h */,
+				6A0D48131B32EFEE00ED385B /* config.h.in */,
+				6A0D48141B32EFEE00ED385B /* config.log */,
+				6A0D48151B32EFEE00ED385B /* config.status */,
+				6A0D48161B32EFEE00ED385B /* configure */,
+				6A0D48171B32EFEE00ED385B /* configure.in */,
+				6A0D48181B32EFEE00ED385B /* COPYING */,
+				6A0D48191B32EFEE00ED385B /* COPYING.LIB */,
+				6A0D481A1B32EFEE00ED385B /* dc */,
+				6A0D48321B32EFEE00ED385B /* depcomp */,
+				6A0D48331B32EFEE00ED385B /* doc */,
+				6A0D48401B32EFEE00ED385B /* Examples */,
+				6A0D48451B32EFEE00ED385B /* FAQ */,
+				6A0D48461B32EFEE00ED385B /* h */,
+				6A0D48491B32EFEE00ED385B /* INSTALL */,
+				6A0D484A1B32EFEE00ED385B /* install-sh */,
+				6A0D484B1B32EFEE00ED385B /* lib */,
+				6A0D48591B32EFEE00ED385B /* Makefile */,
+				6A0D485A1B32EFEE00ED385B /* Makefile.am */,
+				6A0D485B1B32EFEE00ED385B /* Makefile.in */,
+				6A0D485C1B32EFEE00ED385B /* missing */,
+				6A0D485D1B32EFEE00ED385B /* NEWS */,
+				6A0D485E1B32EFEE00ED385B /* README */,
+				6A0D485F1B32EFEE00ED385B /* stamp-h1 */,
+				6A0D48601B32EFEE00ED385B /* Test */,
+			);
+			path = "bc-1.06.95";
+			sourceTree = "<group>";
+		};
+		6A0D47EE1B32EFEE00ED385B /* bc */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D47EF1B32EFEE00ED385B /* .deps */,
+				6A0D47F91B32EFEE00ED385B /* bc */,
+				6A0D47FA1B32EFEE00ED385B /* bc.c */,
+				6A0D47FB1B32EFEE00ED385B /* bc.h */,
+				6A0D47FC1B32EFEE00ED385B /* bc.y */,
+				6A0D47FD1B32EFEE00ED385B /* bcdefs.h */,
+				6A0D47FE1B32EFEE00ED385B /* const.h */,
+				6A0D47FF1B32EFEE00ED385B /* execute.c */,
+				6A0D48001B32EFEE00ED385B /* fix-libmath_h */,
+				6A0D48011B32EFEE00ED385B /* global.c */,
+				6A0D48021B32EFEE00ED385B /* global.h */,
+				6A0D48031B32EFEE00ED385B /* libmath.b */,
+				6A0D48041B32EFEE00ED385B /* libmath.h */,
+				6A0D48051B32EFEE00ED385B /* load.c */,
+				6A0D48061B32EFEE00ED385B /* main.c */,
+				6A0D48071B32EFEE00ED385B /* Makefile */,
+				6A0D48081B32EFEE00ED385B /* Makefile.am */,
+				6A0D48091B32EFEE00ED385B /* Makefile.in */,
+				6A0D480A1B32EFEE00ED385B /* proto.h */,
+				6A0D480B1B32EFEE00ED385B /* sbc.y */,
+				6A0D480C1B32EFEE00ED385B /* scan.c */,
+				6A0D480D1B32EFEE00ED385B /* scan.l */,
+				6A0D480E1B32EFEE00ED385B /* storage.c */,
+				6A0D480F1B32EFEE00ED385B /* util.c */,
+				6A0D48101B32EFEE00ED385B /* warranty.c */,
+			);
+			path = bc;
+			sourceTree = "<group>";
+		};
+		6A0D47EF1B32EFEE00ED385B /* .deps */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D47F01B32EFEE00ED385B /* bc.Po */,
+				6A0D47F11B32EFEE00ED385B /* execute.Po */,
+				6A0D47F21B32EFEE00ED385B /* global.Po */,
+				6A0D47F31B32EFEE00ED385B /* load.Po */,
+				6A0D47F41B32EFEE00ED385B /* main.Po */,
+				6A0D47F51B32EFEE00ED385B /* scan.Po */,
+				6A0D47F61B32EFEE00ED385B /* storage.Po */,
+				6A0D47F71B32EFEE00ED385B /* util.Po */,
+				6A0D47F81B32EFEE00ED385B /* warranty.Po */,
+			);
+			path = .deps;
+			sourceTree = "<group>";
+		};
+		6A0D481A1B32EFEE00ED385B /* dc */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D481B1B32EFEE00ED385B /* .deps */,
+				6A0D48231B32EFEE00ED385B /* array.c */,
+				6A0D48241B32EFEE00ED385B /* dc */,
+				6A0D48251B32EFEE00ED385B /* dc-proto.h */,
+				6A0D48261B32EFEE00ED385B /* dc-regdef.h */,
+				6A0D48271B32EFEE00ED385B /* dc.c */,
+				6A0D48281B32EFEE00ED385B /* dc.h */,
+				6A0D48291B32EFEE00ED385B /* eval.c */,
+				6A0D482A1B32EFEE00ED385B /* Makefile */,
+				6A0D482B1B32EFEE00ED385B /* Makefile.am */,
+				6A0D482C1B32EFEE00ED385B /* Makefile.in */,
+				6A0D482D1B32EFEE00ED385B /* misc.c */,
+				6A0D482E1B32EFEE00ED385B /* numeric.c */,
+				6A0D482F1B32EFEE00ED385B /* stack.c */,
+				6A0D48301B32EFEE00ED385B /* string.c */,
+				6A0D48311B32EFEE00ED385B /* TODO */,
+			);
+			path = dc;
+			sourceTree = "<group>";
+		};
+		6A0D481B1B32EFEE00ED385B /* .deps */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D481C1B32EFEE00ED385B /* array.Po */,
+				6A0D481D1B32EFEE00ED385B /* dc.Po */,
+				6A0D481E1B32EFEE00ED385B /* eval.Po */,
+				6A0D481F1B32EFEE00ED385B /* misc.Po */,
+				6A0D48201B32EFEE00ED385B /* numeric.Po */,
+				6A0D48211B32EFEE00ED385B /* stack.Po */,
+				6A0D48221B32EFEE00ED385B /* string.Po */,
+			);
+			path = .deps;
+			sourceTree = "<group>";
+		};
+		6A0D48331B32EFEE00ED385B /* doc */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48341B32EFEE00ED385B /* bc.1 */,
+				6A0D48351B32EFEE00ED385B /* bc.info */,
+				6A0D48361B32EFEE00ED385B /* bc.texi */,
+				6A0D48371B32EFEE00ED385B /* dc.1 */,
+				6A0D48381B32EFEE00ED385B /* dc.info */,
+				6A0D48391B32EFEE00ED385B /* dc.texi */,
+				6A0D483A1B32EFEE00ED385B /* Makefile */,
+				6A0D483B1B32EFEE00ED385B /* Makefile.am */,
+				6A0D483C1B32EFEE00ED385B /* Makefile.in */,
+				6A0D483D1B32EFEE00ED385B /* texi-ver.incl */,
+				6A0D483E1B32EFEE00ED385B /* texi-ver.incl.in */,
+				6A0D483F1B32EFEE00ED385B /* texinfo.tex */,
+			);
+			path = doc;
+			sourceTree = "<group>";
+		};
+		6A0D48401B32EFEE00ED385B /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48411B32EFEE00ED385B /* ckbook.b */,
+				6A0D48421B32EFEE00ED385B /* pi.b */,
+				6A0D48431B32EFEE00ED385B /* primes.b */,
+				6A0D48441B32EFEE00ED385B /* twins.b */,
+			);
+			path = Examples;
+			sourceTree = "<group>";
+		};
+		6A0D48461B32EFEE00ED385B /* h */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48471B32EFEE00ED385B /* getopt.h */,
+				6A0D48481B32EFEE00ED385B /* number.h */,
+			);
+			path = h;
+			sourceTree = "<group>";
+		};
+		6A0D484B1B32EFEE00ED385B /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D484C1B32EFEE00ED385B /* .deps */,
+				6A0D48511B32EFEE00ED385B /* getopt.c */,
+				6A0D48521B32EFEE00ED385B /* getopt1.c */,
+				6A0D48531B32EFEE00ED385B /* Makefile */,
+				6A0D48541B32EFEE00ED385B /* Makefile.am */,
+				6A0D48551B32EFEE00ED385B /* Makefile.in */,
+				6A0D48561B32EFEE00ED385B /* number.c */,
+				6A0D48571B32EFEE00ED385B /* testmul.c */,
+				6A0D48581B32EFEE00ED385B /* vfprintf.c */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		6A0D484C1B32EFEE00ED385B /* .deps */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D484D1B32EFEE00ED385B /* getopt.Po */,
+				6A0D484E1B32EFEE00ED385B /* getopt1.Po */,
+				6A0D484F1B32EFEE00ED385B /* number.Po */,
+				6A0D48501B32EFEE00ED385B /* vfprintf.Po */,
+			);
+			path = .deps;
+			sourceTree = "<group>";
+		};
+		6A0D48601B32EFEE00ED385B /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48611B32EFEE00ED385B /* array.b */,
+				6A0D48621B32EFEE00ED385B /* arrayp.b */,
+				6A0D48631B32EFEE00ED385B /* aryprm.b */,
+				6A0D48641B32EFEE00ED385B /* atan.b */,
+				6A0D48651B32EFEE00ED385B /* BUG.bc */,
+				6A0D48661B32EFEE00ED385B /* checklib.b */,
+				6A0D48671B32EFEE00ED385B /* div.b */,
+				6A0D48681B32EFEE00ED385B /* exp.b */,
+				6A0D48691B32EFEE00ED385B /* fact.b */,
+				6A0D486A1B32EFEE00ED385B /* jn.b */,
+				6A0D486B1B32EFEE00ED385B /* ln.b */,
+				6A0D486C1B32EFEE00ED385B /* mul.b */,
+				6A0D486D1B32EFEE00ED385B /* raise.b */,
+				6A0D486E1B32EFEE00ED385B /* signum */,
+				6A0D486F1B32EFEE00ED385B /* sine.b */,
+				6A0D48701B32EFEE00ED385B /* sqrt.b */,
+				6A0D48711B32EFEE00ED385B /* sqrt1.b */,
+				6A0D48721B32EFEE00ED385B /* sqrt2.b */,
+				6A0D48731B32EFEE00ED385B /* testfn.b */,
+				6A0D48741B32EFEE00ED385B /* timetest */,
+			);
+			path = Test;
+			sourceTree = "<group>";
+		};
+		6A0D48781B32EFEE00ED385B /* D8 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48791B32EFEE00ED385B /* libD8U.a */,
+				6A0D487A1B32EFEE00ED385B /* libD8usb.a */,
+				6A0D487B1B32EFEE00ED385B /* librf.h */,
+			);
+			path = D8;
+			sourceTree = "<group>";
+		};
+		6A0D487C1B32EFEE00ED385B /* extso */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D487D1B32EFEE00ED385B /* exso.c */,
+				6A0D487E1B32EFEE00ED385B /* exso.h */,
+				6A0D487F1B32EFEE00ED385B /* Makefile */,
+				6A0D48801B32EFEE00ED385B /* README.md */,
+			);
+			path = extso;
+			sourceTree = "<group>";
+		};
+		6A0D48811B32EFEE00ED385B /* mongoose */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48821B32EFEE00ED385B /* Makefile */,
+				6A0D48831B32EFEE00ED385B /* mongoose.c */,
+				6A0D48841B32EFEE00ED385B /* mongoose.h */,
+			);
+			path = mongoose;
+			sourceTree = "<group>";
+		};
+		6A0D48851B32EFEE00ED385B /* sqlite */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48861B32EFEE00ED385B /* Makefile */,
+				6A0D48871B32EFEE00ED385B /* sqlite3.c */,
+				6A0D48881B32EFEE00ED385B /* sqlite3.exe */,
+				6A0D48891B32EFEE00ED385B /* sqlite3.h */,
+			);
+			path = sqlite;
+			sourceTree = "<group>";
+		};
+		6A0D488B1B32EFEE00ED385B /* bmsdriver */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D488C1B32EFEE00ED385B /* beijingqiche */,
+				6A0D48901B32EFEE00ED385B /* GB-T-27930-2011 */,
+				6A0D48941B32EFEE00ED385B /* guoxuangaoke */,
+			);
+			name = bmsdriver;
+			path = ../bmsdriver;
+			sourceTree = "<group>";
+		};
+		6A0D488C1B32EFEE00ED385B /* beijingqiche */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D488D1B32EFEE00ED385B /* canbms.c */,
+				6A0D488E1B32EFEE00ED385B /* Makefile */,
+				6A0D488F1B32EFEE00ED385B /* pgn.h */,
+			);
+			path = beijingqiche;
+			sourceTree = "<group>";
+		};
+		6A0D48901B32EFEE00ED385B /* GB-T-27930-2011 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48911B32EFEE00ED385B /* canbms.c */,
+				6A0D48921B32EFEE00ED385B /* Makefile */,
+				6A0D48931B32EFEE00ED385B /* pgn.h */,
+			);
+			path = "GB-T-27930-2011";
+			sourceTree = "<group>";
+		};
+		6A0D48941B32EFEE00ED385B /* guoxuangaoke */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48951B32EFEE00ED385B /* canbms.c */,
+				6A0D48961B32EFEE00ED385B /* Makefile */,
+				6A0D48971B32EFEE00ED385B /* pgn.h */,
+			);
+			path = guoxuangaoke;
+			sourceTree = "<group>";
+		};
+		6A0D48981B32EFEE00ED385B /* config */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48991B32EFEE00ED385B /* ontom.sql */,
+				6A0D489A1B32EFEE00ED385B /* ontom.sql.README */,
+			);
+			name = config;
+			path = ../config;
+			sourceTree = "<group>";
+		};
+		6A0D489C1B32EFEE00ED385B /* DOCS */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D489D1B32EFEE00ED385B /* can.txt */,
+				6A0D489E1B32EFEE00ED385B /* CN203377620U.pdf */,
+				6A0D489F1B32EFEE00ED385B /* DL-T 645-2007 多功能电能表通信协议.pdf */,
+				6A0D48A01B32EFEE00ED385B /* DL-T 645-2007 多功能电能表通信协议（最终版）.doc */,
+				6A0D48A11B32EFEE00ED385B /* DLT 634.5104-2009 远动设备及系统 第5-104部分：传输规约 采用标准传输规约集的IEC 60870-5-101网络访问.pdf */,
+				6A0D48A21B32EFEE00ED385B /* DLT 645-2007.pdf */,
+				6A0D48A31B32EFEE00ED385B /* GBT 18657.1-2002远动设备及系统 第5部分：传输远约 第1篇.pdf */,
+				6A0D48A41B32EFEE00ED385B /* GBT 18657.2-2002远动设备及系统 第5部分传输规约 第2篇.pdf */,
+				6A0D48A51B32EFEE00ED385B /* GBT 27930-2011 电动汽车非车载传导式充电机与电池管理系统之间的通信协议.pdf */,
+				6A0D48A61B32EFEE00ED385B /* IEC 870-5-101 华东电网应用规范.pdf */,
+				6A0D48A71B32EFEE00ED385B /* IEC60870-5-104.pdf */,
+				6A0D48A81B32EFEE00ED385B /* ISO7816-1234.pdf */,
+				6A0D48A91B32EFEE00ED385B /* log_tom_clut224.ppm */,
+				6A0D48AA1B32EFEE00ED385B /* Modbus_Application_Protocol_V1_1b3.pdf */,
+				6A0D48AB1B32EFEE00ED385B /* Modbus_over_serial_line_V1_02.pdf */,
+				6A0D48AC1B32EFEE00ED385B /* NB_T 33003-2010_____________________________.doc */,
+				6A0D48AD1B32EFEE00ED385B /* NBT《电动汽车充换电服务网络运营管理系统通信规约：系统与离散充电桩通信规约》.doc */,
+				6A0D48AE1B32EFEE00ED385B /* NBT《电动汽车充换电服务网络运营管理系统通信规约：系统与站级监控系统通信规约》.doc */,
+				6A0D48AF1B32EFEE00ED385B /* PI_MBUS_300.pdf */,
+				6A0D48B01B32EFEE00ED385B /* README */,
+				6A0D48B11B32EFEE00ED385B /* README.html */,
+				6A0D48B21B32EFEE00ED385B /* sae j1939-21-2006.pdf */,
+				6A0D48B31B32EFEE00ED385B /* SAE J1939-21.pdf */,
+				6A0D48B41B32EFEE00ED385B /* SERVER  CLIENT.vsd */,
+				6A0D48B51B32EFEE00ED385B /* splash.png */,
+				6A0D48B61B32EFEE00ED385B /* splash.psd */,
+				6A0D48B71B32EFEE00ED385B /* XY-英可瑞模块 */,
+				6A0D48BD1B32EFEE00ED385B /* ZLG522S系列模块的应用.doc */,
+				6A0D48BE1B32EFEE00ED385B /* ~$直流充电机-通用技术规范.doc */,
+				6A0D48BF1B32EFEE00ED385B /* 【20150127】充电站后台监控说明表格.xls */,
+				6A0D48C01B32EFEE00ED385B /* 【20150318】一体式直流充电桩技术手册.doc */,
+				6A0D48C11B32EFEE00ED385B /* 【奥能电源】充电站智能管理系统软件.doc */,
+				6A0D48C21B32EFEE00ED385B /* 万向电动汽车电池管理系统内网通信协议V2.02.pdf */,
+				6A0D48C31B32EFEE00ED385B /* 东方电表 */,
+				6A0D48CC1B32EFEE00ED385B /* 交流充电桩在线交易指令.docx */,
+				6A0D48CD1B32EFEE00ED385B /* 产品 */,
+				6A0D48EB1B32EFEE00ED385B /* 充电任务状态机转移图.png */,
+				6A0D48EC1B32EFEE00ED385B /* 充电机CAN-RS485协议转换盒RS485端协议.xls */,
+				6A0D48ED1B32EFEE00ED385B /* 充电机MODBUS通信协议.xls */,
+				6A0D48EE1B32EFEE00ED385B /* 充电桩一机四枪可行性方案.docx */,
+				6A0D48EF1B32EFEE00ED385B /* 充电桩充电逻辑转移图.vsd */,
+				6A0D48F01B32EFEE00ED385B /* 充电桩参数配置表.xlsx */,
+				6A0D48F11B32EFEE00ED385B /* 充电桩监控系统组织结构.vsd */,
+				6A0D48F21B32EFEE00ED385B /* 充电桩相关信息.xlsx */,
+				6A0D48F31B32EFEE00ED385B /* 充电桩管理逻辑流程图.vsd */,
+				6A0D48F41B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0(1).doc */,
+				6A0D48F51B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0(2).doc */,
+				6A0D48F61B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0t1.doc */,
+				6A0D48F71B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0t2.doc */,
+				6A0D48F81B32EFEE00ED385B /* 充电桩采样盒与直流充电桩总监控通讯协议V1.0t3.doc */,
+				6A0D48F91B32EFEE00ED385B /* 充电桩项目标准 */,
+				6A0D49001B32EFEE00ED385B /* 国网物资采购标准-高速公路城际互联快充站非车载充电机-通用技术规范-20140513.1.doc */,
+				6A0D49011B32EFEE00ED385B /* 整车直流充电机-通用技术规范.doc */,
+				6A0D49021B32EFEE00ED385B /* 测试实验记录表格.xlsx */,
+				6A0D49031B32EFEE00ED385B /* 电动汽车主站和电池仓充电仓集中器通讯规约(V1.0)20110415.pdf */,
+				6A0D49041B32EFEE00ED385B /* 电动汽车主站和终端通讯规约(V1.1).pdf */,
+				6A0D49051B32EFEE00ED385B /* 电动汽车充电对电网影响的综述.pdf */,
+				6A0D49061B32EFEE00ED385B /* 电动汽车非车载传导式充电机与电池管理.pdf */,
+				6A0D49071B32EFEE00ED385B /* 电动汽车非载传导式充机与池管理 系统通信协议2010.12.02.pdf */,
+				6A0D49081B32EFEE00ED385B /* 电度表倍率计算公式.png */,
+				6A0D49091B32EFEE00ED385B /* 直流充电桩监控开发时间表.docx */,
+				6A0D490A1B32EFEE00ED385B /* 直流充电桩监控系统设计细节.xlsx */,
+				6A0D490B1B32EFEE00ED385B /* 答疑会纪要 .doc */,
+				6A0D490C1B32EFEE00ED385B /* 终止充电条件转移图.png */,
+				6A0D490D1B32EFEE00ED385B /* 读卡器 */,
+			);
+			name = DOCS;
+			path = ../DOCS;
+			sourceTree = "<group>";
+		};
+		6A0D48B71B32EFEE00ED385B /* XY-英可瑞模块 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48B81B32EFEE00ED385B /* CAN-RS485(PA1D5Z)协议转换器用户手册.doc */,
+				6A0D48B91B32EFEE00ED385B /* CAN-RS485-RS422(PA2D5Z)协议转换器用户手册.doc */,
+				6A0D48BA1B32EFEE00ED385B /* 英可瑞240V_336V高压直流模块CAN通讯协议V1.0.pdf */,
+				6A0D48BB1B32EFEE00ED385B /* 英可瑞整流模块MODBUS协议V1.3.doc */,
+				6A0D48BC1B32EFEE00ED385B /* 英可瑞整流模块MODBUS协议V1.3.rar */,
+			);
+			path = "XY-英可瑞模块";
+			sourceTree = "<group>";
+		};
+		6A0D48C31B32EFEE00ED385B /* 东方电表 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48C41B32EFEE00ED385B /* db1东方电表维护软件(用户版2011-3-8) */,
+				6A0D48CA1B32EFEE00ED385B /* W508三相智能电能表说明书.pdf */,
+				6A0D48CB1B32EFEE00ED385B /* 电能表维护软件说明书 .pdf */,
+			);
+			path = "东方电表";
+			sourceTree = "<group>";
+		};
+		6A0D48C41B32EFEE00ED385B /* db1东方电表维护软件(用户版2011-3-8) */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48C51B32EFEE00ED385B /* db1东方电表维护软件(用户版2011-3-8) */,
+			);
+			path = "db1东方电表维护软件(用户版2011-3-8)";
+			sourceTree = "<group>";
+		};
+		6A0D48C51B32EFEE00ED385B /* db1东方电表维护软件(用户版2011-3-8) */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48C61B32EFEE00ED385B /* CanShu.hch */,
+				6A0D48C71B32EFEE00ED385B /* db1东方电表维护软件.exe */,
+				6A0D48C81B32EFEE00ED385B /* db1东方电表维护软件.exe.manifest */,
+				6A0D48C91B32EFEE00ED385B /* Shiduan.hch */,
+			);
+			path = "db1东方电表维护软件(用户版2011-3-8)";
+			sourceTree = "<group>";
+		};
+		6A0D48CD1B32EFEE00ED385B /* 产品 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48CE1B32EFEE00ED385B /* 哈尔滨冠拓电源设备有限公司 */,
+				6A0D48D01B32EFEE00ED385B /* 天津广麒电源装备科技有限公司 */,
+				6A0D48D81B32EFEE00ED385B /* 河北凯翔电气科技股份有限公司 */,
+				6A0D48DB1B32EFEE00ED385B /* 珠海泰坦科技股份有限公司 */,
+			);
+			path = "产品";
+			sourceTree = "<group>";
+		};
+		6A0D48CE1B32EFEE00ED385B /* 哈尔滨冠拓电源设备有限公司 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48CF1B32EFEE00ED385B /* QQ截图20150128092631.png */,
+			);
+			path = "哈尔滨冠拓电源设备有限公司";
+			sourceTree = "<group>";
+		};
+		6A0D48D01B32EFEE00ED385B /* 天津广麒电源装备科技有限公司 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48D11B32EFEE00ED385B /* 1.png */,
+				6A0D48D21B32EFEE00ED385B /* 2.png */,
+				6A0D48D31B32EFEE00ED385B /* 3.png */,
+				6A0D48D41B32EFEE00ED385B /* 4.png */,
+				6A0D48D51B32EFEE00ED385B /* 5-自动手动充电模式.png */,
+				6A0D48D61B32EFEE00ED385B /* 6.png */,
+				6A0D48D71B32EFEE00ED385B /* 7.png */,
+			);
+			path = "天津广麒电源装备科技有限公司";
+			sourceTree = "<group>";
+		};
+		6A0D48D81B32EFEE00ED385B /* 河北凯翔电气科技股份有限公司 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48D91B32EFEE00ED385B /* 1.png */,
+				6A0D48DA1B32EFEE00ED385B /* QQ截图20150204101948.png */,
+			);
+			path = "河北凯翔电气科技股份有限公司";
+			sourceTree = "<group>";
+		};
+		6A0D48DB1B32EFEE00ED385B /* 珠海泰坦科技股份有限公司 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48DC1B32EFEE00ED385B /* 1.png */,
+				6A0D48DD1B32EFEE00ED385B /* 10.png */,
+				6A0D48DE1B32EFEE00ED385B /* 11.png */,
+				6A0D48DF1B32EFEE00ED385B /* 12.png */,
+				6A0D48E01B32EFEE00ED385B /* 13.png */,
+				6A0D48E11B32EFEE00ED385B /* 14.png */,
+				6A0D48E21B32EFEE00ED385B /* 15.png */,
+				6A0D48E31B32EFEE00ED385B /* 2.png */,
+				6A0D48E41B32EFEE00ED385B /* 3.png */,
+				6A0D48E51B32EFEE00ED385B /* 4.png */,
+				6A0D48E61B32EFEE00ED385B /* 5.png */,
+				6A0D48E71B32EFEE00ED385B /* 6.png */,
+				6A0D48E81B32EFEE00ED385B /* 7.png */,
+				6A0D48E91B32EFEE00ED385B /* 8.png */,
+				6A0D48EA1B32EFEE00ED385B /* 9.png */,
+			);
+			path = "珠海泰坦科技股份有限公司";
+			sourceTree = "<group>";
+		};
+		6A0D48F91B32EFEE00ED385B /* 充电桩项目标准 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D48FA1B32EFEE00ED385B /* 电动汽车充换电服务网络运营监控系统通信规约-系统与离散充电桩.pdf */,
+				6A0D48FB1B32EFEE00ED385B /* 电动汽车充换电服务网络运营监控系统通信规约-系统与站级监控系统 .pdf */,
+				6A0D48FC1B32EFEE00ED385B /* 电动汽车充电接口规范：第一部分通用要求1234.1.pdf */,
+				6A0D48FD1B32EFEE00ED385B /* 电动汽车充电接口规范：第三部分-直流充电接口1234.3.pdf */,
+				6A0D48FE1B32EFEE00ED385B /* 电动汽车非车载充电机-通信协议1235.pdf */,
+				6A0D48FF1B32EFEE00ED385B /* 电动汽车非车载充电机通用要求1233.pdf */,
+			);
+			path = "充电桩项目标准";
+			sourceTree = "<group>";
+		};
+		6A0D490D1B32EFEE00ED385B /* 读卡器 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D490E1B32EFEE00ED385B /* ZLG600S_130820.pdf */,
+				6A0D490F1B32EFEE00ED385B /* ZLG600S_test */,
+				6A0D494A1B32EFEE00ED385B /* ZLG600S_test.rar */,
+				6A0D494B1B32EFEE00ED385B /* ZLG600SP_soft */,
+				6A0D49511B32EFEE00ED385B /* ZLG600SP_soft.rar */,
+				6A0D49521B32EFEE00ED385B /* 读卡器配置流程.txt */,
+			);
+			path = "读卡器";
+			sourceTree = "<group>";
+		};
+		6A0D490F1B32EFEE00ED385B /* ZLG600S_test */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49101B32EFEE00ED385B /* ZLG522S_test */,
+			);
+			path = ZLG600S_test;
+			sourceTree = "<group>";
+		};
+		6A0D49101B32EFEE00ED385B /* ZLG522S_test */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49111B32EFEE00ED385B /* ZLG522S Demo */,
+				6A0D49191B32EFEE00ED385B /* ZLG522S DLL */,
+				6A0D491F1B32EFEE00ED385B /* ZLG522S DLL Test */,
+				6A0D49491B32EFEE00ED385B /* 使用说明.txt */,
+			);
+			path = ZLG522S_test;
+			sourceTree = "<group>";
+		};
+		6A0D49111B32EFEE00ED385B /* ZLG522S Demo */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49121B32EFEE00ED385B /* GlobalDefine.h */,
+				6A0D49131B32EFEE00ED385B /* StatusCode.h */,
+				6A0D49141B32EFEE00ED385B /* ZLG522S DLL Test.exe */,
+				6A0D49151B32EFEE00ED385B /* ZLG522S.dll */,
+				6A0D49161B32EFEE00ED385B /* ZLG522S.h */,
+				6A0D49171B32EFEE00ED385B /* ZLG522S.lib */,
+				6A0D49181B32EFEE00ED385B /* 读我.txt */,
+			);
+			path = "ZLG522S Demo";
+			sourceTree = "<group>";
+		};
+		6A0D49191B32EFEE00ED385B /* ZLG522S DLL */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D491A1B32EFEE00ED385B /* GlobalDefine.h */,
+				6A0D491B1B32EFEE00ED385B /* StatusCode.h */,
+				6A0D491C1B32EFEE00ED385B /* ZLG522S.dll */,
+				6A0D491D1B32EFEE00ED385B /* ZLG522S.h */,
+				6A0D491E1B32EFEE00ED385B /* ZLG522S.lib */,
+			);
+			path = "ZLG522S DLL";
+			sourceTree = "<group>";
+		};
+		6A0D491F1B32EFEE00ED385B /* ZLG522S DLL Test */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49201B32EFEE00ED385B /* AutoDetectRes.cpp */,
+				6A0D49211B32EFEE00ED385B /* AutoDetectRes.h */,
+				6A0D49221B32EFEE00ED385B /* BSEdit.cpp */,
+				6A0D49231B32EFEE00ED385B /* BSEdit.h */,
+				6A0D49241B32EFEE00ED385B /* GlobalDefine.h */,
+				6A0D49251B32EFEE00ED385B /* HexEdit.cpp */,
+				6A0D49261B32EFEE00ED385B /* HexEdit.h */,
+				6A0D49271B32EFEE00ED385B /* ReadMe.txt */,
+				6A0D49281B32EFEE00ED385B /* Release */,
+				6A0D492B1B32EFEE00ED385B /* res */,
+				6A0D492E1B32EFEE00ED385B /* resource.h */,
+				6A0D492F1B32EFEE00ED385B /* SetModuleMode.cpp */,
+				6A0D49301B32EFEE00ED385B /* SetModuleMode.h */,
+				6A0D49311B32EFEE00ED385B /* StatusCode.h */,
+				6A0D49321B32EFEE00ED385B /* StdAfx.cpp */,
+				6A0D49331B32EFEE00ED385B /* StdAfx.h */,
+				6A0D49341B32EFEE00ED385B /* ZLG522S DLL Test.aps */,
+				6A0D49351B32EFEE00ED385B /* ZLG522S DLL Test.clw */,
+				6A0D49361B32EFEE00ED385B /* ZLG522S DLL Test.cpp */,
+				6A0D49371B32EFEE00ED385B /* ZLG522S DLL Test.dsp */,
+				6A0D49381B32EFEE00ED385B /* ZLG522S DLL Test.dsw */,
+				6A0D49391B32EFEE00ED385B /* ZLG522S DLL Test.h */,
+				6A0D493A1B32EFEE00ED385B /* ZLG522S DLL Test.opt */,
+				6A0D493B1B32EFEE00ED385B /* ZLG522S DLL Test.plg */,
+				6A0D493C1B32EFEE00ED385B /* ZLG522S DLL Test.rc */,
+				6A0D493D1B32EFEE00ED385B /* ZLG522S DLL Test.suo */,
+				6A0D493E1B32EFEE00ED385B /* ZLG522S DLL TestDlg.cpp */,
+				6A0D493F1B32EFEE00ED385B /* ZLG522S DLL TestDlg.h */,
+				6A0D49401B32EFEE00ED385B /* ZLG522S.dll */,
+				6A0D49411B32EFEE00ED385B /* ZLG522S.h */,
+				6A0D49421B32EFEE00ED385B /* ZLG522S.lib */,
+				6A0D49431B32EFEE00ED385B /* ZLG522S_ISO14443A.cpp */,
+				6A0D49441B32EFEE00ED385B /* ZLG522S_ISO14443A.h */,
+				6A0D49451B32EFEE00ED385B /* ZLG522S_Mifare.cpp */,
+				6A0D49461B32EFEE00ED385B /* ZLG522S_Mifare.h */,
+				6A0D49471B32EFEE00ED385B /* ZLG522S_PlusCPU.cpp */,
+				6A0D49481B32EFEE00ED385B /* ZLG522S_PlusCPU.h */,
+			);
+			path = "ZLG522S DLL Test";
+			sourceTree = "<group>";
+		};
+		6A0D49281B32EFEE00ED385B /* Release */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49291B32EFEE00ED385B /* ZLG522S DLL Test.exe */,
+				6A0D492A1B32EFEE00ED385B /* ZLG522S.dll */,
+			);
+			path = Release;
+			sourceTree = "<group>";
+		};
+		6A0D492B1B32EFEE00ED385B /* res */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D492C1B32EFEE00ED385B /* ZLG522S DLL Test.ico */,
+				6A0D492D1B32EFEE00ED385B /* ZLG522S DLL Test.rc2 */,
+			);
+			path = res;
+			sourceTree = "<group>";
+		};
+		6A0D494B1B32EFEE00ED385B /* ZLG600SP_soft */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D494C1B32EFEE00ED385B /* ZLG522SP上位机软件 */,
+			);
+			path = ZLG600SP_soft;
+			sourceTree = "<group>";
+		};
+		6A0D494C1B32EFEE00ED385B /* ZLG522SP上位机软件 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D494D1B32EFEE00ED385B /* DLL */,
+				6A0D494F1B32EFEE00ED385B /* MF1Plus.exe */,
+				6A0D49501B32EFEE00ED385B /* MF1Plus.ini */,
+			);
+			path = "ZLG522SP上位机软件";
+			sourceTree = "<group>";
+		};
+		6A0D494D1B32EFEE00ED385B /* DLL */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D494E1B32EFEE00ED385B /* zlg522sp.dll */,
+			);
+			path = DLL;
+			sourceTree = "<group>";
+		};
+		6A0D49541B32EFEE00ED385B /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49551B32EFEE00ED385B /* bms */,
+				6A0D49591B32EFEE00ED385B /* lj */,
+			);
+			name = lib;
+			path = ../lib;
+			sourceTree = "<group>";
+		};
+		6A0D49551B32EFEE00ED385B /* bms */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49561B32EFEE00ED385B /* father.c */,
+				6A0D49571B32EFEE00ED385B /* father.h */,
+				6A0D49581B32EFEE00ED385B /* Makefile */,
+			);
+			path = bms;
+			sourceTree = "<group>";
+		};
+		6A0D49591B32EFEE00ED385B /* lj */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D495A1B32EFEE00ED385B /* config.c */,
+				6A0D495B1B32EFEE00ED385B /* config.h */,
+				6A0D495C1B32EFEE00ED385B /* Hachiko.c */,
+				6A0D495D1B32EFEE00ED385B /* Hachiko.h */,
+				6A0D495E1B32EFEE00ED385B /* list.h */,
+				6A0D495F1B32EFEE00ED385B /* log.c */,
+				6A0D49601B32EFEE00ED385B /* log.h */,
+				6A0D49611B32EFEE00ED385B /* Makefile */,
+				6A0D49621B32EFEE00ED385B /* stdafx.c */,
+				6A0D49631B32EFEE00ED385B /* stdafx.h */,
+			);
+			path = lj;
+			sourceTree = "<group>";
+		};
+		6A0D49641B32EFEE00ED385B /* linux-3.2.0-overlay */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49651B32EFEE00ED385B /* arch */,
+				6A0D49691B32EFEE00ED385B /* drivers */,
+			);
+			name = "linux-3.2.0-overlay";
+			path = "../linux-3.2.0-overlay";
+			sourceTree = "<group>";
+		};
+		6A0D49651B32EFEE00ED385B /* arch */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49661B32EFEE00ED385B /* arm */,
+			);
+			path = arch;
+			sourceTree = "<group>";
+		};
+		6A0D49661B32EFEE00ED385B /* arm */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49671B32EFEE00ED385B /* boot */,
+			);
+			path = arm;
+			sourceTree = "<group>";
+		};
+		6A0D49671B32EFEE00ED385B /* boot */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49681B32EFEE00ED385B /* uImage */,
+			);
+			path = boot;
+			sourceTree = "<group>";
+		};
+		6A0D49691B32EFEE00ED385B /* drivers */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D496A1B32EFEE00ED385B /* tty */,
+			);
+			path = drivers;
+			sourceTree = "<group>";
+		};
+		6A0D496A1B32EFEE00ED385B /* tty */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D496B1B32EFEE00ED385B /* serial */,
+			);
+			path = tty;
+			sourceTree = "<group>";
+		};
+		6A0D496B1B32EFEE00ED385B /* serial */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D496C1B32EFEE00ED385B /* omap-serial.c */,
+			);
+			path = serial;
+			sourceTree = "<group>";
+		};
+		6A0D49721B32EFEE00ED385B /* plugins */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49731B32EFEE00ED385B /* 104 */,
+				6A0D49771B32EFEE00ED385B /* buzzer */,
+				6A0D497B1B32EFEE00ED385B /* default */,
+				6A0D497E1B32EFEE00ED385B /* demo */,
+				6A0D49811B32EFEE00ED385B /* libtcc */,
+				6A0D49841B32EFEE00ED385B /* Q-GDW-11177.2-2014 */,
+			);
+			name = plugins;
+			path = ../plugins;
+			sourceTree = "<group>";
+		};
+		6A0D49731B32EFEE00ED385B /* 104 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49741B32EFEE00ED385B /* 104.c */,
+				6A0D49751B32EFEE00ED385B /* 104.h */,
+				6A0D49761B32EFEE00ED385B /* Makefile */,
+			);
+			path = 104;
+			sourceTree = "<group>";
+		};
+		6A0D49771B32EFEE00ED385B /* buzzer */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49781B32EFEE00ED385B /* buzzer.c */,
+				6A0D49791B32EFEE00ED385B /* buzzer.h */,
+				6A0D497A1B32EFEE00ED385B /* Makefile */,
+			);
+			path = buzzer;
+			sourceTree = "<group>";
+		};
+		6A0D497B1B32EFEE00ED385B /* default */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D497C1B32EFEE00ED385B /* default.c */,
+				6A0D497D1B32EFEE00ED385B /* Makefile */,
+			);
+			path = default;
+			sourceTree = "<group>";
+		};
+		6A0D497E1B32EFEE00ED385B /* demo */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D497F1B32EFEE00ED385B /* demo.c */,
+				6A0D49801B32EFEE00ED385B /* Makefile */,
+			);
+			path = demo;
+			sourceTree = "<group>";
+		};
+		6A0D49811B32EFEE00ED385B /* libtcc */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49821B32EFEE00ED385B /* libtcc.a */,
+				6A0D49831B32EFEE00ED385B /* libtcc.h */,
+			);
+			path = libtcc;
+			sourceTree = "<group>";
+		};
+		6A0D49841B32EFEE00ED385B /* Q-GDW-11177.2-2014 */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49851B32EFEE00ED385B /* Makefile */,
+				6A0D49861B32EFEE00ED385B /* upcom.c */,
+				6A0D49871B32EFEE00ED385B /* upcom.h */,
+			);
+			path = "Q-GDW-11177.2-2014";
+			sourceTree = "<group>";
+		};
+		6A0D498A1B32EFEE00ED385B /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D498B1B32EFEE00ED385B /* automount.sh */,
+				6A0D498C1B32EFEE00ED385B /* autoupgrade.sh */,
+				6A0D498D1B32EFEE00ED385B /* export.sh */,
+				6A0D498E1B32EFEE00ED385B /* findarm.sh */,
+				6A0D498F1B32EFEE00ED385B /* hellhound.sh */,
+				6A0D49901B32EFEE00ED385B /* install-host.sh */,
+				6A0D49911B32EFEE00ED385B /* install-register-dir.sh */,
+				6A0D49921B32EFEE00ED385B /* install-register-file.sh */,
+				6A0D49931B32EFEE00ED385B /* install-register-link.sh */,
+				6A0D49941B32EFEE00ED385B /* install.db */,
+				6A0D49951B32EFEE00ED385B /* install.sh */,
+				6A0D49961B32EFEE00ED385B /* installcard.sh */,
+				6A0D49971B32EFEE00ED385B /* nock.sh */,
+				6A0D49981B32EFEE00ED385B /* preconfig.sh */,
+				6A0D49991B32EFEE00ED385B /* profile */,
+				6A0D499A1B32EFEE00ED385B /* runme.sh */,
+				6A0D499B1B32EFEE00ED385B /* runzeus.sh */,
+				6A0D499C1B32EFEE00ED385B /* upgrade.sh */,
+			);
+			name = scripts;
+			path = ../scripts;
+			sourceTree = "<group>";
+		};
+		6A0D499D1B32EFEE00ED385B /* testing */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D499E1B32EFEE00ED385B /* 1.txt */,
+				6A0D499F1B32EFEE00ED385B /* bcc */,
+				6A0D49A01B32EFEE00ED385B /* bcc.c */,
+				6A0D49A11B32EFEE00ED385B /* BMS测试报文-国轩高科BMS抓取.txt */,
+				6A0D49A21B32EFEE00ED385B /* buzzer */,
+				6A0D49A31B32EFEE00ED385B /* buzzer.c */,
+				6A0D49A41B32EFEE00ED385B /* can.log */,
+				6A0D49A51B32EFEE00ED385B /* card */,
+				6A0D49A61B32EFEE00ED385B /* card.c */,
+				6A0D49A71B32EFEE00ED385B /* db_tes.c */,
+				6A0D49A81B32EFEE00ED385B /* gui */,
+				6A0D49DB1B32EFEE00ED385B /* gui.tar.gz */,
+				6A0D49DC1B32EFEE00ED385B /* keygen.c */,
+				6A0D49DD1B32EFEE00ED385B /* onconfig.c */,
+				6A0D49DE1B32EFEE00ED385B /* rs485_read.c */,
+				6A0D49DF1B32EFEE00ED385B /* rs485_send.c */,
+				6A0D49E01B32EFEE00ED385B /* sqlite3 */,
+				6A0D49E11B32EFEE00ED385B /* sqlite3-arm */,
+				6A0D49E21B32EFEE00ED385B /* sqlite3.exe */,
+				6A0D49E31B32EFEE00ED385B /* sqlite3_analyzer */,
+				6A0D49E41B32EFEE00ED385B /* uartread */,
+				6A0D49E51B32EFEE00ED385B /* uartwrite */,
+				6A0D49E61B32EFEE00ED385B /* unit_test.c */,
+				6A0D49E71B32EFEE00ED385B /* 充电机与BMS报文 - 副本.txt */,
+				6A0D49E81B32EFEE00ED385B /* 国轩高科BMS抓取.txt */,
+				6A0D49E91B32EFEE00ED385B /* 新国标充电流程CAN报文CAN2_3360_1.xlsx */,
+			);
+			name = testing;
+			path = ../testing;
+			sourceTree = "<group>";
+		};
+		6A0D49A81B32EFEE00ED385B /* gui */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49A91B32EFEE00ED385B /* qt */,
+			);
+			path = gui;
+			sourceTree = "<group>";
+		};
+		6A0D49A91B32EFEE00ED385B /* qt */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49AA1B32EFEE00ED385B /* lib */,
+			);
+			path = qt;
+			sourceTree = "<group>";
+		};
+		6A0D49AA1B32EFEE00ED385B /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49AB1B32EFEE00ED385B /* fonts */,
+				6A0D49B11B32EFEE00ED385B /* libQtCore.la */,
+				6A0D49B21B32EFEE00ED385B /* libQtCore.prl */,
+				6A0D49B31B32EFEE00ED385B /* libQtCore.so.4.8.2 */,
+				6A0D49B41B32EFEE00ED385B /* libQtGui.la */,
+				6A0D49B51B32EFEE00ED385B /* libQtGui.prl */,
+				6A0D49B61B32EFEE00ED385B /* libQtGui.so.4.8.2 */,
+				6A0D49B71B32EFEE00ED385B /* libQtNetwork.la */,
+				6A0D49B81B32EFEE00ED385B /* libQtNetwork.prl */,
+				6A0D49B91B32EFEE00ED385B /* libQtNetwork.so */,
+				6A0D49BA1B32EFEE00ED385B /* libQtNetwork.so.4 */,
+				6A0D49BB1B32EFEE00ED385B /* libQtNetwork.so.4.8 */,
+				6A0D49BC1B32EFEE00ED385B /* libQtNetwork.so.4.8.2 */,
+				6A0D49BD1B32EFEE00ED385B /* libQtOpenVG.la */,
+				6A0D49BE1B32EFEE00ED385B /* libQtOpenVG.prl */,
+				6A0D49BF1B32EFEE00ED385B /* libQtOpenVG.so */,
+				6A0D49C01B32EFEE00ED385B /* libQtOpenVG.so.4 */,
+				6A0D49C11B32EFEE00ED385B /* libQtOpenVG.so.4.8 */,
+				6A0D49C21B32EFEE00ED385B /* libQtOpenVG.so.4.8.2 */,
+				6A0D49C31B32EFEE00ED385B /* libQtTest.la */,
+				6A0D49C41B32EFEE00ED385B /* libQtTest.prl */,
+				6A0D49C51B32EFEE00ED385B /* libQtTest.so */,
+				6A0D49C61B32EFEE00ED385B /* libQtTest.so.4 */,
+				6A0D49C71B32EFEE00ED385B /* libQtTest.so.4.8 */,
+				6A0D49C81B32EFEE00ED385B /* libQtTest.so.4.8.2 */,
+				6A0D49C91B32EFEE00ED385B /* libQtWebKit.la */,
+				6A0D49CA1B32EFEE00ED385B /* libQtWebKit.prl */,
+				6A0D49CB1B32EFEE00ED385B /* libQtWebKit.so.4.9.2 */,
+				6A0D49CC1B32EFEE00ED385B /* libQtXml.la */,
+				6A0D49CD1B32EFEE00ED385B /* libQtXml.prl */,
+				6A0D49CE1B32EFEE00ED385B /* libQtXml.so */,
+				6A0D49CF1B32EFEE00ED385B /* libQtXml.so.4 */,
+				6A0D49D01B32EFEE00ED385B /* libQtXml.so.4.8 */,
+				6A0D49D11B32EFEE00ED385B /* libQtXml.so.4.8.2 */,
+				6A0D49D21B32EFEE00ED385B /* pkgconfig */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		6A0D49AB1B32EFEE00ED385B /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49AC1B32EFEE00ED385B /* simsun_100_50.qpf */,
+				6A0D49AD1B32EFEE00ED385B /* simsun_120_50.qpf */,
+				6A0D49AE1B32EFEE00ED385B /* simsun_140_50.qpf */,
+				6A0D49AF1B32EFEE00ED385B /* simsun_160_50.qpf */,
+				6A0D49B01B32EFEE00ED385B /* wqy-microhei.ttc */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
+		6A0D49D21B32EFEE00ED385B /* pkgconfig */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49D31B32EFEE00ED385B /* QtCore.pc */,
+				6A0D49D41B32EFEE00ED385B /* QtGui.pc */,
+				6A0D49D51B32EFEE00ED385B /* QtNetwork.pc */,
+				6A0D49D61B32EFEE00ED385B /* QtOpenVG.pc */,
+				6A0D49D71B32EFEE00ED385B /* QtSql.pc */,
+				6A0D49D81B32EFEE00ED385B /* QtTest.pc */,
+				6A0D49D91B32EFEE00ED385B /* QtWebKit.pc */,
+				6A0D49DA1B32EFEE00ED385B /* QtXml.pc */,
+			);
+			path = pkgconfig;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -30,6 +1509,12 @@
 			);
 			mainGroup = 6A0D41AB1B30343900ED385B;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 6A0D47E41B32EFEE00ED385B /* Products */;
+					ProjectRef = 6A0D47E31B32EFEE00ED385B /* ontom.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 			);

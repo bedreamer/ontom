@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>967133B0-BF92-4035-9709-1A2DB70E1409</string>
+	<key>IDESourceControlProjectName</key>
+	<string>ontom</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>4616729354287E5037853866DD615E847BCC3DAD</key>
+		<string>https://github.com/bedreamer/ontom.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>ontom/ontom.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>4616729354287E5037853866DD615E847BCC3DAD</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/bedreamer/ontom.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>4616729354287E5037853866DD615E847BCC3DAD</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>4616729354287E5037853866DD615E847BCC3DAD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ontom</string>
+		</dict>
+	</array>
+</dict>
+</plist>
