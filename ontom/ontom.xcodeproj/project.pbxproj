@@ -466,6 +466,9 @@
 		6A0D49E81B32EFEE00ED385B /* 国轩高科BMS抓取.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "国轩高科BMS抓取.txt"; sourceTree = "<group>"; };
 		6A0D49E91B32EFEE00ED385B /* 新国标充电流程CAN报文CAN2_3360_1.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "新国标充电流程CAN报文CAN2_3360_1.xlsx"; sourceTree = "<group>"; };
 		6A0D49EA1B32EFEE00ED385B /* VERSION */ = {isa = PBXFileReference; lastKnownFileType = text; name = VERSION; path = ../VERSION; sourceTree = "<group>"; };
+		6A0D49FD1B32F0C300ED385B /* canbms.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = canbms.c; sourceTree = "<group>"; };
+		6A0D49FE1B32F0C300ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6A0D49FF1B32F0C300ED385B /* pgn.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pgn.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -796,6 +799,7 @@
 		6A0D488B1B32EFEE00ED385B /* bmsdriver */ = {
 			isa = PBXGroup;
 			children = (
+				6A0D49FC1B32F0C300ED385B /* GB-T-27930-2011-test */,
 				6A0D488C1B32EFEE00ED385B /* beijingqiche */,
 				6A0D48901B32EFEE00ED385B /* GB-T-27930-2011 */,
 				6A0D48941B32EFEE00ED385B /* guoxuangaoke */,
@@ -1490,6 +1494,16 @@
 				6A0D49DA1B32EFEE00ED385B /* QtXml.pc */,
 			);
 			path = pkgconfig;
+			sourceTree = "<group>";
+		};
+		6A0D49FC1B32F0C300ED385B /* GB-T-27930-2011-test */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D49FD1B32F0C300ED385B /* canbms.c */,
+				6A0D49FE1B32F0C300ED385B /* Makefile */,
+				6A0D49FF1B32F0C300ED385B /* pgn.h */,
+			);
+			path = "GB-T-27930-2011-test";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
