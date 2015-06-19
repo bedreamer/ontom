@@ -239,7 +239,9 @@ typedef enum {
     JOB_EXITTING,
 
     // 作业销毁，等待其他线程引用退出
-    JOB_DETACHING
+    JOB_DETACHING,
+    // 作业销毁完成，等待主程序删除资源
+    JOB_DIZZY
 }JOBSTATUS;
 
 typedef enum {
@@ -568,10 +570,24 @@ typedef enum {
 
     // 1: 自动充电， 0: 手动充电
     JF_AUTO_CHARGE = 0x01,
-
+    // 1: 充电枪已连接，0: 充电枪未连接
+    JF_GUN_OK,
+    // 1: 辅助电源已经上电，0: 辅助电源未上电
+    JF_ASSIT_PWR_ON,
+    // 1: 电子锁已经闭合，0: 电子锁未闭合
+    JF_LOCK_ON,
     // 1: BMS驱动已经绑定，0: 未绑定
     JF_BMS_DRV_BINDED,
+    // 1: BMS允许充电，0：BMS不允许充电
+    JF_CHARGE_BMS_ALLOW,
+    // 1: 作业中止，0: 作业不中止
+    JF_CMD_ABORT,
+    // 1: 作业退出, 0：作业未退出
+    JF_JOB_EXIT,
+    // 1: 作业销毁, 0：未销毁作业
+    JF_DESTROY,
 
+    // {{ BMS 数据包事件
     // 1: 已经接收到BRM，0：还未接收到BRM
     JF_BMS_RX_BRM,
     // 1: 接收BRM超时，0: 正常
@@ -629,6 +645,36 @@ typedef enum {
     JS_BMS_RX_BSD_TIMEOUT,
     // 1: 已经发送CSD，0:还未发送CSD
     JF_BMS_TX_CSD,
+    // }}
+
+    //{{ BMS 控制逻辑标记
+    // 1: BMS 已经识别， 0: BMS未识别
+    JF_BMS_BRM_OK,
+    // 1: 充电机已经识别，0: 充电机未识别
+    JF_CHG_CRM_OK,
+
+    // 1: BMS 已经准备好充电，0: BMS未准备好充电
+    JF_BMS_BRO_OK,
+    // 1: 充电机已经准备好充电，0: 充电机未准备好充电
+    JF_CHG_CRO_OK,
+
+    // 1: BMS 中止充电，0: BMS 未中止充电
+    JF_BMS_TRM_CHARGE,
+    // 1: 充电机中止充电，0: 充电机未中止充电
+    JF_CHG_TRM_CHARGE,
+    //}}
+
+    // 作业退出资源销毁标记
+    // {{
+    // 心跳定时器
+    JR_HEART_BEAT_TIMER,
+    // 传输定时器
+    JR_TP_CONN_TIMER,
+    // 读线程引用
+    JR_RD_THREAD_REF,
+    // 写线程引用
+    JR_WR_THREAD_REF,
+    // }}
 
     J_END
 }JOB_FLAG_SINGLE;
@@ -1404,6 +1450,17 @@ struct bms_struct {
 
     // BMS 驱动
     struct bmsdriver *driver;
+
+    // 发送的数据包总数
+    unsigned int frame_tx;
+    // 发送速率
+    unsigned int frame_speed_tx;
+    unsigned int tx_seed;
+    // 接收的数据包总数
+    unsigned int frame_rx;
+    // 接收速率
+    unsigned int frame_speed_rx;
+    unsigned int rx_seed;
 
     // 数据库操作计数器
     unsigned int readed;

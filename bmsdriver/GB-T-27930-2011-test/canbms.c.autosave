@@ -454,20 +454,10 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
 // 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
 void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachiko_food *self)
 {
-    static int food = 0;
-
     if (evt == HACHIKO_TIMEOUT ) {
         unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)_private;
         struct can_pack_generator *gen, *me;
-
-        food ++;
-        if ( food == 1000 ) {
-            // 1S 为更新周期
-            thiz->bms.frame_speed_rx = thiz->bms.rx_seed;
-            thiz->bms.frame_speed_tx = thiz->bms.tx_seed;
-        }
-
         for ( i = 0; thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             gen = & thiz->bms.generator[i];
             if ( gen->stage == thiz->bms.charge_stage ) {
@@ -491,13 +481,13 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
          */
         for ( i = 0; thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             me = &thiz->bms.generator[i];
-            //if ( bit_read(thiz, JF_GUN_OK) && bit_read(thiz, JF_ASSIT_PWR_ON) ) {
+            if ( bit_read(thiz, JF_GUN_OK) && bit_read(thiz, JF_ASSIT_PWR_ON) ) {
                 if ( me->stage == thiz->bms.charge_stage ) {
                     me->can_silence ++;
                 } else {
                     me->can_silence = 0;
                 }
-            //} else continue;
+            } else continue;
             if ( me->can_tolerate_silence < me->can_silence ) {
                 switch (thiz->bms.charge_stage) {
                 case CHARGE_STAGE_HANDSHACKING:
@@ -505,8 +495,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                         if ( !bit_read(thiz, JS_BMS_RX_BRM_TIMEOUT) ) {
                             bit_set(thiz, JS_BMS_RX_BRM_TIMEOUT);
                             bit_clr(thiz, JF_BMS_BRM_OK);
-                            log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障(%d)"),
-                                       me->can_tolerate_silence);
+                            log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
                         } else {
                             me->can_silence = 0;
@@ -517,8 +506,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                         if ( !bit_read(thiz, JS_BMS_RX_BCP_TIMEOUT) ) {
                             bit_set(thiz, JS_BMS_RX_BCP_TIMEOUT);
                             bit_clr(thiz, JF_BMS_RX_BCP);
-                            log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障(%d)"),
-                                       me->can_tolerate_silence);
+                            log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障"));
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
                         } else {
                             me->can_silence = 0;
@@ -529,8 +517,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                         if ( !bit_read(thiz, JS_BMS_RX_BCL_TIMEOUT) ) {
                             bit_set(thiz, JS_BMS_RX_BCL_TIMEOUT);
                             bit_clr(thiz, JF_BMS_RX_BCL);
-                            log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障(%d)"),
-                                       me->can_tolerate_silence);
+                            log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障"));
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
                         } else {
                             me->can_silence = 0;
@@ -538,11 +525,11 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                     break;
                 case CHARGE_STAGE_DONE:
                     if (me->can_pgn != PGN_BSD) break;
-                        if ( !bit_read(thiz, JS_BMS_RX_BSD_TIMEOUT) &&
-                             ! bit_read(thiz, JF_BMS_RX_BSD) ) {
+                        if ( !bit_read(thiz, JS_BMS_RX_BSD_TIMEOUT) ) {
                             bit_set(thiz, JS_BMS_RX_BSD_TIMEOUT);
-                            log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障(%d)"),
-                                       me->can_tolerate_silence);
+                            bit_clr(thiz, JF_BMS_RX_BSD);
+                            log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障"));
+                            thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
                         } else {
                             me->can_silence = 0;
                         }
@@ -728,8 +715,8 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
                 if ( thiz->bms.charge_stage != CHARGE_STAGE_CHARGING ) {
                     log_printf(INF, "BMS.BRO: 充电阶段转换为"GRN("充电阶段"));
                 }
-                thiz->bms.charge_stage = CHARGE_STAGE_CHARGING;
             }
+            thiz->bms.charge_stage = CHARGE_STAGE_CHARGING;
         } else {
             log_printf(WRN, "BMS: wrong can package data.");
         }
@@ -945,7 +932,6 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         memcpy(&thiz->bms.bms_bst, param->buff.rx_buff,
                sizeof(struct pgn6400_BST));
 
-        thiz->bms.charge_stage = CHARGE_STAGE_DONE;
         log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文

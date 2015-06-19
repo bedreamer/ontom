@@ -627,9 +627,9 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             for( i = 0; i < task->sys_config_gun_nr; i ++ ) {
                 if ( task->job[ i ] == NULL ) continue;
                 job_running(task, task->job[ i ]);
-                if ( task->job[i]->job_status == JOB_DETACHING ) {
-                    //free(task->job[i]);
-                    log_printf(INF, "ZEUS: 作业中止");
+                if ( task->job[i]->job_status == JOB_DIZZY ) {
+                    free(task->job[i]);
+                    log_printf(INF, "ZEUS: 销毁完成..");
                     task->job[i] = NULL;
                     continue;
                 }
@@ -856,6 +856,10 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
     switch ( job->job_status ) {
     case JOB_IDLE:
     case JOB_SETTING:
+        job->bms.bms_read_init_ok = 0xFF;
+        job->bms.bms_write_init_ok = 0xFF;
+        job->bms.can_heart_beat.status = HACHIKO_INVALID;
+        job->bms.can_tp_bomb.status = HACHIKO_INVALID;
         break;
     case JOB_WAITTING:
         config_write("需求电压", "2000");
@@ -864,8 +868,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
 
-        if ( bit_read(job, CMD_JOB_ABORT) ) {
-            bit_clr(job, CMD_JOB_ABORT);
+        if ( bit_read(job, JF_CMD_ABORT) ) {
+            bit_clr(job, JF_CMD_ABORT);
             job->status_befor_fault = JOB_WAITTING;
             job->job_status = JOB_ABORTING;
             job->charge_exit_kwh_data = task->meter[0].kwh_zong;
@@ -906,19 +910,19 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         bit_clr(tsk, F_CHARGE_LED);
-        ret = __is_gun_phy_conn_ok(job);
-        if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
-            break;
-        }
-
-        if ( bit_read(job, CMD_JOB_ABORT) ) {
-            bit_clr(job, CMD_JOB_ABORT);
+        if ( bit_read(job, JF_CMD_ABORT) ) {
+            bit_clr(job, JF_CMD_ABORT);
             job->status_befor_fault = JOB_STANDBY;
             job->job_status = JOB_ABORTING;
             job->charge_exit_kwh_data = task->meter[0].kwh_zong;
             job->charge_stop_timestamp = time(NULL);
             end ++;
             log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
+            break;
+        }
+
+        ret = __is_gun_phy_conn_ok(job);
+        if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
         }
 
@@ -957,7 +961,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                 }
             }
-            if ( ! bit_read(job, F_BMS_RECOGNIZED) ) {
+            if ( ! bit_read(job, JF_BMS_BRM_OK) ) {
                 break;
             }
         }
@@ -1053,7 +1057,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             //{{ 在这做是否充完判定
             if (job->charge_billing.mode == BILLING_MODE_AS_CAP ) {
                 if ( job->charged_kwh + job->section_kwh >= job->charge_billing.option.set_kwh ||
-                     bit_read(job, F_PCK_BMS_TRM) ) {
+                     bit_read(job, JF_BMS_TRM_CHARGE) || bit_read(job, JF_CHG_TRM_CHARGE) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -1068,7 +1072,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
                 double used_kwh = job->charged_kwh + job->section_kwh;
                 if ( used_kwh * task->kwh_price >= job->charge_billing.option.set_money ||
-                     bit_read(job, F_PCK_BMS_TRM) ) {
+                     bit_read(job, JF_BMS_TRM_CHARGE) || bit_read(job, JF_CHG_TRM_CHARGE) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -1083,7 +1087,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_TIME ) {
                 unsigned int used_seconds = job->charged_seconds + job->section_seconds;
                 if ( used_seconds >= job->charge_billing.option.set_time ||
-                     bit_read(job, F_PCK_BMS_TRM) ) {
+                     bit_read(job, JF_BMS_TRM_CHARGE) || bit_read(job, JF_CHG_TRM_CHARGE) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -1098,7 +1102,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_FREE ) {
 
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_AUTO ) {
-                if ( bit_read(job, F_PCK_BMS_TRM) ) {
+                if ( bit_read(job, JF_BMS_TRM_CHARGE) || bit_read(job, JF_CHG_TRM_CHARGE) ) {
                     job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                     job->charge_stop_timestamp = time(NULL);
                     log_printf(INF,
@@ -1108,7 +1112,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                task->meter[0].kwh_zong,
                                job->charged_kwh + job->section_kwh);
                     //job->job_status = JOB_DONE;
-		    bit_set(job, CMD_JOB_ABORT);
+                    bit_set(job, JF_CMD_ABORT);
                     end ++;
                 }
             } else {
@@ -1116,23 +1120,15 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             }
 
             //}}
-            if ( bit_read(job, CMD_JOB_ABORT) ) {
-                bit_clr(job, CMD_JOB_ABORT);
+            if ( bit_read(job, JF_CMD_ABORT) ) {
+                bit_clr(job, JF_CMD_ABORT);
                 job->status_befor_fault = JOB_WORKING;
                 job->job_status = JOB_ABORTING;
                 job->charge_exit_kwh_data = task->meter[0].kwh_zong;
                 job->charge_stop_timestamp = time(NULL);
-                bit_set(job, F_PCK_CHARGER_TRM);
+                bit_set(job, JF_CHG_TRM_CHARGE);
                 end ++;
                 log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
-            }
-            if ( bit_read(job, CMD_JOB_MAN_PAUSE) ) {
-                job->status_befor_fault = JOB_WORKING;
-                job->job_status = JOB_MAN_PAUSE;
-                job->charge_exit_kwh_data = task->meter[0].kwh_zong;
-                job->charge_stop_timestamp = time(NULL);
-                end ++;
-                log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
             }
 
             // 充电作业发生状态变化
@@ -1167,8 +1163,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
-            if ( bit_read(job, CMD_JOB_ABORT) ) {
-                bit_clr(job, CMD_JOB_ABORT);
+            if ( bit_read(job, JF_CMD_ABORT) ) {
+                bit_clr(job, JF_CMD_ABORT);
                 log_printf(INF, "ZEUS: 充电任务中止(%X)",
                            job->status_befor_fault);
                 job->job_status = JOB_ABORTING;
@@ -1184,8 +1180,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        if ( bit_read(job, CMD_JOB_ABORT) ) {
-            bit_clr(job, CMD_JOB_ABORT);
+        if ( bit_read(job, JF_CMD_ABORT) ) {
+            bit_clr(job, JF_CMD_ABORT);
             log_printf(INF, "ZEUS: 充电任务中止(%X:JOB_MAN_PAUSE)",
                        job->status_befor_fault);
             job->job_status = JOB_ABORTING;
@@ -1199,10 +1195,6 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
 
         } else {
-            if ( bit_read(job, CMD_JOB_MAN_PAUSE) ) {
-                break;
-            }
-
         }
         break;
     case JOB_RESUMING:
@@ -1214,7 +1206,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        bit_set(job, F_PCK_CHARGER_TRM);
+        bit_set(job, JF_CHG_TRM_CHARGE);
         if ( job->charge_mode == CHARGE_AUTO ) {
             /*
              * 中止自动充电
@@ -1258,39 +1250,12 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-	/*
+
         if ( job->charge_mode == CHARGE_AUTO ) {
-            if ( bit_read(job, F_PCK_RX_BSD) &&
-                 bit_read(job, F_PCK_TX_CSD) ) {
-                if ( bit_read(task, F_NEED_BILLING) ) {
-                    if (bit_read(job, F_BILLING_DONE) ) {
-                        job->job_status = JOB_EXITTING;
-                    } else {
-                        if (bit_read(job, F_BILING_TIMEOUT)) {
 
-                        } else {
-
-                        }
-                    }
-                } else {
-                    job->job_status = JOB_EXITTING;
-                }
-            }
         } else {
-            if ( bit_read(task, F_NEED_BILLING) ) {
-                if (bit_read(job, F_BILLING_DONE) ) {
-                    job->job_status = JOB_EXITTING;
-                } else {
-                    if (bit_read(job, F_BILING_TIMEOUT)) {
-
-                    } else {
-
-                    }
-                }
-            } else {*/
-                job->job_status = JOB_EXITTING;
-        //    }
-        //}
+            job->job_status = JOB_EXITTING;
+        }
         break;
     case JOB_EXITTING:
         config_write("需求电压", "2000");
@@ -1302,9 +1267,6 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_2_ASSIT_PWN_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-        if ( job->bms.driver == NULL ) {
-            job->job_status = JOB_DETACHING;
-        }
         if ( job->job_gun_sn == GUN_SN0 ) {
             bit_clr(tsk, F_GUN1_CHARGE);
             bit_clr(tsk, F_VOL1_SET_OK);
@@ -1313,7 +1275,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             bit_clr(tsk, F_GUN2_CHARGE);
             bit_clr(tsk, F_VOL2_SET_OK);
         }
-
+        job->job_status = JOB_DETACHING;
         break;
     case JOB_DETACHING:
         config_write("需求电压", "2000");
@@ -1322,39 +1284,48 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         task->chargers[0]->cstats = CHARGER_IDLE;
         bit_clr(tsk, F_CHARGE_LED);
         if ( job->job_gun_sn == GUN_SN0 ) {
+            if ( bit_read(tsk, CMD_GUN_1_LOCK_ON) ) {
+                log_printf(INF, "ZEUS: 电子锁已经断开，等待充电枪拔出.");
+            }
             bit_clr(tsk, CMD_GUN_1_LOCK_ON);
-            log_printf(INF, "ZEUS: 电子锁已经断开，等待充电枪拔出.");
         }
         if ( job->job_gun_sn == GUN_SN1 ) {
+            if ( bit_read(tsk, CMD_GUN_2_LOCK_ON) ) {
+                log_printf(INF, "ZEUS: 电子锁已经断开，等待充电枪拔出.");
+            }
             bit_clr(tsk, CMD_GUN_2_LOCK_ON);
-            log_printf(INF, "ZEUS: 电子锁已经断开，等待充电枪拔出.");
         }
         if ( job->job_status >= JOB_WORKING ){
             bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
             bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
             bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         }
-        job = NULL;
-        break;
-    }
 
-    if ( bit_read(job, CMD_JOB_ABORT) ) {
-        bit_clr(job, CMD_JOB_ABORT);
-        job->status_befor_fault = JOB_WORKING;
-        job->job_status = JOB_ABORTING;
-        job->charge_exit_kwh_data = task->meter[0].kwh_zong;
-        job->charge_stop_timestamp = time(NULL);
-        end ++;
-        log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
-    }
-    if ( bit_read(job, CMD_JOB_MAN_PAUSE) ) {
-        bit_clr(job, CMD_JOB_MAN_PAUSE);
-        job->status_befor_fault = JOB_WORKING;
-        job->job_status = JOB_MAN_PAUSE;
-        job->charge_exit_kwh_data = task->meter[0].kwh_zong;
-        job->charge_stop_timestamp = time(NULL);
-        end ++;
-        log_printf(WRN, "ZEUS: 人工暂停作业(JOB_WORKING)");
+        // 自动充电需要释放资源
+        // * BMS驱动 超时,心跳定时器
+        // * BMS驱动多包传输定时器
+        // * BMS驱动 读数据线程引用关系
+        // * BMS驱动 写数据线程引用关系
+        // * BMS驱动 绑定关系
+        // * BMS驱动 数据包发送器
+        // * 作业控制结构本身
+        // * 任务和作业之间的绑定关系
+        if ( job->charge_mode == CHARGE_AUTO ) {
+            if ( job->bms.can_heart_beat.status == HACHIKO_INVALID &&
+                 job->bms.can_tp_bomb.status == HACHIKO_INVALID &&
+                 job->bms.bms_read_init_ok == 0xFF &&
+                 job->bms.bms_write_init_ok == 0xFF ) {
+                job->bms.driver = NULL;
+                free(job->bms.generator);
+                job->job_status = JOB_DIZZY;
+                log_printf(INF, "ZEUS.job: 作业清除引用完成.");
+            }
+        } else {
+            job->job_status = JOB_DIZZY;
+        }
+        break;
+    case JOB_DIZZY:
+        return;
     }
 
     // 充电作业发生状态变化
@@ -1379,14 +1350,6 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
 // 作业销毁程序
 void job_destroy(struct charge_job *job)
 {
-    static struct charge_job *junk = NULL;
-    
-    if ( junk == NULL ) {
-        junk = job;
-    } else {
-        list_ini(&job->job_node);
-        list_inserttail(&junk->job_node, &job->job_node);
-    }
 }
 
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd)

@@ -1007,8 +1007,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         log_printf(DBG_LV2, "BMS: PGN_BEM fetched.");
         break;
     default:
-        log_printf(WRN, "BMS: un-recognized PGN %08X",
-                   param->can_id);
+        //log_printf(WRN, "BMS: un-recognized PGN %08X", param->can_id);
         break;
     }
     return ERR_OK;

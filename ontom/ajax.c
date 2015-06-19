@@ -1821,7 +1821,9 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         "正在中止",
         "作业完成",
         "正在退出",
-        "正在清除"
+        "正在清除",
+        "即将销毁",
+        "undefined"
     };
     char *cmode_string[] = {
         "自动",
@@ -1856,7 +1858,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         sprintf(buff, "断开");
     }
     double ycdl = 0.0;
-    if ( job->job_status == JOB_WORKING ) {
+    if ( job->job_status < JOB_DONE ) {
         switch (job->charge_billing.mode) {
         case BILLING_MODE_AS_CAP:
             ycdl = 100 * (task->meter[0].kwh_zong - job->charge_begin_kwh_data) /
@@ -1869,6 +1871,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
                     job->charge_billing.option.set_time;
             break;
         default:
+            ycdl = job->bms.bms_all_battery_status.spn3078_soc;
             break;
         }
     } else if ( job->job_status == JOB_DONE ) {
@@ -1966,6 +1969,28 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
                 "\"BRO\":{\"spn2829\":\"%s\"},", bat_temprature);
 
+        // BCS
+        // 充电电压
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"BCS\":{\"spn3075\":\"%.1f\",",
+                job->bms.bms_all_battery_status.spn3075_charge_voltage/10.0);
+        // 充电电流
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"spn3076\":\"%.1f\",",
+                (job->bms.bms_all_battery_status.spn3076_charge_current-4000)/-10.0f);
+        // 最高单体电压电池组号
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"spn3077\":\"%d\",",
+                (job->bms.bms_all_battery_status.spn3077_max_v_g_number&0xFFF)/100.0f);
+        // SOC
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"spn3078\":\"%d\",",
+                job->bms.bms_all_battery_status.spn3078_soc);
+        // 剩余充电时间
+        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                "\"spn3079\":\"%d\"},",
+                job->bms.bms_all_battery_status.spn3079_need_time);
+
         // BCL
         // 电压需求
         xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
@@ -1994,6 +2019,7 @@ int ajax_job_query_json_proc(struct ajax_xml_struct *thiz)
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "{\"jobs\":[");
     for ( i = 0; i < CONFIG_SUPPORT_CHARGE_JOBS; i ++ ) {
         if ( task->job[i] == NULL ) continue;
+        if ( task->job[i]->job_status >= JOB_EXITTING ) continue;
         job_query_json_fromat(thiz, task->job[i]);
     }
     h = task->wait_head;
@@ -2074,7 +2100,7 @@ int ajax_job_abort_json_proc(struct ajax_xml_struct *thiz)
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"作业保护\"");
         } else {
             thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
-            bit_set(j, CMD_JOB_ABORT);
+            bit_set(j, JF_CMD_ABORT);
             log_printf(INF, "UART: 作业运行时间: %ld - %ld = %ld",
                        time(NULL), j->charge_job_create_timestamp,
                        time(NULL) - j->charge_job_create_timestamp);
@@ -2106,7 +2132,7 @@ int ajax_job_manpause_json_proc(struct ajax_xml_struct *thiz)
     } else {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
         if ( j->job_status == JOB_WORKING ) {
-                bit_set(j, CMD_JOB_MAN_PAUSE);
+                //bit_set(j, CMD_JOB_MAN_PAUSE);
         }
     }
 
@@ -2134,7 +2160,7 @@ int ajax_job_resume_json_proc(struct ajax_xml_struct *thiz)
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"reason\":\"没有该作业\"");
     } else {
         thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "\"status\":\"OK\"");
-        bit_set(j, CMD_JOB_RESUME);
+        //bit_set(j, CMD_JOB_RESUME);
     }
 
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len], "}");

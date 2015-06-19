@@ -76,16 +76,13 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
         // 轮询所有的驱动
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
             unsigned int i;
-            for ( i = 0; driver->binder[i] &&
-                  i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
-                thiz = driver->binder[i];
-                if ( thiz->job_status == JOB_EXITTING || thiz->job_status == JOB_DETACHING ) {
-                    if ( thiz->bms.driver ) {
-                        log_printf(INF, "JOB exited, unbind BMS driver automatic!");
-                        driver->driver_main_proc(thiz, EVENT_CAN_DESTROY, &thiz->param, driver);
-                        driver->binder[i] = NULL;
-                        thiz->bms.driver = NULL;
-                    }
+            for ( i = 0; driver->binder[i][1] &&
+                  i < sizeof(driver->binder)/(2*sizeof(struct charge_job *)); i ++ ) {
+                thiz = driver->binder[i][1];
+                if ( thiz->job_status == JOB_DETACHING ) {
+                    log_printf(INF, "JOB exited, unbind BMS.write driver automatic!");
+                    driver->binder[i][1] = NULL;
+                    thiz->bms.bms_write_init_ok = 0xFF;
                     continue;
                 }
 
@@ -94,10 +91,6 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                     driver->driver_main_proc(thiz, EVENT_CAN_INIT, &thiz->param, driver);
                     thiz->bms.bms_write_init_ok = 0x7f;
                     thiz->ref_nr ++;
-                } else if ( thiz->job_status == JOB_DETACHING ) {
-                    thiz->ref_nr --;
-                    thiz->bms.bms_write_init_ok = 0;
-                    continue;
                 }
 
                 /*
@@ -173,6 +166,9 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                         thiz->param.evt_param = EVT_RET_ERR;
                         driver->driver_main_proc(thiz, EVENT_TX_FAILS, &thiz->param, driver);
                     } else {
+                        thiz->bms.frame_tx ++;
+                        thiz->bms.tx_seed ++;
+
                         thiz->param.evt_param = EVT_RET_OK;
                         driver->driver_main_proc(thiz, EVENT_TX_DONE, &thiz->param, driver);
                     }
@@ -247,9 +243,10 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     struct charge_task *tsk = (struct charge_task *)arg;
     struct bmsdriver *driver;
     struct charge_job *thiz;
+    fd_set rfds;
+    struct timeval tv ;
+    int retval;
 
-    // 缓冲区数据字节数
-    unsigned int tp_cnt = 0;
     // 数据包个数
     unsigned int tp_packets_nr = 0;
     // 数据包字节总数
@@ -264,7 +261,9 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
     if ( s == -1 ) {
         log_printf(ERR, "打开CAN失败!");
     }
-    fcntl(s, F_SETFL, FASYNC);
+    if ( -1 == fcntl(s, F_SETFL, FASYNC) ) {
+        log_printf(ERR, "BMS.read: set read socketCAN to ASYNC failed!");
+    }
     strcpy(ifr.ifr_name, "can0" );
     if ( 0 != ioctl(s, SIOCGIFINDEX, &ifr) ) {
         log_printf(ERR, "BMSDRV: 配置CAN失败.");
@@ -279,16 +278,15 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
         // 轮询所有的驱动
         for ( driver = tsk->bmsdriver; driver ; driver = driver->next ) {
             unsigned int i;
-            for ( i = 0; driver->binder[i] &&
-                  i < sizeof(driver->binder)/sizeof(struct charge_job *); i ++ ) {
-                thiz = driver->binder[i];
-                if ( thiz->job_status == JOB_EXITTING || thiz->job_status == JOB_DETACHING ) {
-                    if ( thiz->bms.driver ) {
-                        log_printf(INF, "JOB exited, unbind BMS driver automatic!");
-                        driver->driver_main_proc(thiz, EVENT_CAN_DESTROY, &thiz->param, driver);
-                        driver->binder[i] = NULL;
-                        thiz->bms.driver = NULL;
-                    }
+            for ( i = 0; driver->binder[i][0] &&
+                  i < sizeof(driver->binder)/(2*sizeof(struct charge_job *)); i ++ ) {
+                thiz = driver->binder[i][0];
+                if ( thiz->job_status == JOB_DETACHING ) {
+                    log_printf(INF, "JOB exited, unbind BMS driver.read automatic!");
+                    thiz->bms.bms_read_init_ok = 0xFF;
+                    Hachiko_kill(&thiz->bms.can_tp_bomb);
+                    Hachiko_kill(&thiz->bms.can_heart_beat);
+                    driver->binder[i][0] = NULL;
                     continue;
                 }
 
@@ -301,10 +299,33 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                     thiz->ref_nr ++;
                 }
 
+                FD_ZERO(&rfds);
+                FD_SET(s, &rfds);
+                tv.tv_sec = 1;
+                tv.tv_usec = 0;
+                retval = select(s+1, &rfds, NULL, NULL, &tv);
+                if (  -1 == retval ) {
+                    continue;
+                } else if ( 0 != retval ) {
+                    if ( ! FD_ISSET(s, &rfds) ) {
+                        continue;
+                    }
+                } else {
+                    // 超 时
+                    continue;
+                }
                 memset(&frame, 0, sizeof(frame));
                 nbytes = read(s, &frame, sizeof(struct can_frame));
+                if ( nbytes == sizeof(struct can_frame) ) {
+                    thiz->bms.frame_rx ++;
+                    thiz->bms.rx_seed ++;
+
+                    if ( thiz->bms.frame_rx < thiz->bms.frame_tx ) {
+
+                    }
+                }
                 if ( (frame.can_id & 0xFFFF) != CAN_RCV_ID_MASK ) {
-                    #if 1
+                    #if 0
                     log_printf(DBG_LV0, "BMS: id not accept %x", frame.can_id);
                     #endif
                     if ( (frame.can_id & 0xFFFF) == CAN_TX_ID_MASK ) {
@@ -317,11 +338,6 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 /*
                  * 非阻塞方式读
                  */
-                if ( thiz->job_status == JOB_DETACHING ) {
-                    thiz->bms.bms_read_init_ok = 0;
-                    thiz->ref_nr --;
-                    continue;
-                }
 
                 if ( nbytes != sizeof(struct can_frame) ) {
                     thiz->param.evt_param = EVT_RET_ERR;
@@ -399,7 +415,6 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                          * byte[5]: 0xFF
                          * byte[6:8]: PGN
                          */
-                        tp_cnt = 0;
                         tp_packets_size = frame.data[2] * 256 + frame.data[1];
                         tp_packets_nr = frame.data[3];
                         tp_packet_PGN = frame.data[5] +
@@ -636,7 +651,7 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
 {
     if ( !drv || ! job ) return ERR_ERR;
 
-    if ( drv->binder[0] ) {
+    if ( drv->binder[0][0] || drv->binder[0][1] ) {
         log_printf(ERR, "绑定BMS驱动失败!");
         return ERR_ERR;
     }
@@ -653,7 +668,8 @@ int bind_bmsdriver(struct bmsdriver *drv, struct charge_job *job)
     log_printf(INF, "绑定BMS驱动成功!");
 
     job->bms.driver = drv;
-    drv->binder[0] = job;
+    drv->binder[0][0] = job;
+    drv->binder[0][1] = job;
     return ERR_OK;
 }
 

@@ -149,7 +149,9 @@ struct bmsdriver {
     time_t loaded;
     // 只有一个CAN 因此最多能绑定一个作业
     // 不排除以后多枪充电的可能
-    struct charge_job *binder[1];
+    // binder[x][0] ==> 读数据线程
+    // binder[x][1] ==> 写数据线程
+    struct charge_job *binder[1][2];
 
     /* 安装驱动到系统中, 做相关的初始化动作 */
     int (*driver_install)(struct charge_task *);

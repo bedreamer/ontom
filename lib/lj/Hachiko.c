@@ -33,6 +33,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *_uc)
         // 下面的逻辑判定顺序不可更改，详情请参考README文件
         if ( pool[i]->status == HACHIKO_INVALID ) continue;
         if ( pool[i]->status == HACHIKO_KILLED ) {
+            pool[i]->status = HACHIKO_INVALID;
             pool[i] = NULL;
             refresh ++;
             log_printf(DBG_LV3, "HACHIKO: watch dog killed.");
