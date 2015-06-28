@@ -1539,14 +1539,23 @@
 		6A0D41B01B30343900ED385B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				New_Setting = "";
 			};
 			name = Debug;
 		};
 		6A0D41B11B30343900ED385B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				New_Setting = "";
 			};
 			name = Release;
+		};
+		6A0D4C281B3E343400ED385B /* Debug copy */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				New_Setting = "";
+			};
+			name = "Debug copy";
 		};
 /* End XCBuildConfiguration section */
 
@@ -1555,10 +1564,11 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6A0D41B01B30343900ED385B /* Debug */,
+				6A0D4C281B3E343400ED385B /* Debug copy */,
 				6A0D41B11B30343900ED385B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
