@@ -32,7 +32,7 @@ CCFLAGS+=-I../qt-4.8.2-arm/mkspecs/qws/linux-arm-gcc -I.
 # used for some directory.
 CPFLAGS=-I./ontom -I./thirdpart/D8 -I./thirdpart/mongoose -I./thirdpart/sqlite -I./thirdpart/extso -Wl,-O1
 EXFLAGS=
-LDFLAGS=-L. -L/home/tom/workspace/qt-4.8.2-arm/lib \
+LDFLAGS=-L$(WORKDIR) -L/home/tom/workspace/qt-4.8.2-arm/lib \
 	-L/home/tom/workspace/tslib/lib -L$(WORKDIR)/lib \
 	-L$(WORKDIR)/thirdpart/mongoose \
 	-L$(WORKDIR)/thirdpart/sqlite \
@@ -52,14 +52,14 @@ b-objs=
 PHONY+=y-objs m-objs s-objs b-objs
 EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 	PWD ARCH WORKDIR IMGFILE Q CFLAGS CCFLAGS CMODULE \
-	BINASFLAGS CPFLAGS EXFLAGS yobjs-list mobjs-list sobjs-list
+	BINASFLAGS CPFLAGS EXFLAGS LDFLAGS LDEXFLAGS yobjs-list mobjs-list sobjs-list
 SEP-DIRS=thirdpart/mongoose thirdpart/sqlite thirdpart/extso
 # must be the last one.
 LAST-DIR=
-BMSDRVIVER=bmsdriver/GB-T-27930-2011 bmsdriver/GB-T-27930-2011-test   bmsdriver/beijingqiche bmsdriver/guoxuangaoke
+BMSDRVIVER=bmsdriver/GB-T-27930-2011 bmsdriver/onlypower bmsdriver/beijingqiche bmsdriver/guoxuangaoke
 PLUGINS=plugins/default plugins/104 plugins/demo plugins/buzzer plugins/Q-GDW-11177.2-2014
 LIBDIR=lib/lj lib/bms
-SUB-DIRS=ontom $(LIBDIR) $(BMSDRVIVER) $(PLUGINS)
+SUB-DIRS=$(LIBDIR) $(BMSDRVIVER) $(PLUGINS) ontom pandora 
 EX-OBJS=
 PHONY+=EX-OBJS
 

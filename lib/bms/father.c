@@ -49,6 +49,7 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
     struct charge_task *tsk = (struct charge_task *)arg;
     struct bmsdriver *driver;
     struct charge_job *thiz;
+    int keep_alive = 0;
 
     if ( done == NULL ) done = &mydone;
 
@@ -136,13 +137,21 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                     continue;
                 }
 
+                keep_alive = 0;
                 if ( EVT_RET_OK != thiz->param.evt_param ) {
-                    continue;
+                    if ( thiz->bms.can_bms_status & CAN_NORMAL != CAN_NORMAL ) {
+                        driver->driver_main_proc(thiz, EVENT_TX_REQUEST, &thiz->param, driver);
+                        if ( EVT_RET_OK == thiz->param.evt_param ) {
+                            keep_alive = 1;
+                        } else continue;
+                    } else {
+                        continue;
+                    }
                 }
 
                 thiz->param.evt_param = EVT_RET_INVALID;
                 // 链接模式下的数据包发送不需要确认, 并且也不能被中止
-                if ( thiz->bms.can_bms_status == CAN_NORMAL ) {
+                if ( thiz->bms.can_bms_status == CAN_NORMAL || keep_alive ) {
                     driver->driver_main_proc(thiz, EVENT_TX_PRE, &thiz->param, driver);
                     if ( EVT_RET_TX_ABORT == thiz->param.evt_param ) {
                         // packet sent abort.
@@ -184,6 +193,18 @@ void *thread_bms_write_service(void *arg) ___THREAD_ENTRY___
                 }
 
                 thiz->param.buff_payload = 0;
+                if ( thiz->bms.frame_speed_rx < thiz->bms.frame_speed_tx &&
+                     thiz->bms.frame_tx > 0 && thiz->bms.frame_speed_rx <= 0 ) {
+                    log_printf(INF,
+                               "BMS.DRV: CAN device dizzy, reconfig manual，Vrx: %d, Vtx: %d.",
+                               thiz->bms.frame_speed_rx,
+                               thiz->bms.frame_speed_tx);
+                    thiz->bms.frame_speed_tx = 0;
+                    thiz->bms.frame_tx = 0;
+                    system("ip link set can0 down;");
+                    system("ip link set can0 type can bitrate 250000;");
+                    system("ip link set can0 up;");
+                }
 
                 // 准备接收完成
                 if ( thiz->bms.can_bms_status == (CAN_TP_RD | CAN_TP_CTS) ) {
@@ -297,12 +318,13 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                 if ( thiz->bms.bms_read_init_ok != 0x7f ) {
                     thiz->bms.bms_read_init_ok = 0x7F;
                     thiz->ref_nr ++;
+                    thiz->bms.can_tp_bomb.status = HACHIKO_INVALID;
                 }
 
                 FD_ZERO(&rfds);
                 FD_SET(s, &rfds);
-                tv.tv_sec = 1;
-                tv.tv_usec = 0;
+                tv.tv_sec = 0;
+                tv.tv_usec = 500;
                 retval = select(s+1, &rfds, NULL, NULL, &tv);
                 if (  -1 == retval ) {
                     continue;
@@ -443,7 +465,7 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                             log_printf(WRN, "BMS: previous connection not exit,"
                                        " do new connection instead.");
                             Hachiko_feed( &thiz->bms.can_tp_bomb );
-                        } else {
+                        } else if ( thiz->bms.can_tp_bomb.status == HACHIKO_INVALID ) {
                             thiz->bms.can_tp_bomb.Hachiko_notify_proc =
                                     Hachiko_CAN_TP_notify_proc;
                             // 根据SAE J1939-21中关于CAN总线数据传输链接的说明，中间传输
@@ -463,6 +485,8 @@ void *thread_bms_read_service(void *arg) ___THREAD_ENTRY___
                                            ret);
                                 continue;
                             }
+                        } else {
+                            continue;
                         }
 
                         thiz->bms.can_tp_param.tp_pack_nr = tp_packets_nr;

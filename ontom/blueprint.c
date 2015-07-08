@@ -123,6 +123,10 @@ int set_other_attribute(int fd, int speed, int databits, int stopbits, int parit
     bzero( &options, sizeof( options ) );
 
     switch(speed){  //设置数据传输率
+	case 1200:
+       cfsetispeed(&options,B1200);
+       cfsetospeed(&options,B1200);
+       break;
     case 2400:
        cfsetispeed(&options,B2400);
        cfsetospeed(&options,B2400);
@@ -442,7 +446,7 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         if ( self->dev_handle == -1 ) {
             return ERR_UART_OPEN_FAILE;
         } else {
-            log_printf(DBG, "UART: self->dev_handle: %d", self->bp_evt_handle);
+            log_printf(DBG, "UART: self->dev_handle: %d", self->dev_handle);
         }
 
         if ( self->hw_port == SERIAL4_CTRL_PIN ) {
@@ -1122,7 +1126,6 @@ int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
     }
     return ret;
 }
-
 
 int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
@@ -3226,7 +3229,6 @@ int Increase_module_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP
             }
             bit_set(task, S_CHARGE_M_1_ERR + (unsigned int)(me->_private) -1 );
         }
-        log_printf(WRN, "UART: %s:%d get signal TIMEOUT", __FUNCTION__, evt);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -3281,7 +3283,7 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x00;
         if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
-            buff[ nr ++ ] = 1; // 开机
+            buff[ nr ++ ] = 1; // 关机
         } else {
             buff[ nr ++ ] = 0; // 开机
         }
@@ -3417,7 +3419,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                     buff[ nr ++ ] = rat & 0xFF;
                 }
 #endif
-                unsigned int rat = (unsigned int)atoi(config_read("need_I1"));
+                unsigned int rat = (unsigned int)atoi(config_read("需求电流"));
                 log_printf(INF, "UART.Increa: rat: %d", rat);
 
                 buff[ nr ++ ] = rat >> 8;
@@ -3434,6 +3436,8 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                 buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) >> 8;
                 buff[ nr ++ ] = ((unsigned short)task->bus2_correct_V) & 0xFF;
             } else {
+				bit_set(task, F_VOL1_SET_OK);
+				bit_set(task, F_VOL2_SET_OK);
                 buff[ nr ++ ] = (unsigned short)atoi(config_read("需求电压")) >> 8;
                 buff[ nr ++ ] = (unsigned short)atoi(config_read("需求电压")) & 0xFF;
             }
@@ -3480,7 +3484,7 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
 }
 
 // 从电表读取电能数据
-int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int huali_3AC_kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     unsigned char buff[32];
@@ -3639,7 +3643,7 @@ int kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
 }
 
 // 从电表读取电压数据
-int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int huali_3AV_voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     unsigned char buff[32];
@@ -3759,7 +3763,7 @@ int voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
 }
 
 // 电能表安装过程.
-int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+int huali_3AC_kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
     unsigned char buff[32];
@@ -3866,6 +3870,244 @@ int kwh_meter_install_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UA
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 从电表读取电能数据
+int yada_DC_kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    unsigned char buff[32];
+    int nr = 0, l;
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned char sum = check_sum(&param->buff.rx_buff[4], param->need_bytes - 2 - 4);
+            unsigned char check = param->buff.rx_buff[ param->need_bytes - 2 ];
+            log_printf(DBG_LV3, "UART: CRC cheke result: need: %02X, gave: %02X",
+                       sum, check);
+            if ( sum != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                int hwh_zong = 0, hwh_jian = 0, hwh_feng = 0, hwh_ping = 0, hwh_gu = 0, i;
+
+                for ( i = 0; i < 4; i ++ ) {
+                    param->buff.rx_buff[16 + i] -= 0x33;
+                }
+
+                hwh_zong = (param->buff.rx_buff[16] >> 4 ) * 10 + (param->buff.rx_buff[16] & 0x0F );
+                hwh_zong += (param->buff.rx_buff[17] >> 4 ) * 1000 + (param->buff.rx_buff[17] & 0x0F ) * 100;
+                hwh_zong += (param->buff.rx_buff[18] >> 4 ) * 100000 + (param->buff.rx_buff[18] & 0x0F ) * 10000;
+                hwh_zong += (param->buff.rx_buff[19] >> 4 ) * 10000000 + (param->buff.rx_buff[19] & 0x0F ) * 1000000;
+
+                hwh_zong = task->meter_I_xishu * task->meter_V_xishu * hwh_zong;
+                hwh_jian = task->meter_I_xishu * task->meter_V_xishu * hwh_jian;
+                hwh_feng = task->meter_I_xishu * task->meter_V_xishu * hwh_feng;
+                hwh_ping = task->meter_I_xishu * task->meter_V_xishu * hwh_ping;
+                hwh_gu = task->meter_I_xishu * task->meter_V_xishu * hwh_gu;
+
+                log_printf(DBG_LV3, "UART: %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH  %.2fKWH",
+                           hwh_zong / 100.0f, hwh_jian / 100.0f, hwh_feng / 100.0f
+                           , hwh_ping / 100.0f, hwh_gu / 100.0f);
+                task->meter[0].kwh_zong = hwh_zong / 100.0f;
+                task->meter[0].kwh_jian = hwh_jian / 100.0f;
+                task->meter[0].kwh_feng = hwh_feng / 100.0f;
+                task->meter[0].kwh_ping = hwh_ping / 100.0f;
+                task->meter[0].kwh_gu = hwh_gu / 100.0f;
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_KWH_METER_COMM_DOWN) ) {
+            log_printf(INF, "UART: "GRN("电表通信恢复(%d)"), self->master->died);
+        }
+        self->master->died = 0;
+        bit_clr(task, S_KWH_METER_COMM_DOWN);
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0x68;
+
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[10], task->meter[0].addr[11]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[8], task->meter[0].addr[9]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[6], task->meter[0].addr[7]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[4], task->meter[0].addr[5]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[2], task->meter[0].addr[3]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[0], task->meter[0].addr[1]);
+
+        buff[ nr ++ ] = 0x68;
+        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x02;
+        buff[ nr ++ ] = (unsigned char)(0x10 + 0x33);
+        buff[ nr ++ ] = (unsigned char)(0x90 + 0x33);
+
+        l = nr;
+        buff[ nr ++ ] = check_sum(&buff[4], l - 4);
+        buff[ nr ++ ] = 0x16;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+        self->master->time_to_send = ( param->payload_size + 1) * 1000 / 218;
+        self->rx_param.need_bytes = 22;
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        if ( self->master->died < self->master->died_line ) {
+            self->master->died ++;
+        } else {
+            //self->master->died ++;
+            if ( ! bit_read(task, S_KWH_METER_COMM_DOWN) ) {
+                log_printf(ERR, "UART: "RED("电表通信中断, 请排查故障,(%d)"),
+                           self->master->died);
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+            }
+            bit_set(task, S_KWH_METER_COMM_DOWN);
+        }
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
+// 从电表读取电流数据
+int yada_DC_current_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    unsigned char buff[32];
+    int nr = 0, l;
+    int ret = ERR_ERR;
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size < param->need_bytes ) {
+            ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        } else {
+            unsigned char sum = check_sum(&param->buff.rx_buff[4], param->need_bytes-2-4);
+            unsigned char check = param->buff.rx_buff[ param->need_bytes - 2 ];
+            log_printf(DBG_LV2, "UART: SUM check result: need: %02X, gave: %02X",
+                       sum, check);
+            if ( sum != check ) {
+                ret = ERR_FRAME_CHECK_ERR;
+            } else {
+                int va, vb, vc, i;
+
+                for ( i = 0; i < 6; i ++ ) {
+                    param->buff.rx_buff[14 + i] -= 0x33;
+                }
+
+                va = (param->buff.rx_buff[15] >> 4 ) * 1000 + (param->buff.rx_buff[15] & 0x0F ) * 100;
+                va += (param->buff.rx_buff[14] >> 4 ) * 10 + (param->buff.rx_buff[14] & 0x0F );
+
+                vb = (param->buff.rx_buff[17] >> 4 ) * 1000 + (param->buff.rx_buff[17] & 0x0F ) * 100;
+                vb += (param->buff.rx_buff[16] >> 4 ) * 10 + (param->buff.rx_buff[16] & 0x0F );
+
+                vc = (param->buff.rx_buff[19] >> 4 ) * 1000 + (param->buff.rx_buff[19] & 0x0F ) * 100;
+                vc += (param->buff.rx_buff[18] >> 4 ) * 10 + (param->buff.rx_buff[18] & 0x0F );
+
+                log_printf(DBG_LV3, "UART: %.2fV  %.2fV  %.2f V",
+                           va / 10.0f, vb / 10.0f, vc / 10.0f);
+
+                task->meter[0].Va = va / 10.0f;
+                task->meter[0].Vb = vb / 10.0f;
+                task->meter[0].Vc = vc / 10.0f;
+                ret = ERR_OK;
+            }
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0xFE;
+        buff[ nr ++ ] = 0x68;
+
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[10], task->meter[0].addr[11]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[8], task->meter[0].addr[9]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[6], task->meter[0].addr[7]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[4], task->meter[0].addr[5]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[2], task->meter[0].addr[3]);
+        buff[ nr ++ ] = __chars2bcd(task->meter[0].addr[0], task->meter[0].addr[1]);
+
+        buff[ nr ++ ] = 0x68;
+        buff[ nr ++ ] = 0x01;
+        buff[ nr ++ ] = 0x02;
+        buff[ nr ++ ] = 0x00 + 0x33;
+        buff[ nr ++ ] = (unsigned char)(0xFF + 0x33);
+        buff[ nr ++ ] = 0x01 + 0x33;
+        buff[ nr ++ ] = 0x02 + 0x33;
+
+        l = nr;
+        buff[ nr ++ ] = check_sum(&buff[4], l - 4);
+        buff[ nr ++ ] = 0x16;
+
+        memcpy(param->buff.tx_buff, buff, nr);
+        param->payload_size = nr;
+        self->master->time_to_send = (param->payload_size + 1) * 1000 / 218;
+        self->rx_param.need_bytes = 22;
+        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        //log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -4586,7 +4828,8 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     int retval;
     size_t cursor;
     fd_set rfds;
-    struct timeval tv ;
+    struct timeval  tv ;
+    sigset_t origmask;
 
     log_printf(INF, "UART %s framework start up.              DONE(%ld).",
                thiz->dev_name,
@@ -4676,7 +4919,7 @@ ___fast_switch_2_rx:
                 tv.tv_usec = 0;
                 retval = select(thiz->dev_handle+1, &rfds, NULL, NULL, &tv);
                 if ( -1 == retval ) {
-                    log_printf(INF, "select error.");
+                    log_printf(DBG_LV1, "select error(%s).", strerror(errno));
                     continue;
                 } else if ( retval != 0 ) {
                     if ( ! FD_ISSET(thiz->dev_handle, &rfds) ) {

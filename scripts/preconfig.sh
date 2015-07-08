@@ -10,6 +10,18 @@ $SQLITE3 $DB "UPDATE RS485_config SET disabled='false' where disabled=0"
 $SQLITE3 $DB "UPDATE RS485_config SET disabled='true' where disabled=1"
 SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type'"`
 MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'"`
+NEED_KWH_METER=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='sys_need_kwh_meter'"`
+METER_TYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='kwh_meter_type'"`
+
+# 先移动默认的文件
+if [ -e "OEM.man" ];then
+	OEM=`cat OEM.man`
+else
+	OEM='default'
+fi
+
+echo "OEM厂商 $OEM"
+cp /srv/www/OEM/$OEM/* /srv/www/OEM/ -r
 
 # 根据系统选型配置是否有充电屏监控通信模组
 if [ $SYSTYPE -eq 0 ]; then
@@ -51,12 +63,15 @@ if [ $MODULE -eq 0 ];then
 	echo "    关闭     英瑞克模块协议转换盒模组"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000009'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='M000000A'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='M0000015'"
+
 elif [ $MODULE -eq 4 ];then
 	# 英瑞克 EVR400-7500
 	echo "系统采用英瑞克 EVR400-7500模块，选择协议转换盒"
 	echo "    打开     英瑞克模块协议转换盒模组"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000009'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='M000000A'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='M0000015'"
 	
 	echo "关闭冲突的串口模组..."
 	echo "    关闭     奥能协议转换盒模组"
@@ -73,9 +88,35 @@ $SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000001'"
 $SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000E'"
 echo "    打开     周立功-7816读卡器"
 $SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000002'"
-echo "    打开     华立-三相电能表"
-$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000B'"
-$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000C'"
+
+if [ $NEED_KWH_METER -eq 1 ];then
+	if [ $METER_TYPE -eq 1 ];then
+		echo "    打开     华立-三相电能表"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000B'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000C'"
+		echo "    关闭     直流电能表"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000017'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000018'"
+	elif [ $METER_TYPE -eq 2 ];then
+		echo "    关闭     华立-三相电能表"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='0000000B'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='0000000C'"
+		echo "    打开     雅达-直流电能表"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000017'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000018'"
+	else
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='0000000B'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='0000000C'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000017'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000018'"
+	fi
+else
+	echo "关闭     电能表模块"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='0000000B'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='0000000C'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000017'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000018'"
+fi
 
 echo "系统预配置完成..."
 exit 0;

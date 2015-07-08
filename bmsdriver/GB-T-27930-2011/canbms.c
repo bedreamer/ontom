@@ -42,15 +42,15 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRM);
 
-    if ( 0 == bit_read(thiz, F_BMS_RECOGNIZED) ) {
-        param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
-    } else {
+    if ( bit_read(thiz, JF_BMS_BRM_OK) &&
+         bit_read(thiz, JF_BMS_RX_BRM) ) {
         param->buff.tx_buff[0] = BMS_RECOGNIZED;
-        bit_set(thiz, F_VEHICLE_RECOGNIZED);
-    }
-    if ( bit_read(thiz, F_BMS_RECOGNIZED) ) {
-        log_printf(INF, "BMS"RED("%s")": 握手-CRM-充电机辨识报文",
-                   bit_read(thiz, F_BMS_RECOGNIZED)?"已识别":"未识别");
+        if ( ! bit_read(thiz, JF_CHG_CRM_OK) ) {
+            log_printf(INF, "BMS.CRM: 充电机识别BMS成功.");
+        }
+        bit_set(thiz, JF_CHG_CRM_OK);
+    } else {
+        param->buff.tx_buff[0] = BMS_NOT_RECOGNIZED;
     }
 
     param->buff.tx_buff[1] = 0x01;
@@ -62,6 +62,16 @@ int gen_packet_PGN256(struct charge_job * thiz, struct bms_event_struct* param)
     param->evt_param = EVT_RET_OK;
 
     gen->can_counter ++;
+
+    bit_set(thiz, JF_BMS_TX_CRM);
+
+    if ( bit_read(thiz, JF_CHG_CRM_OK) &&
+         bit_read(thiz, JF_BMS_TX_CRM) ) {
+        if ( thiz->bms.charge_stage != CHARGE_STAGE_CONFIGURE ) {
+            log_printf(INF, "BMS.BRM: 充电阶段转换为"GRN("配置阶段"));
+        }
+        thiz->bms.charge_stage = CHARGE_STAGE_CONFIGURE;
+    }
 
     return 0;
 }
@@ -105,6 +115,7 @@ int gen_packet_PGN1792(struct charge_job * thiz, struct bms_event_struct* param)
 
     gen->can_counter ++;
 
+    bit_set(thiz, JF_BMS_TX_CTS);
     return 0;
 }
 
@@ -127,6 +138,7 @@ int gen_packet_PGN2048(struct charge_job * thiz, struct bms_event_struct* param)
 
     gen->can_counter ++;
 
+    bit_set(thiz, JF_BMS_TX_CML);
     return 0;
 }
 
@@ -136,7 +148,13 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
     struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CRO);
     struct pgn2560_CRO cro;
 
-    cro.spn2830_charger_ready_for_charge = CHARGER_READY_FOR_CHARGE;
+    bit_set(thiz, JF_CHG_CRO_OK);
+
+    if ( bit_read(thiz, JF_CHG_CRO_OK) ) {
+        cro.spn2830_charger_ready_for_charge = CHARGER_READY_FOR_CHARGE;
+    } else {
+        cro.spn2830_charger_ready_for_charge = CHARGER_NOT_READY_FOR_CHARGE;
+    }
 
     memset(param->buff.tx_buff, 0xFF, 8);
     memcpy(param->buff.tx_buff, &cro, sizeof(struct pgn2560_CRO));
@@ -148,6 +166,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 
     gen->can_counter ++;
 
+    bit_set(thiz, JF_BMS_TX_CRO);
     return 0;
 }
 
@@ -155,16 +174,23 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CCS);
-    struct pgn4608_CCS ccs;
+    struct pgn4608_CCS ccs = {0};
     struct charge_task *tsk = thiz->tsk;
 
     if ( thiz->job_gun_sn == GUN_SN0 ) {
-        ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM0);
-        //ccs.spn3082_output_current = thiz->bms.bms_all_battery_status.spn3076_charge_current;
-        ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT0)-400)*10;
+        if ( tsk->measure[0] ) {
+            ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM0);
+            ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT0)-400)*10;
+        } else {
+            log_printf(ERR, "crash %d", __LINE__);
+        }
     } else if ( thiz->job_gun_sn == GUN_SN1 ) {
-        ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM1);
-        ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT1)-400)*10;
+        if ( tsk->measure[0] ) {
+            ccs.spn3081_output_voltage = b2l(tsk->measure[0]->measure.VinKM1);
+            ccs.spn3082_output_current  = (b2l(tsk->measure[0]->measure.IoutBAT1)-400)*10;
+        } else {
+            log_printf(ERR, "crash %d", __LINE__);
+        }
     }
     ccs.spn3083_charge_time = (thiz->charged_seconds + thiz->section_seconds)/60;
 
@@ -183,6 +209,7 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 
     gen->can_counter ++;
 
+    bit_set(thiz, JF_BMS_TX_CCS);
     return 0;
 }
 
@@ -191,21 +218,28 @@ int gen_packet_PGN6656(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = gen_search(thiz->bms.generator,
                                                 thiz->bms.can_pack_gen_nr, PGN_CST);
-    if ( bit_read(thiz, F_PCK_BMS_TRM) ) {
+    if ( bit_read(thiz, JF_BMS_TRM_CHARGE) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
-        memcpy(param->buff.tx_buff, &thiz->bms.bms_cst, sizeof(struct pgn6656_CST));
+        memcpy(param->buff.tx_buff, &thiz->bms.cst, sizeof(struct pgn6656_CST));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
-        bit_set(thiz, F_PCK_TX_CST);
-    } else if ( bit_read(thiz, F_PCK_CHARGER_TRM) ) {
+        bit_set(thiz, JF_BMS_TX_CST);
+    } else if ( bit_read(thiz, JF_CHG_TRM_CHARGE) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
-        memcpy(param->buff.tx_buff, &thiz->bms.bms_cst, sizeof(struct pgn6656_CST));
+        memcpy(param->buff.tx_buff, &thiz->bms.cst, sizeof(struct pgn6656_CST));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
-        bit_set(thiz, F_PCK_TX_CST);
+        bit_set(thiz, JF_BMS_TX_CST);
     } else param->evt_param = EVT_RET_INVALID;
+
+    if ( (bit_read(thiz, JF_BMS_TX_CST) && bit_read(thiz, JF_BMS_RX_BST)) ||
+         (bit_read(thiz, JF_BMS_TX_CST) && bit_read(thiz, JS_BMS_RX_BST_TIMEOUT))) {
+        log_printf(INF, "BMS.CST: 转换为充电完成状态");
+        thiz->bms.charge_stage = CHARGE_STAGE_DONE;
+    }
+
     return 0;
 }
 
@@ -214,20 +248,28 @@ int gen_packet_PGN7424(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = gen_search(thiz->bms.generator,
                                                 thiz->bms.can_pack_gen_nr, PGN_CSD);
-    if ( bit_read(thiz, F_PCK_BMS_TRM) || bit_read(thiz, F_PCK_CHARGER_TRM) ) {
+    if ( bit_read(thiz, JF_CHG_TRM_CHARGE) || bit_read(thiz, JF_BMS_TRM_CHARGE) ) {
         memset(param->buff.tx_buff, 0xFF, 8);
-        thiz->bms.charger_stop_csd.charger_sn = 1;
-        thiz->bms.charger_stop_csd.total_kwh = (u16)(thiz->charged_kwh + thiz->section_kwh);
-        thiz->bms.charger_stop_csd.total_min =
+        thiz->bms.csd.charger_sn = 1;
+        thiz->bms.csd.total_kwh = (u16)(thiz->charged_kwh + thiz->section_kwh);
+        thiz->bms.csd.total_min =
                 (thiz->charged_seconds + thiz->section_seconds) / 60;
-        log_printf(INF, "BMS.CSD: KWH: %d kWH, TIME: %d min",
-                   thiz->bms.charger_stop_csd.total_kwh,
-                   thiz->bms.charger_stop_csd.total_min);
-        memcpy(param->buff.tx_buff, &thiz->bms.charger_stop_csd, sizeof(struct pgn7424_CSD));
+        if ( !bit_read(thiz, JF_BMS_TX_CSD) ) {
+            log_printf(INF, "BMS.CSD: KWH: %d kWH, TIME: %d min",
+                       thiz->bms.csd.total_kwh,
+                       thiz->bms.csd.total_min);
+        }
+        memcpy(param->buff.tx_buff, &thiz->bms.csd, sizeof(struct pgn7424_CSD));
         param->buff_payload = gen->datalen;
         param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
         param->evt_param = EVT_RET_OK;
-        bit_set(thiz, F_PCK_TX_CSD);
+
+        bit_set(thiz, JF_BMS_TX_CSD);
+
+        if ( bit_read(thiz, JF_BMS_RX_BSD) || bit_read(thiz, JS_BMS_RX_BSD_TIMEOUT) ) {
+            log_printf(INF, "BMS.CSD: 充电过程完成，CAN通信退出.");
+            thiz->bms.charge_stage = CHARGE_STAGE_INVALID;
+        }
     }
     return 0;
 }
@@ -283,63 +325,14 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
         break;
     case EVENT_TX_DONE:
         // 数据包发送完成了
-        log_printf(DBG_LV0, "BMS: packet sent. %08X", param->can_id);
-        if ( (param->can_id & 0x00FF0000) == (PGN_CRM << 8) &&
-             bit_read(thiz, F_BMS_RECOGNIZED ) &&
-             bit_read(thiz, F_VEHICLE_RECOGNIZED ) &&
-             thiz->bms.charge_stage == CHARGE_STAGE_HANDSHACKING) {
-            thiz->bms.charge_stage = CHARGE_STAGE_CONFIGURE;
-            log_printf(INF, "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CONFIGURE"));
-        } else if ( (param->can_id & 0x00FF0000) == (PGN_CRO << 8) &&
-             bit_read(thiz, F_CHARGER_READY) &&
-             bit_read(thiz, F_BMS_READY ) &&
-             thiz->bms.charge_stage == CHARGE_STAGE_CONFIGURE ) {
-            thiz->bms.charge_stage = CHARGE_STAGE_CHARGING;
-            log_printf(INF,
-              "BMS: CHARGER change stage to "RED("CHARGE_STAGE_CHARGING"));
-        } else {
-            param->can_id = param->can_id >> 8;
-            about_packet_reciev_done(thiz, param);
-        }
+        param->can_id = param->can_id >> 8;
+        about_packet_reciev_done(thiz, param);
         break;
     case EVENT_TX_PRE:
         // 决定是否要发送刚刚准备发送的数据包
         param->evt_param = EVT_RET_OK;
         break;
     case EVENT_TX_REQUEST:
-        /*
-         * 在这里进行CAN数据包的发送处理
-         * 进行数据包发送的条件是：充电枪物理连接正常，进入车辆识别过程，或充电过程。
-         *
-         * 数据包的发送，优先级最高的是错误报文输出，若是遇到周期性发送的数据包在发送
-         * 时序上有重叠的问题，那么在这里的处理方式是，先到先处理，例如在若干个循环内
-         * 数据包A，B的发送周期是10ms, 30ms，那么A，B的发送时时序应该是如下方式
-         * T (ms)      数据包
-         * |             |
-         * 0             A
-         * 0  + $$       B
-         * |             |
-         * |             |
-         * 10            A
-         * |             |
-         * |             |
-         * 20            A
-         * |             |
-         * |             |
-         * 30            A
-         * 30 + $$       B
-         * |             |
-         * |             |
-         * ...         ...
-         *
-         * $$ 表示最小的循环控制周期，一般来说是绝对小于数据包的发送周期的
-         * 所以会有如下的控制逻辑结构
-         * if ( ... ) {
-         * } else if ( ... ) {
-         * } else if ( ... ) {
-         * } else ;
-         * 在若干个循环控制周期内，数据包都能按照既定的周期发送完成.
-         */
         switch ( thiz->bms.charge_stage ) {
         case CHARGE_STAGE_INVALID:
             param->evt_param = EVT_RET_ERR;
@@ -402,9 +395,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
                 if ( gen && gen->heartbeat >= gen->period ) {
                     gen_packet_PGN4608(thiz, param);
                     gen->heartbeat = 0;
-                    log_printf(INF, "CCS sent.");
-                }
-                else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST)) &&
+                } else if ( (gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CST)) &&
                           gen->heartbeat >= gen->period ) {
                     gen_packet_PGN6656(thiz, param);
                     gen->heartbeat = 0;
@@ -431,6 +422,7 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
             } while (0);
             break;
         default:
+            param->evt_param = EVT_RET_ERR;
             break;
         }
         break;
@@ -493,10 +485,23 @@ int driver_main_proc(struct charge_job *thiz, BMS_EVENT_CAN ev,
 // 数据包超时心跳包, 定时器自动复位, 一个单位时间一次
 void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachiko_food *self)
 {
+    static int food = 0;
+
     if (evt == HACHIKO_TIMEOUT ) {
         unsigned int i = 0;
         struct charge_job * thiz = (struct charge_job *)_private;
         struct can_pack_generator *gen, *me;
+
+        food ++;
+        if ( food == 1000 ) {
+            // 1S 为更新周期
+            thiz->bms.frame_speed_tx = thiz->bms.tx_seed;
+            thiz->bms.frame_speed_rx = thiz->bms.rx_seed;
+            thiz->bms.tx_seed = 0;
+            thiz->bms.rx_seed = 0;
+           food = 0;
+        }
+
         for ( i = 0; thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             gen = & thiz->bms.generator[i];
             if ( gen->stage == thiz->bms.charge_stage ) {
@@ -520,45 +525,79 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
          */
         for ( i = 0; thiz && i < thiz->bms.can_pack_gen_nr; i++ ) {
             me = &thiz->bms.generator[i];
-            if ((bit_read(thiz, F_GUN_1_PHY_CONN_STATUS)&&
-                 bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))
-                    ||
-                (bit_read(thiz, F_GUN_2_PHY_CONN_STATUS)&&
-                 bit_read(thiz, F_GUN_1_ASSIT_PWN_SWITCH_STATUS))){
-                me->can_silence ++;
-            } else continue;
+            //if ( bit_read(thiz, JF_GUN_OK) && bit_read(thiz, JF_ASSIT_PWR_ON) ) {
+                if ( me->stage == thiz->bms.charge_stage ) {
+                    me->can_silence ++;
+                } else {
+                    me->can_silence = 0;
+                }
+            //} else continue;
             if ( me->can_tolerate_silence < me->can_silence ) {
                 switch (thiz->bms.charge_stage) {
                 case CHARGE_STAGE_HANDSHACKING:
                     if (me->can_pgn != PGN_BRM) break;
-                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
-                            bit_set(thiz, S_BMS_COMM_DOWN);
-                            log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
+                        if ( !bit_read(thiz, JS_BMS_RX_BRM_TIMEOUT) ) {
+                            bit_set(thiz, JS_BMS_RX_BRM_TIMEOUT);
+                            bit_clr(thiz, JF_BMS_BRM_OK);
+                            log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障(%d, V(RX):%d, V(TX):%d)")", 重新握手",
+                                       me->can_tolerate_silence,
+                                       thiz->bms.frame_speed_rx,
+                                       thiz->bms.frame_speed_tx);
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                        } else {
+                            me->can_silence = 0;
                         }
                     break;
                 case CHARGE_STAGE_CONFIGURE:
-                    if (me->can_pgn != PGN_BCP) break;
-                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
-                            bit_set(thiz, S_BMS_COMM_DOWN);
-                            log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障"));
+                    if (me->can_pgn != PGN_BRO && me->can_pgn != PGN_BCP ) break;
+                        if ( me->can_pgn == PGN_BRO && !bit_read(thiz, JS_BMS_RX_BRO_TIMEOUT) ) {
+                            bit_set(thiz, JS_BMS_RX_BRO_TIMEOUT);
+                            bit_clr(thiz, JF_BMS_RX_BRO);
+                        } else {
+                            me->can_silence = 0;
+                        }
+
+                        if ( me->can_pgn == PGN_BCP && !bit_read(thiz, JS_BMS_RX_BCP_TIMEOUT) ) {
+                            bit_set(thiz, JS_BMS_RX_BCP_TIMEOUT);
+                            bit_clr(thiz, JF_BMS_RX_BCP);
+                        } else {
+                            me->can_silence = 0;
+                        }
+
+                        if ( bit_read(thiz, JS_BMS_RX_BRO_TIMEOUT) &&
+                             bit_read(thiz, JS_BMS_RX_BCP_TIMEOUT) ) {
+                            log_printf(WRN, "BMS: 配置阶段BMS通信"RED("故障(%d, V(RX):%d, V(TX):%d)")", 重新握手",
+                                       me->can_tolerate_silence,
+                                       thiz->bms.frame_speed_rx,
+                                       thiz->bms.frame_speed_tx);
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
                         }
                     break;
                 case CHARGE_STAGE_CHARGING:
                     if (me->can_pgn != PGN_BCL) break;
-                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
-                            bit_set(thiz, S_BMS_COMM_DOWN);
-                            log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障"));
+                        if ( !bit_read(thiz, JS_BMS_RX_BCL_TIMEOUT) ) {
+                            bit_set(thiz, JS_BMS_RX_BCL_TIMEOUT);
+                            bit_clr(thiz, JF_BMS_RX_BCL);
+                            log_printf(WRN, "BMS: 充电阶段BMS通信"RED("故障(%d, V(RX):%d, V(TX):%d)")", 重新握手",
+                                       me->can_tolerate_silence,
+                                       thiz->bms.frame_speed_rx,
+                                       thiz->bms.frame_speed_tx);
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                        } else {
+                            me->can_silence = 0;
                         }
                     break;
                 case CHARGE_STAGE_DONE:
                     if (me->can_pgn != PGN_BSD) break;
-                        if ( !bit_read(thiz, S_BMS_COMM_DOWN) ) {
-                            bit_set(thiz, S_BMS_COMM_DOWN);
-                            log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障"));
-                            thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                        if ( !bit_read(thiz, JS_BMS_RX_BSD_TIMEOUT) &&
+                             ! bit_read(thiz, JF_BMS_RX_BSD) ) {
+                            bit_set(thiz, JS_BMS_RX_BSD_TIMEOUT);
+                            log_printf(WRN, "BMS: 充电完成阶段BMS通信"RED("故障(%d, V(RX):%d, V(TX):%d)"),
+                                       me->can_tolerate_silence,
+                                       thiz->bms.frame_speed_rx,
+                                       thiz->bms.frame_speed_tx);
+                        } else {
+                            me->can_silence = 0;
                         }
                     break;
                 default:
@@ -576,329 +615,348 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
     struct can_pack_generator *gen = NULL;
 
     switch ( param->can_id & 0x00FF00 ) {
-    case PGN_CRM :// 0x000100,
-        break;
-    case PGN_CTS :// 0x000700,
-        break;
-    case PGN_CML :// 0x000800,
-        break;
-    case PGN_CCS :// 0x001200,
-        break;
-    case PGN_CST :// 0x001A00,
-        bit_set(thiz, F_PCK_TX_CST);
-        log_printf(INF, "BMS: PGN_CST 已经发送.");
-        //thiz->bms.charge_stage = CHARGE_STAGE_DONE;
-        log_printf(INF,
-          "BMS: CHARGER change stage to "RED("CHARGE_STAGE_DONE"));
-        break;
-    case PGN_CSD :// 0x001D00,
-        bit_set(thiz, F_PCK_TX_CSD);
-        log_printf(INF, "BMS: PGN_CSD 已经发送.");
-        break;
-    case PGN_CRO :// 0x000A00,
-        break;
-    case PGN_CEM :// 0x001F00
-        break;
     case PGN_BRM :// 0x000200, BMS 车辆辨识报文
+        if ( bit_read(thiz, JS_BMS_RX_BRM_TIMEOUT) ) {
+            bit_clr(thiz, JS_BMS_RX_BRM_TIMEOUT);
+            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
+        }
+        bit_set(thiz, JF_BMS_RX_BRM);
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BRM);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
-            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
-        }
-        bit_clr(thiz, S_BMS_COMM_DOWN);
-        //__dump_can_param(param);
 
         if ( param->buff_payload == 8 ) {
-            memcpy(&thiz->bms.vehicle_info, param->buff.rx_buff, 8);
+            memcpy(&thiz->bms.brm, param->buff.rx_buff, 8);
         } else if ( param->buff_payload == sizeof(struct pgn512_BRM) ) {
-            memcpy(&thiz->bms.vehicle_info,
+            memcpy(&thiz->bms.brm,
                    param->buff.rx_buff, sizeof(struct pgn512_BRM));
         }
 
-        if ( thiz->bms.vehicle_info.spn2565_bms_version[0] == 0x00 &&
-             thiz->bms.vehicle_info.spn2565_bms_version[1] == 0x01 &&
-             thiz->bms.vehicle_info.spn2565_bms_version[2] == 0x00 ) {
-
+        if ( thiz->bms.brm.spn2565_bms_version[0] == 0x00 &&
+             thiz->bms.brm.spn2565_bms_version[1] == 0x01 &&
+             thiz->bms.brm.spn2565_bms_version[2] == 0x00 ) {
         } else {
             log_printf(WRN,
                   "BMS: BMS not recognized due to invalid BMS VERSION(SPN2565)."
                        "%02X%02X%02X",
-                       thiz->bms.vehicle_info.spn2565_bms_version[0],
-                       thiz->bms.vehicle_info.spn2565_bms_version[1],
-                       thiz->bms.vehicle_info.spn2565_bms_version[2]);
-            bit_clr(thiz, F_BMS_RECOGNIZED);
+                       thiz->bms.brm.spn2565_bms_version[0],
+                       thiz->bms.brm.spn2565_bms_version[1],
+                       thiz->bms.brm.spn2565_bms_version[2]);
+            bit_clr(thiz, JF_BMS_BRM_OK);
             break;
         }
 
-        if ( thiz->bms.vehicle_info.spn2566_battery_type == 0 ||
-             (thiz->bms.vehicle_info.spn2566_battery_type > 0x08 &&
-              thiz->bms.vehicle_info.spn2566_battery_type < 0xFF) ) {
+        if ( thiz->bms.brm.spn2566_battery_type == 0 ||
+             (thiz->bms.brm.spn2566_battery_type > 0x08 &&
+              thiz->bms.brm.spn2566_battery_type < 0xFF) ) {
             log_printf(WRN,
                    "BMS: BMS not recognized due to invalid BATTERY TYPE(SPN2566)");
-            bit_clr(thiz, F_BMS_RECOGNIZED);
+            bit_clr(thiz, JF_BMS_BRM_OK);
             break;
         }
 
-        if ( thiz->bms.vehicle_info.spn2567_capacity / 10.0f > 1000.0f ) {
+        if ( thiz->bms.brm.spn2567_capacity / 10.0f > 1000.0f ) {
             log_printf(WRN,
                    "BMS: BMS not recognized due to invalid CAP INFO(SPN2567)");
-            bit_clr(thiz, F_BMS_RECOGNIZED);
+            bit_clr(thiz, JF_BMS_BRM_OK);
             break;
         }
 
-        if ( thiz->bms.vehicle_info.spn2568_volatage / 10.0f > 750.0f ) {
+        if ( thiz->bms.brm.spn2568_volatage / 10.0f > 750.0f ) {
             log_printf(WRN,
                   "BMS: BMS not recognized due to invalid VOLTAGE INFO(SPN2568)");
-            bit_clr(thiz, F_BMS_RECOGNIZED);
+            bit_clr(thiz, JF_BMS_BRM_OK);
             break;
         }
         log_printf(INF, "BMS: BMS recognized....CAP: %.1f A.H, VOL: %.1f V",
-                   thiz->bms.vehicle_info.spn2567_capacity/10.0f,
-                   thiz->bms.vehicle_info.spn2568_volatage/10.0);
-        if ( ! bit_read(thiz, F_BMS_RECOGNIZED ) ) {
+                   thiz->bms.brm.spn2567_capacity/10.0f,
+                   thiz->bms.brm.spn2568_volatage/10.0);
+        if ( ! bit_read(thiz, JF_BMS_BRM_OK ) ) {
             // send recognized event from here.
         }
-        bit_set(thiz, F_BMS_RECOGNIZED);
+        if ( ! bit_read(thiz, JF_BMS_BRM_OK) ) {
+            log_printf(INF, "BMS.BRM: 识别BMS成功.");
+        }
+        bit_set(thiz, JF_BMS_BRM_OK);
         break;
     case PGN_BCP :// 0x000600, BMS 配置报文
+        if ( bit_read(thiz, JS_BMS_RX_BCP_TIMEOUT) ) {
+            bit_clr(thiz, JS_BMS_RX_BCP_TIMEOUT);
+            log_printf(INF, "BMS: BMS 通信"GRN("恢复") "BCP");
+        }
+        bit_set(thiz, JF_BMS_RX_BCP);
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BCP);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
-            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
-        }
-        bit_clr(thiz, S_BMS_COMM_DOWN);
 
         if ( param->buff_payload != 13 ) {
             log_printf(WRN, "BMS: BCP packet size crash, need 13 gave %d",
                        param->buff_payload);
             break;
         }
-        memcpy(&thiz->bms.bms_config_info, param->buff.rx_buff,
+        memcpy(&thiz->bms.bcp, param->buff.rx_buff,
                sizeof(struct pgn1536_BCP));
 
-        if ( thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery /
+        if ( thiz->bms.bcp.spn2816_max_charge_volatage_single_battery /
                 100.0f > 24.0f ) {
             log_printf(WRN,
                        "BMS: max_charge_volatage_single_battery out of rang(0-24)"
                        "gave %.2f V (SPN2816)",
-             thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery /
+             thiz->bms.bcp.spn2816_max_charge_volatage_single_battery /
                        100.0f);
             break;
         }
 
-        if ( thiz->bms.bms_config_info.spn2817_max_charge_current / 10.0f >
+        if ( thiz->bms.bcp.spn2817_max_charge_current / 10.0f >
              400.0f ) {
             log_printf(WRN, "BMS: max_charge_current out of rang(-400-0)"
                        "gave %.1f V (SPN2816)",
-                     thiz->bms.bms_config_info.spn2817_max_charge_current / 10.0f);
+                     thiz->bms.bcp.spn2817_max_charge_current / 10.0f);
             break;
         }
 
-        if ( thiz->bms.bms_config_info.spn2818_total_energy / 10.0f > 1000.0f ) {
+        if ( thiz->bms.bcp.spn2818_total_energy / 10.0f > 1000.0f ) {
             log_printf(WRN, "BMS: total_energy out of rang(0-1000 KW.H)"
                        "gave %.1f KW.H (SPN2818)",
-                     thiz->bms.bms_config_info.spn2818_total_energy / 10.0f);
+                     thiz->bms.bcp.spn2818_total_energy / 10.0f);
             break;
         }
 
-        if ( thiz->bms.bms_config_info.spn2819_max_charge_voltage / 10.0f >
+        if ( thiz->bms.bcp.spn2819_max_charge_voltage / 10.0f >
                 750.0f ) {
             log_printf(WRN, "BMS: max_charge_voltage out of rang(0-750 V)"
                        "gave %.1f V (SPN2819)",
-                     thiz->bms.bms_config_info.spn2819_max_charge_voltage / 10.0f);
+                     thiz->bms.bcp.spn2819_max_charge_voltage / 10.0f);
             break;
         }
 
         log_printf(INF, "BMS: BCP done, BSVH: %.2f V, MAXi: %.1f A, "
                    "CAP: %.1f KW.H, MVC: %.1f V, MT: %d, SOC: %.1f %%, V: %.1f V",
-                   thiz->bms.bms_config_info.spn2816_max_charge_volatage_single_battery/100.0f,
-                   (thiz->bms.bms_config_info.spn2817_max_charge_current-4000)/-10.0f,
-                   thiz->bms.bms_config_info.spn2818_total_energy/10.0f,
-                   thiz->bms.bms_config_info.spn2819_max_charge_voltage/10.0f,
-                   thiz->bms.bms_config_info.spn2820_max_temprature-50,
-                   thiz->bms.bms_config_info.spn2821_soc/10.0f,
-                   thiz->bms.bms_config_info.spn2822_total_voltage/10.0f);
+                   thiz->bms.bcp.spn2816_max_charge_volatage_single_battery/100.0f,
+                   (thiz->bms.bcp.spn2817_max_charge_current-4000)/-10.0f,
+                   thiz->bms.bcp.spn2818_total_energy/10.0f,
+                   thiz->bms.bcp.spn2819_max_charge_voltage/10.0f,
+                   thiz->bms.bcp.spn2820_max_temprature-50,
+                   thiz->bms.bcp.spn2821_soc/10.0f,
+                   thiz->bms.bcp.spn2822_total_voltage/10.0f);
         break;
     case PGN_BRO :// 0x000900, BMS 充电准备就绪报文
+        if ( bit_read(thiz, JS_BMS_RX_BRO_TIMEOUT) ) {
+            log_printf(INF, "BMS.BRO: BRO报文通信恢复.");
+        }
+        bit_clr(thiz, JS_BMS_RX_BRO_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BRO);
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BRO);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        log_printf(INF, "BMS is %s for charge.",
-                   param->buff.rx_buff[0] == 0x00 ?
-                    "not ready" :
-                    param->buff.rx_buff[0] == 0xAA ?
-                    "ready" : "<unkown status>");
+
         if ( param->buff.rx_buff[0] == 0x00 ) {
-            bit_clr(thiz, F_BMS_READY);
-            bit_clr(thiz, F_CHARGER_READY);
+            bit_clr(thiz, JF_BMS_BRO_OK);
         } else if ( param->buff.rx_buff[0] == 0xAA ) {
-            bit_set(thiz, F_BMS_READY);
-            bit_set(thiz, F_CHARGER_READY);
+            if ( !bit_read(thiz, JF_BMS_BRO_OK) ) {
+                log_printf(INF, "BMS.BRO: BMS充电准备完成");
+            }
+            bit_set(thiz, JF_BMS_BRO_OK);
+            if ( bit_read(thiz, JF_CHG_CRO_OK) &&
+                 bit_read(thiz, JF_BMS_TX_CRO) ) {
+                if ( thiz->bms.charge_stage != CHARGE_STAGE_CHARGING ) {
+                    log_printf(INF, "BMS.BRO: 充电阶段转换为"GRN("充电阶段"));
+                }
+                thiz->bms.charge_stage = CHARGE_STAGE_CHARGING;
+            }
         } else {
             log_printf(WRN, "BMS: wrong can package data.");
         }
         break;
     case PGN_BCL :// 0x001000, BMS 电池充电需求报文
+        if ( bit_read(thiz, JS_BMS_RX_BCL_TIMEOUT) ) {
+            log_printf(INF, "BMS.BCL: BCL报文通信恢复.");
+        }
+        thiz->bms.charge_stage = CHARGE_STAGE_CHARGING;
+        bit_clr(thiz, JS_BMS_RX_BCL_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BCL);
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BCL);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
-            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
-        }
-        bit_clr(thiz, S_BMS_COMM_DOWN);
 
-        memcpy(&thiz->bms.bms_charge_need_now,
+        memcpy(&thiz->bms.bcl,
                param->buff.rx_buff, sizeof(struct pgn4096_BCL));
-        if ( thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f > 750 ) {
-            log_printf(WRN, "BMS: spn3072 range 0-750V gave: %d V",
-                       thiz->bms.bms_charge_need_now.spn3072_need_voltage);
+        if ( thiz->bms.bcl.spn3072_need_voltage/10.0f > 750 ) {
+            log_printf(WRN, "BMS: BCL.spn3072 range 0-750V gave: %d V",
+                       thiz->bms.bcl.spn3072_need_voltage);
         } else {
             //thiz->need_V = 10;
-            thiz->need_V = thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0f;
+            thiz->need_V = thiz->bms.bcl.spn3072_need_voltage/10.0f;
         }
-        if ( (thiz->bms.bms_charge_need_now.spn3073_need_current - 4000 )/-10.0f < 0 ) {
-            log_printf(WRN, "BMS: spn3073 range -400-0A gave: %d A",
-                       thiz->bms.bms_charge_need_now.spn3073_need_current);
+        if ( (thiz->bms.bcl.spn3073_need_current - 4000 )/-10.0f < 0 ) {
+            log_printf(WRN, "BMS: BCL.spn3073 range -400-0A gave: %d A",
+                       thiz->bms.bcl.spn3073_need_current);
         } else {
             thiz->need_I = 0;
-            double fi = (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/10.0;
+            double fi = (thiz->bms.bcl.spn3073_need_current-4000)/10.0;
             fi = fi < 0 ? -fi : fi;
             thiz->need_I = fi;
         }
 
-        log_printf(INF, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
+        log_printf(DBG_LV3, "BMS: SETV: %.1f, SETI: %.1f", thiz->need_V, thiz->need_I);
 
-        double fi = (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/10.0;
-        log_printf(INF, "BMS.BCL: need I:  %04X, %d, %d, |(NI - 4000)/10|=%.1f A, GBT: %.1f A",
-                   thiz->bms.bms_charge_need_now.spn3073_need_current,
-                   thiz->bms.bms_charge_need_now.spn3073_need_current,
-                   (unsigned)thiz->bms.bms_charge_need_now.spn3073_need_current,
+        double fi = (thiz->bms.bcl.spn3073_need_current-4000)/10.0;
+        log_printf(DBG_LV3, "BMS.BCL: need I:  %04X, %d, %d, |(NI - 4000)/10|=%.1f A, GBT: %.1f A",
+                   thiz->bms.bcl.spn3073_need_current,
+                   thiz->bms.bcl.spn3073_need_current,
+                   (unsigned)thiz->bms.bcl.spn3073_need_current,
                    fi < 0 ? -fi : fi,
-                   (thiz->bms.bms_charge_need_now.spn3073_need_current-4000)/-10.0
+                   (thiz->bms.bcl.spn3073_need_current-4000)/-10.0
                    );
 
-        log_printf(INF, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %.1f mode: %s",
-                   thiz->bms.bms_charge_need_now.spn3072_need_voltage/10.0,
-                   (thiz->bms.bms_charge_need_now.spn3073_need_current+400)/-10.0f,
-                   thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
+        log_printf(DBG_LV3, "BMS: PGN_BCL fetched, V-need: %.1f V, I-need: %.1f mode: %s",
+                   thiz->bms.bcl.spn3072_need_voltage/10.0,
+                   (thiz->bms.bcl.spn3073_need_current+400)/-10.0f,
+                   thiz->bms.bcl.spn3074_charge_mode ==
                     CHARGE_WITH_CONST_VOLTAGE ? "恒压充电" :
-                   thiz->bms.bms_charge_need_now.spn3074_charge_mode ==
+                   thiz->bms.bcl.spn3074_charge_mode ==
                         CHARGE_WITH_CONST_CURRENT ? "恒流充电" : "无效模式");
         break;
     case PGN_BCS :// 0x001100, BMS 电池充电总状态报文
+        if ( bit_read(thiz, JS_BMS_RX_BCS_TIMEOUT) ) {
+            log_printf(INF, "BMS.BCS: BCS报文通信恢复.");
+        }
+        bit_clr(thiz, JS_BMS_RX_BCS_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BCS);
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BCS);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
         log_printf(DBG_LV2, "BMS: PGN_BCS fetched.");
-        memcpy(&thiz->bms.bms_all_battery_status, param->buff.rx_buff,
+        memcpy(&thiz->bms.bcs, param->buff.rx_buff,
                sizeof(struct pgn4352_BCS));
-        if (thiz->bms.bms_all_battery_status.spn3075_charge_voltage/10.0 > 750.0f) {
-            log_printf(WRN, "BMS: spn3075 range 0-750 gave: %.1f V",
-                     thiz->bms.bms_all_battery_status.spn3075_charge_voltage/10.0);
+        if (thiz->bms.bcs.spn3075_charge_voltage/10.0 > 750.0f) {
+            log_printf(WRN, "BMS: BCS.spn3075 range 0-750 gave: %.1f V",
+                     thiz->bms.bcs.spn3075_charge_voltage/10.0);
         }
-        if (thiz->bms.bms_all_battery_status.spn3076_charge_current/10.0 > 400.0f) {
-            log_printf(WRN, "BMS: spn3076 range -400-0 gave: %.1f V",
-                   -(thiz->bms.bms_all_battery_status.spn3076_charge_current/10.0));
+        if (thiz->bms.bcs.spn3076_charge_current/10.0 > 400.0f) {
+            log_printf(WRN, "BMS: BCS.spn3076 range -400-0 gave: %.1f V",
+                   -(thiz->bms.bcs.spn3076_charge_current/10.0));
         }
-        if (thiz->bms.bms_all_battery_status.spn3077_max_v_g_number/100.0 > 24.0 ) {
-            log_printf(WRN, "BMS: spn3077 range 0-24 gave: %.1f V",
-                   -(thiz->bms.bms_all_battery_status.spn3077_max_v_g_number/100.0));
+        if (thiz->bms.bcs.spn3077_max_v_g_number/100.0 > 24.0 ) {
+            log_printf(WRN, "BMS: BCS.spn3077 range 0-24 gave: %.1f V",
+                   -(thiz->bms.bcs.spn3077_max_v_g_number/100.0));
         }
-        if (thiz->bms.bms_all_battery_status.spn3078_soc > 100 ) {
-            log_printf(WRN, "BMS: spn3078 range 0%%-100%% gave: %d%%",
-                   -(thiz->bms.bms_all_battery_status.spn3078_soc));
+        if (thiz->bms.bcs.spn3078_soc > 100 ) {
+            log_printf(WRN, "BMS: BCS.spn3078 range 0%%-100%% gave: %d%%",
+                   -(thiz->bms.bcs.spn3078_soc));
         }
         log_printf(INF, "BMS.BCS: CV: %.1f V, CI: %.1f A, gVmax: %.1f, "
                    "SOC: %d %%, RT: %d min",
-                   thiz->bms.bms_all_battery_status.spn3075_charge_voltage/10.0,
-                   (thiz->bms.bms_all_battery_status.spn3076_charge_current-4000)/-10.0,
-                   (thiz->bms.bms_all_battery_status.spn3077_max_v_g_number&0xFFF)/100.0,
-                   thiz->bms.bms_all_battery_status.spn3078_soc,
-                   thiz->bms.bms_all_battery_status.spn3079_need_time);
+                   thiz->bms.bcs.spn3075_charge_voltage/10.0,
+                   (thiz->bms.bcs.spn3076_charge_current-4000)/-10.0,
+                   (thiz->bms.bcs.spn3077_max_v_g_number&0xFFF)/100.0,
+                   thiz->bms.bcs.spn3078_soc,
+                   thiz->bms.bcs.spn3079_need_time);
         break;
     case PGN_BSM :// 0x001300, 动力蓄电池状态信息报文
+        if ( bit_read(thiz, JS_BMS_RX_BSM_TIMEOUT) ) {
+            log_printf(INF, "BMS.BSM: BSM报文通信恢复.");
+        }
+        bit_clr(thiz, JS_BMS_RX_BSM_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BSM);
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSM);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
         log_printf(DBG_LV2, "BMS: PGN_BSM fetched.");
-        memcpy(&thiz->bms.bms_battery_status, param->buff.rx_buff,
+        memcpy(&thiz->bms.bsm, param->buff.rx_buff,
                sizeof(struct pgn4864_BSM));
         if ( SINGLE_BATTERY_VOLTAGE_HIGH ==
-             (thiz->bms.bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_HIGH)){
+             (thiz->bms.bsm.remote_single&SINGLE_BATTERY_VOLTAGE_HIGH)){
         }
         if (SINGLE_BATTERY_VOLTAGE_LOW ==
-             (thiz->bms.bms_battery_status.remote_single&SINGLE_BATTERY_VOLTAGE_LOW)){
+             (thiz->bms.bsm.remote_single&SINGLE_BATTERY_VOLTAGE_LOW)){
 
         }
 
         if (BATTERY_CHARGE_CURRENT_HIGH ==
-             (thiz->bms.bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_HIGH)){
+             (thiz->bms.bsm.remote_single&BATTERY_CHARGE_CURRENT_HIGH)){
 
         }
         if (BATTERY_CHARGE_CURRENT_LOW ==
-             (thiz->bms.bms_battery_status.remote_single&BATTERY_CHARGE_CURRENT_LOW)){
+             (thiz->bms.bsm.remote_single&BATTERY_CHARGE_CURRENT_LOW)){
         }
 
         if (BATTERY_TEMPRATURE_HIGH ==
-                (thiz->bms.bms_battery_status.remote_single&BATTERY_TEMPRATURE_HIGH)){
+                (thiz->bms.bsm.remote_single&BATTERY_TEMPRATURE_HIGH)){
         }
         if (BATTERY_TEMPRATURE_LOW ==
-                (thiz->bms.bms_battery_status.remote_single&BATTERY_TEMPRATURE_LOW)) {
+                (thiz->bms.bsm.remote_single&BATTERY_TEMPRATURE_LOW)) {
         }
 
         if (INSULATION_FAULT ==
-                (thiz->bms.bms_battery_status.remote_single&INSULATION_FAULT)){
+                (thiz->bms.bsm.remote_single&INSULATION_FAULT)){
         }
         if (INSULATION_UNRELIABLE==
-                (thiz->bms.bms_battery_status.remote_single&INSULATION_UNRELIABLE)){
+                (thiz->bms.bsm.remote_single&INSULATION_UNRELIABLE)){
         }
 
         if (CONNECTOR_STATUS_FAULT==
-                (thiz->bms.bms_battery_status.remote_single&CONNECTOR_STATUS_FAULT)){
+                (thiz->bms.bsm.remote_single&CONNECTOR_STATUS_FAULT)){
         }
         if (CONNECTOR_STATUS_UNRELIABLE==
-                (thiz->bms.bms_battery_status.remote_single&CONNECTOR_STATUS_UNRELIABLE)){
+                (thiz->bms.bsm.remote_single&CONNECTOR_STATUS_UNRELIABLE)){
         }
 
         if (CHARGE_ALLOWED==
-                (thiz->bms.bms_battery_status.remote_single&CHARGE_ALLOWED)){
+                (thiz->bms.bsm.remote_single&CHARGE_ALLOWED)){
+            bit_set(thiz, JF_CHARGE_BMS_ALLOW);
         }
         if (CHARGE_FORBIDEN==
-                (thiz->bms.bms_battery_status.remote_single&CHARGE_FORBIDEN)){
+                (thiz->bms.bsm.remote_single&CHARGE_FORBIDEN)){
+            bit_clr(thiz, JF_CHARGE_BMS_ALLOW);
         }
         break;
     case PGN_BMV :// 0x001500, 单体动力蓄电池电压报文
+        if ( bit_read(thiz, JS_BMS_RX_BMV_TIMEOUT) ) {
+            log_printf(INF, "BMS.BMV: BMV报文通信恢复.");
+        }
+        bit_clr(thiz, JS_BMS_RX_BMV_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BMV);
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BMV);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        memcpy(&thiz->bms.bms_battery_V, param->buff.rx_buff,
+        memcpy(&thiz->bms.bmv, param->buff.rx_buff,
                sizeof(struct pgn5376_BMV));
 
         log_printf(DBG_LV2, "BMS: PGN_BMV fetched.");
         break;
     case PGN_BMT :// 0x001600, 单体动力蓄电池温度报文
+        if ( bit_read(thiz, JS_BMS_RX_BMT_TIMEOUT) ) {
+            log_printf(INF, "BMS.BMT: BMT报文通信恢复.");
+        }
+        bit_clr(thiz, JS_BMS_RX_BMT_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BMT);
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BMT);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        memcpy(&thiz->bms.bms_battery_T, param->buff.rx_buff,
+        memcpy(&thiz->bms.bmt, param->buff.rx_buff,
                sizeof(struct pgn5632_BMT));
 
         log_printf(DBG_LV2, "BMS: PGN_BMT fetched.");
@@ -913,39 +971,51 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
         log_printf(DBG_LV2, "BMS: PGN_BSP fetched.");
         break;
     case PGN_BST :// 0x001900, BMS 中止充电报文
+        if ( bit_read(thiz, JS_BMS_RX_BST_TIMEOUT) ) {
+            log_printf(INF, "BMS.BST: BST报文通信恢复.");
+        }
+        bit_clr(thiz, JS_BMS_RX_BST_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BST);
+        bit_set(thiz, JF_BMS_TRM_CHARGE);
+        log_printf(INF, "BMS.BST: BMS中止充电.");
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BST);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        /*
-         * 接收到中止充电报文，充电机发送CTS，并关闭高压输出
-         */
-        bit_set(thiz, F_PCK_BMS_TRM);
-        memcpy(&thiz->bms.bms_bst, param->buff.rx_buff,
+
+        memcpy(&thiz->bms.bst, param->buff.rx_buff,
                sizeof(struct pgn6400_BST));
+
+        if ( bit_read(thiz, JF_BMS_TX_CST) ) {
+            log_printf(INF, "BMS.BST: 转换为充电完成状态");
+            thiz->bms.charge_stage = CHARGE_STAGE_DONE;
+        }
 
         log_printf(INF, "BMS: PGN_BST fetched.");
         break;
     case PGN_BSD :// 0x001C00, BMS 统计数据报文
+        if ( bit_read(thiz, JS_BMS_RX_BSD_TIMEOUT) ) {
+            log_printf(INF, "BMS.BSD: BSD报文通信恢复.");
+        }
+        bit_clr(thiz, JS_BMS_RX_BSD_TIMEOUT);
+        bit_set(thiz, JF_BMS_RX_BSD);
+
         gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_BSD);
         if ( gen ) {
             gen->can_counter ++;
             gen->can_silence = 0;
         }
-        if ( bit_read(thiz, S_BMS_COMM_DOWN) ) {
-            log_printf(INF, "BMS: BMS 通信"GRN("恢复"));
-        }
-        thiz->bms.charge_stage = CHARGE_STAGE_DONE;
-        bit_clr(thiz, S_BMS_COMM_DOWN);
-        memcpy(&thiz->bms.bms_stop_bsd, param->buff.rx_buff,
+
+        memcpy(&thiz->bms.bsd, param->buff.rx_buff,
                sizeof(struct pgn7168_BSD));
         log_printf(INF, "BMS.BSD: SOC: %d %%, Vmin: %.2f V, Vmax: %.2f V,"
-                   "Tmin: %d, Tmax: %d", thiz->bms.bms_stop_bsd.end_soc,
-                   thiz->bms.bms_stop_bsd.min_bat_V/100.0f,
-                   thiz->bms.bms_stop_bsd.max_bat_V/100.0f,
-                   thiz->bms.bms_stop_bsd.min_bat_T - 50,
-                   thiz->bms.bms_stop_bsd.max_bat_T - 50);
+                   "Tmin: %d, Tmax: %d", thiz->bms.bsd.end_soc,
+                   thiz->bms.bsd.min_bat_V/100.0f,
+                   thiz->bms.bsd.max_bat_V/100.0f,
+                   thiz->bms.bsd.min_bat_T - 50,
+                   thiz->bms.bsd.max_bat_T - 50);
 
         log_printf(DBG_LV2, "BMS: PGN_BSD fetched.");
         break;

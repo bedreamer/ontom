@@ -52,7 +52,7 @@ sync
 #/usr/test/am335x_qt -qws &
 
 umask 022
-export PATH=$PATH:/usr/zeus:/usr/zeus/scripts
+export PATH=$PATH:/usr/zeus:/usr/zeus/script
 
 #/usr/browser/browser -qws http://127.0.0.1:8080 &
 #/usr/zeus/zeus &

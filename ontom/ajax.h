@@ -18,6 +18,8 @@ struct ajax_xml_struct {
     struct mg_connection *xml_conn;
 	// XML缓冲区，最大为4K
 	char iobuff[XML_IO_SIZE];
+    // 输出临时文件
+    FILE * ofile;
 };
 
 int ajax_search_file(const char *fn);

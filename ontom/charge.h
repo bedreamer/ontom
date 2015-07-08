@@ -313,6 +313,13 @@ typedef enum {
     UI_PAGE_JOBS
 }UI_PAGE;
 
+// 电表定义
+typedef enum {
+    KWH_METER_NONE,
+    KWH_METER_HUALI_3AC,
+    KWH_METER_YADA_DC
+}KWH_METER;
+
 /* 系统信号定义
  * 前 128个信号为系统标记
  */
@@ -334,6 +341,10 @@ typedef enum {
     F_BILLING_DONE,
     // 扣费超时
     F_BILING_TIMEOUT,
+    // 手动充电需要辅助电源
+    F_MANUL_CHARGE_NEED_ASSITER,
+    // 需要进行电能计费
+    F_NEED_KWH_METER,
 
     // {{
     // 1#枪充电
@@ -574,6 +585,10 @@ typedef enum {
     JF_GUN_OK,
     // 1: 辅助电源已经上电，0: 辅助电源未上电
     JF_ASSIT_PWR_ON,
+    // 1: 24V辅助电源，0: 12V 辅助电源
+    JF_ASSIT_VOL,
+    // 1: 需要辅助电源，0: 不需要辅助电源
+    JF_NEED_ASSIT_PWR,
     // 1: 电子锁已经闭合，0: 电子锁未闭合
     JF_LOCK_ON,
     // 1: BMS驱动已经绑定，0: 未绑定
@@ -975,6 +990,26 @@ struct MDATA_QRY {
 
     unsigned short crc;
 };
+typedef enum {
+    // 端口未使用
+    OUT_NOT_USED,
+    // 1枪输出开关
+    OUT_GUN1_DC_OUTPUT,
+    // 1枪辅助电源
+    OUT_GUN1_ASSIT,
+    // 1枪电子锁
+    OUT_GUN1_LOCK,
+    // 2枪输出开关
+    OUT_GUN2_DC_OUTPUT,
+    // 2枪辅助电源
+    OUT_GUN2_ASSIT,
+    // 2枪电子锁
+    OUT_GUN2_LOCK,
+    // 系统故障状态
+    OUT_SYS_ERR_STAT,
+    // 系统充电状态
+    OUT_SYS_CHARGE_STAT
+}SIMPLE_BOX_OUT_PORT;
 
 // 握手阶段
 // 充电机辨识报文
@@ -1426,27 +1461,27 @@ struct bms_struct {
     struct Hachiko_food can_heart_beat;
 
     // 车辆基本信息
-    struct pgn512_BRM  vehicle_info;
+    struct pgn512_BRM  brm;
     // BMS充电配置信息
-    struct pgn1536_BCP bms_config_info;
+    struct pgn1536_BCP bcp;
     // BMS当前充电需求信息
-    struct pgn4096_BCL bms_charge_need_now;
+    struct pgn4096_BCL bcl;
     // BMS 电池充电总状态信息
-    struct pgn4352_BCS bms_all_battery_status;
+    struct pgn4352_BCS bcs;
     // BMS 动力蓄电池状态信息
-    struct pgn4864_BSM bms_battery_status;
+    struct pgn4864_BSM bsm;
     // BMS 动力蓄电池电压信息
-    struct pgn5376_BMV bms_battery_V;
+    struct pgn5376_BMV bmv;
     // BMS 动力蓄电池温度信息
-    struct pgn5632_BMT bms_battery_T;
+    struct pgn5632_BMT bmt;
     // BMS 中止充电原因
-    struct pgn6400_BST bms_bst;
+    struct pgn6400_BST bst;
     // BMS 充电统计信息
-    struct pgn7168_BSD bms_stop_bsd;
+    struct pgn7168_BSD bsd;
     // 充电机 中止充电原因
-    struct pgn6656_CST bms_cst;
+    struct pgn6656_CST cst;
     // 充电机统计信息
-    struct pgn7424_CSD charger_stop_csd;
+    struct pgn7424_CSD csd;
 
     // BMS 驱动
     struct bmsdriver *driver;
@@ -1558,7 +1593,7 @@ struct charge_job {
     // 产生故障时的状
     JOBSTATUS status_befor_fault;
     // 作业序号
-    time_t job_url_commit_timestamp;
+    time_t jid;
     // 作业充电枪
     CHARGE_GUN_SN job_gun_sn;
     // 充电模式
@@ -1632,6 +1667,21 @@ struct error_history {
     ERR_RECOVER_REASON error_recover_reason;
 
     struct list_head error_me;
+};
+
+// 配置项
+struct task_config {
+    // 系统配置项
+    struct {
+    }sys;
+
+    // 通讯配置项
+    struct {
+    }comm;
+
+    // 充电机配置项
+    struct {
+    }charger;
 };
 
 //充电任务描述, 详细描述了系统的配置参数
@@ -1764,6 +1814,9 @@ struct charge_task {
     double meter_V_xishu;
     // 电能表电流系数比
     double meter_I_xishu;
+    // 电表类型
+    KWH_METER meter_type;
+
     // 电流分流器系数
     unsigned int flq_xishu;
     // 模块功率因数
@@ -1774,6 +1827,10 @@ struct charge_task {
     double single_module_max_I;
     // 充电触发压差
     double charge_triger_V;
+    // 模块输出最高电压
+    double module_max_V;
+    // 模块输出最低电压
+    double moudle_min_V;
     // {{ 电压电流校准参数
     double bus1_correct_V;
     double bus1_read_V;
@@ -1782,6 +1839,9 @@ struct charge_task {
     double bus_correct_I;
     double bus_read_I;
     // }}
+
+    // 采样板输出端口功能定义
+    SIMPLE_BOX_OUT_PORT ctl_port[8];
 
     // 授权序号, BCD 码
     unsigned char bcd_auth_code[17];
@@ -2107,6 +2167,7 @@ void job_running(struct charge_task *, struct charge_job *);
 void job_destroy(struct charge_job *);
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd);
 int job_exsit(time_t id);
+int job_export(struct charge_job *);
 struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *need);
 struct charge_job* job_search(time_t ci_timestamp);
 struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun);

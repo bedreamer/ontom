@@ -274,15 +274,43 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
         printf("充电触发电压: %s V\n", text[1]);
     } else if ( 0 == strcmp(text[0], "default_bms") ) {
         strncpy((char *)task->bms_vendor_version, text[1], 16);
-        printf("默认车载BMS驱动: %s V\n", text[1]);
+        printf("默认车载BMS驱动: %s\n", text[1]);
+    }  else if ( 0 == strcmp(text[0], "module_max_V") ) {
+        task->module_max_V = atof(text[1]);
+        printf("模块最高输出电压: %s V\n", text[1]);
+    }  else if ( 0 == strcmp(text[0], "module_min_V") ) {
+        task->moudle_min_V = atof(text[1]);
+        printf("模块最低输出电压: %s V\n", text[1]);
     } else if ( 0 == strcmp(text[0], "need_billing") ) {
         if ( text[1][0] == '0' ) {
             bit_clr(task, F_NEED_BILLING);
         } else {
             bit_set(task, F_NEED_BILLING);
         }
-        printf("是否需要刷卡扣费: %s V\n",
+        printf("是否需要刷卡扣费: %s\n",
                bit_read(task, F_NEED_BILLING) ? "需要" : "不需要");
+    } else if ( 0 == strcmp(text[0], "manneed_assister") ) {
+        if ( text[1][0] == '0' ) {
+            bit_clr(task, F_MANUL_CHARGE_NEED_ASSITER);
+        } else {
+            bit_set(task, F_MANUL_CHARGE_NEED_ASSITER);
+        }
+        printf("手动充电需要辅助电源: %s\n",
+               bit_read(task, F_MANUL_CHARGE_NEED_ASSITER) ? "需要" : "不需要");
+    } else if ( 0 == strcmp(text[0], "sys_need_kwh_meter") ) {
+        if ( text[1][0] == '0' ) {
+            bit_clr(task, F_NEED_KWH_METER);
+        } else {
+            bit_set(task, F_NEED_KWH_METER);
+        }
+    } else if ( 0 == strcmp(text[0], "kwh_meter_type") ) {
+        if ( text[1][0] == '1' ) {
+            task->meter_type = KWH_METER_HUALI_3AC;
+        } else if ( text[1][0] == '2 ' ) {
+            task->meter_type = KWH_METER_YADA_DC;
+        } else {
+            task->meter_type = KWH_METER_NONE;
+        }
     }
     return 0;
 }
@@ -316,9 +344,12 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000009", Increase_convert_box_write_evt_handle},
         {"M000000A", Increase_module_read_evt_handle},
         {"M0000015", Increase_module_write_evt_handle},
-        {"0000000B", kwh_meter_read_evt_handle},
-        {"0000000C", voltage_meter_read_evt_handle},
-        {"I0000010", kwh_meter_install_evt_handle},
+        {"0000000B", huali_3AC_kwh_meter_read_evt_handle},
+        {"0000000C", huali_3AV_voltage_meter_read_evt_handle},
+        {"I0000010", huali_3AC_kwh_meter_install_evt_handle},
+
+        {"00000017", yada_DC_kwh_meter_read_evt_handle},
+        {"00000018", yada_DC_current_meter_read_evt_handle},
         {NULL, NULL}
     };
     struct bp_user u;
@@ -435,6 +466,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
     task->bat_2_insti_ohm_v = 100.0;
     task->meter_I_xishu = 100.0f;
     task->meter_V_xishu = 1.0f;
+    bit_clr(task, F_NEED_KWH_METER); // 默认不使用电能表
+    task->meter_type = KWH_METER_NONE;
     task->charge_triger_V = 5.0f;
     strcpy(task->bms_vendor_version, "0_1.0");
 
@@ -510,6 +543,8 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         task->measure[0] = (struct measure_struct *)malloc(sizeof(struct measure_struct));
         memset(task->measure[0], 0, sizeof(struct measure_struct));
         task->sys_type = SYSTEM_YITISHI;
+
+        log_printf(INF, "ZEUS.TSK: 作业结构初始化完成.");
     }
 
     do {
@@ -690,6 +725,10 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         if ( tsp >= 600 ) {
             sync_system_log();
             tsp = 0;
+        } else if ( tsp % 100 == 0 ) {
+            if ( task->job[0] && task->job[0]->job_status < JOB_DETACHING ) {
+                job_export(task->job[0]);
+            }
         }
 
         usleep(50000);
@@ -835,7 +874,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         fault ++;
     }
     // 电能表通信故障
-    if ( bit_read(task, S_KWH_METER_COMM_DOWN) ) {
+    if ( bit_read(task, F_NEED_KWH_METER) &&
+         bit_read(task, S_KWH_METER_COMM_DOWN) ) {
         fault ++;
     }
     // 充电机组通信故障
@@ -862,8 +902,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         job->bms.can_tp_bomb.status = HACHIKO_INVALID;
         break;
     case JOB_WAITTING:
-        config_write("需求电压", "2000");
-        config_write("初始电压", "2000");
+        sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
+        config_write("需求电压", buff);
+        config_write("初始电压", buff);
         bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
@@ -921,6 +962,16 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             break;
         }
 
+        if ( bit_read(job, JF_BMS_TRM_CHARGE) ) {
+            job->status_befor_fault = JOB_STANDBY;
+            job->job_status = JOB_ABORTING;
+            job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+            job->charge_stop_timestamp = time(NULL);
+            end ++;
+            log_printf(INF, "***** ZEUS(关键): 作业中止(BMS), 正在中止");
+            break;
+        }
+
         ret = __is_gun_phy_conn_ok(job);
         if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
             break;
@@ -941,7 +992,10 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
 
         // 充电模式为自动充电，需要和BMS通信，此时才需要将辅助电源合闸
-        if ( job->charge_mode == CHARGE_AUTO ) {
+        // 手动充电时，配置需要辅助电源时也将其合闸
+        if ( job->charge_mode == CHARGE_AUTO ||
+             (bit_read(task, F_MANUL_CHARGE_NEED_ASSITER) &&
+              (job->charge_mode==CHARGE_BV||job->charge_mode==CHARGE_BI))) {
             if ( ret == GUN_SN0 ) {
                 if ( ! bit_read(tsk, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
                     if ( !bit_read(tsk, S_ASSIT_PWN_ERR) ) {
@@ -961,7 +1015,8 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                 }
             }
-            if ( ! bit_read(job, JF_BMS_BRM_OK) ) {
+            if ( (job->charge_mode == CHARGE_AUTO) &&
+                 (! bit_read(job, JF_BMS_BRM_OK)) ) {
                 break;
             }
         }
@@ -975,7 +1030,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
 
         job->job_status = JOB_WORKING;
         sprintf(sql, "UPDATE jobs set job_status='%d' where job_id='%ld'",
-                job->job_status, job->job_url_commit_timestamp);
+                job->job_status, job->jid);
         (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
         log_printf(INF, "***** ZEUS(关键): 作业转为正式开始执行, 正在执行.");
 
@@ -1047,7 +1102,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             if ( start ) {
                 sprintf(sql, "INSERT INTO job_billing VALUES("
                         "'%ld','%ld','0','0','%.2f','0.00','0.00','%.2f')",
-                        job->job_url_commit_timestamp,
+                        job->jid,
                         job->charge_begin_timestamp,
                         job->charge_begin_kwh_data,
                         task->kwh_price);
@@ -1140,14 +1195,14 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                         "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
                         job->charge_stop_timestamp,
                         job->charge_exit_kwh_data,
-                        job->job_url_commit_timestamp,
+                        job->jid,
                         job->charge_begin_timestamp);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
 
                 sprintf(sql,
                         "UPDATE jobs SET jos_status='%d' WHERE job_id='%ld'",
                         job->job_status,
-                        job->job_url_commit_timestamp);
+                        job->jid);
                 (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
                 job->section_kwh = 0;
                 job->section_seconds = 0;
@@ -1156,8 +1211,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_ERR_PAUSE:
-        config_write("需求电压", "2000");
-        config_write("初始电压", "2000");
+        sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
+        config_write("需求电压", buff);
+        config_write("初始电压", buff);
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -1213,9 +1269,19 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
              * BMS通信阶段，是否计费
              **/
             if ( bit_read(task, F_NEED_BILLING) &&
-                 bit_read(task, F_BILLING_DONE) ) {
+                 bit_read(task, F_BILLING_DONE) &&
+                 bit_read(job, JF_BMS_TX_CST) &&
+                 ( bit_read(job, JF_BMS_RX_BST) || bit_read(job, JS_BMS_RX_BST_TIMEOUT) ) &&
+                 bit_read(job, JF_BMS_TX_CSD) &&
+                 ( bit_read(job, JF_BMS_RX_BSD) || bit_read(job, JS_BMS_RX_BSD_TIMEOUT) )
+            ) {
                 job->job_status = JOB_EXITTING;
-            } else if ( ! bit_read(task, F_NEED_BILLING ) ) {
+            } else if ( ! bit_read(task, F_NEED_BILLING ) &&
+                        bit_read(job, JF_BMS_TX_CST) &&
+                        ( bit_read(job, JF_BMS_RX_BST) || bit_read(job, JS_BMS_RX_BST_TIMEOUT) ) &&
+                        bit_read(job, JF_BMS_TX_CSD) &&
+                        ( bit_read(job, JF_BMS_RX_BSD) || bit_read(job, JS_BMS_RX_BSD_TIMEOUT) )
+            ) {
                 job->job_status = JOB_EXITTING;
             } else if ( bit_read(task, F_NEED_BILLING) &&
                         bit_read(task, F_BILING_TIMEOUT) ){
@@ -1244,8 +1310,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_DONE:
-        config_write("需求电压", "2000");
-        config_write("初始电压", "2000");
+        sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
+        config_write("需求电压", buff);
+        config_write("初始电压", buff);
         config_write("需求电流", "0");
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
@@ -1258,8 +1325,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
         break;
     case JOB_EXITTING:
-        config_write("需求电压", "2000");
-        config_write("初始电压", "2000");
+        sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
+        config_write("需求电压", buff);
+        config_write("初始电压", buff);
         config_write("需求电流", "0");
         task->chargers[0]->cstats = CHARGER_IDLE;
         bit_clr(tsk, F_CHARGE_LED);
@@ -1278,8 +1346,9 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         job->job_status = JOB_DETACHING;
         break;
     case JOB_DETACHING:
-        config_write("需求电压", "2000");
-        config_write("初始电压", "2000");
+        sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
+        config_write("需求电压", buff);
+        config_write("初始电压", buff);
         config_write("需求电流", "0");
         task->chargers[0]->cstats = CHARGER_IDLE;
         bit_clr(tsk, F_CHARGE_LED);
@@ -1319,7 +1388,17 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 free(job->bms.generator);
                 job->job_status = JOB_DIZZY;
                 log_printf(INF, "ZEUS.job: 作业清除引用完成.");
-            }
+            } else {
+	      log_printf(DBG_LV1, "%d  %d %x %x", job->bms.can_heart_beat.status,
+                 job->bms.can_tp_bomb.status,
+                 job->bms.bms_read_init_ok,
+                 job->bms.bms_write_init_ok);
+	      Hachiko_kill(&job->bms.can_heart_beat);
+	      Hachiko_kill(&job->bms.can_tp_bomb);
+	      job->bms.can_heart_beat.status = HACHIKO_INVALID;
+              job->bms.can_tp_bomb.status = HACHIKO_INVALID;
+	      
+	    }
         } else {
             job->job_status = JOB_DIZZY;
         }
@@ -1335,14 +1414,14 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 "b_end_kwh='%.2f' WHERE job_id='%ld' AND b_begin_timestamp='%ld'",
                 job->charge_stop_timestamp,
                 job->charge_exit_kwh_data,
-                job->job_url_commit_timestamp,
+                job->jid,
                 job->charge_begin_timestamp);
         (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
 
         sprintf(sql,
                 "UPDATE jobs SET jos_status='%d' WHERE job_id='%ld'",
                 job->job_status,
-                job->job_url_commit_timestamp);
+                job->jid);
         (void)sqlite3_exec(task->database, sql, NULL, NULL, NULL);
     }
 }
@@ -1414,7 +1493,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->section_seconds = 0;
     thiz->tsk = tsk;
     list_ini(thiz->job_node);
-    thiz->job_url_commit_timestamp = need->url_commit_timestamp;
+    thiz->jid = need->url_commit_timestamp;
     thiz->charge_billing.mode = need->biling_mode;
     if ( thiz->charge_billing.mode == BILLING_MODE_AS_CAP ) {
        thiz->charge_billing.option.set_kwh = need->as_kwh;
@@ -1474,7 +1553,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     }
     sprintf(sql, "INSERT INTO jobs VALUES("
             "\'%ld\',\'%d\',\'%d\',\'%s\',\'%s\',\'%s\')",
-            thiz->job_url_commit_timestamp,
+            thiz->jid,
             thiz->job_status,
             thiz->job_gun_sn,
             thiz->card.triger_card_sn,
@@ -1491,7 +1570,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->charge_job_create_timestamp = time(NULL);
 
     log_printf(INF, "ZEUS: 作业创建完成(%p:%d:%ld).",
-               thiz, task->wait_job_nr, thiz->job_url_commit_timestamp);
+               thiz, task->wait_job_nr, thiz->jid);
     return thiz;
 
 die:
@@ -1511,7 +1590,7 @@ int job_exsit(time_t id)
 
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
-        if ( task->job[i]->job_url_commit_timestamp == id ) {
+        if ( task->job[i]->jid == id ) {
             return (int)task->job[i];
         }
     }
@@ -1536,7 +1615,7 @@ int job_exsit(time_t id)
         thiz = task->wait_head;
         do {
             j = list_load(struct charge_job, job_node, thiz);
-            if ( j->job_url_commit_timestamp == id ) {
+            if ( j->jid == id ) {
                 break;
             }
             thiz = thiz->next;
@@ -1558,7 +1637,7 @@ struct charge_job* job_search(time_t ci_timestamp)
 
     for ( i = 0; i < sizeof(task->job)/sizeof(struct charge_job*); i ++) {
         if ( task->job[i] == NULL ) continue;
-        if ( task->job[i]->job_url_commit_timestamp == ci_timestamp ) {
+        if ( task->job[i]->jid == ci_timestamp ) {
             return task->job[i];
         }
     }
@@ -1568,7 +1647,7 @@ struct charge_job* job_search(time_t ci_timestamp)
         thiz = task->wait_head;
         do {
             j = list_load(struct charge_job, job_node, thiz);
-            if ( j->job_url_commit_timestamp == ci_timestamp ) {
+            if ( j->jid == ci_timestamp ) {
                 break;
             }
             thiz = thiz->next;
@@ -1625,7 +1704,7 @@ void job_detach_wait(struct charge_task *tsk)
         do {
             next = p->next;
             thiz = list_load(struct charge_job, job_node, p);
-            //log_printf(INF, "id: %08X %x", thiz->job_url_commit_timestamp,
+            //log_printf(INF, "id: %08X %x", thiz->jid,
             //           thiz->job_status);
             if ( thiz->job_status != JOB_DETACHING ) {
                 p = p->next;
@@ -1642,7 +1721,7 @@ void job_detach_wait(struct charge_task *tsk)
                     tsk->wait_job_nr --;
                 }
             }
-            log_printf(INF, "ZEUS: 作业 %ld 被释放", thiz->job_url_commit_timestamp);
+            log_printf(INF, "ZEUS: 作业 %ld 被释放", thiz->jid);
             free(thiz);
             break;
         } while ( p != tsk->wait_head);
@@ -1666,6 +1745,67 @@ struct job_commit_data *job_select_commit(struct charge_task *tsk)
     }
     pthread_mutex_unlock (&tsk->commit_lck);
     return thiz;
+}
+
+#define EXPORT_JOB_SIGNAL(job, sig) do {      \
+        sprintf(buff, "echo %-32s:%d >> /tmp/zeus/job_%08X_single", #sig, bit_read(job, sig), (unsigned int)job->jid);\
+    system(buff);} while (0)
+#define EXPORT_FIRST_JOB_SIGNAL(job, sig) do {      \
+        sprintf(buff, "echo %-32s:%d > /tmp/zeus/job_%08X_single", #sig, bit_read(job, sig), (unsigned int)job->jid);\
+    system(buff);} while (0)
+
+// 将作业信息导出至文件系统
+int job_export(struct charge_job *job)
+{
+    char buff[512];
+    EXPORT_FIRST_JOB_SIGNAL(job, JF_AUTO_CHARGE);
+    EXPORT_JOB_SIGNAL(job, JF_GUN_OK);
+    EXPORT_JOB_SIGNAL(job, JF_ASSIT_PWR_ON);
+    EXPORT_JOB_SIGNAL(job, JF_LOCK_ON);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_DRV_BINDED);
+    EXPORT_JOB_SIGNAL(job, JF_CHARGE_BMS_ALLOW);
+    EXPORT_JOB_SIGNAL(job, JF_CMD_ABORT);
+    EXPORT_JOB_SIGNAL(job, JF_JOB_EXIT);
+    EXPORT_JOB_SIGNAL(job, JF_DESTROY);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BRM);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BRM_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CRM);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BCP);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BCP_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BRO);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BRO_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CTS);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CML);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CRO);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BCL);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BCL_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BCS);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BCS_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BSM);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BSM_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BMV);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BMV_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BMT);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BMT_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BST);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BST_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CCS);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CST);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BSD);
+    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BSD_TIMEOUT);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CSD);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_BRM_OK);
+    EXPORT_JOB_SIGNAL(job, JF_CHG_CRM_OK);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_BRO_OK);
+    EXPORT_JOB_SIGNAL(job, JF_CHG_CRO_OK);
+    EXPORT_JOB_SIGNAL(job, JF_BMS_TRM_CHARGE);
+    EXPORT_JOB_SIGNAL(job, JF_CHG_TRM_CHARGE);
+    EXPORT_JOB_SIGNAL(job, JR_HEART_BEAT_TIMER);
+    EXPORT_JOB_SIGNAL(job, JR_TP_CONN_TIMER);
+    EXPORT_JOB_SIGNAL(job, JR_RD_THREAD_REF);
+    EXPORT_JOB_SIGNAL(job, JR_WR_THREAD_REF);
+
+    return 0;
 }
 
 unsigned int error_history_begin(struct charge_job *job, unsigned int error_id, char *error_string)

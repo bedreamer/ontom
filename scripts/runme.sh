@@ -2,11 +2,12 @@
 
 echo "监控系统正在启动..."
 echo "执行数据库预配置..."
-/usr/zeus/preconfig.sh /usr/zeus/ontom.db
+/usr/zeus/script/preconfig.sh /usr/zeus/ontom.db
 echo "开始启动主程序..."
 
 if [ ! -d /tmp/hellhound ] && [ ! -e /tmp/hellhound ];then 
     mkdir /tmp/hellhound
+	mkdir /tmp/zeus
 fi
 
 if [ ! -e /tmp/hellhound/zeus_pid ];then
@@ -55,6 +56,6 @@ while [ true ]; do
 	sleep 1;
 	echo "关闭地狱犬.."
 	echo "重新预配置数据库"
-	/usr/zeus/preconfig.sh /usr/zeus/ontom.db
+	/usr/zeus/script/preconfig.sh /usr/zeus/ontom.db
 	echo "正在重启...."
 done

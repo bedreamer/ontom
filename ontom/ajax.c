@@ -851,26 +851,6 @@ int ajax_system_query_json_proc(struct ajax_xml_struct *thiz)
 // 充电任务操作接口
 int ajax_job_create_json_proc(struct ajax_xml_struct *thiz)
 {
-#if 0
-    int ret = ERR_ERR, i = S_ERROR;
-    char buff[32] = "";
-    //if ( task->this_job[0] == NULL ) {
-    task->this_job[0] = & task->jobs[0];
-    task->this_job[0]->job_status = JOB_STANDBY;
-    ret = ERR_OK;
-    thiz->xml_len = sprintf(&thiz->iobuff[thiz->xml_len],
-            "\"jobs\":{\"nr\":1}");
-    for (; i < S_ERR_END; i ++) {
-        if ( bit_read(task->this_job[0], i) ) {
-            sprintf(buff, "E%04X", i);
-            thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
-                    "%s ", config_read(buff));
-        }
-    }
-    task->this_job[0]->job_gun_sn = GUN_SN0;
-   // }
-    return ret;
-#else
     struct job_commit_data jc;
     char timestamp[32] = {0};
     char cid[32] = {0};
@@ -1056,7 +1036,6 @@ reject:
     thiz->xml_len += sprintf(&thiz->iobuff[thiz->xml_len],
             "\"status\":\"REJECTED\"}");
     return ERR_OK;
-#endif
 }
 
 int ajax_job_delete_json_proc(struct ajax_xml_struct *thiz)
@@ -1398,8 +1377,8 @@ int sql_system_settings_result(void *param, int nr, char **text, char **name)
 {
     struct ajax_xml_struct *thiz = (struct ajax_xml_struct *)param;
 
-    if ( 0 == strcmp(text[3], "options") ) {
-
+    if ( 0 == strcmp(text[3], "options") ||
+         0 == strcmp(text[3], "advance") ) {
         char *p = text[4];
         for ( ; *p; p ++ ) {
             if ( *p == '\"' ) *p = '@';
@@ -1839,12 +1818,14 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
         "自由"
     };
     CHARGE_GUN_SN g = __is_gun_phy_conn_ok(job);
-    char bat_kind[32] = {0};
+    char *bat_kind[] = {
+        "未知", "铅酸电池", "镍氢电池", "磷酸铁锂电池", "锰酸锂电池",
+        "钴酸锂电池", "三元材料电池", "聚合物锂离子电池", "钛酸锂电池"
+    };
     char bat_max_v[8] = {0};
     char bat_min_v[8] = {0};
     char bat_temprature[8] = {0};
 
-    strcpy(bat_kind, "N/A");
     strcpy(bat_max_v, "N/A");
     strcpy(bat_min_v, "N/A");
     strcpy(bat_temprature, "N/A");
@@ -1871,7 +1852,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
                     job->charge_billing.option.set_time;
             break;
         default:
-            ycdl = job->bms.bms_all_battery_status.spn3078_soc;
+            ycdl = job->bms.bcs.spn3078_soc;
             break;
         }
     } else if ( job->job_status == JOB_DONE ) {
@@ -1887,7 +1868,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"LI\":\"%.1f A\","     // 充电限流
             "\"bmode\":\"%s\","      // 计费方式
             "\"hwk\":\"%.1f KW.H\"," // 电量
-            "\"time\":\"%.d 分钟\","  // 时间
+            "\"time\":\"%d 分钟\","  // 时间
             "\"money\":\"%.1f 元\","  // 金额
             "\"cid\":\"%s\","         // 卡号ID
             "\"cremain\":\"%.2f 元\"," // 余额
@@ -1901,7 +1882,7 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             "\"gun_stat\":\"%s\","      // 充电枪连接状态
             ,
             status_string[job->job_status],
-            (unsigned int)job->job_url_commit_timestamp,
+            (unsigned int)job->jid,
             job->job_gun_sn + 1,
             cmode_string[job->charge_mode],
             job->need_V,
@@ -1923,84 +1904,160 @@ void job_query_json_fromat(struct ajax_xml_struct *xml, struct charge_job *job)
             );
     if ( job->charge_mode == CHARGE_AUTO ) {
         // BRM
-        // 动力蓄电池类型
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BRM\":{\"bat_kind\":\"%s\",", bat_kind);
-        // 蓄电池额定容量
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn_\":\"%s\",", bat_temprature);
-        // 蓄电池额定电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\",", bat_temprature);
-        // 动力蓄电池单体最高电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_max_v\":\"%s\",", bat_max_v);
-        // 动力蓄电池单体最低电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_min_v\":\"%s\",", bat_min_v);
-        // 动力蓄电池温度);
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"bat_temprature\":\"%s\"},", bat_temprature);
+        if ( job->bms.charge_stage >= CHARGE_STAGE_HANDSHACKING ) {
+            // 动力蓄电池类型
+            if ( job->bms.brm.spn2566_battery_type > 0x08 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "\"BRM\":[{\"k\":\"电池材质\",\"v\":\"其他电池\"},");
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "\"BRM\":[{\"k\":\"电池材质\",\"v\":\"%s\"},",
+                        bat_kind[job->bms.brm.spn2566_battery_type]);
+            }
+            // 蓄电池额定容量
+            if ( job->bms.brm.spn2567_capacity <= 10000 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"额定容量\",\"v\":\"%.1f A.H\"},",
+                        job->bms.brm.spn2567_capacity/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"额定容量\",\"v\":\"N/A\"},");
+            }
+            // 蓄电池额定电压
+            if ( job->bms.brm.spn2568_volatage <= 7500 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"额定电压\",\"v\":\"%.1f V\"}],",
+                        job->bms.brm.spn2568_volatage/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"额定电压\",\"v\":\"N/A\"}],");
+            }
+        }
 
         // BCP
-        // 单体最高允许电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BCP\":{\"spn2816\":\"%s\",", bat_temprature);
-        // 最高允许充电电流
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn2817\":\"%s\",", bat_temprature);
-        // 蓄电池标称总能量
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn2818\":\"%s\",", bat_temprature);
-        // 最高允许充电电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn2819\":\"%s\",", bat_temprature);
-        // 最高允许温度
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn2820\":\"%s\",", bat_temprature);
-        // 初始SOC
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn2821\":\"%s\",", bat_temprature);
-        // 初始总电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn2822\":\"%s\"},", bat_temprature);
+        if ( job->bms.charge_stage >= CHARGE_STAGE_CONFIGURE ) {
+            // 单体最高允许电压
+            if ( job->bms.bcp.spn2816_max_charge_volatage_single_battery < 2400 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "\"BCP\":[{\"k\":\"单体最高允许电压\",\"v\":\"%.2f V\"},",
+                        job->bms.bcp.spn2816_max_charge_volatage_single_battery/100.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "\"BCP\":[{\"k\":\"单体最高允许电压\",\"v\":\"N/A\"},");
+            }
+            // 最高允许充电电流
+            if ( job->bms.bcp.spn2817_max_charge_current > -4000 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"单体最高允许电流\",\"v\":\"%.1f A\"},",
+                        (job->bms.bcp.spn2817_max_charge_current-4000)/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"单体最高允许电流\",\"v\":\"N/A\"},");
+            }
+            // 蓄电池标称总能量
+            if ( job->bms.bcp.spn2818_total_energy < 10000 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"标称总能量\",\"v\":\"%.1f KW.H\"},",
+                        job->bms.bcp.spn2818_total_energy/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"标称总能量\",\"v\":\"N/A\"},");
+            }
+            // 最高允许充电电压
+            if ( job->bms.bcp.spn2819_max_charge_voltage < 7500 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"最高允许充电电压\",\"v\":\"%.1f V\"},",
+                        job->bms.bcp.spn2819_max_charge_voltage/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"最高允许充电电压\",\"v\":\"N/A\"},");
+            }
+            // 最高允许温度
+            if ( job->bms.bcp.spn2820_max_temprature <= 250 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"最高允许温度\",\"v\":\"%d 度\"},",
+                        (job->bms.bcp.spn2820_max_temprature-50));
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"最高允许温度\",\"v\":\"N/A\"},");
+            }
+            // 初始SOC
+            if ( job->bms.bcp.spn2821_soc <= 1000 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"初始SOC\",\"v\":\"%.1f %%\"},",
+                        job->bms.bcp.spn2821_soc/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"初始SOC\",\"v\":\"N/A\"},");
+            }
+            // 初始总电压
+            if ( job->bms.bcp.spn2822_total_voltage <= 7500 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"初始总电压\",\"v\":\"%.1f V\"}],",
+                        job->bms.bcp.spn2822_total_voltage/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"初始总电压\",\"v\":\"N/A\"}],");
+            }
+        }
 
         // BRO
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BRO\":{\"spn2829\":\"%s\"},", bat_temprature);
+        if ( job->bms.charge_stage >= CHARGE_STAGE_CONFIGURE ) {
+            xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "\"BRO\":{\"k\":\"BMS充电状态\",\"v\":\"%s\"},",
+                    bit_read(job, JF_BMS_BRO_OK) ? "就绪":"等待");
+        }
 
         // BCS
-        // 充电电压
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BCS\":{\"spn3075\":\"%.1f\",",
-                job->bms.bms_all_battery_status.spn3075_charge_voltage/10.0);
-        // 充电电流
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn3076\":\"%.1f\",",
-                (job->bms.bms_all_battery_status.spn3076_charge_current-4000)/-10.0f);
-        // 最高单体电压电池组号
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn3077\":\"%d\",",
-                (job->bms.bms_all_battery_status.spn3077_max_v_g_number&0xFFF)/100.0f);
-        // SOC
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn3078\":\"%d\",",
-                job->bms.bms_all_battery_status.spn3078_soc);
-        // 剩余充电时间
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn3079\":\"%d\"},",
-                job->bms.bms_all_battery_status.spn3079_need_time);
+        if ( job->bms.charge_stage >= CHARGE_STAGE_CHARGING ) {
+            // 充电电压
+            xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "\"BCS\":[{\"k\":\"BMS充电电压\",\"v\":\"%.1f V\"},",
+                    job->bms.bcs.spn3075_charge_voltage/10.0);
+            // 充电电流
+            xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "{\"k\":\"BMS充电电流\",\"v\":\"%.1f A\"},",
+                    (job->bms.bcs.spn3076_charge_current-4000)/-10.0f);
+            // 最高单体电压电池组号
+            xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "{\"k\":\"BMS充电状态\",\"v\":\"%d\"},",
+                    (job->bms.bcs.spn3077_max_v_g_number&0xFFF)/100);
+            // SOC
+            xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "{\"k\":\"SOC\",\"v\":\"%d %%\"},",
+                    job->bms.bcs.spn3078_soc);
+            // 剩余充电时间
+            xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "{\"k\":\"剩余充电时间\",\"v\":\"%d 分\"}],",
+                    job->bms.bcs.spn3079_need_time);
+        }
 
         // BCL
-        // 电压需求
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"BCL\":{\"spn3072\":\"%s\",", bat_temprature);
-        // 电流需求
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn3073\":\"%s\",", bat_temprature);
-        // 充电模式
-        xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
-                "\"spn3074\":\"%s\"}", bat_temprature);
+        if ( job->bms.charge_stage >= CHARGE_STAGE_CHARGING ) {
+            // 电压需求
+            if ( job->bms.bcl.spn3072_need_voltage <= 7500 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "\"BCL\":[{\"k\":\"BMS电压需求\",\"v\":\"%.1f V\"},",
+                        job->bms.bcl.spn3072_need_voltage/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "\"BCL\":[{\"k\":\"BMS电压需求\",\"v\":\"N/A\"},");
+            }
+            // 电流需求
+            if ( job->bms.bcl.spn3073_need_current >= -4000 ) {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"BMS电流需求\",\"v\":\"%.1f A\"},",
+                        (job->bms.bcl.spn3073_need_current-4000)/10.0f);
+            } else {
+                xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                        "{\"k\":\"BMS电流需求\",\"v\":\"N/A\"},");
+            }
+            // 充电模式
+            xml->xml_len+=sprintf(&xml->iobuff[xml->xml_len],
+                    "{\"k\":\"BMS充电模式\",\"v\":\"%s\"}]",
+                    job->bms.bcl.spn3074_charge_mode==0x01?"恒压":
+                    job->bms.bcl.spn3074_charge_mode==0x02?"恒流":"N/A");
+        }
 
     }
     if (xml->iobuff[xml->xml_len-1] == ',') {
