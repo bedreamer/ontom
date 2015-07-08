@@ -469,6 +469,8 @@
 		6A0D49FD1B32F0C300ED385B /* canbms.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = canbms.c; sourceTree = "<group>"; };
 		6A0D49FE1B32F0C300ED385B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		6A0D49FF1B32F0C300ED385B /* pgn.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pgn.h; sourceTree = "<group>"; };
+		6AC30A261B4D4BAF0014428E /* cantp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cantp.c; sourceTree = "<group>"; };
+		6AC30A271B4D4BAF0014428E /* cantp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cantp.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1201,6 +1203,8 @@
 				6A0D49561B32EFEE00ED385B /* father.c */,
 				6A0D49571B32EFEE00ED385B /* father.h */,
 				6A0D49581B32EFEE00ED385B /* Makefile */,
+				6AC30A261B4D4BAF0014428E /* cantp.c */,
+				6AC30A271B4D4BAF0014428E /* cantp.h */,
 			);
 			path = bms;
 			sourceTree = "<group>";
