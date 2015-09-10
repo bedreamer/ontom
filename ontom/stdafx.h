@@ -37,4 +37,8 @@
 #include "../lib/lj/Hachiko.h"
 #include "../lib/bms/father.h"
 
+#include "../pandora/magicbox.h"
+#include "../pandora/z2b.h"
+#include "../pandora/b2p.h"
+
 #endif// ___STDAFX_H_

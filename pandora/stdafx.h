@@ -35,7 +35,14 @@
 #include "../lib/lj/Hachiko.h"
 #include "../lib/lj/log.h"
 
+typedef size_t pack_t;
+typedef size_t unit_t;
+typedef size_t func_t;
+typedef size_t msg_t;
+
+
 #include "magicbox.h"
 #include "z2b.h"
+#include "b2p.h"
 
 #endif// _LIB__STDAFX_H_

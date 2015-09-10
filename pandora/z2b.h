@@ -1,10 +1,6 @@
 #ifndef _Z2B_INCLUDED_H_
 #define _Z2B_INCLUDED_H_
 
-typedef size_t pack_t;
-typedef size_t unit_t;
-typedef size_t func_t;
-
 // 消息传递头
 struct pack_header {
     // 包ID， 发送接收独立计数
@@ -19,20 +15,6 @@ struct pack_header {
 
     // 数据包体大小，byte
     size_t pack_size;
-};
-
-// 字段定义
-struct pack_section {
-    // 字段ID
-    unit_t uid;
-    // 字段名称
-    char u_name[32];
-    // 字段长度
-    size_t u_size;
-    // 字段类型
-    char u_type[16];
-    // 字段格式
-    char u_format[16];
 };
 
 // 数据包传输控制结构, 有效载荷比 96.8%
@@ -60,19 +42,36 @@ struct pack_tp_struct {
 // 包ID
 enum {
     // 正在执行的作业
-    PID_WORKING_JOB =  0x80000001,
+    PID_WORKING_JOB_01 =  0x80000001,
+    PID_WORKING_JOB_02 =  0x80000002,
     // 正在等待的作业
-    PID_PEDDING_JOB =  0x80000003,
+    PID_PEDDING_JOB_01 =  0x80000003,
+    PID_PEDDING_JOB_02 =  0x80000004,
+    PID_PEDDING_JOB_03 =  0x80000005,
+    PID_PEDDING_JOB_04 =  0x80000006,
+    PID_PEDDING_JOB_05 =  0x80000007,
+    PID_PEDDING_JOB_06 =  0x80000008,
+    PID_PEDDING_JOB_07 =  0x80000009,
+    PID_PEDDING_JOB_08 =  0x8000000A,
+    PID_PEDDING_JOB_09 =  0x8000000B,
+    PID_PEDDING_JOB_10 =  0x8000000C,
+    PID_PEDDING_JOB_11 =  0x8000000D,
+    PID_PEDDING_JOB_12 =  0x8000000E,
+    PID_PEDDING_JOB_13 =  0x8000000F,
+    PID_PEDDING_JOB_14 =  0x80000010,
+    PID_PEDDING_JOB_15 =  0x80000011,
+    PID_PEDDING_JOB_16 =  0x80000012,
     // 充电桩信息
-    PID_CHARGER_INFO = 0x80000014,
+    PID_CHARGER_INFO   =  0x80000013,
+
     // 充电桩控制
-    PID_CHARGER_CTRL = 0x80000015,
+    PID_CHARGER_CTRL   =  0x80000014,
     // 参数配置
-    PID_PARAM_CONFIG = 0x80000016,
+    PID_PARAM_CONFIG   =  0x80000015,
     // 作业控制
-    PID_JOB_CTRL     = 0x80000017,
+    PID_JOB_CTRL       =  0x80000016,
     // 连接控制
-    PID_CONN_CTRL    = 0x80000018
+    PID_CONN_CTRL      =  0x80000017
 }PID;
 
 // 会话类型
@@ -122,12 +121,5 @@ struct session_struct {
     // 会话节点
     struct list_head nd;
 };
-
-// 向缓冲区中填入数据
-int session_push_bytes(struct session_buff *sb, const char *ibuf, int bytes);
-// 从缓冲区中取出前bytes数据
-int session_pull_bytes(struct session_buff *sb, char *obuf, int bytes);
-// 从缓冲区中弹出bytes数据
-int session_pop_bytes(struct session_buff *sb, char *obuf, int bytes);
 
 #endif // _Z2B_INCLUDED_H_

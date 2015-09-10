@@ -1,11 +1,11 @@
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,$(SRCS))
 m-deps+=$(OBJS)
-EX-OBJS+=$(WORKDIR)/pandoras-box build-in.a
+EX-OBJS+=build-in.a $(WORKDIR)/libpandora.so
 
-$(WORKDIR)/pandoras-box:$(OBJS)
+$(WORKDIR)/libpandora.so:$(OBJS)
 	$(Q)echo "  **LD**      $@"
-	$(Q)$(LD) $(LDFLAGS) $(LDEXFLAGS) -o $@ $^
+	$(Q)$(LD) -fPIC -shared $(LDFLAGS) -o $@ $^
 
 build-in.a:$(OBJS)
 	$(Q)echo "  **AR**      `pwd`/$@"

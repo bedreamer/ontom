@@ -62,7 +62,6 @@ int exso_buzzer_exit(void *p)
 void * buzzer_thread_proc(void *p)
 {
     int fd;
-    int i;
 
     fd = open(DEV_NAME, O_RDWR);
     if (fd < 0)

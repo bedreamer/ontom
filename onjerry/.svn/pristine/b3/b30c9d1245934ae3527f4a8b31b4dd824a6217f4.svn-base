@@ -1,0 +1,4 @@
+--cpu Cortex-M3 "..\output\startup_stm32f10x_cl.o" "..\output\sys_init.o" "..\output\uart.o" "..\output\main.o" "..\output\ads7953.o" "..\output\ad_sample.o" "..\output\stat_control.o" "..\output\timer.o" "..\output\crc.o" "..\output\data_pro.o" "..\output\flash.o" "..\output\cal_sampdata.o" "..\output\watchdog.o" "..\output\bmscom_gb.o" "..\output\bmscom_sae.o" "..\output\can.o" "..\output\core_cm3.o" "..\output\system_stm32f10x.o" --strict --scatter "..\Output\Changesample.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\Changesample.map" -o "..\Output\Changesample.axf"

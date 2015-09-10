@@ -17,8 +17,9 @@ profile='no'
 qtlib='no'
 script='no'
 zeus='no'
+vpnsurpport='no'
 
-while getopts acdDelpqstuvzhP:T:W:C: param; do
+while getopts acdDelpqstuvzmhP:T:W:C: param; do
 	# commands
 	case "$param" in
 	a|-all) # 安装全部
@@ -32,6 +33,7 @@ while getopts acdDelpqstuvzhP:T:W:C: param; do
 		qtlib='yes'
 		script='yes'
 		zeus='yes'
+		vpnsurpport='yes'
 	;;
 	c|-config)
 		config='yes';
@@ -65,6 +67,9 @@ while getopts acdDelpqstuvzhP:T:W:C: param; do
 	;;
 	z|-zeus) # 安装程序
 		zeus='yes';
+	;;
+	m|-modules) # 仅安装VPN支持文件
+		vpnsurpport='yes';
 	;;
 	v|-version)
 		echo "installer of zeus version: $VERSION"
@@ -246,7 +251,7 @@ if [ $ext == "yes" ];then
 fi
 sleep 0.1
 if [ $html == "yes" ];then
-	do_install "html"
+	./scripts/installui.sh
 fi
 sleep 0.1
 if [ $library == "yes" ];then
@@ -259,6 +264,11 @@ fi
 sleep 0.1
 if [ $qtlib == "yes" ];then
 	do_install "qtlib"
+fi
+
+if [ $vpnsurpport == "yes" ];then
+	echo "	decompress VPN surpport files..."
+	tar -C $prefix -xf scripts/VPN.update.tar
 fi
 
 cd $WORKDIR/$prefix

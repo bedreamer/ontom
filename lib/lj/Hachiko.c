@@ -63,6 +63,7 @@ static void Hachiko_wangwang(int sig, siginfo_t *si, void *_uc)
             if ( pool[i]->type == HACHIKO_ONECE ) {
                 pool[i]->Hachiko_notify_proc(HACHIKO_DIE,
                                              pool[i]->_private, pool[i]);
+            	pool[i]->status = HACHIKO_INVALID;
                 pool[i] = NULL;
                 refresh ++;
                 log_printf(DBG_LV3, "HACHIKO: watch dog die.");

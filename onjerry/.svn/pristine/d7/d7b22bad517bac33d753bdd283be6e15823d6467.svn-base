@@ -1,0 +1,1 @@
+-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I.\inc -I.\src -I..\CMSIS --asm -I "E:\Keil 4 ARM\ARM\RV31\Inc" -I "E:\Keil 4 ARM\ARM\CMSIS\Include" -I "E:\Keil 4 ARM\ARM\Inc\ST\STM32F10x" -DSTM32F10X_MD -o "..\Output\test.o" --omf_browse "..\Output\test.crf" --depend "..\Output\test.d" "src\test.c"

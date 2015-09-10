@@ -263,9 +263,9 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
     } else if ( 0 == strcmp(text[0], "module_power_fact") ) {
         task->module_power_fact = atof(text[1]);
         printf("模块功率因数: %s\n", text[1]);
-    } else if ( 0 == strcmp(text[0], "single_module_power") ) {
-        task->single_module_power = atof(text[1]);
-        printf("单台模块功率: %s KW\n", text[1]);
+    } else if ( 0 == strcmp(text[0], "single_module_A") ) {
+        task->single_module_A = atof(text[1]);
+        printf("单台模块额定电流: %s A\n", text[1]);
     } else if ( 0 == strcmp(text[0], "single_module_max_I") ) {
         task->single_module_max_I = atof(text[1]);
         printf("单台模块最高允许电流: %s A\n", text[1]);
@@ -283,12 +283,26 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
         printf("模块最低输出电压: %s V\n", text[1]);
     } else if ( 0 == strcmp(text[0], "need_billing") ) {
         if ( text[1][0] == '0' ) {
+            // 不计费
             bit_clr(task, F_NEED_BILLING);
-        } else {
+            task->deal_methord = DEAL_NONE;
+            printf("是否需要刷卡扣费: 不需要\n");
+        } else if ( text[1][0] == '1' ) {
+            // 卡片计费
             bit_set(task, F_NEED_BILLING);
+            task->deal_methord = DEAL_USE_CARD;
+            printf("是否需要刷卡扣费: 离线式计费\n");
+        } else if ( text[1][0] == '2' ) {
+            // 在线计费
+            bit_set(task, F_NEED_BILLING);
+            task->deal_methord = DEAL_USE_NET;
+            printf("是否需要刷卡扣费: 在线式计费\n");
+        } else if ( text[1][0] == '3' ) {
+            // 在线,卡片计费
+            bit_set(task, F_NEED_BILLING);
+            task->deal_methord = DEAL_USE_BOTH;
+            printf("是否需要刷卡扣费: 在线式,卡片计费\n");
         }
-        printf("是否需要刷卡扣费: %s\n",
-               bit_read(task, F_NEED_BILLING) ? "需要" : "不需要");
     } else if ( 0 == strcmp(text[0], "manneed_assister") ) {
         if ( text[1][0] == '0' ) {
             bit_clr(task, F_MANUL_CHARGE_NEED_ASSITER);
@@ -311,6 +325,172 @@ int sql_db_settings_result(void *param, int nr, char **text, char **name)
         } else {
             task->meter_type = KWH_METER_NONE;
         }
+    } else if ( 0 == strcmp(text[0], "kaichu_syschg") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_SYSCHG] = 1 << shift;
+            task->kaichu_map[KAICHU_SYSCHG] = shift - 1;
+            printf("充电灯开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_SYSCHG] = 0;
+            task->kaichu_map[KAICHU_SYSCHG] = 0xFF;
+            printf("充电灯开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_syserr") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_SYSERR] = 1 <<shift;
+            task->kaichu_map[KAICHU_SYSERR] = shift - 1;
+            printf("系统故障开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_SYSERR] = 0;
+            task->kaichu_map[KAICHU_SYSERR] = 0xFF;
+            printf("系统故障开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun1_sw") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN1_SW] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN1_SW] = shift - 1;
+            printf("1#枪接触器开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN1_SW] = 0;
+            task->kaichu_map[KAICHU_GUN1_SW] = 0xFF;
+            printf("1#枪接触器开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun2_sw") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN2_SW] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN2_SW] = shift - 1;
+            printf("2#枪接触器开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN2_SW] = 0;
+            task->kaichu_map[KAICHU_GUN2_SW] = 0xFF;
+            printf("2#枪接触器开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun1_assit12") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN1_ASSIT_12] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN1_ASSIT_12] = shift - 1;
+            printf("1#枪12V辅助电源开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN1_ASSIT_12] = 0;
+            task->kaichu_map[KAICHU_GUN1_ASSIT_12] = 0xFF;
+            printf("1#枪12V辅助电源开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun1_assit24") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN1_ASSIT_24] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN1_ASSIT_24] = shift - 1;
+            printf("1#枪24V辅助电源开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN1_ASSIT_24] = 0;
+            task->kaichu_map[KAICHU_GUN1_ASSIT_24] = 0xFF;
+            printf("1#枪24V辅助电源开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun2_assit12") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN2_ASSIT_12] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN2_ASSIT_12] = shift - 1;
+            printf("2#枪12V辅助电源开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN2_ASSIT_12] = 0;
+            task->kaichu_map[KAICHU_GUN2_ASSIT_12] = 0xFF;
+            printf("2#枪12V辅助电源开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun2_assit24") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN2_ASSIT_24] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN2_ASSIT_24] = shift - 1;
+            printf("2#枪24V辅助电源开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN2_ASSIT_24] = 0;
+            task->kaichu_map[KAICHU_GUN2_ASSIT_24] = 0xFF;
+            printf("2#枪24V辅助电源开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun1_lock") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN1_LOCK] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN1_LOCK] = shift - 1;
+            printf("1#枪电子锁开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN1_LOCK] = 0;
+            task->kaichu_map[KAICHU_GUN1_LOCK] = 0xFF;
+            printf("1#枪电子锁开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_gun2_lock") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_GUN2_LOCK] = 1 << shift;
+            task->kaichu_map[KAICHU_GUN2_LOCK] = shift - 1;
+            printf("2#枪电子锁开出口: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_GUN2_LOCK] = 0;
+            task->kaichu_map[KAICHU_GUN2_LOCK] = 0xFF;
+            printf("2#枪电子锁开出口: 无\n");
+        }
+    } else if ( 0 == strcmp(text[0], "kaichu_ac_flag") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_AC_LED] = 1 << shift;
+            task->kaichu_map[KAICHU_AC_LED] = shift - 1;
+            printf("市电灯: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_AC_LED] = 0;
+            task->kaichu_map[KAICHU_AC_LED] = 0xFF;
+            printf("市电灯: 无\n");
+        }
+    }  else if ( 0 == strcmp(text[0], "kaichu_light_sw") ) {
+        int shift = atoi(text[1]);
+        if ( shift ) {
+            task->kaichu_mask[KAICHU_LIGHT] = 1 << shift;
+            task->kaichu_map[KAICHU_LIGHT] = shift - 1;
+            printf("照明灯板: %d\n", shift);
+        } else {
+            task->kaichu_mask[KAICHU_LIGHT] = 0;
+            task->kaichu_map[KAICHU_LIGHT] = 0xFF;
+            printf("照明灯板: 无\n");
+        }
+    }  else if ( 0 == strcmp(text[0], "ac_input_hi") ) {
+        task->ac_input_hi = atof(text[1]);
+    } else if ( 0 == strcmp(text[0], "ac_input_lo") ) {
+        task->ac_input_lo = atof(text[1]);
+    } else if ( 0 == strcmp(text[0], "assit_12v_24v_methord") ) {
+        int methord = atoi(text[1]);
+        if ( 1 == methord ) {
+            task->assit_select_methord = ASSIT_SELECT_AUTO;
+        } else {
+            task->assit_select_methord = ASSIT_SELECT_MANUAL;
+        }
+    } else if ( 0 == strcmp(text[0], "server_addr") ) {
+        task->ac_input_lo = atof(text[1]);
+        strncpy(task->server_addr, text[1], 32);
+        printf("服务器地址: %s\n", text[1]);
+    }  else if ( 0 == strcmp(text[0], "server_port") ) {
+        task->server_port = atoi(text[1]);
+        printf("服务器端口: %d\n", task->server_port);
+    }  else if ( 0 == strcmp(text[0], "local_addr") ) {
+        task->charger_sn = atoi(text[1]);
+        printf("本机地址: %d\n", task->charger_sn);
+    } else if ( 0 == strcmp(text[0], "comm_mode") ) {
+        if ( text[1][0] == '0' ) {
+            bit_clr(task, F_SYSTEM_COMM_MODE);
+        } else {
+            bit_set(task, F_SYSTEM_COMM_MODE);
+        }
+        printf("通讯模式: %s\n", bit_read(task, F_SYSTEM_COMM_MODE)?"在线式":"离线式");
+    } else if ( 0 == strcmp(text[0], "lightup_time") ) {
+        printf("照明开始于: %s\n", text[1]);
+        strncpy(task->lightup_time, text[1], 16);
+    } else if ( 0 == strcmp(text[0], "lightup_hours") ) {
+        task->lightup_hours = atof(text[1]);
+        printf("照明时长: %s\n", text[1]);
     }
     return 0;
 }
@@ -334,6 +514,7 @@ int sql_rs485_result(void *param, int nr, char **text, char **name) {
         {"00000004", uart4_charger_config_evt_handle},
         {"00000005", uart4_charger_yaoce_0_49_handle},
         {"00000006", uart4_charger_yaoce_50_100_handle},
+        {"00000019", uart4_charger_module_evt_handle},
         // {{ 这个顺序不要调换，为了规避读卡器导致的模块转换盒通信中断问题。
         {"00000007", ANC01_convert_box_write_evt_handle},
         {"00000008", ANC01_convert_box_read_evt_handle},
@@ -503,6 +684,11 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
         log_printf(INF, "ZEUS: default plugin loaded.");
     }
 
+    if ( bit_read(task, F_SYSTEM_COMM_MODE) ) {
+        // 在线式启用初始化
+        pandora_init(task);
+    }
+
     /* 方案1：
      *   一组充电机， 一个采样盒，两把枪
      *   两把枪分时充电
@@ -598,9 +784,21 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             goto __panic;
         }
     }
+
     if ( task->uarts[1] && task->uarts[1]->users_nr ) {
         // 串口通信线程
         ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)task->uarts[1]);
+        if ( 0 != ret ) {
+            ret  = 0x1006;
+            log_printf(ERR,
+                       "UART framework start up.                       FAILE!!!!");
+            goto __panic;
+        }
+    }
+
+    if ( task->uarts[2] && task->uarts[1]->users_nr ) {
+        // 串口通信线程
+        ret = pthread_create( & task->tid, &task->attr, thread_uart_service, (void*)task->uarts[2]);
         if ( 0 != ret ) {
             ret  = 0x1006;
             log_printf(ERR,
@@ -675,6 +873,11 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
             // 选取可执行的作业并准备执行
             struct charge_job *job;
             if ( task->sys_config_gun_nr == 2 && task->sys_charge_group_nr == 1 ) {
+	        if ( !task->job[0] && !task->job[1] ) {
+		    char buff[16];
+		    sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f) );
+		    config_write("需求电压", buff);
+		}
                 if ( task->job[0] || task->job[1] ) break;
 
                 job = job_select_wait(task, GUN_SN0);
@@ -722,6 +925,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
 
         tsp ++;
         // 每30秒主动同步一次操作日志
+#if 0
         if ( tsp >= 600 ) {
             sync_system_log();
             tsp = 0;
@@ -730,7 +934,7 @@ void *thread_charge_task_service(void *arg) ___THREAD_ENTRY___
                 job_export(task->job[0]);
             }
         }
-
+#endif
         usleep(50000);
     }
 __panic:
@@ -755,7 +959,7 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
            ei ++;
         }
     }
-    if ( ei >= tsk->modules_nr ) {
+    if ( ei >= tsk->modules_nr && tsk->modules_nr ) {
         bit_set(tsk, S_CHARGE_GROUP_ERR);
     } else {
         bit_clr(tsk, S_CHARGE_GROUP_ERR);
@@ -779,6 +983,25 @@ void deal_with_system_protection(struct charge_task *tsk, struct charge_job *thi
 
 
     return;
+}
+
+int job_delay_exit(struct charge_job *job)
+{
+	time_t t = time(NULL);
+
+	if (job->delay_exit_tsp == 0) {
+		job->delay_exit_tsp = t;
+		log_printf(INF, "JOB: 退出,开始15秒倒计时！");
+		return 0;
+	}
+
+	if (t - job->delay_exit_tsp >= 15) {
+		log_printf(INF, "JOB: 正式退出！");
+		job->job_status = JOB_DIZZY;
+		return 1;
+	}
+
+	return 0;
 }
 
 void job_running(struct charge_task *tsk, struct charge_job *job)
@@ -817,7 +1040,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
 
         // 1路输出跳闸
-        if ( task->measure[0]->measure.Flag_prtc6 & 0x04 ) {
+        if ( bit_read(task, S_DC_OUTPUT_0_TRIP) ) {
             fault ++;
         }
     } else if ( job->job_gun_sn == GUN_SN1 ) {
@@ -847,8 +1070,30 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         }
 
         // 2路输出跳闸
-        if ( task->measure[0]->measure.Flag_prtc6 & 0x08 ) {
+        if ( bit_read(task, S_DC_OUTPUT_1_TRIP) ) {
             fault ++;
+        }
+    }
+
+    // 充电过程中充电枪脱落
+    if ( job->job_gun_sn != __is_gun_phy_conn_ok(job) &&
+         (
+             job->job_status == JOB_WORKING ||
+             job->job_status == JOB_ERR_PAUSE ||
+             job->job_status == JOB_MAN_PAUSE
+         )
+    ) {
+        fault ++;
+        if ( job->job_gun_sn == GUN_SN0 ) {
+            bit_set(task, S_GUN1_DROPED);
+        } else if ( job->job_gun_sn == GUN_SN1 ) {
+            bit_set(task, S_GUN2_DROPED);
+        }
+    } else {
+        if ( job->job_gun_sn == GUN_SN0 ) {
+            bit_clr(task, S_GUN1_DROPED);
+        } else if ( job->job_gun_sn == GUN_SN1 ) {
+            bit_clr(task, S_GUN2_DROPED);
         }
     }
 
@@ -857,15 +1102,15 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         fault ++;
     }
     // 直流总输出熔断器熔断
-    if ( task->measure[0]->measure.Flag_prtc6 & 0x01 ) {
+    if ( bit_read(task, S_DC_OUTPUT_RD) ) {
         fault ++;
     }
     // 直流总输出跳闸
-    if ( task->measure[0]->measure.Flag_prtc6 & 0x01 ) {
+    if ( bit_read(task, S_DC_OUTPUT_TRIP) ) {
         fault ++;
     }
     // 急停
-    if ( task->measure[0]->measure.Flag_prtc6 & 0x40 ) {
+    if ( bit_read(task, S_HALT) ) {
         fault ++;
     }
 
@@ -887,6 +1132,22 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         fault ++;
     }
 
+    // 交流输入过压
+    if ( bit_read(task, S_AC_INPUT_HI ) ) {
+        fault ++;
+    }
+    // 交流输入欠压
+    if ( bit_read(task, S_AC_INPUT_LO ) ) {
+        fault ++;
+    }
+
+    // BMS 通讯故障
+    if ( job->charge_mode == CHARGE_AUTO &&
+         bit_read(job, JS_BMS_COMM_ERR) ) {
+         fault ++;
+    } else {
+    }
+
     if ( fault ) {
         bit_clr(task, F_SYSTEM_CHARGE_ALLOW);
     } else {
@@ -900,50 +1161,14 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         job->bms.bms_write_init_ok = 0xFF;
         job->bms.can_heart_beat.status = HACHIKO_INVALID;
         job->bms.can_tp_bomb.status = HACHIKO_INVALID;
-        break;
-    case JOB_WAITTING:
-        sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
-        config_write("需求电压", buff);
-        config_write("初始电压", buff);
-        bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
-        bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
-        bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
-
-        if ( bit_read(job, JF_CMD_ABORT) ) {
-            bit_clr(job, JF_CMD_ABORT);
-            job->status_befor_fault = JOB_WAITTING;
-            job->job_status = JOB_ABORTING;
-            job->charge_exit_kwh_data = task->meter[0].kwh_zong;
-            job->charge_stop_timestamp = time(NULL);
-            end ++;
-            log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
-            break;
-        }
-
-        if ( job->job_gun_sn == GUN_SN0 ) {
-            if ( __bytes2double(b2l(task->measure[0]->measure.VinKM0)) > 450 ) {
-                break;
-            }
-        } else if ( job->job_gun_sn == GUN_SN1 ) {
-            if ( __bytes2double(b2l(task->measure[0]->measure.VinKM1)) > 450 ) {
-                break;
-            }
-        }
-
         memset((void*)job->single, 0, sizeof(job->single));
-        job->job_status = JOB_STANDBY;
-        bit_clr(tsk, F_CHARGE_LED);
-        if ( job->charge_mode == CHARGE_AUTO ) {
-            int bms_vendor_id;
-            char bms_version[32] = {0};
-
-            bms_vendor_id = __string_to_bms_vendor(task->bms_vendor_version);
-            if ( 0 == __string_to_bms_version(task->bms_vendor_version, bms_version ) ) {
-                task->bmsdriver = bmsdriver_search(task, bms_vendor_id, bms_version);
-                log_printf(INF, "ZEUS: Load default BMS %d %s", bms_vendor_id, bms_version);
-            }
-            bind_bmsdriver(bmsdriver_search(task, bms_vendor_id, bms_version), job);
-        }
+        break;
+    case JOB_12V_ASSIT_TEST:
+    case JOB_24V_ASSIT_TEST:
+    case JOB_SCANNING:
+    case JOB_START:
+    case JOB_WAITTING:
+        job_wait(tsk, job);
         break;
     case JOB_STANDBY:
         task->chargers[0]->cstats = CHARGER_IDLE;
@@ -991,32 +1216,178 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
             }
         }
 
+        if (job->charge_implemention_timestamp == 0) {
+            job->charge_implemention_timestamp = time(NULL);
+        }
+
         // 充电模式为自动充电，需要和BMS通信，此时才需要将辅助电源合闸
         // 手动充电时，配置需要辅助电源时也将其合闸
         if ( job->charge_mode == CHARGE_AUTO ||
              (bit_read(task, F_MANUL_CHARGE_NEED_ASSITER) &&
               (job->charge_mode==CHARGE_BV||job->charge_mode==CHARGE_BI))) {
             if ( ret == GUN_SN0 ) {
-                if ( ! bit_read(tsk, F_GUN_1_ASSIT_PWN_SWITCH_STATUS) ) {
+                if ( 1 /*! bit_read(tsk, F_GUN_1_ASSIT_PWN_SWITCH_STATUS)*/ ) {
                     if ( !bit_read(tsk, S_ASSIT_PWN_ERR) ) {
                         if ( ! bit_read(tsk, CMD_GUN_1_ASSIT_PWN_ON) ) {
                             log_printf(INF, "ZEUS: 1# 充电枪辅助电源开始供电");
                         }
                     }
+                    if ( task->kaichu_mask[KAICHU_GUN1_ASSIT_12] &&
+                         task->kaichu_mask[KAICHU_GUN1_ASSIT_24] ) {
+                        if ( job->assit_power_level == 0 ) {
+                            /*
+                             *  系统中包含12V和24V两种辅助电源
+                             *  默认投入12V辅助电源, BMS无法识别后再投入24V电源
+                             *
+                             *  .NOTE:
+                             *     注意这段代码的安全问题:
+                             *     1. 通信物理通路可靠性是否足够。通讯线连接异常会导致
+                             *        电源异常切换。
+                             *     2. 软件可靠性是否足够。软件故障或操作系统故障均会导致
+                             *        数据包无法接收和送达。
+                             *
+                             *  声明:
+                             *     我不赞同这种切换方案!!!!
+                             */
+                            time_t running = time(NULL);
+                            time_t ate = running - job->charge_implemention_timestamp;
+
+                            if  (ate >= 0 && ate <= 10 ) {
+                                if (!bit_read(tsk, F_GUN1_ASSIT_12V)) {
+                                    log_printf(INF, "1#枪12V辅助电源投入.");
+                                }
+                                // 投入12V电源
+                                bit_set(tsk, F_GUN1_ASSIT_12V);
+                                bit_clr(tsk, F_GUN1_ASSIT_24V);
+                            } else if ( ate > 10 && ate <= 15 ) {
+                                if (bit_read(tsk, F_GUN1_ASSIT_12V)) {
+                                    log_printf(INF, "关断1#枪12V辅助电源.");
+                                }
+                                // 关断12V电源
+                                bit_clr(tsk, F_GUN1_ASSIT_12V);
+                                bit_clr(tsk, F_GUN1_ASSIT_24V);
+                            } else if ( ate > 15 && ate <= 25 ) {
+                                if (!bit_read(tsk, F_GUN1_ASSIT_24V)) {
+                                    log_printf(INF, "1#枪24V辅助电源投入.");
+                                }
+                                // 投入24V电源
+                                bit_set(tsk, F_GUN1_ASSIT_24V);
+                                bit_clr(tsk, F_GUN1_ASSIT_12V);
+                            } else {
+                                // 两种电源都无法使用, 无法充电
+                                bit_clr(tsk, F_GUN1_ASSIT_12V);
+                                bit_clr(tsk, F_GUN1_ASSIT_24V);
+                                log_printf(INF, "BMS 无响应停止投切辅助电源.");
+                            }
+                        } else if ( job->assit_power_level == 12 ) {
+                            // 手动选择12V 辅助电源
+                            bit_set(tsk, F_GUN1_ASSIT_12V);
+                            bit_clr(tsk, F_GUN1_ASSIT_24V);
+                        } else if ( job->assit_power_level == 24 ) {
+                            // 手动选择24V 辅助电源
+                            bit_clr(tsk, F_GUN1_ASSIT_12V);
+                            bit_set(tsk, F_GUN1_ASSIT_24V);
+                        } else {
+                            bit_clr(tsk, F_GUN1_ASSIT_12V);
+                            bit_clr(tsk, F_GUN1_ASSIT_24V);
+                        }
+                    } else if ( task->kaichu_mask[KAICHU_GUN1_ASSIT_12]) {
+                        bit_clr(tsk, F_GUN1_ASSIT_24V);
+                        bit_set(tsk, F_GUN1_ASSIT_12V);
+                        log_printf(DBG_LV1, "单独12V辅助电源.");
+                    } else if ( task->kaichu_mask[KAICHU_GUN1_ASSIT_24]) {
+                        bit_clr(tsk, F_GUN1_ASSIT_12V);
+                        bit_set(tsk, F_GUN1_ASSIT_24V);
+                        log_printf(DBG_LV1, "单独24V辅助电源.");
+                    } else {
+                        // 充电桩不需要辅助电源
+                    }
                     bit_set(tsk, CMD_GUN_1_ASSIT_PWN_ON);
                 }
             } else {
-                if ( ! bit_read(tsk, F_GUN_2_ASSIT_PWN_SWITCH_STATUS) ) {
+                if ( 1 /*! bit_read(tsk, F_GUN_2_ASSIT_PWN_SWITCH_STATUS)*/ ) {
                     if ( !bit_read(tsk, S_ASSIT_PWN_ERR) ) {
                         if ( ! bit_read(tsk, CMD_GUN_2_ASSIT_PWN_ON) ) {
                             log_printf(INF, "ZEUS: 2# 充电枪辅助电源开始供电");
                         }
                     }
+                    if ( task->kaichu_mask[KAICHU_GUN2_ASSIT_12] &&
+                         task->kaichu_mask[KAICHU_GUN2_ASSIT_24] ) {
+                        if ( job->assit_power_level == 0 ) {
+                            // 系统中包含12V和24V两种辅助电源
+                            time_t running = time(NULL);
+                            time_t ate = running - job->charge_implemention_timestamp;
+
+                            if  (ate >= 0 && ate <= 10 ) {
+                                if (!bit_read(tsk, F_GUN2_ASSIT_12V)) {
+                                    log_printf(INF, "2#枪12V辅助电源投入.");
+                                }
+                                // 投入12V电源
+                                bit_set(tsk, F_GUN2_ASSIT_12V);
+                                bit_clr(tsk, F_GUN2_ASSIT_24V);
+                            } else if ( ate > 10 && ate <= 15 ) {
+                                if (bit_read(tsk, F_GUN2_ASSIT_12V)) {
+                                    log_printf(INF, "关断2#枪12V辅助电源.");
+                                }
+                                // 关断12V电源
+                                bit_clr(tsk, F_GUN2_ASSIT_12V);
+                                bit_clr(tsk, F_GUN2_ASSIT_24V);
+                            } else if ( ate > 15 && ate <= 25 ) {
+                                if (!bit_read(tsk, F_GUN2_ASSIT_24V)) {
+                                    log_printf(INF, "2#枪24V辅助电源投入.");
+                                }
+                                // 投入24V电源
+                                bit_set(tsk, F_GUN2_ASSIT_24V);
+                                bit_clr(tsk, F_GUN2_ASSIT_12V);
+                            } else {
+                                // 两种电源都无法使用
+                                bit_clr(tsk, F_GUN2_ASSIT_12V);
+                                bit_clr(tsk, F_GUN2_ASSIT_24V);
+                            }
+                        } else if ( job->assit_power_level == 12 ) {
+                            // 手动选择12V 辅助电源
+                            bit_set(tsk, F_GUN2_ASSIT_12V);
+                            bit_clr(tsk, F_GUN2_ASSIT_24V);
+                        } else if ( job->assit_power_level == 24 ) {
+                            // 手动选择24V 辅助电源
+                            bit_clr(tsk, F_GUN2_ASSIT_12V);
+                            bit_set(tsk, F_GUN2_ASSIT_24V);
+                        } else {
+                            bit_clr(tsk, F_GUN2_ASSIT_12V);
+                            bit_clr(tsk, F_GUN2_ASSIT_24V);
+                        }
+                    } else if ( task->kaichu_mask[KAICHU_GUN2_ASSIT_12]) {
+                        bit_clr(tsk, F_GUN2_ASSIT_24V);
+                        bit_set(tsk, F_GUN2_ASSIT_12V);
+                    } else if ( task->kaichu_mask[KAICHU_GUN2_ASSIT_24]) {
+                        bit_clr(tsk, F_GUN2_ASSIT_12V);
+                        bit_set(tsk, F_GUN2_ASSIT_24V);
+                    } else {
+                        // 充电桩不需要辅助电源
+                    }
                     bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                 }
             }
-            if ( (job->charge_mode == CHARGE_AUTO) &&
-                 (! bit_read(job, JF_BMS_BRM_OK)) ) {
+
+            // 自动充电模式下，以BMS握手成功为投切成功标识
+            // 手动充电模式下，以母线上有电池高压信号为投切成功标识
+
+            double bat_v = 0.0f;
+            if ( job->job_gun_sn == GUN_SN0 ) {
+                bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT0));
+            } else if ( job->job_gun_sn == GUN_SN1 ) {
+                bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT1));
+            } else {
+
+            }
+
+            if (
+                  ((job->charge_mode == CHARGE_AUTO) && (! bit_read(job, JF_BMS_BRM_OK)))||
+                    (
+                        (job->charge_mode == CHARGE_BI||job->charge_mode == CHARGE_BV) &&
+                        bat_v < task->moudle_min_V
+                    )
+               ) {
                 break;
             }
         }
@@ -1039,14 +1410,28 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
     case JOB_WORKING:
         bit_set(tsk, F_CHARGE_LED);
         task->chargers[0]->cstats = CHARGER_WORK;
-
-        //if ( job->charge_mode == CHARGE_AUTO ) {
-            sprintf(buff, "%d", (unsigned int)(job->need_V * 10.0f) );
-            config_write("需求电压", buff);
-            config_write("初始电压", buff);
-            sprintf(buff, "%d", (unsigned int)(job->need_I * 10.0f) );
-            config_write("需求电流", buff);
-        //}
+        sprintf(buff, "%d", (unsigned int)(job->need_V * 10.0f) );
+        config_write("需求电压", buff);
+        config_write("初始电压", buff);
+        if ( job->job_gun_sn == GUN_SN0 ) {
+            if ( job->need_I > task->bat_1_I_hi || 
+	       job->need_I > task->single_module_A * task->modules_nr
+	    ) {
+                sprintf(buff, "%d", task->single_module_A * task->modules_nr);
+            } else {
+                sprintf(buff, "%d", (unsigned int)(job->need_I * 10.0f) );
+            }
+        } else if ( job->job_gun_sn == GUN_SN1 ) {
+            if ( job->need_I > task->bat_2_I_hi || 
+	       job->need_I > task->single_module_A * task->modules_nr ) {
+                sprintf(buff, "%d", task->single_module_A * task->modules_nr);
+            } else {
+                sprintf(buff, "%d", (unsigned int)(job->need_I * 10.0f) );
+            }
+        } else {
+            sprintf(buff, "0");
+        }
+        config_write("需求电流", buff);
 
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
             bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
@@ -1079,8 +1464,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     bit_set(tsk, CMD_GUN_1_ASSIT_PWN_ON);
                 }
                 bit_set(tsk, CMD_GUN_1_OUTPUT_ON);
-            }
-            if ( ret  == GUN_SN1 ) {
+            } else if ( ret  == GUN_SN1 ) {
                 bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
 
                 if ( ! bit_read(tsk, CMD_GUN_2_OUTPUT_ON) ) {
@@ -1092,6 +1476,17 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                     bit_set(tsk, CMD_GUN_2_ASSIT_PWN_ON);
                 }
                 bit_set(tsk, CMD_GUN_2_OUTPUT_ON);
+            } else {
+                // 充电枪脱落
+                if (job->job_gun_sn == GUN_SN0) {
+                    bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
+                } else if ( job->job_gun_sn == GUN_SN1 ) {
+                    bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+                }
+                job->status_befor_fault = JOB_WORKING;
+                job->job_status = JOB_ERR_PAUSE;
+                log_printf(WRN, "ZEUS: 充电枪脱落, 自动暂停作业(JOB_WORKING)");
+                break;
             }
 
             job->section_kwh = task->meter[0].kwh_zong - job->charge_begin_kwh_data;
@@ -1121,7 +1516,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
                                job->charged_kwh + job->section_kwh);
-                    job->job_status = JOB_DONE;
+                    job->job_status = JOB_ABORTING;
                     end ++;
                 }
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_MONEY ) {
@@ -1136,7 +1531,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                job->charge_begin_kwh_data,
                                task->meter[0].kwh_zong,
                                used_kwh);
-                    job->job_status = JOB_DONE;
+                    job->job_status = JOB_ABORTING;
                     end ++;
                 }
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_TIME ) {
@@ -1151,7 +1546,7 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                                job->charge_begin_timestamp,
                                job->charge_stop_timestamp,
                                used_seconds);
-                    job->job_status = JOB_DONE;
+                    job->job_status = JOB_ABORTING;
                     end ++;
                 }
             } else if ( job->charge_billing.mode == BILLING_MODE_AS_FREE ) {
@@ -1186,6 +1581,16 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                 log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
             }
 
+            if ( bit_read(job, JF_BILLING_DONE) ) {
+                job->status_befor_fault = JOB_WORKING;
+                job->job_status = JOB_ABORTING;
+                job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+                job->charge_stop_timestamp = time(NULL);
+                bit_set(job, JF_CHG_TRM_CHARGE);
+                end ++;
+                log_printf(INF, "***** ZEUS(关键): 作业终止，计费完成！");
+            }
+
             // 充电作业发生状态变化
             if ( end ) {
                 job->charged_kwh = job->charged_kwh + job->section_kwh;
@@ -1218,14 +1623,19 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+
+        if ( bit_read(job, JF_CMD_ABORT) ) {
+            bit_clr(job, JF_CMD_ABORT);
+            log_printf(INF, "ZEUS: 充电任务中止(%X)",
+                       job->status_befor_fault);
+            job->job_status = JOB_ABORTING;
+        }
         if ( ! bit_read(tsk, F_SYSTEM_CHARGE_ALLOW) ) {
-            if ( bit_read(job, JF_CMD_ABORT) ) {
-                bit_clr(job, JF_CMD_ABORT);
-                log_printf(INF, "ZEUS: 充电任务中止(%X)",
-                           job->status_befor_fault);
-                job->job_status = JOB_ABORTING;
-            }
         } else {
+            ret = __is_gun_phy_conn_ok(job);
+            if ( ret == GUN_UNDEFINE || ret == GUN_INVALID ) {
+                break;
+            }
             job->job_status = JOB_RESUMING;
             log_printf(INF, "ZEUS: 故障消除, 充电作业继续进行(%X)",
                        job->status_befor_fault);
@@ -1263,51 +1673,10 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
         bit_set(job, JF_CHG_TRM_CHARGE);
-        if ( job->charge_mode == CHARGE_AUTO ) {
-            /*
-             * 中止自动充电
-             * BMS通信阶段，是否计费
-             **/
-            if ( bit_read(task, F_NEED_BILLING) &&
-                 bit_read(task, F_BILLING_DONE) &&
-                 bit_read(job, JF_BMS_TX_CST) &&
-                 ( bit_read(job, JF_BMS_RX_BST) || bit_read(job, JS_BMS_RX_BST_TIMEOUT) ) &&
-                 bit_read(job, JF_BMS_TX_CSD) &&
-                 ( bit_read(job, JF_BMS_RX_BSD) || bit_read(job, JS_BMS_RX_BSD_TIMEOUT) )
-            ) {
-                job->job_status = JOB_EXITTING;
-            } else if ( ! bit_read(task, F_NEED_BILLING ) &&
-                        bit_read(job, JF_BMS_TX_CST) &&
-                        ( bit_read(job, JF_BMS_RX_BST) || bit_read(job, JS_BMS_RX_BST_TIMEOUT) ) &&
-                        bit_read(job, JF_BMS_TX_CSD) &&
-                        ( bit_read(job, JF_BMS_RX_BSD) || bit_read(job, JS_BMS_RX_BSD_TIMEOUT) )
-            ) {
-                job->job_status = JOB_EXITTING;
-            } else if ( bit_read(task, F_NEED_BILLING) &&
-                        bit_read(task, F_BILING_TIMEOUT) ){
-                job->job_status = JOB_EXITTING;
-            } else {
 
-            }
-        } else {
-            /*
-             * 中止手动充电
-             * 如果需要计费，那么需要等待计费完成，或计费超时才能退出作业
-             * 如果不需要计费，则直接退出.
-             * 否则等待计费完成指令
-             */
-            if ( bit_read(task, F_NEED_BILLING) &&
-                 bit_read(task, F_BILLING_DONE) ) {
-                job->job_status = JOB_EXITTING;
-            } else if ( ! bit_read(task, F_NEED_BILLING ) ) {
-                job->job_status = JOB_EXITTING;
-            } else if ( bit_read(task, F_NEED_BILLING) &&
-                        bit_read(task, F_BILING_TIMEOUT) ){
-                job->job_status = JOB_EXITTING;
-            } else {
+        job->job_status = JOB_DONE;
+        log_printf(INF, "作业中止");
 
-            }
-        }
         break;
     case JOB_DONE:
         sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
@@ -1317,10 +1686,24 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, F_CHARGE_LED);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        if ( job->charge_abort_timestamp == 0 ) {
+            job->charge_abort_timestamp = time(NULL);
+        }
 
-        if ( job->charge_mode == CHARGE_AUTO ) {
-
+        if ( bit_read(task, F_NEED_BILLING) ) {
+            if ( bit_read(job, JF_BILLING_DONE) ) {
+                job->job_status = JOB_EXITTING;
+                log_printf(INF, "JOB: 计费完成, 作业退出!");
+            } else if ( bit_read(job, JS_BILLING_TIMEOUT) ) {
+                job->job_status = JOB_EXITTING;
+                log_printf(INF, "JOB: 计费超时, 交易数据暂存后退出作业!");
+            } else {
+                if ( time(NULL) - job->charge_abort_timestamp >= 15 ) {
+                    bit_set(job, JS_BILLING_TIMEOUT);
+                }
+            }
         } else {
+	    bit_read(job, JF_BILLING_DONE);
             job->job_status = JOB_EXITTING;
         }
         break;
@@ -1335,6 +1718,10 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
         bit_clr(tsk, CMD_GUN_2_ASSIT_PWN_ON);
         bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
         bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+        bit_clr(tsk, F_GUN1_ASSIT_12V);
+        bit_clr(tsk, F_GUN1_ASSIT_24V);
+        bit_clr(tsk, F_GUN2_ASSIT_12V);
+        bit_clr(tsk, F_GUN2_ASSIT_24V);
         if ( job->job_gun_sn == GUN_SN0 ) {
             bit_clr(tsk, F_GUN1_CHARGE);
             bit_clr(tsk, F_VOL1_SET_OK);
@@ -1384,23 +1771,25 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
                  job->bms.can_tp_bomb.status == HACHIKO_INVALID &&
                  job->bms.bms_read_init_ok == 0xFF &&
                  job->bms.bms_write_init_ok == 0xFF ) {
-                job->bms.driver = NULL;
-                free(job->bms.generator);
-                job->job_status = JOB_DIZZY;
-                log_printf(INF, "ZEUS.job: 作业清除引用完成.");
+				job->bms.driver = NULL;
+				if (job_delay_exit(job)) {
+					free(job->bms.generator);
+					job->job_status = JOB_DIZZY;
+					log_printf(INF, "ZEUS.job: 作业清除引用完成.");
+				}
             } else {
-	      log_printf(DBG_LV1, "%d  %d %x %x", job->bms.can_heart_beat.status,
-                 job->bms.can_tp_bomb.status,
-                 job->bms.bms_read_init_ok,
-                 job->bms.bms_write_init_ok);
-	      Hachiko_kill(&job->bms.can_heart_beat);
-	      Hachiko_kill(&job->bms.can_tp_bomb);
-	      job->bms.can_heart_beat.status = HACHIKO_INVALID;
+              log_printf(DBG_LV1, "%d  %d %x %x", job->bms.can_heart_beat.status,
+                     job->bms.can_tp_bomb.status,
+                     job->bms.bms_read_init_ok,
+                     job->bms.bms_write_init_ok);
+              Hachiko_kill(&job->bms.can_heart_beat);
+              Hachiko_kill(&job->bms.can_tp_bomb);
+              job->bms.can_heart_beat.status = HACHIKO_INVALID;
               job->bms.can_tp_bomb.status = HACHIKO_INVALID;
-	      
-	    }
+            }
         } else {
-            job->job_status = JOB_DIZZY;
+            //job->job_status = JOB_DIZZY;
+			job_delay_exit(job);
         }
         break;
     case JOB_DIZZY:
@@ -1426,10 +1815,63 @@ void job_running(struct charge_task *tsk, struct charge_job *job)
     }
 }
 
-// 作业销毁程序
-void job_destroy(struct charge_job *job)
+int job_wait(struct charge_task *tsk, struct charge_job *job)
 {
+    int ret;
+    char buff[64] = {0};
+    char sql[256];
+    int start  = 0, end = 0, fault = 0;
+
+    sprintf(buff, "%d", (unsigned int)(task->moudle_min_V * 10.0f));
+    config_write("需求电压", buff);
+    config_write("初始电压", buff);
+    bit_clr(tsk, CMD_DC_OUTPUT_SWITCH_ON);
+    bit_clr(tsk, CMD_GUN_1_OUTPUT_ON);
+    bit_clr(tsk, CMD_GUN_2_OUTPUT_ON);
+    job->charge_abort_timestamp = 0;
+    job->charge_implemention_timestamp = 0;
+
+    if ( bit_read(job, JF_CMD_ABORT) ) {
+        bit_clr(job, JF_CMD_ABORT);
+        job->status_befor_fault = JOB_WAITTING;
+        job->job_status = JOB_ABORTING;
+        job->charge_exit_kwh_data = task->meter[0].kwh_zong;
+        job->charge_stop_timestamp = time(NULL);
+        end ++;
+        log_printf(INF, "***** ZEUS(关键): 作业中止(人为), 正在中止");
+        return 0;
+    }
+
+    if ( job->job_gun_sn == GUN_SN0 ) {
+        if ( __bytes2double(b2l(task->measure[0]->measure.VinKM0)) > (task->moudle_min_V + 36.0f) ) {
+            return 0;
+        }
+    } else if ( job->job_gun_sn == GUN_SN1 ) {
+        if ( __bytes2double(b2l(task->measure[0]->measure.VinKM1)) > (task->moudle_min_V + 36.0f) ) {
+            return 0;
+        }
+    }
+
+    job->job_status = JOB_STANDBY;
+    bit_clr(tsk, F_CHARGE_LED);
+    if ( job->charge_mode == CHARGE_AUTO ) {
+        int bms_vendor_id;
+        char bms_version[32] = {0};
+
+        bms_vendor_id = __string_to_bms_vendor(task->bms_vendor_version);
+        if ( 0 == __string_to_bms_version(task->bms_vendor_version, bms_version ) ) {
+            task->bmsdriver = bmsdriver_search(task, bms_vendor_id, bms_version);
+            log_printf(INF, "ZEUS: Load default BMS %d %s", bms_vendor_id, bms_version);
+        }
+        bind_bmsdriver(bmsdriver_search(task, bms_vendor_id, bms_version), job);
+    }
+    return 0;
 }
+
+int job_standby(struct charge_task *, struct charge_job *);
+int job_working(struct charge_task *, struct charge_job *);
+int job_done(struct charge_task *, struct charge_job *);
+int job_billing(struct charge_task *, struct charge_job *);
 
 int job_commit(struct charge_task *tsk, const struct job_commit_data *jc, COMMIT_CMD cmd)
 {
@@ -1491,6 +1933,7 @@ struct charge_job * job_fork(struct charge_task *tsk, struct job_commit_data *ne
     thiz->charged_money = 0.0f;
     thiz->charged_seconds = 0;
     thiz->section_seconds = 0;
+    thiz->assit_power_level = need->assit_power_level;
     thiz->tsk = tsk;
     list_ini(thiz->job_node);
     thiz->jid = need->url_commit_timestamp;
@@ -1753,58 +2196,98 @@ struct job_commit_data *job_select_commit(struct charge_task *tsk)
 #define EXPORT_FIRST_JOB_SIGNAL(job, sig) do {      \
         sprintf(buff, "echo %-32s:%d > /tmp/zeus/job_%08X_single", #sig, bit_read(job, sig), (unsigned int)job->jid);\
     system(buff);} while (0)
+#define EXPORT_JOB_HEX(job, key, value) do {\
+        sprintf(buff, "echo %32s: %08X >> /tmp/zeus/job_%08X_single", key, value, (unsigned int)job->jid);\
+    system(buff);} while (0)
+#define EXPORT_JOB_DEC(job, key, value) do {\
+        sprintf(buff, "echo %32s: %d >> /tmp/zeus/job_%08X_single", key, value, (unsigned int)job->jid);\
+    system(buff);} while (0)
 
+#define JSON_status(id, status)do {\
+        sprintf(buff, "printf {\\\"id\\\":\\\"%d\\\",\\\"v\\\":\\\"%d\\\"}, >> /tmp/rcm.json", id, status);\
+        system(buff);} while (0)
+#define JSON_formatint(id, value) do {\
+        sprintf(buff, "printf {\\\"id\\\":\\\"%d\\\",\\\"v\\\":\\\"%d\\\"},  >> /tmp/rcm.json", id, value);\
+        system(buff);} while (0)
+#define JSON_formatfloat(id, value) do {\
+        sprintf(buff, "printf {\\\"id\\\":\\\"%d\\\",\\\"v\\\":\\\"%.4f\\\"},  >> /tmp/rcm.json", id, value);\
+        system(buff);} while (0)
 // 将作业信息导出至文件系统
 int job_export(struct charge_job *job)
 {
-    char buff[512];
-    EXPORT_FIRST_JOB_SIGNAL(job, JF_AUTO_CHARGE);
-    EXPORT_JOB_SIGNAL(job, JF_GUN_OK);
-    EXPORT_JOB_SIGNAL(job, JF_ASSIT_PWR_ON);
-    EXPORT_JOB_SIGNAL(job, JF_LOCK_ON);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_DRV_BINDED);
-    EXPORT_JOB_SIGNAL(job, JF_CHARGE_BMS_ALLOW);
-    EXPORT_JOB_SIGNAL(job, JF_CMD_ABORT);
-    EXPORT_JOB_SIGNAL(job, JF_JOB_EXIT);
-    EXPORT_JOB_SIGNAL(job, JF_DESTROY);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BRM);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BRM_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CRM);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BCP);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BCP_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BRO);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BRO_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CTS);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CML);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CRO);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BCL);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BCL_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BCS);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BCS_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BSM);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BSM_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BMV);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BMV_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BMT);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BMT_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BST);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BST_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CCS);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CST);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_RX_BSD);
-    EXPORT_JOB_SIGNAL(job, JS_BMS_RX_BSD_TIMEOUT);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TX_CSD);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_BRM_OK);
-    EXPORT_JOB_SIGNAL(job, JF_CHG_CRM_OK);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_BRO_OK);
-    EXPORT_JOB_SIGNAL(job, JF_CHG_CRO_OK);
-    EXPORT_JOB_SIGNAL(job, JF_BMS_TRM_CHARGE);
-    EXPORT_JOB_SIGNAL(job, JF_CHG_TRM_CHARGE);
-    EXPORT_JOB_SIGNAL(job, JR_HEART_BEAT_TIMER);
-    EXPORT_JOB_SIGNAL(job, JR_TP_CONN_TIMER);
-    EXPORT_JOB_SIGNAL(job, JR_RD_THREAD_REF);
-    EXPORT_JOB_SIGNAL(job, JR_WR_THREAD_REF);
+    char *server_addr = "122.224.90.74:10008";
+    char buff[256];
+    time_t timep;
+    struct tm *p;
+    timep = time(NULL);
+    p =localtime(&timep);
 
+    sprintf(buff, "printf device_sn=ON-DC-%04d > /tmp/rcm.json", random() % 4);
+    system(buff);
+    sprintf(buff, "printf \\&datetime=%d-%d-%d\\ %d:%d:%d\\&type=上报 >> /tmp/rcm.json",
+            p->tm_year + 1900,
+            p->tm_mon + 1,
+            p->tm_mday,
+            p->tm_hour,
+            p->tm_min,
+            p->tm_sec);
+    system(buff);
+
+    sprintf(buff, "printf \\&json_text={\\\"task\\\":[ >> /tmp/rcm.json");
+    system(buff);
+    // {{ 任务状态
+    do {
+        unsigned int ei, i = 0;
+        for ( ei = S_ERROR; ei < S_END; ei ++, i ++ ) {
+            if ( bit_read(task, ei) ) {
+                JSON_status( i + 54, 1);
+            } else {
+                continue;
+            }
+        }
+    } while ( 0 );
+    // }}
+
+    //{{ 任务数据
+    JSON_formatfloat(155, __bytes2double(task->measure[0]->measure.VinKM0));
+    JSON_formatfloat(156, __bytes2double(task->measure[0]->measure.IoutBAT0));
+    JSON_formatfloat(157, __bytes2double(task->measure[0]->measure.VinBAT0));
+    JSON_formatfloat(158, __bytes2double(task->measure[0]->measure.IoutBAT0));
+    JSON_formatfloat(159, __bytes2double(task->measure[0]->measure.VinKM1));
+    JSON_formatfloat(160, __bytes2double(task->measure[0]->measure.IoutBAT1));
+    JSON_formatfloat(161, __bytes2double(task->measure[0]->measure.VinBAT1));
+    JSON_formatfloat(162, __bytes2double(task->measure[0]->measure.IoutBAT1));
+
+    JSON_formatfloat(155, __bytes2double(task->measure[0]->measure.VinBAT0RESP));
+    JSON_formatfloat(155, __bytes2double(task->measure[0]->measure.VinBAT0RESN));
+    JSON_formatfloat(155, __bytes2double(task->measure[0]->measure.VinBAT1RESP));
+    JSON_formatfloat(155, __bytes2double(task->measure[0]->measure.VinBAT1RESN));
+    //}}
+    sprintf(buff, "printf {\\\"id\\\":\\\"-1\\\",\\\"v\\\":\\\"-1\\\"}], >> /tmp/rcm.json");
+    system(buff);
+
+    sprintf(buff, "printf \\\"job\\\":[ >> /tmp/rcm.json");
+    system(buff);
+    // {{ 作业状态
+    do {
+        unsigned int ei, i = 0;
+        for ( ei = JF_AUTO_CHARGE; ei < J_END; ei ++, i ++ ) {
+            if ( bit_read(job, ei) ) {
+                JSON_status( ei, 1);
+            } else {
+                JSON_status( ei, 0);
+                continue;
+            }
+        }
+    } while ( 0 );
+    // }}
+
+    // {{ 作业数据
+    // }}
+    sprintf(buff, "printf {\\\"id\\\":\\\"-1\\\",\\\"v\\\":\\\"-1\\\"}]}\\&ttl=30\\&MM_insert=form1 >> /tmp/rcm.json");
+    system(buff);
+
+    system("/usr/zeus/script/feedback.sh");
     return 0;
 }
 

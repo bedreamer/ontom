@@ -1,0 +1,168 @@
+#ifndef _CAN_PROTYPEDEF_H_
+#define _CAN_PROTYPEDEF_H_
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t REQ_PGN[3];
+    
+}FrameSAE_Request;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t Controlbyte;
+    uint8_t GroupFunVal;
+    uint8_t Reserve[2];
+    uint8_t Status_ACK;
+    uint8_t ACK_PGN[3];
+    
+}FrameSAE_ACK;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t Data[8];
+    
+}FrameSAE_ProA;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t Data[8];
+    
+}FrameSAE_ProA2;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t Data[8];
+    
+}FrameSAE_ProB;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t REQ_PGN[3];
+    uint8_t SpecIns;
+    uint8_t Reserve[4];
+    
+}FrameSAE_Request2;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t Tran_PGN[3];
+    uint8_t LenDataofDev;
+    uint8_t Dev_FunECU;
+    uint8_t Dev_Fun;
+    uint8_t VehicleSys; //Bits 8-2
+    uint8_t AACandIGandVSIand;
+    
+}FrameSAE_Transfer;
+
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t CtrlByte;
+    uint8_t TotalMsgByteNum[2];
+    uint8_t TotalPacketNum;
+    uint8_t MaxPacketNum;
+    uint8_t SendPacketNum; 
+    uint8_t NextSendPacketNum;
+    uint8_t Sequence_Num;
+    
+}FrameSAE_TP_CM;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t CtrlByte;
+    uint8_t TotalMsgByteNum[2];
+    uint8_t TotalPacketNum;
+    uint8_t MaxSendPacketNum;//FF indicats that no limit exists for originator
+    uint8_t PGNofMsg[3];
+    
+}FrameSAE_TP_CM_RTS;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t CtrlByte;
+    uint8_t RecePacketNum;
+    uint8_t NextSendPacketNum;
+    uint8_t Reserve[2];//Must FF;
+    uint8_t PGNofMsg[3];
+    
+}FrameSAE_TP_CM_CTS;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t CtrlByte;
+    uint8_t AbortReason;
+    uint8_t Reserve[3];//Must FF;
+    uint8_t PGNofMsg[3];
+    
+}FrameSAE_TP_CM_Abort;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t CtrlByte;
+    uint8_t TotalMsgByteNum[2];
+    uint8_t TotalPacketNum;
+    uint8_t Reserve;//Must FF;
+    uint8_t PGNofMsg[3];
+    
+}FrameSAE_TP_CM_BAM;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t CtrlByte;
+    uint8_t TotalMsgByteNum[2];
+    uint8_t TotalPacketNum;
+    uint8_t Reserve;//Must FF;
+    uint8_t PGNofMsg[3];
+    
+}FrameSAE_TP_CM_EndOfMsgACK;
+
+typedef struct
+{
+    uint32_t ID;
+    uint32_t DLC;
+    uint8_t Sequence_Num;
+    uint8_t PacketData[7];
+    
+}FrameSAE_TP_DT;
+
+
+
+
+typedef union
+{
+    uint32_t regbuff[4];
+    
+}Un_CANProFrame;
+
+typedef struct
+{
+
+} BMS_FramType;
+
+#endif

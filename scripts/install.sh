@@ -15,6 +15,7 @@ html='no'
 qtlib='no'
 browser='no'
 tools='no'
+vpnsurpport='no'
 
 while getopts abcdlpqtuvhP:T:W:C: param; do
 	# commands
@@ -28,6 +29,7 @@ while getopts abcdlpqtuvhP:T:W:C: param; do
 		qtlib='yes';
 		browser='yes';
 		tools='yes';
+		vpnsurpport='yes';
 	;;
 	b|-browser) # 安装浏览器
 		browser='yes';
@@ -52,6 +54,9 @@ while getopts abcdlpqtuvhP:T:W:C: param; do
 	;;
 	u|-html) # 仅安装html文件
 		html='yes';
+	;;
+	m|-modules) # 仅安装VPN支持文件
+		vpnsurpport='yes';
 	;;
 	v|-version)
 		echo "installer of zeus version: $VERSION"
@@ -197,6 +202,11 @@ if [ $qtlib == "yes" ];then
 	#ln -s libQtWebKit.so.4.9.2 $prefix/usr/gui/qt/lib/libQtWebKit.so
 	#ln -s libQtWebKit.so.4.9.2 $prefix/usr/gui/qt/lib/libQtWebKit.so.4
 	#ln -s libQtWebKit.so.4.9.2 $prefix/usr/gui/qt/lib/libQtWebKit.so.4.9
+fi
+
+if [ $vpnsurpport == "yes" ];then
+	echo "	decompress VPN surpport files..."
+	tar -C $prefix -xf scripts/VPN.update.tar
 fi
 
 mkdir -p $prefix/usr/zeus

@@ -47,12 +47,24 @@ export QWS_MOUSE_PROTO=tslib:/dev/input/event0
 
 sync
 
-#[ -f /etc/pointercal ] || /usr/bin/ts_calibrate
+[ -f /etc/pointercal ] || /usr/bin/ts_calibrate
 
 #/usr/test/am335x_qt -qws &
 
 umask 022
 export PATH=$PATH:/usr/zeus:/usr/zeus/script
+
+if ps | grep narigw.lua |grep onshell > /dev/null; then
+	echo "narigw already exists";
+else
+	onshell /home/only/narigw.lua 1000;
+fi
+if ps | grep recovery.lua |grep onshell > /dev/null; then
+	echo "recovery already exists";
+else
+	onshell /home/only/recovery.lua;
+fi
+
 
 #/usr/browser/browser -qws http://127.0.0.1:8080 &
 #/usr/zeus/zeus &
@@ -61,9 +73,6 @@ ps > /tmp/pslist
 cat /tmp/pslist | grep zeus >/dev/null 2>&1
 if [ $? -eq 1 ]; then
     /usr/zeus/runme.sh &
-	if [ -e '/usr/zeus/nock.sh' ];then
-		/usr/zeus/nock.sh &
-	fi
 fi
 alias ls='ls --color=auto'
 

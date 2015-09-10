@@ -2,6 +2,7 @@
 #include "charge.h"
 #include <stdint.h>
 #include <execinfo.h>
+#include <ucontext.h>
 
 extern void * thread_xml_service(void *) ___THREAD_ENTRY___;
 extern void * thread_charger_service(void *) ___THREAD_ENTRY___;
@@ -158,6 +159,7 @@ void dump(unsigned int pc)
 static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
 
 {
+#ifdef  ARM
 
     static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
     int i;
@@ -190,8 +192,8 @@ static void sigsegv_handler(int signum, siginfo_t* info, void*ptr)
     for(i = 0; i < sz; ++i){
          printf("%s\n", strings[i]);
     }
+#endif
     _exit (-1);
-
 }
 
 
@@ -215,8 +217,36 @@ static void  catch_sigsegv()
 
 }
 
+struct args_items {
+    const char *cmd_line;
+    const struct args_items * params;
+    const char *comment;
+};
 
-int main()
+struct args_items args[] = {
+    {"--allways_conn1",           NULL,          "1#充电枪始终连接."},
+    {"--allways_conn2",           NULL,          "2#充电枪始终连接."},
+    {"--random_mx_V Vlo Vhi",     NULL,          "随机母线电压，范围 Vlo-Vhi."},
+    {"--random_bat1_V Vlo Vhi",   NULL,          "随机电池1电压，范围 Vlo-Vhi."},
+    {"--random_bat2_V Vlo Vhi",   NULL,          "随机电池2电压，范围 Vlo-Vhi."},
+    {"--random_bat1_I Ilo Ihi",   NULL,          "随机电池1电流，范围 Ilo-Ihi."},
+    {"--random_bat2_I Ilo Ihi",   NULL,          "随机电池2电流，范围 Ilo-Ihi."},
+    {"--no_timeout",              NULL,          "不进行设备超时统计,只针对采样盒，读卡器，电表，模块等串口设备."},
+    {"--no_error",                NULL,          "不进行任何故障统计."},
+    {"--version",                 NULL,          "显示主程序版本号, 执行后退出."},
+    {"--help",                    NULL,          "显示帮助信息, 执行后退出."},
+    {NULL, NULL}
+};
+
+void parase_args(int argc, const char *argv[])
+{
+    int i ;
+    for ( i = 1; i < argc; i ++ ) {
+        printf("\t%d:<%s>\n", i, argv[i]);
+    }
+}
+
+int main(int argc, const char *argv[])
 {
     const char *user_cfg = NULL;
     int s;
@@ -225,6 +255,25 @@ int main()
     int errcode = 0, ret;
     char *errmsg = NULL;
     struct sigaction act;
+
+    // 读取配置文件的顺序必须是
+    // 1. 系统配置文件
+    // 2. 用户参数配置文件
+    // 需要注意的是，用户配置数据和用户配置数据可以有相同的配置项
+    // 但优先级最高的是用户配置数据，如果某个配置项同时出现在系统配置
+    // 和用户配置中，那么系统最终采用的值将是用户配置数据中的值
+    // 因此这里需要注意的是：
+    // * 有两个配置文件是一种冗余设计
+    // * 非必要的情况下，分别将系统配置和用户配置分开存储到两个文件中
+    config_initlize("/usr/zeus/ontom.cfg");
+    user_cfg = config_read("user_config_file");
+    if ( user_cfg == NULL ) {
+        log_printf(WRN, "not gave user config file,"
+                   "use 'user.cfg' by default.");
+        user_cfg = "user.cfg";
+    }
+    config_initlize(user_cfg);
+    parase_args(argc, argv);
 
     signal(SIGINT, sig_interrupt);
     sigemptyset(&act.sa_mask);
@@ -283,24 +332,6 @@ int main()
     printf( "           \nCopyright © 2014 杭州奥能电源设备股份有限公司版权所有\n");
     printf( "                            %s %s\n\n", __DATE__, __TIME__);
     printf("系统启动中(Revision: %d).....\n\n\n\n", VERSION);
-
-    // 读取配置文件的顺序必须是
-    // 1. 系统配置文件
-    // 2. 用户参数配置文件
-    // 需要注意的是，用户配置数据和用户配置数据可以有相同的配置项
-    // 但优先级最高的是用户配置数据，如果某个配置项同时出现在系统配置
-    // 和用户配置中，那么系统最终采用的值将是用户配置数据中的值
-    // 因此这里需要注意的是：
-    // * 有两个配置文件是一种冗余设计
-    // * 非必要的情况下，分别将系统配置和用户配置分开存储到两个文件中
-    config_initlize("/usr/zeus/ontom.cfg");
-    user_cfg = config_read("user_config_file");
-    if ( user_cfg == NULL ) {
-        log_printf(WRN, "not gave user config file,"
-                   "use 'user.cfg' by default.");
-        user_cfg = "user.cfg";
-    }
-    config_initlize(user_cfg);
 
     s = pthread_attr_init(&task->attr);
     if ( 0 != s ) {
@@ -416,6 +447,8 @@ int main()
     }
     log_printf(INF, "UART framework start up.                           DONE.");
 #endif
+
+#if 1
     // mongoose 线程，用来处理AJAX请求，解析由客户提交的请求，返回应答的xml文件或其他数据
     ret = pthread_create( & task->tid, &task->attr, thread_xml_service, &thread_done[0]);
     if ( 0 != ret ) {
@@ -425,7 +458,7 @@ int main()
         goto die;
     }
     log_printf(DBG_LV1, "mongoose service start up.                         DONE.");
-
+#endif
 
 #if CONFIG_DEBUG_CONFIG >= 1
     config_print();

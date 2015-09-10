@@ -345,51 +345,6 @@ static inline void __dump_uart_hex(unsigned char *hex, int len, unsigned int lv)
     log_printf(lv, "UART:%d [ %s ]", len, buff);
 }
 
-// 串口4的超时响应
-void uart4_Hachiko_notify_proc(Hachiko_EVT evt, void *_private, const struct Hachiko_food *self)
-{
-    struct bp_uart * thiz = (struct bp_uart * __restrict__)_private;
-    struct Hachiko_food *p;
-
-    if ( evt != HACHIKO_TIMEOUT ) return;
-    p = & (thiz->rx_seed);
-
-    if ( self == p ) {
-        Hachiko_pause(&thiz->rx_seed);
-        return;
-    }
-
-#if (CONFIG_SUPPORT_SIGIO > 0)
-    /*
-     * 串口发送完成事件由系统提供SIGIO信号来确定，具体逻辑见函数
-     *  void uarts_async_sigio(int param)
-     */
-#else
-    #if (CONFIG_SUPPORT_ASYNC_UART_TX == 1)
-    p = & thiz->tx_seed;
-    if ( self == p ) {
-        Hachiko_pause(p);
-        static struct bp_user *pre = NULL;
-        if ( thiz->master != pre ) {
-            pre = thiz->master;
-        } else {
-            log_printf(WRN, "HACHIKO: renter.... %p != %p", pre, thiz->master);
-        }
-        log_printf(DBG_LV0, "UART: packet send done.");
-        thiz->bp_evt_handle(thiz, BP_EVT_TX_FRAME_DONE, &thiz->tx_param);
-        thiz->tx_param.payload_size = 0;
-        memset(thiz->rx_param.buff.rx_buff, 0, thiz->rx_param.buff_size);
-        thiz->status = BP_UART_STAT_RD;
-        if ( thiz->role == BP_UART_MASTER ) {
-            // 主动设备，需要进行接收超时判定
-            Hachiko_resume(&thiz->rx_seed);
-        }
-        return;
-    }
-    #endif
-#endif
-}
-
 // 串口4的发送节奏定时器
 void uart4_Hachiko_speed_proc(Hachiko_EVT evt, void *_private,
                             const struct Hachiko_food *self)
@@ -421,8 +376,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
     // 串口数据结构初始化
     case BP_EVT_INIT:
         self->role = BP_UART_MASTER;
-        self->rx_seed._private = (void*)self;
-        self->rx_seed.Hachiko_notify_proc = uart4_Hachiko_notify_proc;
         self->rx_param.buff.rx_buff = self->rx_buff;
         self->rx_param.cursor = 0;
         self->rx_param.payload_size = 0;
@@ -432,11 +385,6 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
         self->sequce = 0;
         self->continues_nr = 0;
 
-        ret = _Hachiko_new(&self->rx_seed, HACHIKO_AUTO_HOLD,
-                     100, HACHIKO_PAUSE, (void*)self);
-        if ( ret != ERR_OK ) {
-            log_printf(ERR, "UART: create uart reciever's timer faile.");
-        }
         break;
     // 串口配置
     case BP_EVT_CONFIGURE:
@@ -574,6 +522,8 @@ int uart4_bp_evt_handle(struct bp_uart *self, BP_UART_EVENT evt,
                 log_printf(DBG_LV1, "UART: %s BP_EVT_TX_FRAME_REQUEST ret: %d, load: %d, sent: %d",
                            self->master->name,
                            ret, param->payload_size, hit->sent_frames);
+
+                self->master->last_tx_tsp = time(NULL);
             } else {
                 log_printf(WRN, "UART: 发生程序时序故障");
                 self->master = NULL;
@@ -700,12 +650,14 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
             log_printf(INF, "UART: "GRN("充电机监控通讯(次要0-49)恢复"));
         }
         memcpy(&me->chargers->chargers, &param->buff.rx_buff[3], 100);
-        if ( me->chargers->chargers.charger_status!= 0) {
+#if 0
+		if ( me->chargers->chargers.charger_status!= 0) {
             log_printf(WRN, "UART: 充电机组故障.");
             bit_set(task, S_CHARGE_GROUP_ERR);
         } else {
             bit_clr(task, S_CHARGE_GROUP_ERR);
         }
+#endif
         break;
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
@@ -741,9 +693,11 @@ int uart4_charger_yaoce_0_49_handle(struct bp_uart *self, struct bp_user *me, BP
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
+            if ( !bit_read(task, S_CHARGER_YX_1_COMM_DOWN)) {
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+                log_printf(ERR, "UART: "RED("充电机监控通讯(次要0-49)中断"));
+            }
             bit_set(task, S_CHARGER_YX_1_COMM_DOWN);
-            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
-            log_printf(ERR, "UART: "RED("充电机监控通讯(次要0-49)中断"));
         }
         break;
     // 串口IO错误
@@ -799,10 +753,12 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
                 param->buff.rx_buff[4 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
                 param->buff.rx_buff[3 + i] = param->buff.rx_buff[3 + i] ^ param->buff.rx_buff[4 + i];
             }
-            if ( param->buff.rx_buff[i + 3] & 0x0F ) {
-                bit_set(task, S_CHARGE_M_1_ERR + i);
-            } else {
-                bit_clr(task, S_CHARGE_M_1_ERR + i);
+            if ( i < task->modules_nr ) {
+				if ((param->buff.rx_buff[i + 3] & 0x0F) && (!(param->buff.rx_buff[i + 3] & 0xF0)) ) {
+                    bit_set(task, S_CHARGE_M_1_ERR + i);
+                } else {
+                    bit_clr(task, S_CHARGE_M_1_ERR + i);
+                }
             }
         }
         break;
@@ -840,9 +796,11 @@ int uart4_charger_yaoce_50_100_handle(struct bp_uart *self, struct bp_user *me, 
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
+            if ( ! bit_read(task, S_CHARGER_YX_2_COMM_DOWN) ) {
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+                log_printf(ERR, "UART: "RED("充电机监控通讯(次要50-100)中断"));
+            }
             bit_set(task, S_CHARGER_YX_2_COMM_DOWN);
-            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
-            log_printf(ERR, "UART: "RED("充电机监控通讯(次要50-100)中断"));
         }
         break;
     // 串口IO错误
@@ -864,7 +822,14 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
 {
     int ret = ERR_ERR;
     unsigned int val;
-    unsigned char buff[32], nr = 0, s;
+    unsigned char  s;
+
+    unsigned char buff[32];
+    int nr = 0, len;
+    unsigned int need_V, need_I, A;
+    double bus_v, bat_v;
+    int charge_mode = 0;
+    double err_v;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -874,7 +839,7 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
             unsigned short crc = load_crc(param->need_bytes-2, param->buff.rx_buff);
             unsigned short check = param->buff.rx_buff[ param->need_bytes - 2 ] |
                     param->buff.rx_buff[ param->need_bytes - 1] << 8;
-            log_printf(WRN, "UART: CRC cheke result: need: %04X, gave: %04X",
+            log_printf(DBG_LV2, "UART: CRC cheke result: need: %04X, gave: %04X",
                        crc, check);
             if ( crc != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
@@ -909,22 +874,73 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         buff[nr ++] = (unsigned short)val >> 8;
         buff[nr ++] = (unsigned short)val;
 
-        // 充电命令
-        buff[nr ++] = 0x00;
-        buff[nr ++] = 0x01;
+        // 充电状态
+        buff[nr ++] = 0;
+        if ( (bit_read(task, CMD_GUN_1_OUTPUT_ON) && bit_read(task, F_VOL1_SET_OK))
+              ||
+              (bit_read(task, CMD_GUN_2_OUTPUT_ON) && bit_read(task, F_VOL2_SET_OK))
+           ) {
+            buff[nr ++] = 1;
+        } else {
+            buff[nr ++] = 0;
+        }
 
-        val = (unsigned int)atoi(config_read("需求电压"));
-        // 需求电压
-        buff[nr ++] = (unsigned short)val >> 8;
-        buff[nr ++] = (unsigned short)val;
+        bus_v = __module_max_voltage(&task->chargers[0]->chargers,task->modules_nr);
+        if ( bit_read(task, F_GUN1_CHARGE) ) {
+            bus_v = __bytes2double(b2l(task->measure[0]->measure.VinKM0));
+            bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT0));
+        } else if ( bit_read(task, F_GUN2_CHARGE) ) {
+            bus_v = __bytes2double(b2l(task->measure[0]->measure.VinKM1));
+            bat_v = __bytes2double(b2l(task->measure[0]->measure.VinBAT1));
+        } else {
+            bat_v = 400.0f;
+        }
 
-        val = (unsigned int)atoi(config_read("需求电流"));
-        // 需求电流
-        buff[nr ++] = (unsigned short)val >> 8;
-        buff[nr ++] = (unsigned short)val;
+        if ( bus_v + task->charge_triger_V < bat_v &&
+             ( !bit_read(task, F_VOL1_SET_OK) ||
+               !bit_read(task, F_VOL2_SET_OK)
+             ) )  {
+            // 电压还未达到，继续调压
+            charge_mode = 0;
+            if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ||
+                 bit_read(task, CMD_GUN_2_OUTPUT_ON) ) {
+                err_v = (bat_v + task->charge_triger_V) * 5 / 1000;
+                need_V = (int)((bat_v - task->charge_triger_V + err_v ) * 10.0f);
+            } else {
+                need_V = atoi(config_read("需求电压"));
+            }
+            bit_clr(task, F_VOL1_SET_OK);
+            bit_clr(task, F_VOL2_SET_OK);
+        } else if ( bit_read(task, F_GUN1_CHARGE) ) {
+            charge_mode = 1;
+            need_V = atoi(config_read("需求电压"));
+            bit_set(task, F_VOL1_SET_OK);
+        } else if ( bit_read(task, F_GUN2_CHARGE) ) {
+            charge_mode = 1;
+            need_V = atoi(config_read("需求电压"));
+            bit_set(task, F_VOL2_SET_OK);
+        } else {
+            charge_mode = 0;
+            need_V = atoi(config_read("需求电压"));
+        }
+        // 需求电压值
+        buff[nr ++] = need_V >> 8;
+        buff[nr ++] = need_V & 0xFF;
+
+        // 需求电流值
+        need_I = atof(config_read("需求电流"));
+        if ( (need_I / task->modules_nr) > task->single_module_max_I ) {
+            need_I = task->single_module_max_I * task->modules_nr * 10;
+            buff[nr ++] = (unsigned short)(need_I) >> 8;
+            buff[nr ++] = (unsigned short)(need_I) & 0xFF;
+        } else {
+            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) >> 8;
+            buff[nr ++] = ((unsigned short)(((atof(config_read("需求电流")))))) & 0xFF;
+        }
+
         s = nr;
 
-        log_printf(INF, "初始电压:%.1f V, 需求电压: %.1f V, 需求电流: %.1f A",
+        log_printf(DBG_LV3, "初始电压:%.1f V, 需求电压: %.1f V, 需求电流: %.1f A",
                    atof(config_read("初始电压"))/10.0f, atof(config_read("需求电压"))/10.0f,
                    atof(config_read("需求电流"))/10.0f);
 
@@ -954,9 +970,11 @@ int uart4_charger_config_evt_handle(struct bp_uart *self, struct bp_user *me, BP
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
         if ( self->master->died >= self->master->died_line ) {
+            if ( !bit_read(task, S_CHARGER_COMM_DOWN) ) {
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+                log_printf(ERR, "UART: "RED("充电机监控通讯(主要)中断"));
+            }
             bit_set(task, S_CHARGER_COMM_DOWN);
-            log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
-            log_printf(ERR, "UART: "RED("充电机监控通讯(主要)中断"));
         }
         break;
     // 串口IO错误
@@ -978,6 +996,7 @@ int uart4_charger_module_evt_handle(struct bp_uart *self, struct bp_user *me, BP
 {
     int ret = ERR_ERR;
     unsigned char buff[8];
+    int nr = 0, s = 0;
 
     switch (evt) {
     case BP_EVT_FRAME_CHECK:
@@ -1006,20 +1025,29 @@ int uart4_charger_module_evt_handle(struct bp_uart *self, struct bp_user *me, BP
     // 串口发送数据请求
     case BP_EVT_TX_FRAME_REQUEST:
         param->attrib = BP_FRAME_UNSTABLE;
-        buff[0] = 0x01;
-        buff[1] = 0x04;
-        buff[2] = buff[3] = 0x00;
-        buff[4] = 0x00;
-        buff[5] = 0x06;
-        buff[6] = 0x70;
-        buff[7] = 0x08;
+        buff[nr ++] = 0x01;
+        buff[nr ++] = 0x06;
+	if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) ||
+	     bit_read(task, CMD_GUN_2_OUTPUT_ON)
+	) {
+	  buff[nr ++] = 0x00;
+	  buff[nr ++] = 0x64;
+	} else {
+	  buff[nr ++] = 0x00;
+	  buff[nr ++] = 0x65;
+	}
+        buff[nr ++] = 0;
+        buff[nr ++] = 0xFF;
+	s = nr;
+	buff[nr ++] = load_crc(s, buff);
+        buff[nr ++] = load_crc(s, buff) >> 8;
+	
+        self->rx_param.need_bytes = 8;
 
-        self->rx_param.need_bytes = 17;
-
-        memcpy(param->buff.tx_buff, buff, sizeof(buff));
+        memcpy(param->buff.tx_buff, buff, nr);
         param->payload_size = sizeof(buff);
         self->master->time_to_send = param->payload_size * 1000 / 960;
-        ret = ERR_ERR;
+        ret = ERR_OK;
         log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
@@ -1035,7 +1063,7 @@ int uart4_charger_module_evt_handle(struct bp_uart *self, struct bp_user *me, BP
     // 串口接收帧超时, 接受的数据不完整
     case BP_EVT_RX_FRAME_TIMEOUT:
         //self->master->died ++;
-        log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+        //log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
         break;
     // 串口IO错误
     case BP_EVT_IO_ERROR:
@@ -1085,7 +1113,8 @@ int uart4_charger_date_evt_handle(struct bp_uart *self, struct bp_user *me, BP_U
         param->attrib = BP_FRAME_UNSTABLE;
         buff[0] = 0x01;
         buff[1] = 0x04;
-        buff[2] = buff[3] = 0x00;
+        buff[2] = 0x00;
+        buff[3] = 0x00;
         buff[4] = 0x00;
         buff[5] = 0x06;
         buff[6] = 0x70;
@@ -1190,7 +1219,7 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
         } else {
             bit_clr(task, S_BUS_0_VHI);
         }
-        if ( box->Flag_prtc1 & 0x02 ) {
+        if ( box->Flag_prtc1 & 0x02 && bit_read(task, F_CHARGE_LED) ) {
             len += sprintf(&errstr[len], "[%d: 母线0欠压] ", ++errnr);
             bit_set(task, S_BUS_0_VLO);
         } else {
@@ -1208,7 +1237,7 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
         } else {
             bit_clr(task, S_BUS_1_VHI);
         }
-        if ( box->Flag_prtc1 & 0x10 ) {
+        if ( box->Flag_prtc1 & 0x10 && bit_read(task, F_CHARGE_LED) ) {
             len += sprintf(&errstr[len], "[%d: 母线1欠压] ", ++errnr);
             bit_set(task, S_BUS_1_VLO);
         } else {
@@ -1221,33 +1250,39 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
             bit_clr(task, S_BUS_1_SHORT);
         }
 
-        if ( box->Flag_prtc2 & 0x01 ) {
+        if ( box->Flag_prtc2 & 0x01) {
             len += sprintf(&errstr[len], "[%d: 电池0过压] ", ++errnr);
             bit_set(task, S_BAT_0_VHI);
         } else {
             bit_clr(task, S_BAT_0_VHI);
         }
-        if ( box->Flag_prtc2 & 0x02 ) {
+        if ( box->Flag_prtc2 & 0x02 && bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池0欠压] ", ++errnr);
             bit_set(task, S_BAT_0_VLO);
         } else {
             bit_clr(task, S_BAT_0_VLO);
         }
-        if ( box->Flag_prtc2 & 0x04 ) {
+        if ( box->Flag_prtc2 & 0x04 && bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池0链接短路] ", ++errnr);
             bit_set(task, S_BAT_0_SHORT);
         } else {
             bit_clr(task, S_BAT_0_SHORT);
         }
-        if ( box->Flag_prtc2 & 0x08 ) {
+        if ( box->Flag_prtc2 & 0x08 && bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池0反接] ", ++errnr);
             bit_set(task, S_BAT_0_REVERT);
         } else {
             bit_clr(task, S_BAT_0_REVERT);
         }
-        if ( box->Flag_prtc2 & 0x10 ) {
+        if ( box->Flag_prtc2 & 0x10 && bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池0绝缘接地] ", ++errnr);
             bit_set(task, S_BAT_0_INSTITUDE);
+            log_printf(DBG_LV3, "UART: BAT1+: %X, %.1f Kohm BAT1-: %X, %.1f Kohm",
+                        task->measure[0]->measure.VinBAT0RESP,
+                        __bytes2double(b2l(task->measure[0]->measure.VinBAT0RESP)),
+                        task->measure[0]->measure.VinBAT0RESN,
+                        __bytes2double(b2l(task->measure[0]->measure.VinBAT0RESN))
+                    );
         } else {
             bit_clr(task, S_BAT_0_INSTITUDE);
         }
@@ -1263,27 +1298,33 @@ int simple_box_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART
         } else {
             bit_clr(task, S_BAT_1_VHI);
         }
-        if ( box->Flag_prtc3 & 0x02 ) {
+        if ( box->Flag_prtc3 & 0x02 && bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池1欠压] ", ++errnr);
             bit_set(task, S_BAT_1_VLO);
         } else {
             bit_clr(task, S_BAT_1_VLO);
         }
-        if ( box->Flag_prtc3 & 0x04 ) {
+        if ( box->Flag_prtc3 & 0x04 && bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池1链接短路] ", ++errnr);
             bit_set(task, S_BAT_1_SHORT);
         } else {
             bit_clr(task, S_BAT_1_SHORT);
         }
-        if ( box->Flag_prtc3 & 0x08 ) {
+        if ( box->Flag_prtc3 & 0x08 && bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池1反接] ", ++errnr);
             bit_set(task, S_BAT_1_REVERT);
         } else {
             bit_clr(task, S_BAT_1_REVERT);
         }
-        if ( box->Flag_prtc3 & 0x10 ) {
+        if ( box->Flag_prtc3 & 0x10 && bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
             len += sprintf(&errstr[len], "[%d: 电池1绝缘接地] ", ++errnr);
             bit_set(task, S_BAT_1_INSTITUDE);
+            log_printf(DBG_LV3, "UART: BAT2+: %X, %.1f Kohm BAT2-: %X, %.1f Kohm",
+                        task->measure[0]->measure.VinBAT1RESP,
+                        __bytes2double(b2l(task->measure[0]->measure.VinBAT1RESP)),
+                        task->measure[0]->measure.VinBAT1RESN,
+                        __bytes2double(b2l(task->measure[0]->measure.VinBAT1RESN))
+                    );
         } else {
             bit_clr(task, S_BAT_1_INSTITUDE);
         }
@@ -1622,48 +1663,147 @@ int simple_box_write_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
         param->attrib = BP_FRAME_UNSTABLE;
 
         if ( bit_read(task, CMD_GUN_1_ASSIT_PWN_ON) ) {
-            cmd |= GUN1_ASSIT_PWN_ON;
-            cmd &= ~GUN2_ASSIT_PWN_ON;
+            if ( bit_read(task, F_GUN1_ASSIT_12V) &&
+                 bit_read(task, F_GUN1_ASSIT_24V) ) {
+                // 不能同时使用两个辅助电源
+            } else if ( bit_read(task, F_GUN1_ASSIT_12V ) ) {
+                cmd |= task->kaichu_mask[KAICHU_GUN1_ASSIT_12];
+                cmd &= ~task->kaichu_mask[KAICHU_GUN1_ASSIT_24];
+            } else if ( bit_read(task, F_GUN1_ASSIT_24V ) ) {
+                if ( task->kaichu_mask[KAICHU_GUN1_ASSIT_12] &&
+                     task->kaichu_mask[KAICHU_GUN1_ASSIT_24] ) {
+                    // 24V 辅助电源的使用需要同时吸合12V和24V开出节点
+                    cmd |= task->kaichu_mask[KAICHU_GUN1_ASSIT_24];
+                    cmd |= task->kaichu_mask[KAICHU_GUN1_ASSIT_12];
+
+                    log_printf(DBG_LV3, "24辅助电源吸合完成..");
+                } else if ( task->kaichu_mask[KAICHU_GUN1_ASSIT_24 ] &&
+                            ! task->kaichu_mask[KAICHU_GUN1_ASSIT_12] ) {
+                    // 单24V辅助电源
+                    cmd |= task->kaichu_mask[KAICHU_GUN1_ASSIT_24];
+                    cmd &= ~task->kaichu_mask[KAICHU_GUN1_ASSIT_12];
+                } else {
+                    // 默认单电源
+                    cmd |= task->kaichu_mask[KAICHU_GUN1_ASSIT_24];
+                    cmd &= ~task->kaichu_mask[KAICHU_GUN1_ASSIT_12];
+                }
+            } else {
+                cmd &= ~task->kaichu_mask[KAICHU_GUN1_ASSIT_12];
+                cmd &= ~task->kaichu_mask[KAICHU_GUN1_ASSIT_24];
+            }
         } else {
-            cmd &= ~GUN1_ASSIT_PWN_ON;
+            cmd &= ~task->kaichu_mask[KAICHU_GUN1_ASSIT_12];
+            cmd &= ~task->kaichu_mask[KAICHU_GUN1_ASSIT_24];
         }
+        log_printf(DBG_LV3, "开出值1： %04X", cmd);
+
         if ( bit_read(task, CMD_GUN_2_ASSIT_PWN_ON) ) {
-            cmd |= GUN2_ASSIT_PWN_ON;
-            cmd &= ~GUN1_ASSIT_PWN_ON;
+            if ( bit_read(task, F_GUN2_ASSIT_12V) &&
+                 bit_read(task, F_GUN2_ASSIT_24V) ) {
+                // 不能同使用两个辅助电源
+            } else if ( bit_read(task, F_GUN2_ASSIT_12V ) ) {
+                cmd |= task->kaichu_mask[KAICHU_GUN2_ASSIT_12];
+                cmd &= ~task->kaichu_mask[KAICHU_GUN2_ASSIT_24];
+            } else if ( bit_read(task, F_GUN2_ASSIT_24V ) ) {
+                if ( task->kaichu_mask[KAICHU_GUN1_ASSIT_12] &&
+                     task->kaichu_mask[KAICHU_GUN1_ASSIT_24] ) {
+                    // 24V 辅助电源的使用需要同时吸合12V和24V开出节点
+                    cmd |= task->kaichu_mask[KAICHU_GUN2_ASSIT_24];
+                    cmd |= task->kaichu_mask[KAICHU_GUN2_ASSIT_12];
+                } else if ( task->kaichu_mask[KAICHU_GUN2_ASSIT_24 ] &&
+                            ! task->kaichu_mask[KAICHU_GUN2_ASSIT_12] ) {
+                    // 单24V辅助电源
+                    cmd |= task->kaichu_mask[KAICHU_GUN2_ASSIT_24];
+                    cmd &= ~task->kaichu_mask[KAICHU_GUN2_ASSIT_12];
+                } else {
+                    // 默认单电源
+                    cmd |= task->kaichu_mask[KAICHU_GUN2_ASSIT_24];
+                    cmd &= ~task->kaichu_mask[KAICHU_GUN2_ASSIT_12];
+                }
+            } else {
+                cmd &= ~task->kaichu_mask[KAICHU_GUN2_ASSIT_12];
+                cmd &= ~task->kaichu_mask[KAICHU_GUN2_ASSIT_24];
+            }
         } else {
-            cmd &= ~GUN2_ASSIT_PWN_ON;
+            cmd &= ~task->kaichu_mask[KAICHU_GUN2_ASSIT_12];
+            cmd &= ~task->kaichu_mask[KAICHU_GUN2_ASSIT_24];
         }
+        log_printf(DBG_LV3, "开出值2： %04X", cmd);
+
         if ( bit_read(task, CMD_GUN_1_OUTPUT_ON) &&
              bit_read(task, F_VOL1_SET_OK) ) {
-            cmd |= GUN1_OUTPUT_ON;
-            cmd &= ~GUN2_OUTPUT_ON;
+            cmd |= task->kaichu_mask[KAICHU_GUN1_SW];
         } else {
-            cmd &= ~GUN1_OUTPUT_ON;
+            cmd &= ~task->kaichu_mask[KAICHU_GUN1_SW];
         }
+        log_printf(DBG_LV3, "开出值3： %04X", cmd);
+
         if ( bit_read(task, CMD_GUN_2_OUTPUT_ON) &&
              bit_read(task, F_VOL2_SET_OK)  ) {
-            cmd |= GUN2_OUTPUT_ON;
-            cmd &= ~GUN1_OUTPUT_ON;
+            cmd |= task->kaichu_mask[KAICHU_GUN2_SW];
         } else {
-            cmd &= ~GUN2_OUTPUT_ON;
+            cmd &= ~task->kaichu_mask[KAICHU_GUN2_SW];
         }
+        log_printf(DBG_LV3, "开出值4： %04X", cmd);
+
+        if ( bit_read(task, CMD_GUN_1_LOCK_ON) ) {
+            cmd |= task->kaichu_mask[KAICHU_GUN1_LOCK];
+        } else {
+            cmd &= ~task->kaichu_mask[KAICHU_GUN1_LOCK];
+        }
+        if ( bit_read(task, CMD_GUN_2_LOCK_ON) ) {
+            cmd |= task->kaichu_mask[KAICHU_GUN2_LOCK];
+        } else {
+            cmd &= ~task->kaichu_mask[KAICHU_GUN2_LOCK];
+        }
+        log_printf(DBG_LV3, "开出值5： %04X", cmd);
+
 
         if ( bit_read(task, CMD_DC_OUTPUT_SWITCH_ON) ) {
             cmd |= DC_SWITCH_ON;
+            log_printf(DBG_LV3, "FUCK: DC_SWITCH_ON: %04X",
+                       DC_SWITCH_ON);
         } else {
             cmd &= ~DC_SWITCH_ON;
         }
+        log_printf(DBG_LV3, "开出值6： %04X", cmd);
 
         if ( bit_read(task, F_CHARGE_LED) ) {
-            cmd |= 0x80;
+            cmd |= task->kaichu_mask[KAICHU_SYSCHG];
+            log_printf(DBG_LV3, "FUCK: kaichu_mask[KAICHU_SYSCHG]: %04X",
+                       task->kaichu_mask[KAICHU_SYSCHG]);
         } else {
-            cmd &= ~0x80;
+            cmd &= ~task->kaichu_mask[KAICHU_SYSCHG];
         }
+        log_printf(DBG_LV3, "开出值7： %04X", cmd);
 
         if ( bit_read(task, S_ERROR) ) {
-            cmd |= 0x100;
+
+            log_printf(DBG_LV3, "FUCK: kaichu_mask[KAICHU_SYSERR]: %04X",
+                       task->kaichu_mask[KAICHU_SYSERR]);
+
+            cmd |= task->kaichu_mask[KAICHU_SYSERR];
         } else {
-            cmd &= ~0x100;
+            cmd &= ~task->kaichu_mask[KAICHU_SYSERR];
+        }
+        log_printf(DBG_LV3, "开出值8： %04X", cmd);
+
+        // 市电灯
+        {
+            if ( bit_read(task, F_AC_LED) ) {
+                cmd |= task->kaichu_mask[KAICHU_AC_LED];
+            } else {
+                cmd &= ~task->kaichu_mask[KAICHU_AC_LED];
+            }
+        }
+
+        // 照明灯板
+        {
+            if ( bit_read(task, CMD_LIGHT_UP ) ) {
+                cmd |= task->kaichu_mask[KAICHU_LIGHT];
+            } else {
+                cmd &= ~task->kaichu_mask[KAICHU_LIGHT];
+            }
         }
 
         buff[ nr ++ ] = 0xF0;
@@ -1728,7 +1868,7 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
                      struct bp_evt_param *param)
 {
     int ret = ERR_ERR;
-    unsigned char buff[64];
+    unsigned char buff[128];
     int nr = 0, len = 0;
 
     switch (evt) {
@@ -1767,8 +1907,8 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x02;
         buff[ nr ++ ] = 0x00;
-        buff[ nr ++ ] = 13;
-        buff[ nr ++ ] = 26;
+        buff[ nr ++ ] = 13 + 0 + 0;
+        buff[ nr ++ ] = ( 13 + 0 + 0 ) * 2;
         buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10) >>8;
         buff[ nr ++ ] = double2short(task->bus_1_v_hi, 10);
         buff[ nr ++ ] = double2short(task->bus_1_v_lo, 10) >>8;
@@ -1795,6 +1935,7 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
         buff[ nr ++ ] = double2short(task->bat_2_insti_ohm_v, 10);
         buff[ nr ++ ] = task->flq_xishu >> 8;
         buff[ nr ++ ] = task->flq_xishu;
+
         len = nr;
         buff[ nr ++ ] = load_crc(len, buff);
         buff[ nr ++ ] = load_crc(len, buff) >> 8;
@@ -1806,8 +1947,15 @@ int simple_box_configwrite_evt_handle(struct bp_uart *self, struct bp_user *me, 
 
         self->rx_param.need_bytes = 12;
         self->master->time_to_send = (param->payload_size + 1) * 1000 / 960 + self->master->swap_time_modify;
-        ret = ERR_OK;
-        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
+        // 每30秒发送一次
+        if ( self->master->last_tx_tsp == 0 ||
+             time(NULL) - self->master->last_tx_tsp >= 30 ||
+             bit_read(task, S_MEASURE_1_COMM_DOWN) ) {
+            ret = ERR_OK;
+            log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        } else {
+            ret = ERR_ERR;
+        }        log_printf(DBG_LV3, "UART: %s sent", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -2708,7 +2856,7 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
 {
     unsigned char buff[32];
     int nr = 0, len;
-    unsigned int need_V, need_I;
+    unsigned int need_V, need_I, A;
     double bus_v, bat_v;
     int charge_mode = 0;
     double err_v;
@@ -2734,14 +2882,10 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
         buff[nr ++] = 0x09;
         buff[nr ++] = 0x12;
 
-        // 额定电流值
-        switch ( task->module_model ) {
-        case MODEL_AN10680:
-        default:
-            buff[nr ++] = 0x00;
-            buff[nr ++] = 0x6E;
-            break;
-        }
+        A = (unsigned int)task->single_module_A;
+        // 额定电流
+        buff[nr ++] = (A >> 8 ) & 0xFF;
+        buff[nr ++] = (A >> 0 ) & 0xFF;
 
         // 需求电流值
         need_I = atof(config_read("需求电流"));
@@ -2801,8 +2945,8 @@ int ANC01_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *me,
                    atof(config_read("需求电压"))/10.0f);
 
         // 电压下限值
-        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) >> 8;
-        buff[nr ++] = (unsigned short)((10 * (task->limit_min_V))) & 0xFF;
+        buff[nr ++] = (unsigned short)((10 * (task->moudle_min_V))) >> 8;
+        buff[nr ++] = (unsigned short)((10 * (task->moudle_min_V))) & 0xFF;
 
         // 目标电压值
         buff[nr ++] = need_V >> 8;
@@ -3204,8 +3348,14 @@ int Increase_module_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP
         param->payload_size = nr;
         self->master->time_to_send = param->payload_size * 1000 / 960;
         self->rx_param.need_bytes = 17;
+        // 每5秒发送一次
+        if ( self->master->last_tx_tsp == 0 ||
+             time(NULL) - self->master->last_tx_tsp >= 5 ) {
+            log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        } else {
+            ret = ERR_ERR;
+        }
         ret = ERR_OK;
-        log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         break;
     // 串口发送确认
     case BP_EVT_TX_FRAME_CONFIRM:
@@ -3282,10 +3432,19 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         buff[ nr ++ ] = 0x00;
         buff[ nr ++ ] = 0x05;
         buff[ nr ++ ] = 0x00;
+        /*
         if ( task->modules_on_off[ buff[ 0 ] - 1 ] == 0x81 ) {
             buff[ nr ++ ] = 1; // 关机
         } else {
             buff[ nr ++ ] = 0; // 开机
+        }
+        */
+        if ( bit_read(task, F_CHARGE_LED) ||
+             bit_read(task, CMD_JIAOZHUN_BUS1_V ) ||
+             bit_read(task, CMD_JIAOZHUN_BUS2_V )) {
+            buff[ nr ++ ] = 0; // 开机
+        } else {
+            buff[ nr ++ ] = 1; // 关机
         }
 #else
         unsigned int rat = (unsigned int)atoi(config_read("need_I1"));
@@ -3304,6 +3463,13 @@ int Increase_module_write_evt_handle(struct bp_uart *self, struct bp_user *me, B
         self->master->time_to_send = param->payload_size * 1000 / 960;
         self->rx_param.need_bytes = 8;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        // 每3秒发送一次
+        if ( self->master->last_tx_tsp == 0 ||
+             time(NULL) - self->master->last_tx_tsp >= 3 ) {
+            log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
+        } else {
+            ret = ERR_ERR;
+        }
         ret = ERR_OK;
         break;
     // 串口发送确认
@@ -3392,35 +3558,15 @@ int Increase_convert_box_write_evt_handle(struct bp_uart *self, struct bp_user *
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) >> 8;
                 buff[ nr ++ ] = ((unsigned short)task->bus_correct_I) & 0xFF;
             } else {
-#if 0
-                double maxI = 0;
-                unsigned short rat;
-                if ( task->modules_nr == 0 || task->measure[0]->measure.VinBAT0 < 2000 ) {
-                    buff[ nr ++ ] = 0;
-                    buff[ nr ++ ] = 0;
-                } else {
-                    unsigned int needI = (unsigned int)atof(config_read("需求电流"));
-                    needI = needI / task->modules_nr;
-                    maxI = 7500 / task->measure[0]->measure.VinBAT0;
-                    rat = needI * 1000 / maxI;
+                double need_I = atof(config_read("需求电流"))/10.0f;
+                double I_rat = 0.0f;
+                double I_total = task->single_module_A * task->modules_nr;
+                int rat = 0;
 
-                    if ( rat >= 1000 ) {
-                        rat = 1000;
-                    }
-                    if ( rat <= 10 ) {
-                        rat = 10;
-                    }
+                I_rat = 1000 * ( need_I / I_total );
+                rat = (int)I_rat;
 
-                    log_printf(DBG_LV3, "UART.NEED_I:MAXI: %.1f A, needI: %.1f A, %.1f %% %.1f A",
-                               maxI, needI,
-                               rat / 10.0, maxI * rat/1000.0);
-
-                    buff[ nr ++ ] = rat >> 8;
-                    buff[ nr ++ ] = rat & 0xFF;
-                }
-#endif
-                unsigned int rat = (unsigned int)atoi(config_read("需求电流"));
-                log_printf(INF, "UART.Increa: rat: %d", rat);
+                log_printf(DBG_LV3, "UART.Increa: rat: %.1f", I_rat);
 
                 buff[ nr ++ ] = rat >> 8;
                 buff[ nr ++ ] = rat & 0xFF;
@@ -3682,6 +3828,31 @@ int huali_3AV_voltage_meter_read_evt_handle(struct bp_uart *self, struct bp_user
                 task->meter[0].Va = va / 10.0f;
                 task->meter[0].Vb = vb / 10.0f;
                 task->meter[0].Vc = vc / 10.0f;
+
+                if ( task->meter[0].Va > 50.0f &&
+                     task->meter[0].Vb > 50.0f &&
+                     task->meter[0].Vc > 50.0f ) {
+                    bit_clr(task, S_AC_MISS);
+                } else {
+                    bit_set(task, S_AC_MISS);
+                }
+
+                if ( task->meter[0].Va > task->ac_input_hi ||
+                     task->meter[0].Vb > task->ac_input_hi ||
+                     task->meter[0].Vc > task->ac_input_hi ) {
+                    bit_set(task, S_AC_INPUT_HI);
+                } else {
+                    bit_clr(task, S_AC_INPUT_HI);
+                }
+
+                if ( task->meter[0].Va < task->ac_input_lo ||
+                     task->meter[0].Vb < task->ac_input_lo ||
+                     task->meter[0].Vc < task->ac_input_lo ) {
+                    bit_set(task, S_AC_INPUT_LO);
+                } else {
+                    bit_clr(task, S_AC_INPUT_LO);
+                }
+
                 ret = ERR_OK;
             }
         }
@@ -4015,6 +4186,7 @@ int yada_DC_kwh_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, 
 int yada_DC_current_meter_read_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
+    static int channel = 0;
     unsigned char buff[32];
     int nr = 0, l;
     int ret = ERR_ERR;
@@ -4030,27 +4202,48 @@ int yada_DC_current_meter_read_evt_handle(struct bp_uart *self, struct bp_user *
             if ( sum != check ) {
                 ret = ERR_FRAME_CHECK_ERR;
             } else {
-                int va, vb, vc, i;
+                int current, i;
 
-                for ( i = 0; i < 6; i ++ ) {
-                    param->buff.rx_buff[14 + i] -= 0x33;
+                if ( param->buff.rx_buff[16] == param->buff.rx_buff[17] &&
+                     param->buff.rx_buff[17] == param->buff.rx_buff[18] &&
+                     param->buff.rx_buff[18] == param->buff.rx_buff[19] &&
+                     param->buff.rx_buff[19] == 0  ) {
+                    current = 0;
+                    return ERR_OK;
+                } else {
+                    if ( param->buff.rx_buff[19] == 0x80 ) {
+                        current = 0;
+                        return ERR_OK;
+                    } else {
+                        for ( i = 0; i < 6; i ++ ) {
+                            param->buff.rx_buff[14 + i] -= 0x33;
+                        }
+
+                        current = (param->buff.rx_buff[16] >> 4 ) * 10 + (param->buff.rx_buff[16] & 0x0F );
+                        current += (param->buff.rx_buff[17] >> 4 ) * 1000 + (param->buff.rx_buff[17] & 0x0F ) * 100;
+                        current += (param->buff.rx_buff[18] >> 4 ) * 100000 + (param->buff.rx_buff[18] & 0x0F ) * 10000;
+                        current += (param->buff.rx_buff[19] >> 4 ) * 10000000 + (param->buff.rx_buff[19] & 0x0F ) * 1000000;
+                    }
                 }
+/*
+                current = param->buff.rx_buff[16] |
+                        (param->buff.rx_buff[17] << 8 ) |
+                        (param->buff.rx_buff[18] << 16 ) |
+                        (param->buff.rx_buff[19] << 24 );
+*/
+                log_printf(DBG_LV3, "channel %d, current: %08X, %.4f", channel + 1, current, current/10000.0f);
 
-                va = (param->buff.rx_buff[15] >> 4 ) * 1000 + (param->buff.rx_buff[15] & 0x0F ) * 100;
-                va += (param->buff.rx_buff[14] >> 4 ) * 10 + (param->buff.rx_buff[14] & 0x0F );
+                //channel ++;
 
-                vb = (param->buff.rx_buff[17] >> 4 ) * 1000 + (param->buff.rx_buff[17] & 0x0F ) * 100;
-                vb += (param->buff.rx_buff[16] >> 4 ) * 10 + (param->buff.rx_buff[16] & 0x0F );
+                if ( channel == 6 ) channel = 0;
 
-                vc = (param->buff.rx_buff[19] >> 4 ) * 1000 + (param->buff.rx_buff[19] & 0x0F ) * 100;
-                vc += (param->buff.rx_buff[18] >> 4 ) * 10 + (param->buff.rx_buff[18] & 0x0F );
-
-                log_printf(DBG_LV3, "UART: %.2fV  %.2fV  %.2f V",
-                           va / 10.0f, vb / 10.0f, vc / 10.0f);
-
-                task->meter[0].Va = va / 10.0f;
-                task->meter[0].Vb = vb / 10.0f;
-                task->meter[0].Vc = vc / 10.0f;
+                do {
+                    double c =  current / 10000.0f;
+                    if ( c > 1000.0f ) {
+                        return ERR_OK;
+                    }
+                   task->meter[0].current[0] = c;
+                } while (0);
                 ret = ERR_OK;
             }
         }
@@ -4079,11 +4272,32 @@ int yada_DC_current_meter_read_evt_handle(struct bp_uart *self, struct bp_user *
         buff[ nr ++ ] = 0x68;
         buff[ nr ++ ] = 0x01;
         buff[ nr ++ ] = 0x02;
-        buff[ nr ++ ] = 0x00 + 0x33;
-        buff[ nr ++ ] = (unsigned char)(0xFF + 0x33);
-        buff[ nr ++ ] = 0x01 + 0x33;
-        buff[ nr ++ ] = 0x02 + 0x33;
-
+        switch ( channel ) {
+        case 0:
+        buff[ nr ++ ] = (unsigned char)(0xA1 + 0x33);
+        buff[ nr ++ ] = (unsigned char)(0xB6 + 0x33);
+            break;
+        case 1:
+        buff[ nr ++ ] = (unsigned char)(0xA2 + 0x33);
+        buff[ nr ++ ] = (unsigned char)(0xB6 + 0x33);
+            break;
+        case 2:
+        buff[ nr ++ ] = (unsigned char)(0xA3 + 0x33);
+        buff[ nr ++ ] = (unsigned char)(0xB6 + 0x33);
+            break;
+        case 3:
+        buff[ nr ++ ] = (unsigned char)(0xA4 + 0x33);
+        buff[ nr ++ ] = (unsigned char)(0xB6 + 0x33);
+            break;
+        case 4:
+        buff[ nr ++ ] = (unsigned char)(0xA5 + 0x33);
+        buff[ nr ++ ] = (unsigned char)(0xB6 + 0x33);
+            break;
+        case 5:
+        buff[ nr ++ ] = (unsigned char)(0xA6 + 0x33);
+        buff[ nr ++ ] = (unsigned char)(0xB6 + 0x33);
+            break;
+        }
         l = nr;
         buff[ nr ++ ] = check_sum(&buff[4], l - 4);
         buff[ nr ++ ] = 0x16;
@@ -4092,6 +4306,8 @@ int yada_DC_current_meter_read_evt_handle(struct bp_uart *self, struct bp_user *
         param->payload_size = nr;
         self->master->time_to_send = (param->payload_size + 1) * 1000 / 218;
         self->rx_param.need_bytes = 22;
+
+        task->meter[0].current_ok[0] = 1;
         log_printf(DBG_LV3, "UART: %s requested.", __FUNCTION__);
         ret = ERR_OK;
         break;
@@ -4735,6 +4951,123 @@ int cardreader_install_handle(struct bp_uart *self, struct bp_user *me, BP_UART_
     return ret;
 }
 
+// 新版的读卡器读写过程
+int STC_card_reader_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
+                     struct bp_evt_param *param)
+{
+    static QUERY_STAT query_stat = SEQ_FIND_CARD;
+    static struct charge_job *job = NULL;
+    static char ID[16], id_len = 0, def_passwd[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    unsigned short dl = 0;
+
+    int ret = ERR_ERR;
+    unsigned char buff[64];
+    int nr = 0, l;
+
+    switch (evt) {
+    case BP_EVT_FRAME_CHECK:
+        if ( param->payload_size > 4 ) {
+            dl = ( param->buff.rx_buff[ 2 ] | param->buff.rx_buff[ 3 ] << 8 );
+            if ( dl + 6 > param->payload_size ) {
+                return ERR_FRAME_CHECK_DATA_TOO_SHORT;
+            }
+            if ( param->buff.rx_buff[ param->payload_size - 2 ] ==
+                 BCC_code(param->buff.rx_buff, param->payload_size - 2) ) {
+                return ERR_OK;
+            } else {
+                log_printf(DBG_LV2, "UART: SUM check result: need: %02X, gave: %02X",
+                           BCC_code(param->buff.rx_buff, param->payload_size - 1),
+                           param->buff.rx_buff[ param->payload_size - 2 ]);
+                return ERR_FRAME_CHECK_ERR;
+            }
+        } else {
+            return ERR_FRAME_CHECK_DATA_TOO_SHORT;
+        }
+        break;
+    // 串口接收到新数据
+    case BP_EVT_RX_DATA:
+        break;
+    // 串口收到完整的数据帧
+    case BP_EVT_RX_FRAME:
+        if ( bit_read(task, S_CARD_READER_COMM_DOWN) ) {
+            log_printf(INF, "读卡器通信恢复");
+            bit_clr(task, S_CARD_READER_COMM_DOWN);
+        }
+#pragma pack(1)
+        struct {
+            unsigned char id[10];
+            unsigned char ver[1];
+            unsigned char ttl[4];
+            unsigned char pin[1];
+            unsigned char vin[14];
+        }cd;
+#pragma pack()
+        memcpy(&cd, &param->buff.rx_buff[4], sizeof(cd));
+        __bit_set(task->h_s_ware_config, HW_CMD_BUZZER_BEEP_OK);
+        config_write("triger_card_sn", buff);
+        config_write("card_status", "NORMAL");
+        config_write("card_remaind_money", buff);
+        config_write("card_passwd", buff);
+
+
+        break;
+    // 串口发送数据请求
+    case BP_EVT_TX_FRAME_REQUEST:
+            buff[ nr ++ ] = 0x68;
+            buff[ nr ++ ] = 0x01;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x02;
+            buff[ nr ++ ] = 0x00;
+            buff[ nr ++ ] = 0x05;
+            l = nr;
+            buff[ nr ++ ] = BCC_code(buff, l);
+            buff[ nr ++ ] = 0x16;
+
+            memcpy(param->buff.tx_buff, buff, nr);
+            param->payload_size = nr;
+            self->master->time_to_send = param->payload_size * 1000 / 960;
+            self->rx_param.need_bytes = 36;
+            log_printf(DBG_LV3, "UART: %s:SEQ_FIND_CARD requested.", __FUNCTION__);
+            ret = ERR_OK;
+        break;
+    // 串口发送确认
+    case BP_EVT_TX_FRAME_CONFIRM:
+        ret = ERR_OK;
+        break;
+    // 串口数据发送完成事件
+    case BP_EVT_TX_FRAME_DONE:
+        break;
+    // 串口接收单个字节超时，出现在接收帧的第一个字节
+    case BP_EVT_RX_BYTE_TIMEOUT:
+    // 串口接收帧超时, 接受的数据不完整
+    case BP_EVT_RX_FRAME_TIMEOUT:
+        //self->master->died ++;
+        if ( self->master->died < self->master->died_line ) {
+            //self->master->died ++;
+        } else {
+            //self->master->died ++;
+            if ( ! bit_read(task, S_CARD_READER_COMM_DOWN) ) {
+                log_printf(ERR, "UART: "RED("读卡器通信中断, 请排查故障,(%d)"),
+                           self->master->died);
+                log_printf(WRN, "UART: %s get signal TIMEOUT", __FUNCTION__);
+            }
+            bit_set(task, S_CARD_READER_COMM_DOWN);
+        }
+        query_stat = SEQ_FIND_CARD;
+        break;
+    // 串口IO错误
+    case BP_EVT_IO_ERROR:
+        break;
+    // 帧校验失败
+    case BP_EVT_FRAME_CHECK_ERROR:
+        break;
+    default:
+        log_printf(WRN, "UART: unreliable EVENT %08Xh", evt);
+        break;
+    }
+    return ret;
+}
+
 int uart_sniffer_handle(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                      struct bp_evt_param *param)
 {
@@ -4819,6 +5152,26 @@ int uart5_background_evt_handle(struct bp_uart *self, struct bp_user *me, BP_UAR
     return ret;
 }
 
+// 返回从指定时间到当前时间的ms数
+unsigned long __ms_windows(struct timeval *start)
+{
+    struct timeval t_now;
+    unsigned long err;
+    gettimeofday(&t_now, NULL);
+
+    if ( t_now.tv_sec == start->tv_sec ) {
+        return (t_now.tv_usec - start->tv_usec) / 1000;
+    } else if ( t_now.tv_sec > start->tv_sec ) {
+        if ( t_now.tv_usec <= start->tv_usec ) {
+            return 1000 + t_now.tv_usec/1000 - start->tv_usec/1000;
+        } else {
+            return 1000 + t_now.tv_usec/1000 + start->tv_usec/1000;
+        }
+    } else {
+        return 1000;
+    }
+}
+
 void *thread_uart_service(void *arg) ___THREAD_ENTRY___
 {
     int *done = (int *)arg;
@@ -4827,9 +5180,11 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     struct bp_uart *thiz = (struct bp_uart *)arg;
     int retval;
     size_t cursor;
-    fd_set rfds;
+    fd_set rfds, wfds;
     struct timeval  tv ;
     sigset_t origmask;
+    time_t recode_start_tsp;
+    struct timeval t_start, t_now;
 
     log_printf(INF, "UART %s framework start up.              DONE(%ld).",
                thiz->dev_name,
@@ -4839,6 +5194,7 @@ void *thread_uart_service(void *arg) ___THREAD_ENTRY___
     tv.tv_sec = 2;
     tv.tv_usec = 0;
     FD_ZERO(&rfds);
+    FD_ZERO(&wfds);
 
     if ( thiz ) {
         // 出错误后尝试的次数
@@ -4906,11 +5262,12 @@ ___fast_switch_2_rx:
             thiz->rx_param.buff_size = sizeof(thiz->rx_buff);
             ret = ERR_FRAME_CHECK_DATA_TOO_SHORT;
 
-            Hachiko_feed(&thiz->rx_seed);
+            recode_start_tsp = time(NULL);
+            gettimeofday(&t_start, NULL);
             for (;
                      thiz->status == BP_UART_STAT_RD &&
                      (unsigned)ret == ERR_FRAME_CHECK_DATA_TOO_SHORT &&
-                     thiz->rx_seed.remain
+                     __ms_windows(&t_start) < 800 // 一个读数据过程最多持续 800毫秒
                  ; )
             {
                 FD_ZERO(&rfds);
@@ -4923,8 +5280,16 @@ ___fast_switch_2_rx:
                     continue;
                 } else if ( retval != 0 ) {
                     if ( ! FD_ISSET(thiz->dev_handle, &rfds) ) {
+                        /*
+                         *  .DEF:
+                         *   EXCEPTION: EXCPT_UART_SELECT_EXCEPTION
+                         */
                         log_printf(ERR, "UART.DRIVER: somethind happended.");
-                        continue;
+                        // 还原继续写
+                        thiz->status = BP_UART_STAT_WR;
+                        thiz->continues_nr = 0;
+                        break;
+                    } else {
                     }
                 } else { // 超时s
                     ret == (int)(ERR_FRAME_CHECK_DATA_TOO_SHORT);
@@ -4935,7 +5300,6 @@ ___fast_switch_2_rx:
                 rd = read(thiz->dev_handle,
                           &thiz->rx_param.buff.rx_buff[cursor], 16);
                 if ( rd > 0 ) {
-                    Hachiko_feed(&thiz->rx_seed);
                     thiz->rx_param.payload_size += rd;
                     thiz->rx_param.cursor = thiz->rx_param.payload_size;
                     nr += rd;
@@ -4948,7 +5312,6 @@ ___fast_switch_2_rx:
                 case ERR_OK:
                     __dump_uart_hex((unsigned char*)buff, nr, DBG_LV3);
                     thiz->status = BP_UART_STAT_WR;
-                    Hachiko_pause(&thiz->rx_seed);
                     log_printf(DBG_LV0, "UART: fetched a "GRN("new")" frame.");
                     ret = thiz->bp_evt_handle(thiz, BP_EVT_RX_FRAME,
                                                           &thiz->rx_param);
@@ -4960,8 +5323,7 @@ ___fast_switch_2_rx:
                         } else {
                             thiz->continues_nr = 0;
                         }
-                        log_printf(INF, "UART: 需要立即发送回应帧: %d-%d",
-                                   thiz->continues_nr,
+                        log_printf(INF, "UART: 需要立即发送回应帧: %d-%d", thiz->continues_nr,
                                    thiz->sequce);
                     } else {
                         thiz->continues_nr = 0;
@@ -4977,7 +5339,6 @@ ___fast_switch_2_rx:
                                                               &thiz->rx_param);
                     thiz->status = BP_UART_STAT_WR;
                     thiz->continues_nr = 0;
-                    Hachiko_pause(&thiz->rx_seed);
                     log_printf(WRN,
                                "UART: lenth fetched but check "RED("faile."));
                     rddone ++;
@@ -5061,19 +5422,39 @@ ___fast_switch_2_rx:
                 thiz->tx_param.cursor = 0;
                 continue;
             }
-            tcdrain(thiz->dev_handle);
-            tcflush(thiz->dev_handle, TCIOFLUSH);
+            //tcdrain(thiz->dev_handle);
+            //tcflush(thiz->dev_handle, TCIOFLUSH);
 
 continue_to_send:
+            FD_ZERO(&wfds);
+            FD_SET(thiz->dev_handle, &wfds);
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+            retval = select(thiz->dev_handle+1, NULL, &wfds, NULL, &tv);
+            if ( -1 == retval ) {
+                log_printf(DBG_LV1, "select error(%s).", strerror(errno));
+                continue;
+            } else if ( retval != 0 ) {
+                if ( ! FD_ISSET(thiz->dev_handle, &wfds) ) {
+                    log_printf(ERR, "UART.DRIVER: somethind happended.");
+                    continue;
+                }
+            } else { // 超时s
+                continue;
+            }
             cursor = thiz->tx_param.cursor;
             retval = 0;
+            errno = 0;
             __dump_uart_hex(thiz->tx_param.buff.tx_buff, thiz->tx_param.payload_size, DBG_LV3);
             cursor = thiz->tx_param.cursor;
             retval = write(thiz->dev_handle,
                            & thiz->tx_param.buff.tx_buff[cursor],
                            thiz->tx_param.payload_size - cursor);
             if ( retval <= 0 ) {
-                log_printf(ERR, "UART: send error %d, TX REQUEST AUTOMATIC ABORTED. ", retval);
+                log_printf(ERR, "UART: send error %d, TX REQUEST AUTOMATIC ABORTED <%d>.", retval, errno);
+                printf("handle: %p\n", thiz->dev_handle);
+                printf("pointer: %p\n", & thiz->tx_param.buff.tx_buff[cursor]);
+                printf("size: %p\n", thiz->tx_param.payload_size - cursor);
                 thiz->tx_param.buff.tx_buff = thiz->tx_buff;
                 thiz->tx_param.buff_size = sizeof(thiz->tx_buff);
                 thiz->tx_param.payload_size = 0;
@@ -5088,11 +5469,6 @@ continue_to_send:
                 thiz->tx_param.payload_size = 0;
                 if ( thiz->rx_param.need_bytes ) {
                     thiz->status = BP_UART_STAT_RD;
-                    if ( thiz->role == BP_UART_MASTER ) {
-                        // 主动设备，需要进行接收超时判定
-                        thiz->rx_seed.ttl = thiz->master->ttw;
-                        Hachiko_resume(&thiz->rx_seed);
-                    }
                     goto ___fast_switch_2_rx;
                 } else {
                     thiz->tx_param.buff.tx_buff = thiz->tx_buff;

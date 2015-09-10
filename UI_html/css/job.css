@@ -1,0 +1,85 @@
+﻿@charset "utf-8";
+
+/* CSS Document */
+
+.job_preview_box {
+	position:absolute;
+	height:120px;
+	width:130px;
+	font-size:16px;
+	background-color:rgba(255, 255, 255, 0.2);
+	-webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+	-webkit-box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 1px 1px 1px rgba(255,255,255, .44);
+    -moz-box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 1px 1px 1px rgba(255,255,255, .44);
+    box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 1px 1px 1px rgba(255,255,255, .44);
+	overflow:hidden;
+}
+
+.job_preview_box_table {
+	text-align:right;
+	line-height:16px;
+	font-size:16px;
+}
+
+.job_preview_box:active {
+    position:absolute;  
+    top: 3px;  
+}
+
+.jobs_preview_title {
+	font-size:27px;
+	color:#FFF;
+	line-height:normal;
+	text-align:left;
+	height:8%;
+	top:0;
+	float:left;
+	position:absolute;
+}
+
+.jobs_preview_body {
+	height:77%;
+	top:9%;
+	width:100%;
+	left:0;
+	float:left;
+	position:absolute;
+	overflow:auto;
+}
+
+.jobs_preview_toolbox {
+	text-align: center;
+	height:13%;
+	top:86%;
+	left:40%;
+	float:left;
+	position:absolute;
+	overflow:hidden;
+	//background-color:#F00;
+}
+
+.history_preview_toolbox{
+	left:13%;
+}
+
+.self_info_toolbox {
+	left:30%;
+}
+
+.job_preview_box_stat1 {
+	background-color:#070;
+}
+
+.job_preview_box_stat2 {
+	background-color:#770;
+}
+
+.job_preview_box_stat3 {
+	background-color:#077;
+}
+
+.job_preview_box_stat4 {
+	background-color:#777;
+}

@@ -13,3 +13,4 @@ build-in.a:$(OBJS)
 	$(Q)$(AR) -cqs $@ $^
 
 include $(WORKDIR)/Rule.make
+ 

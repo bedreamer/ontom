@@ -534,6 +534,8 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                             bit_set(thiz, S_BMS_COMM_DOWN);
                             log_printf(WRN, "BMS: 握手阶段BMS通信"RED("故障"));
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                            // 设置BMS通讯超时标志
+                            bit_set(thiz, JS_BMS_COMM_ERR);
                         }
                     break;
                 case CHARGE_STAGE_CONFIGURE:

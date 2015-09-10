@@ -1,0 +1,430 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>直流充电桩监控系统</title>
+<link rel="stylesheet" type="text/css" href="css/page.css" />
+<link rel="stylesheet" type="text/css" href="css/job.css" />
+<script type="text/javascript" src="js/vkey.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+</head>
+<!--oncontextmenu="return false" ondragstart="return false" onselectstart ="return false" onselect="document.selection.empty()" oncopy="document.selection.empty()" onbeforecopy="return false" onmouseup="document.selection.empty()"-->
+<body onload="js_init();" oncontextmenu="return false" ondragstart="return false" onselectstart ="return false" onselect="document.selection.empty()" oncopy="document.selection.empty()" onbeforecopy="return false" onmouseup="document.selection.empty()"  style="overflow:hidden">
+<div class="logo_area">
+	<img src="OEM/imgs/only.png" width="100%" />
+</div>
+	<!-- 用于显示body部分的标题元素 -->
+<div class="title_body" id="id_title_body"><a id="system_date_time">N/A</a>&nbsp;</div>
+ <div class="mainbody">
+	<div class="mainpage" id="id_mainpage">
+        <div class="zues cls_auto" id="id_system_preview">
+        	<!--<a>充电请刷卡</a>
+        	<div class="cls_stat_grid_img" align="center";></div>-->
+			<div style="display:none;">
+				<table class="abc_detail">
+					<tr><td>A:</td><td id="id_a_volatage">N/A</td></tr>
+					<tr><td>B:</td><td id="id_b_volatage">N/A</td></tr>
+					<tr><td>C:</td><td id="id_c_volatage">N/A</td></tr>
+				</table>
+			</div>
+        </div>
+        <div class="cls_status">
+        <table style="font-size:27px; text-align:right" align="center">
+            <tr>
+            	<td>系统状态:</td><td id="id_mainpage_sys_status">N/A</td>
+            </tr>
+            <tr>
+            	<td>充电机组:</td><td id="id_mainpage_chargers_status">N/A</td>
+            </tr>
+            <tr>
+            	<td>绝缘检测:</td><td id="id_mainpage_bus0_institude">N/A</td>
+            </tr>
+            <tr>
+            	<td>母线电压:</td><td id="id_mainpage_bus0_voltage">N/A</td>
+            </tr>
+            <tr>
+            	<td>母线电流:</td><td id="id_mainpage_bus0_current">N/A</td>
+            </tr>
+        </table>
+        </div>
+        <div class="cls_main_toolbox">
+        <button style="left:35px" type="button" class="main_tool_box" onclick="javascript:page_system_menu('id_mainpage');" >信息<br />查询</button>
+        <button style="left:165px" type="button" class="main_tool_box" onclick="javascript:do_op_auth('id_mainpage','id_system_operate_page','s');" >管理<br>操作</button>
+        </div>
+    </div><!--mainpage-->
+    <div class="zues page_frame job_create", id="id_job_create">
+    <table class="job_create_table" align="center" width="96%" height="54%">
+  <caption>
+    充电作业参数设定
+  </caption>
+  <tr>
+    <td height="34" scope="col">卡片序号:</td>
+    <td colspan="2" scope="col" id="id_job_commit_card_sn">ON20122236989</td>
+    <td scope="col">&nbsp;</td>
+    <td scope="col">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="34" scope="col">账户余额:</td>
+    <td scope="col" id="id_job_commit_acount_remain">236.56</td>
+    <td scope="col">元</td>
+    <td scope="col">&nbsp;</td>
+    <td scope="col">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="18%" height="34" scope="col">充电端口:</td>
+    <td width="19%" scope="col"><label><input type="radio" name="gun" id="id_gun_0" value="0"  checked="checked"/>
+1#&nbsp;&nbsp;&nbsp;枪</label></td>
+    <td width="23%" scope="col"><label><input type="radio" name="gun" id="id_gun_1" value="1" />
+2#&nbsp;&nbsp;&nbsp;枪</label></td>
+    <td width="20%" scope="col">&nbsp;</td>
+    <td width="20%" scope="col">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="34">计费模式:</td>
+    <td><label>
+      <input type="radio" name="bm" id="id_bm_auto" value="0"  checked='true' />
+      全自动</label></td>
+    <td><label>
+      <input type="radio" name="bm" id="id_bm_kwh" value="1" onclick="javascript:page_show_bm_set_kwh('kwh');" />
+      按电量</label></td>
+    <td><label>
+      <input type="radio" name="bm" id="id_bm_time" value="2" onclick="javascript:page_show_bm_set_time('time');" />
+      按时间</label></td>
+    <td><label>
+      <input type="radio" name="bm" id="id_bm_money" value="3" onclick="javascript:page_show_bm_set_money('money');" />
+      按金额</label></td>
+  </tr>
+  <tr>
+    <td height="34">充电模式:</td>
+    <td colspan="2"><label>
+      <input type="radio" name="cm" id="id_cm_auto" value="cm_auto"  checked="checked" />
+      自动充电</label></td>
+    <td colspan="2"><label>
+      <input type="radio" name="cm" id="id_cm_manual" value="cm_manual" onclick="javascript:page_show_cm_set('manual');"/>
+      手动充电;</label></td>
+  </tr>
+  <tr>
+    <td height="34">参数汇总:</td>
+    <td colspan="4" id="id_job_commit_preview">1# 枪, 10.1 kw.h,恒流,76A,560V</td>
+  </tr>
+  </table>
+  	<div align="center"><a>再次刷卡提交作业</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="javascript:page_job_create_cancel('id_job_create');">取消作业</button></div></div>
+    </div>
+    <!--job_create_page-->
+    <div class="zues page_frame job_working", id="id_job_working"><div>
+    <table width="96%" align="center" class="job_create_table">
+  <caption>
+    充电作业-<a id="id_job_working_jid">J2015023454</a>
+  </caption>
+  <tr>
+    <td scope="col" class="back_gray">卡片序号</td>
+    <td scope="col" id="id_job_working_cid" class="back_gray">ON123456</td>
+    <td scope="col" class="back_dark">已充时长</td>
+    <td scope="col" class="back_dark" id="id_job_working_time_used">56 分</td>
+  </tr>
+  <tr>
+    <td class="back_dark">电压/电流</td>
+    <td id="id_job_working_IV" class="back_dark">718.9A / 689.6V</td>
+    <td class="back_gray">已充电量</td>
+    <td class="back_gray" id="id_job_working_kwh_used">12.6 kWH</td>
+  </tr>
+  <tr>
+    <td class="back_gray">充电进度</td>
+    <td id="id_job_working_yichongdianliang" class="back_gray">89.8 %</td>
+    <td class="back_dark">充电单价</td>
+    <td id="id_job_working_kwh_price" class="back_dark">1.5 元/度</td>
+  </tr>
+  <tr>
+    <td class="back_dark">系统状态</td>
+    <td id="id_job_working_sys_status" class="back_dark">正常</td>
+    <td class="back_gray">充电金额</td>
+    <td id="id_job_working_money_used" class="back_gray">18.90 元</td>
+  </tr>
+  <tr>
+    <td class="back_gray">充电枪</td>
+    <td id="id_job_working_gun_status" class="back_gray">已连接</td>
+    <td class="back_dark">作业状态</td>
+    <td id="id_job_working_job_status" class="back_dark">等待</td>
+  </tr>
+</table>
+		刷卡中止充电作业.
+	</div>
+	<div class="job_working_toolbox" id="job_working_toolbox_id">
+        <button onclick="javascript:page_show_main_page('id_job_working');">&nbsp;返回主页&nbsp;</button>
+        <button onclick="javascript:page_show_jobs_preview('id_job_working')">&nbsp;返回作业池&nbsp;</button>
+        <button id="id_job_op_href"><div id="id_job_op_btn">&nbsp;无操作&nbsp;</div></button>
+        <select onchange="javascript:job_options_change(this[selectedIndex].value, 'id_job_working')">
+            <option value="1">作业详情</option>
+        	<option value="2">BMS明细</option>
+            <option value="3">电池信息</option>
+            <option value="4">手动调压/流</option>
+        </select>
+    </div>
+    </div> <!--作业显示页面-->
+    <div class="zeus page_frame job_bms_detail_page" id="id_job_bms_detail_page">
+    </div>
+    <div class="zeus page_frame system_query_menu" id="id_system_query_page">
+    	<div>
+            <button class="zeus main_tool_box" style="left:40px;top:60px;height:200px;width:200px" onclick="javascript:page_show_jobs_preview('id_system_query_page')">
+            <div>作业查询</div></button>
+            <button class="zeus main_tool_box" style="left:280px;top:60px;height:200px;width:200px" onclick="javascript:page_show_current_error('id_system_query_page')">
+            <div>当前故障</div></button>
+            <button class="zeus main_tool_box" style="left:520px;top:60px;height:200px;width:200px" onclick="javascript:page_show_self_info('id_system_query_page')">
+            <div>本机信息</div></button>
+        </div>
+        <div class="jobs_preview_toolbox">
+        	<button onclick="javascript:page_show_main_page('id_system_query_page');">返回主页</button>
+        </div>
+    </div> <!--系统查询目录页面-->
+    <div class="zeus page_frame system_operate_menu" id="id_system_operate_page">
+    	<div>
+            <a href="settings.html">
+            <div class="zeus main_tool_box"  style="left:30px;top:30px;">参数<br>配置</div></a>
+            <button class="zeus main_tool_box"  style="left:150px;top:30px;" onclick="javascript:module_op_page_show('id_system_operate_page')">
+            <div>模块<br>操作</div></button>
+            <button class="zeus main_tool_box" style="left:270px;top:30px;" onclick="javascript:clean_history_error_show('id_system_operate_page')">
+            <div>历史<br>清除</div></button>
+            <button class="zeus main_tool_box" style="left:390px;top:30px;" onclick="javascript:show_module_detail_page('id_system_operate_page')">
+            <div>模块<br>信息</div></button>
+            <button class="zeus main_tool_box" style="left:510px;top:30px;" onclick="javascript:page_show_history_error('id_system_operate_page')">
+            <div>历史<br>故障</div></button>
+            <button class="zeus main_tool_box" style="left:630px;top:30px;" onclick="javascript:page_show_kgzt('id_system_operate_page')">
+            <div>遥测<br>遥信</div></button>
+            <button class="zeus main_tool_box" style="left:30px;top:150px;" onclick=
+"javascript:page_show_hot_restart_confirm_page('id_system_operate_page')">
+            <div>重新<br>启动</div></button>
+        </div>
+        <div class="jobs_preview_toolbox">
+        	<button onclick="javascript:page_show_main_page('id_system_operate_page');">返回主页</button>
+        </div>
+    </div> <!--系统操作目录页面-->
+    <div class="zeus page_frame module_detail" id="id_module_detail_page">
+    	<div class="module_detail_box" id="module_detail_panel" align="center"></div>
+        <div class="jobs_preview_toolbox history_preview_toolbox">
+        	<button onclick="javascript:page_show_main_page('id_module_detail_page');">返回主页</button>
+            <button onclick="javascript:show_pre_page_module_detail();">上一页</button>
+            <button onclick="javascript:show_next_page_module_detail();">下一页</button>
+            <button onclick="javascript:page_system_operate_menu('id_module_detail_page');">返&nbsp;&nbsp;&nbsp;&nbsp;回</button>
+        </div>
+    </div> <!--模块信息显示页面-->
+    <div class="zeus page_frame current_error" id="id_current_error_page">
+    	<div class="current_error_box" id="current_error_panel" align="center"></div>
+        <div class="jobs_preview_toolbox history_preview_toolbox">
+        	<button onclick="javascript:page_show_main_page('id_current_error_page');">返回主页</button>
+            <button onclick="javascript:show_pre_page_error();">上一页</button>
+            <button onclick="javascript:show_next_page_error();">下一页</button>
+            <button onclick="javascript:page_system_menu('id_current_error_page');">返&nbsp;&nbsp;&nbsp;&nbsp;回</button>
+        </div>
+    </div> <!--当前故障显示页面-->
+    <div class="zeus page_frame history_error" id="id_history_error_page">
+    	<div class="history_error_box" id="id_historyt_error_panel" align="center"></div>
+        <div class="jobs_preview_toolbox history_preview_toolbox" align="center">
+        	<button onclick="javascript:page_show_main_page('id_history_error_page');">返回主页</button>
+            <button onclick="javascript:show_pre_page_history();">上一页</button>
+            <button onclick="javascript:show_next_page_history();">下一页</button>
+            <button onclick="javascript:page_system_operate_menu('id_history_error_page');">返&nbsp;&nbsp;&nbsp;&nbsp;回</button>
+        </div>
+    </div> <!--历史故障显示页面-->
+    <div class="zeus page_frame self_info" id="id_self_info_page">
+    	<div class="self_info_page_panel" id="id_self_info_page_panel" align="center"></div>
+        <div class="jobs_preview_toolbox self_info_toolbox">
+        	<button onclick="javascript:page_show_main_page('id_self_info_page');">返回主页</button>
+            <button onclick="javascript:page_system_menu('id_self_info_page');">返&nbsp;&nbsp;&nbsp;&nbsp;回</button>
+        </div>
+    </div> <!--本机信息显示页面-->
+    <div class="zeus page_frame kgzt_info" id="id_kgzt_page">
+    	<div class="kgzt_page_panel" id="id_kgzt_page_panel" align="center">
+        	<table width="96%" align="center"  class="job_create_table">
+            	<caption>系统遥测遥信</caption>
+            	<tr>
+                	<td>直流总输出熔断器</td><td id="id_dcrd_zt">N/A</td><td>直流总输出开关量</td><td id="id_dc_kg">N/A</td>
+                </tr>
+                <tr>
+                	<td>直流1路输出开关量</td><td id="id_dc1_kg">N/A</td><td>直流2路输出开关量</td><td id="id_dc2_kg">N/A</td>
+                </tr>
+                <tr>
+                	<td>交流输入开关量</td><td id="id_ac_kg">N/A</td><td>交流输入状态量</td><td id="id_ac_zt">N/A</td>
+                </tr>
+                <tr>
+                	<td>急停状态</td><td id="id_halt_zt">N/A</td><td>防雷器状态</td><td id="id_flq_zt">N/A</td>
+                </tr>
+                <tr>
+                	<td>电池1正对地</td><td id="id_bat1_ohm_P">N/A</td><td>电池1负对地</td><td id="id_bat1_ohm_N">N/A</td>
+                </tr>
+                <tr>
+                	<td>电池2正对地</td><td id="id_bat2_ohm_P">N/A</td><td>电池2负对地</td><td id="id_bat2_ohm_N">N/A</td>
+                </tr>
+            </table>
+        </div>
+        <div class="jobs_preview_toolbox self_info_toolbox">
+        	<button onclick="javascript:page_show_main_page('id_kgzt_page');">返回主页</button>
+            <button onclick="javascript:page_system_operate_menu('id_kgzt_page');">返&nbsp;&nbsp;&nbsp;&nbsp;回</button>
+        </div>
+    </div> <!--开关状态显示页面-->
+    <div class="zeus page_frame modules_op_page" id="id_modules_op_page">
+    	<div class="modules_op_page_panel" id="id_modules_op_page_panel"></div>
+        <div class="jobs_preview_toolbox history_preview_toolbox">
+        	<button onclick="javascript:page_show_main_page('id_modules_op_page');">返回主页</button>
+            <button onclick="javascript:show_pre_page_module_op();">上一页</button>
+            <button onclick="javascript:show_next_page_module_op();">下一页</button>
+            <button onclick="javascript:page_system_operate_menu('id_modules_op_page');">返&nbsp;&nbsp;&nbsp;&nbsp;回</button>
+        </div>
+    </div> <!--模块操作显示页面-->
+    <div class="zeus page_frame job_preview_page" id="jobs_preview_page">
+    	<div class="jobs_preview_title">作业预览</div>
+        <div class="jobs_preview_body" id="jobs_preview"></div>
+        <div class="jobs_preview_toolbox self_info_toolbox">
+        	<button onclick="javascript:page_show_main_page('jobs_preview_page');">返回主页</button>
+            <button onclick="javascript:page_system_menu('jobs_preview_page');">返&nbsp;&nbsp;&nbsp;&nbsp;回</button>
+        </div>
+    </div> <!--jobs_preview-->
+</div>
+
+<div class="v_input_pages cls_operate_confirm_page" id="id_operate_confirm_page">
+			<br><br><br><b><a><div id="id_confirm_notify_text">确认清除全部历史故障?</div></a></b><br><br><br>
+            <button onclick="javascript:clean_history_error(true);">&nbsp;确&nbsp;认&nbsp;</button>&nbsp;&nbsp;
+            <button onclick="javascript:clean_history_error(false);">&nbsp;取&nbsp;消&nbsp;</button>
+</div> <!--清除历史故障操作确认页面-->
+
+<div class="v_input_pages cls_operate_confirm_page" id="id_hot_restart_confirm_page">
+			<br><br><br><b><a><div id="id_confirm_notify_text">确认重新启动</div></a></b><br><br><br>
+            <button onclick="javascript:system_hot_restart(true);">&nbsp;确&nbsp;认&nbsp;</button>&nbsp;&nbsp;
+            <button onclick="javascript:system_hot_restart(false);">&nbsp;取&nbsp;消&nbsp;</button>
+</div> <!--确认重新启动-->
+
+<!-- 按电量充电输入框 -->
+<div class="v_input_pages v_bm_kwh_param_page" id="id_bm_set_kwh_page">
+	<a>充电量配置</a><br>
+    <input onclick="javasctipt:vk_focurs('id_bm_set_kwh')" id="id_bm_set_kwh" align="absmiddle" type="text" height="30px" width="200px" value="1.0" />KW.H
+    <br><br><br><br><br><br><br><button onclick="javascript:page_bm_set_ok('id_bm_set_kwh_page');">确定</button>
+    <button onclick="javascript:page_bm_set_cancel('id_bm_set_kwh_page');">取消</button>
+</div>
+
+<!-- 按时间充电输入框 -->
+<div class="v_input_pages v_bm_time_param_page" id="id_bm_set_time_page">
+	<a>充电时间配置</a><br>
+    <input onclick="javasctipt:vk_focurs('id_bm_set_time')" id="id_bm_set_time" align="absmiddle" type="text" height="30px" width="200px" value="5" />分钟
+    <br><br><br><br><br><br><br><button onclick="javascript:page_bm_set_ok('id_bm_set_time_page');">确定</button>
+    <button onclick="javascript:page_bm_set_cancel('id_bm_set_time_page');">取消</button>
+</div>
+
+<!-- 按金额充电输入框 -->
+<div class="v_input_pages v_bm_money_param_page" id="id_bm_set_money_page">
+	<a>充电金额配置</a><br>
+    <input onclick="javasctipt:vk_focurs('id_bm_set_money')" id="id_bm_set_money" align="absmiddle" type="text" height="30px" width="200px" value="1.0" />元
+    <br><br><br><br><br><br><br><button onclick="javascript:page_bm_set_ok('id_bm_set_money_page');">确定</button>
+    <button onclick="javascript:page_bm_set_cancel('id_bm_set_money_page');">取消</button>
+</div>
+ 
+<!-- 按手动充电输入框 -->
+<div class="v_input_pages v_bm_maual_param_page" id="id_cm_set_page">
+<a>手动充电配置</a>
+    <table align="center">
+        <tr>
+          <td colspan="3"><label><input type="radio" name="mc_mode" checked="true" value="BI"/>
+          恒流</label></td>
+          <td colspan="3"><label><input type="radio" name="mc_mode" value="BV"/>
+          恒压</label></td>
+        </tr>
+        <tr>
+          <td>限流</td>
+          <td><input onclick="javasctipt:vk_focurs('id_cm_set_lI')" id="id_cm_set_lI" type="text" size="5" maxlength="5" value="21"/>A&nbsp;&nbsp;</td>
+          <td>限压</td>
+          <td><input onclick="javasctipt:vk_focurs('id_cm_set_lV')" id="id_cm_set_lV" type="text" size="5" maxlength="5" value="533.8"/>V&nbsp;&nbsp;</td>
+          <td>授权</td>
+          <td><input size="7" maxlength="7" onclick="javasctipt:vk_focurs('id_cm_set_passwd')" id="id_cm_set_passwd" type="password" /></td>
+    </table>
+    <br><br><br><br><br><button onclick="javascript:page_cm_set_ok('id_cm_set_page');">&nbsp;确&nbsp;&nbsp;定&nbsp;</button>
+    <button onclick="javascript:page_cm_set_cancel('id_cm_set_page');">&nbsp;取&nbsp;&nbsp;消&nbsp;</button>
+</div>
+
+<div class="v_input_pages v_card_passwd_input_pages" id="id_card_passwd_input_page">
+	<div><a>充电授权密码</a><a id="id_passwd_card_sn">N/A</a></div>
+    <div><input type="password" id="id_card_passwd" style="font-size:36px; line-height:36px;text-align:center;height:32px" maxlength="6" /></div>
+    <div id="id_card_passwd_notify" style="font-size:16px"><br /><p>&nbsp;</p></div><br><br><br><br><br>
+    <div>
+        <button type="button" onclick="javascript:do_show_job_create_page();">确定</button>
+        <button type="button" onclick="javascript:page_show_main_page('id_card_passwd_input_page');">取消</button>
+    </div>
+</div>
+
+<div class="v_input_pages v_feed_passwd_input_pages" id="id_feed_passwd_input_page">
+	<div>动&nbsp;作&nbsp;授&nbsp;权</div>
+    <div>密钥： <input type="password" id="id_feed_passwd" style="font-size:24px; text-align:center; height:32px" maxlength="6" /></div>
+    <div><a id="id_feed_passwd_notify" style="font-size:16px">&nbsp;</a></div><br><br><br><br><br>
+    <div>
+        <button type="button" id="id_auth_ok"><div class="okcancelbtn okbtn">&nbsp;确&nbsp;&nbsp;定&nbsp;</div></button>
+        <button type="button" id="id_auth_cancel"><div class="okcancelbtn cancelbtn">&nbsp;取&nbsp;&nbsp;消&nbsp;</div></button>
+    </div>
+</div>
+
+<div class="zeus page_frame v_job_billing_detail" id="id_job_billing_detail">
+    <div>
+    	<table width="96%" align="center" class="job_create_table">
+          <caption>
+            交易详情
+          </caption>
+          <tr>
+            <td scope="col" class="back_gray">交易流水号</td>
+            <td scope="col" id="id_billing_bid" class="back_gray">B099921312312312</td>
+            <td scope="col" class="back_dark">卡片序号</td>
+            <td scope="col" id="id_billing_cid" class="back_dark">ON20122236989</td>
+          </tr>
+          <tr>
+            <td class="back_dark">作业ID</td>
+            <td id="id_billing_jid" class="back_dark">J2015023454</td>
+            <td class="back_gray">消费金额</td>
+            <td id="id_billing_cost" class="back_gray">15.6</td>
+          </tr>
+          <tr>
+            <td class="back_gray">消耗电量</td>
+            <td id="id_billing_kwh" class="back_gray">5.6 KW.H</td>
+            <td class="back_dark">账户余额</td>
+            <td id="id_billing_remain" class="back_dark">569.56 元</td>
+          </tr>
+          <tr>
+            <td class="back_dark">起始时刻</td>
+            <td id="id_billing_btime" class="back_dark">2015/03/28 12:56</td>
+            <td class="back_gray">结束时刻</td>
+            <td id="id_billing_etime" class="back_gray">2015/03/28 12:59</td>
+          </tr>
+          <tr>
+            <td class="back_gray">充电时长</td>
+            <td id="id_billing_long" class="back_gray">3.0 分钟</td>
+            <td class="back_dark">&nbsp;</td>
+            <td class="back_dark">&nbsp;</td>
+          </tr>
+        </table>
+    </div>
+    <div class="jobs_preview_toolbox self_info_toolbox">
+        <button onclick="javascript:void();">打印交易账单</button>
+        <button onclick="javascript:do_job_done();">完成</button></div>
+    </div>
+</div>
+
+<!-- 虚拟键盘放置在浮动层，节省空间 -->
+<div class="v_keypad keypad_panel" id="id_keypad">
+	<button type="button" class="key_buttons" onclick="javascript:vk_pushed(0);">0</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(1);">1</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(2);">2</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(3);">3</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(4);">4</button>
+	<button type="button" class="key_buttons" onclick="javascript:vk_pushed(5);">5</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(6);">6</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(7);">7</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(8);">8</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed(9);">9</button>
+	<button type="button" class="key_buttons" onclick="javascript:vk_pushed('dot');">.</button>
+    <button type="button" class="key_buttons" onclick="javascript:vk_pushed('del');">C</button>
+</div>
+<!--
+<div class="notify_info" id="id_notify_info">3</div> <!--信息提示
+<div class="notify_errors" id="id_notify_errors">14</div> <!--故障提示-->
+<div style="position:absolute; float:left; top:94%; left:2%; font-size:16px; overflow:hidden">
+<iframe src="OEM/copyright.html" frameborder="0" width="500px" scrolling="no">
+</iframe>
+</div>
+
+</body>
+</html>

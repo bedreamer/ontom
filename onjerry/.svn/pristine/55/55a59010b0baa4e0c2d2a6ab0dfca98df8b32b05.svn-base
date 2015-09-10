@@ -1,0 +1,12 @@
+..\Output\flash.o: src\Flash.c
+..\Output\flash.o: .\inc\Flash.h
+..\Output\flash.o: ..\CMSIS\stm32f10x.h
+..\Output\flash.o: ..\CMSIS\core_cm3.h
+..\Output\flash.o: E:\Keil 4 ARM\ARM\RV31\Inc\stdint.h
+..\Output\flash.o: ..\CMSIS\system_stm32f10x.h
+..\Output\flash.o: .\inc\UART.h
+..\Output\flash.o: .\inc\Self_Modbus.h
+..\Output\flash.o: .\inc\SYS_Init.h
+..\Output\flash.o: .\inc\Stat_control.h
+..\Output\flash.o: .\inc\MyTypedef.h
+..\Output\flash.o: .\inc\AD_Sample.h

@@ -22,6 +22,12 @@ else
     fi
 fi
 
+ifconfig eth0 up
+ifconfig eth1 up
+# 调试用端口，该端口靠近USB口
+#ifconfig eth1 up
+#ifconfig eth1 10.100.121.200/16
+
 while [ true ]; do
 	for PID in `pidof browser` `pidof zeus`;do
 		kill -9 $PID
@@ -41,16 +47,20 @@ while [ true ]; do
 		echo "启动到校准页面"
 		hellhound.sh browser -qws "http://127.0.0.1:8080/jiaozhun.html" &
 		BROPID=$!
-	elif [ $workmode == "install" ]; then
-		echo "启动到安装配置页面"
-		hellhound.sh browser -qws "http://127.0.0.1:8080/settings.html" &
+	elif [ $workmode == "calibrate" ]; then
+		echo "启动屏幕校准程序"
+		ts_calibrate
+		echo "重新设定工作模式为正常模式"
+		sqlite3 /usr/zeus/ontom.db "UPDATE settings SET current_value='normal'  WHERE key='work_mode'"
+		echo "启动到主页面"
+		hellhound.sh browser -qws "http://127.0.0.1:8080/" &
 		BROPID=$!
 	else
 		echo "启动到默认页面"
 		hellhound.sh browser -qws "http://127.0.0.1:8080/" &
 		BROPID=$!
 	fi
-	/usr/zeus/zeus >> /tmp/zeus.log
+	/usr/zeus/zeus > /dev/null
 	echo "检测到程序主动退出, 1秒后自动重启..."
 	kill -9 $BROPID
 	sleep 1;

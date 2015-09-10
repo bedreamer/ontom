@@ -25,6 +25,8 @@ struct exso_struct {
     // 模块退出函数入口, 必须有
     // 入口名称为 exso_$(exso_name)_exit
     int (*exso_exit_entry)(void *);
+    // 临时调用接口，用户程序功能扩展
+    int (*exso_ioctrl)(unsigned int cmd, void *iparam, void *oparam, void *_private);
 
     // {{
     void *exso_param;
@@ -50,5 +52,8 @@ int exso_unload(struct exso_struct **head, struct exso_struct *exso);
  */
 void exso_do_mainloop(struct exso_struct **head);
 
-
+/*
+ *  搜索指定模块
+ */
+struct exso_struct *exso_search(struct exso_struct **head, const char name);
 #endif

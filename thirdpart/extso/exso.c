@@ -134,3 +134,26 @@ void exso_do_mainloop(struct exso_struct **head)
         thiz = thiz->exso_next;
     }
 }
+
+/*
+ *  搜索指定模块
+ */
+struct exso_struct *exso_search(struct exso_struct **head, const char name)
+{
+    int ret;
+    struct exso_struct *thiz;
+
+    if ( head == NULL ) return;
+    if ( *head == NULL ) return;
+
+    thiz = *head;
+
+    while ( thiz ) {
+        if ( 0 == strcmp(name, thiz->exso_name) ) {
+            break;
+        }
+        thiz = thiz->exso_next;
+    }
+    return thiz;
+}
+

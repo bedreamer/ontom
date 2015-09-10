@@ -1,0 +1,196 @@
+#include "Stat_control.h"
+#include "AD_Sample.h"
+
+void LED_IOinit(void)
+{
+    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
+    GPIOC->CRH &= ~(GPIO_CRH_MODE & 0x0FF00000);//配置输出方式
+    GPIOC->CRH |= 0x02200000;// 2MHz最高输出
+    GPIOC->CRH &= ~(GPIO_CRH_CNF & 0x0FF00000);
+    GPIOC->CRH |= 0x04400000;//配置为开漏输出
+}
+void Relay_IOinit(void)
+{
+    RCC->APB2ENR |= (RCC_APB2ENR_IOPCEN|RCC_APB2ENR_IOPAEN);//使能GPIOC和GPIOA时钟 0x00000014
+    //GPIOA和GPIOC对应IO配置
+    GPIOC->CRL &= ~(GPIO_CRL_MODE & 0x00FFFF00);//配置输出方式
+    GPIOC->CRL |= 0x00222200;// 2MHz最高输出
+    GPIOC->CRL &= ~(GPIO_CRL_CNF & 0x00FFFF00);//推挽输出
+    GPIOA->CRL &= ~(GPIO_CRL_MODE & 0x0000FFFF);//配置输出方式
+    GPIOA->CRL |= 0x00002222;// 2MHz最高输出
+    GPIOA->CRL &= ~(GPIO_CRL_CNF & 0x0000FFFF);//推挽输出
+}
+
+void Coupler_IOinit(void)
+{
+    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;//使能GPIOB时钟  0x0000008
+    //光耦输入配置
+    GPIOB->CRL &= ~(GPIO_CRL_MODE & 0xF00000F0);//配置为输入方式
+    GPIOB->CRL &= ~(GPIO_CRL_CNF & 0xF00000F0);
+    GPIOB->CRL |= 0x40000040;//配置为悬浮输入
+    GPIOB->CRH &= ~(GPIO_CRH_MODE & 0xFFF0F0FF);//配置为输入方式
+    GPIOB->CRH &= ~(GPIO_CRH_CNF & 0xFFF0F0FF);
+    GPIOB->CRH |= 0x44404044;//配置为悬浮输入
+}
+
+
+void Coupler_Updata(Stu_ADSample_DATAStat *sampdata)
+{
+    //更新保护状态字节异步输入,只取5位状态
+    sampdata->Flag_prtc6 = (uint8_t)(~((GET_STATUS(BIT_RDQ_KMMAIN)>>1)|(GET_STATUS(BIT_FLQ)>>7)|(GET_STATUS(BIT_TRIP_ACIN)>>8)|(GET_STATUS(BIT_STOP)>>9))) & 0x71;
+    sampdata->Flag_run1 = (sampdata->Flag_run1 | SW_AC_IN_OFFSET) & (uint8_t)(~(GET_STATUS(BIT_SW_ACIN)>>14));
+
+    sampdata->Flag_run1 = (sampdata->Flag_run1 & 0x67) | (uint8_t)((KM_BRANCH1_STAT) |0x00000008|(FZDY_BRANCH1_STAT << 7));
+    sampdata->Flag_run2 = (sampdata->Flag_run2 & 0xF6) |(uint8_t)((KM_BRANCH2_STAT>>3) |(FZDY_BRANCH2_STAT >> 2));
+    
+    /*Databuff[U0_TXFIFOINDEX_RUNSTATUS1] &= (~(SW_KM_MAIN_OFFSET|SW_KM_BRANCH1_OFFSET));//清总直流输出、LINK0合闸状态
+    Databuff[U0_TXFIFOINDEX_RUNSTATUS1] |= ((GET_STATUS(BIT_SW_KMMAIN)) ? 0x00 : SW_KM_MAIN_OFFSET);//更新总直流输出合闸状态
+    Databuff[U0_TXFIFOINDEX_RUNSTATUS1] |= ((GET_STATUS(BIT_SW_KMBRANCH1)) ? 0x00 : SW_KM_BRANCH1_OFFSET);//更新LINK0合闸状态
+
+    Databuff[U0_TXFIFOINDEX_RUNSTATUS2] &= (~SW_KM_BRANCH2_OFFSET);//清LINK1合闸状态
+    Databuff[U0_TXFIFOINDEX_RUNSTATUS2] |= ((GET_STATUS(BIT_SW_KMBRANCH2)) ? 0x00 : SW_KM_BRANCH2_OFFSET);//更新LINK1合闸状态*/
+}
+
+uint16_t Relay_Control(Stu_ADSample_DATAStat *sampdata, SAMP_Stream* Controlbuff)
+{
+    uint16_t cmd = Controlbuff->cmd;
+    //故障发生，处理
+    if((sampdata->Flag_prtc6 != 0x00)||(sampdata->Flag_prtc1 !=0x00)||(sampdata->Flag_prtc2 != 0x00)||(sampdata->Flag_prtc3 !=0x00) ||(Controlbuff->SysFault != 0x0000) || (cmd & 0x0100))
+    {
+        LED_FAULT_ON;
+        //充电停止类故障发生，停止充电
+        if((sampdata->Flag_prtc6 & (SAMPDATABIT_KMMAINRDQSTAT |SAMPDATABIT_KMMAINTRIPSTAT | SAMPDATABIT_ACINTRIPSTAT | SAMPDATABIT_STOPSTAT )) || (Controlbuff->SysFault != 0x0000))//总运行故障
+        {
+            //KM_MAIN_OFF;
+            KM_BRANCH1_OFF;
+            KM_BRANCH2_OFF;
+            ELELOCK1_OFF;
+            ELELOCK2_OFF;
+            cmd &= 0x0193;//清相应命令
+            Controlbuff->cmd &= 0x0193;
+        }
+        if((sampdata->Flag_prtc6 & SAMPDATABIT_KMBRANCH1TRIPSTAT) ||(sampdata->Flag_prtc1 & ~SAMPDATABITMASK_MX0USTAT) ||(sampdata->Flag_prtc2 !=0x00))//充电1段故障
+        {
+            KM_BRANCH1_OFF;
+            ELELOCK1_OFF;
+            cmd &= 0x01F3;//清相应命令
+            Controlbuff->cmd &= 0x01F3;
+        }
+        if((sampdata->Flag_prtc6 & SAMPDATABIT_KMBRANCH2TRIPSTAT) ||(sampdata->Flag_prtc1 & ~SAMPDATABITMASK_MX1USTAT) ||(sampdata->Flag_prtc3 !=0x00))//充电2段故障
+        {
+            KM_BRANCH2_OFF;
+            ELELOCK2_OFF; 
+            cmd &= 0x019F;//清相应命令
+            Controlbuff->cmd &= 0x019F;
+        }             
+    }
+    else
+    {       
+        LED_FAULT_OFF;
+    }
+    
+    if(((sampdata->Flag_run1 >> SAMPDATABITINDEX_LINK0USTAT) & 0x03) != 0x03)//link0 未连接
+    {
+        cmd &= 0x01F1;//清除闭合命令
+        Controlbuff->cmd &= 0x01F9;//同时清外部命令,但是除电子锁，使得连接之后直接锁住，充电母线和辅助电源需连接后再次受到命令才能动作
+    }
+        
+    if(((sampdata->Flag_run2 >> SAMPDATABITINDEX_LINK1USTAT) & 0x03) != 0x03)//link1 未连接
+    {
+        cmd &= 0x018F;//清除闭合命令
+        Controlbuff->cmd &= 0x01CF;//同时清外部命令,但是除电子锁，使得连接之后直接锁住，充电母线和辅助电源需连接后再次受到命令才能动作
+    }
+    
+    if(cmd & 0x0002)
+    FZDY_BRANCH1_ON;
+    else
+    FZDY_BRANCH1_OFF;
+
+    if(cmd & 0x0004)
+    KM_BRANCH1_ON;
+    else
+    KM_BRANCH1_OFF;  
+    
+    if(cmd & 0x0010)
+    FZDY_BRANCH2_ON;
+    else
+    FZDY_BRANCH2_OFF;
+
+    if(cmd & 0x0020)
+    KM_BRANCH2_ON;
+    else
+    KM_BRANCH2_OFF;   
+    
+    if(cmd & 0x0008)
+    ELELOCK1_ON;
+    else
+    ELELOCK1_OFF;
+
+    if(cmd & 0x0040)
+    ELELOCK2_ON;
+    else
+    ELELOCK2_OFF;
+
+    if(cmd & 0x0080)
+    LED_RUN_ON;
+    else
+    LED_RUN_OFF;
+    
+    //系统状态正常，执行主机命令
+    /*if(((Databuff[U0_TXFIFOINDEX_LINK0USTAT]>>U0_TXFIFOBITINDEX_LINK0USTAT) & 0x03) == 0x03)//link0 连接
+    {
+        if(cmd & 0x06)
+        {
+            if(cmd & 0x02)
+            FZDY_BRANCH1_ON;
+            else
+            FZDY_BRANCH1_OFF;
+
+            if(cmd & 0x04)
+            KM_BRANCH1_ON;
+            else
+            KM_BRANCH1_OFF;     
+        }
+        else
+        {
+            FZDY_BRANCH1_OFF;
+            KM_BRANCH1_OFF;           
+        }
+    }
+    else
+    {
+        FZDY_BRANCH1_OFF;
+        KM_BRANCH1_OFF;
+        Controlbuff->cmd &= 0xF9;//清除闭合命令
+    }
+    
+    if(((Databuff[U0_TXFIFOINDEX_LINK1USTAT]>>U0_TXFIFOBITINDEX_LINK1USTAT) & 0x03) == 0x03)//link1 连接
+    {
+        if(cmd & 0x30)
+        {
+            if(cmd & 0x10)
+            FZDY_BRANCH2_ON;
+            else
+            FZDY_BRANCH2_OFF;
+
+            if(cmd & 0x20)
+            KM_BRANCH2_ON;
+            else
+            KM_BRANCH2_OFF;     
+        }
+        else
+        {
+            FZDY_BRANCH2_OFF;
+            KM_BRANCH2_OFF;           
+        }
+    }
+    else
+    {
+        FZDY_BRANCH2_OFF;
+        KM_BRANCH2_OFF;
+        Controlbuff->cmd &= 0xCF;//清除闭合命令
+    }*/
+    return 0x0000;
+}
+
+

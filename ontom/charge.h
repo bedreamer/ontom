@@ -101,6 +101,18 @@ typedef enum {
     BILLING_MODE_AS_FREE    =0x05
 }BILLING_MODE;
 
+// 交易方式
+typedef enum {
+    // 无交易
+    DEAL_NONE = 0,
+    // 卡片式交易
+    DEAL_USE_CARD = 1,
+    // 网络式交易
+    DEAL_USE_NET  = 2,
+    // 卡片和网络同时存在
+    DEAL_USE_BOTH
+}DEAL_METHORD;
+
 // 充电任务 状态
 typedef enum {
     // 无效任务状态
@@ -220,6 +232,14 @@ typedef enum {
     JOB_SETTING,
     // 正在等待前驱作业完成
     JOB_WAITTING,
+    // 系统扫描测试
+    JOB_SCANNING,
+    // 12V 辅助电源测试
+    JOB_12V_ASSIT_TEST,
+    // 24V 辅助电源测试
+    JOB_24V_ASSIT_TEST,
+    // 作业开始执行
+    JOB_START,
     // 作业就绪等待
     JOB_STANDBY,
 
@@ -252,6 +272,14 @@ typedef enum {
     // 闲置等待
     PRIVATE_STANDBY = 0x02
 }PRIVATE_STATUS;
+
+// 双辅助电源投切方式
+typedef enum {
+    // 手工选择
+    ASSIT_SELECT_MANUAL,
+    // 自动投切
+    ASSIT_SELECT_AUTO
+}DOUBLE_ASSIT_SELECT_METHORD;
 
 // 提交命令
 typedef enum {
@@ -345,12 +373,25 @@ typedef enum {
     F_MANUL_CHARGE_NEED_ASSITER,
     // 需要进行电能计费
     F_NEED_KWH_METER,
+    // 通讯模式, 1: 在线式， 0: 离线式
+    F_SYSTEM_COMM_MODE,
+    // 需要进行账户认证,1: 需要进行账户认证， 0: 不需要进行账户认证
+    F_NEED_AUTH,
 
     // {{
     // 1#枪充电
     F_GUN1_CHARGE,
     // 2#枪充电
     F_GUN2_CHARGE,
+
+    // 1#枪使用12V辅助电源
+    F_GUN1_ASSIT_12V,
+    // 1#枪使用24V电源
+    F_GUN1_ASSIT_24V,
+    // 2#枪使用12V辅助电源
+    F_GUN2_ASSIT_12V,
+    // 2#枪使用24V电源
+    F_GUN2_ASSIT_24V,
 
     // 充电枪1电压抬高完成
     F_VOL1_SET_OK,
@@ -390,6 +431,8 @@ typedef enum {
     F_CARDING_SETTLE,
     // 充电指示灯
     F_CHARGE_LED,
+    // 市电指示
+    F_AC_LED,
 
     // 系统人为条件可以充电
     F_MANUAL_CHARGE_ALLOW, // 人为禁止充电
@@ -447,6 +490,17 @@ typedef enum {
     CMD_JIAOZHUN_BAT_I,
     // }}
 
+    // {{
+    // 点亮照明灯板
+    CMD_LIGHT_UP,
+    CMD_TEST_GUN1_UP,
+    CMD_TEST_GUN2_UP,
+    CMD_TEST_GUN1ASSIT_UP,
+    CMD_TEST_GUN2ASSIT_UP,
+    CMD_TEST_GUN1_LOCK_UP,
+    CMD_TEST_GUN2_LOCK_UP,
+    // }}
+
     // {{卡操作
     CMD_CARD_FORMAT,
     CMD_CARD_SET,
@@ -455,6 +509,7 @@ typedef enum {
     // {{{ 故障标记
     // BMS通信故障
     S_BMS_COMM_DOWN,
+    S_BACKCOMM_DOWN,
     // }}}
 
     // {{ 设备安装标志
@@ -526,9 +581,9 @@ typedef enum {
     system_reserve2,
     system_reserve3,
     system_reserve4,
-    system_reserve5,
-    system_reserve6,
-    system_reserve7,
+    S_AC_INPUT_LO,
+    S_AC_INPUT_HI,
+    S_AC_MISS,
     system_reserve8,
     system_reserve9,
     S_AC_SWITCH_TRIP,
@@ -557,8 +612,8 @@ typedef enum {
     system_reserve28,
     system_reserve29,
     system_reserve30,
-    system_reserve31,
-    system_reserve32,
+    S_GUN1_DROPED,
+    S_GUN2_DROPED,
     system_reserve33,
     system_reserve34,
     system_reserve35,
@@ -575,6 +630,13 @@ typedef enum {
     S_END
 }ONTOM_FLAG_SINGLE;
 
+// 异常定义
+typedef enum {
+    // @ .DEF::EXCPT_UART_SELECT_EXCEPTION
+    // select 函数出现异常
+    EXCPT_UART_SELECT_EXCEPTION,
+}ONTOM_EXCEPTIONS;
+
 // 作业信号
 typedef enum {
     J_BEGIN = 0x00,
@@ -585,8 +647,10 @@ typedef enum {
     JF_GUN_OK,
     // 1: 辅助电源已经上电，0: 辅助电源未上电
     JF_ASSIT_PWR_ON,
-    // 1: 24V辅助电源，0: 12V 辅助电源
-    JF_ASSIT_VOL,
+    // 1: 24V辅助电源，0: 不使用辅助电源
+    JF_ASSIT_12V,
+    // 1: 使用24V辅助电源, 0: 不使用辅助电源
+    JF_ASSIT_24V,
     // 1: 需要辅助电源，0: 不需要辅助电源
     JF_NEED_ASSIT_PWR,
     // 1: 电子锁已经闭合，0: 电子锁未闭合
@@ -595,6 +659,12 @@ typedef enum {
     JF_BMS_DRV_BINDED,
     // 1: BMS允许充电，0：BMS不允许充电
     JF_CHARGE_BMS_ALLOW,
+    // 1: 已经发送计费请求, 0: 未发送计费请求
+    JF_BILLING_TX,
+    // 1: 作业计费完成， 0: 作业计费未完成
+    JF_BILLING_DONE,
+    // 1: 计费超时， 0: 计费未超时
+    JS_BILLING_TIMEOUT,
     // 1: 作业中止，0: 作业不中止
     JF_CMD_ABORT,
     // 1: 作业退出, 0：作业未退出
@@ -660,6 +730,9 @@ typedef enum {
     JS_BMS_RX_BSD_TIMEOUT,
     // 1: 已经发送CSD，0:还未发送CSD
     JF_BMS_TX_CSD,
+
+    // BMS通信故障
+    JS_BMS_COMM_ERR,
     // }}
 
     //{{ BMS 控制逻辑标记
@@ -690,6 +763,11 @@ typedef enum {
     // 写线程引用
     JR_WR_THREAD_REF,
     // }}
+    
+    // 已经上传退出状态
+    JF_UPLOAD_EXIT_STATUS,
+    // BMS 请求切换主副系统
+    JF_NEED_SWITCH_SYSTEM,
 
     J_END
 }JOB_FLAG_SINGLE;
@@ -767,107 +845,85 @@ struct user_card {
     }card;
 };
 
+// 用户认证结构
+struct user_auth {
+    // 认证序列号, 每认证一次自加1
+    unsigned int auth_id;
+    // 认证请求时戳
+    time_t auth_request_tsp;
+    // 发送认证时戳
+    time_t auth_tx_tsp;
+    // 认证返回时戳
+    time_t auth_return_tsp;
+    // 认证超时时长, 默认5秒
+    unsigned int ttl;
+    // 动作次数
+    unsigned int verbose;
+
+    // 卡类型
+    unsigned char card_type;
+    // 卡序号
+    char card_sn[32];
+    // 用户输入密码
+    char user_input_passwd[32];
+
+    // 认证返回结果
+    unsigned char auth_return_value;
+    // 返回提示
+    const char *auth_msg;
+    // 是否允许充电
+    int auth_allow_charge;
+    // 账户余额
+    unsigned int auth_return_remain;
+    // 账户剩余电量
+    unsigned int auth_return_kwh;
+};
+
+// 充电请求
+struct charge_request {
+    // 发送请求的时戳
+    time_t tx_request_tsp;
+    // 请求时戳
+    time_t request_tsp;
+    // 充电枪
+    CHARGE_GUN_SN gun;
+    // 车辆编号
+    char vin[18];
+    // 车牌号
+    char licence[9];
+    // 卡类型
+    unsigned char card_type;
+    // 账户
+    char account[33];
+    // 密码
+    char passwd[17];
+    // 充电模式
+    unsigned char service_mode;
+    // 充电参数
+    unsigned short service_param;
+
+    // 响应时戳
+    time_t ack_tsp;
+    // 操作代码
+    unsigned char result;
+    // 等待充电
+    unsigned char action;
+    // 预扣金额
+    double pre_pay;
+    // 账户余额
+    double remian;
+    // 允许充电时长
+    unsigned int allow_time;
+    // 允许充电电量
+    unsigned short allow_kwh;
+    // 交易流水号
+    unsigned char billing_sn[33];
+};
 
 /*
  * 综合采样盒通信数据定义
  */
 struct MDATA_ACK {
-#if 0
-    // 数据包起始魔数
-    unsigned char magic[5];
-    // 地址
-    unsigned char addr;
-    // 载荷长度
-    unsigned char len;
-
-    // 母线电压
-    unsigned short V_mx;
-    // 电池电压
-    unsigned short V_bat;
-    // 电池电流
-    unsigned short I_bat;
-    // 温度
-    unsigned short temp;
-    // 湿度
-    unsigned short wet;
-    // 保留字
-    unsigned short resv[2];
-    // 采样盒软件版本号
-    unsigned char  version;
-
-    // 母线电压过高故障，0： 正常，1：过高
-    unsigned char yx_mx_V_high:1;
-    // 母线欠压故障，0: 正常，1：欠压
-    unsigned char yx_mx_V_low:1;
-    // 母线短路故障
-    unsigned char yx_mx_short_fault:1;
-    // 电池电压过高
-    unsigned char yx_bat_V_high:1;
-    // 电池电压过低
-    unsigned char yx_bat_V_low:1;
-    // 电池链接短路
-    unsigned char yx_bat_short_fault:1;
-    // 电池反接
-    unsigned char yx_bat_revers_conn:1;
-    // 电池电流过高
-    unsigned char yx_bat_I_high:1;
-
-    // 电池绝缘故障
-    unsigned char yx_bat_institude_fault:1;
-    // 辅助电源状态
-    unsigned char yx_assit_power_stat:1;
-    // 温度状态，00: 正常，01： 过高 10： 过低
-    unsigned char yx_temprature:2;
-    // 湿度状态，00： 正常，01：过湿, 10: 过干
-    unsigned char yx_wet_rate:2;
-    unsigned char yx_prtc2_rsv:2;
-
-    unsigned char yx_prtc3_rsv;
-
-    // 总输出熔断器故障，0：无故障，1：熔断
-    unsigned char yx_rdq:1;
-    // 总直流输出跳闸, 0: 正常， 1： 跳闸
-    unsigned char yx_dc_output_tiaozha:1;
-    // 一路输出跳闸，0：正常，1：跳闸
-    unsigned char yx_dc_output_tiaozha1:1;
-    // 二路输出跳闸，0：正常，1：跳闸
-    unsigned char yx_dc_output_tiaozha2:1;
-    // 防雷器故障，0：无故障，1：防雷器故障
-    unsigned char yx_flq:1;
-    unsigned char yx_prtc4_rsv:3;
-
-    unsigned char yx_prtc5_rsv;
-
-    // 交流输入合闸状态，0：分闸，1：合闸
-    unsigned char yx_ac_hezha:1;
-    // 加热状态，0：未加热，1：加热
-    unsigned char yx_heater_stat:1;
-    // 风扇状态，0：未启动，1：启动
-    unsigned char yx_fan_stat:1;
-    // 直流输入总开关合闸，0：分闸，1：合闸
-    unsigned char yx_dc_output_hz:1;
-    // 1#充电枪输出合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_1_hezha_stat:1;
-    // 1#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
-    // @ GUN_CONN_STAT
-    unsigned char yx_gun_1_conn_stat:2;
-    // 1#充电枪辅助电源合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_1_assit_power_hezha:1;
-
-    // 2#充电枪输出合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_2_hezha_stat:1;
-    // 2#充电枪连接状态，00：未连接，11：链接,01:连接保护，10：连接异常
-    // @ GUN_CONN_STAT
-    unsigned char yx_gun_2_conn_stat:2;
-    // 2#充电枪辅助电源合闸状态，0：未合闸，1：合闸
-    unsigned char yx_gun_2_assit_power_hezha:1;
-    unsigned char yx_run2_rsv:4;
-
-    unsigned char yx_run3_rsv;
-    unsigned char unused;
-
-    unsigned short crc;
-#else
     // 数据包起始魔数
     unsigned char magic[4];
     // 地址
@@ -959,7 +1015,6 @@ struct MDATA_ACK {
     unsigned char unused;
 
     unsigned short crc;
-#endif
 };
 
 // 下发数据包
@@ -1313,13 +1368,22 @@ struct pgn7424_CSD {
 
 // 错误报文分类
 // BMS 错误报文
-struct pgn7680_CEM {
-
+struct pgn7680_BEM {
 };
 
 // 充电机错误报文
-struct pgn7936 {
-
+struct pgn7936_CEM {
+    u8 brm_timeout:2;
+    u8 brm_unused:6;
+    u8 bcp_timeout:2;
+    u8 bro_timeout:2;
+    u8 bcp_unused:4;
+    u8 bcs_timeout:2;
+    u8 bcl_timeout:2;
+    u8 bst_timeout:2;
+    u8 bcs_unused:2;
+    u8 bsd_timeout:2;
+    u8 bsd_unused:6;
 };
 
 #pragma pack()
@@ -1503,6 +1567,19 @@ struct bms_struct {
     struct can_pack_generator *generator;
 };
 
+typedef enum {
+    // 储值卡
+    ACCOUNT_PRESTORCARD = 0x00,
+    // BOSS帐号
+    ACCOUNT_BOSS_ID = 0x01,
+    // 支付宝帐号
+    ACCOUNT_ALIPAY_ID = 0x11,
+    // 微信号
+    ACCOUNT_WEIXIN_ID = 0x12,
+    // 银行卡
+    ACCOUNT_BANK_ID = 0x13
+}ACCOUNT_TYPE;
+
 // 充电计费方式
 struct billing_methord {
     // 计费方式
@@ -1515,6 +1592,17 @@ struct billing_methord {
         // 设定充电目标电量, 0 - 100
         double set_kwh;
     }option;
+
+    // 交易账单号
+    unsigned char billing_sn[32 + 1];
+    // 帐号类型
+    ACCOUNT_TYPE account_type;
+    // 帐号
+    unsigned char account[32 + 1];
+    // 密码
+    unsigned char passwd[16 + 1];
+    // 预扣金额
+    double pre_hold_amount;
 };
 
 // 采样盒 通讯管理描述结构，JOB的下属成员结构
@@ -1558,6 +1646,12 @@ struct meter_data {
     double kwh_ping;
     // 谷电能
     double kwh_gu;
+
+    // 电流
+    double current[2];
+
+    // 电流有效
+    int current_ok[2];
 };
 
 // 作业提交结构
@@ -1575,6 +1669,7 @@ struct job_commit_data {
     char card_passwd[16];        // 卡片密码
     CHARGE_GUN_SN charge_gun;    // 充电枪选择
     CHARGE_MODE charge_mode;     // 选择自动或是手动
+    int assit_power_level;
     double manual_set_charge_volatage; // 手动设置充电电压, 手动充电有效
     double manual_set_charge_current;  // 手动设置充电电流, 手动充电有效
     BILLING_MODE  biling_mode; // 充电计费方式
@@ -1598,12 +1693,16 @@ struct charge_job {
     CHARGE_GUN_SN job_gun_sn;
     // 充电模式
     CHARGE_MODE charge_mode;
+    // 辅助电源大小
+    int assit_power_level;
     // 通信CAN名称
     char job_can_dev_name[32];
     // 充电起始时戳， 闭合充电开关的那一刻
     time_t charge_begin_timestamp;
     // 充电结束时戳， 断开充电开关的那一刻
     time_t charge_stop_timestamp;
+    // 中止充电的那一刻
+    time_t charge_abort_timestamp;
     // 转为实施状态时的时戳, 执行实施函数的那一刻
     time_t charge_implemention_timestamp;
     // BMS握手成功的时戳, 接收到第一次BRM的时刻
@@ -1614,6 +1713,9 @@ struct charge_job {
     double charge_begin_kwh_data;
     // 终止充电时的电表度数
     double charge_exit_kwh_data;
+
+	// 退出延时时戳
+	time_t delay_exit_tsp;
 
     // 当前充电阶段使用的电能
     double section_kwh;
@@ -1626,8 +1728,18 @@ struct charge_job {
     // 已经消费的数额, 按元记，精确到分
     double charged_money;
 
+    // 当前充电电压
+    double charge_voltage;
+    // 当前充电电流
+    double charge_current;
+
     // 结构体引用计数
     unsigned int ref_nr;
+
+    // CAN读句柄
+    int can_read_handle;
+    // CAN写句柄
+    int can_write_handle;
 
     // {{ 充电控制参数
     double need_V;
@@ -1684,6 +1796,11 @@ struct task_config {
     }charger;
 };
 
+// 代码跟踪
+struct code_trace {
+    volatile unsigned char single[16];
+};
+
 //充电任务描述, 详细描述了系统的配置参数
 struct charge_task {
     // 已经编译为多线程安全模式，所以不用加锁
@@ -1712,6 +1829,11 @@ struct charge_task {
     UI_PAGE uipage;
     // 当处于作业详情页刷卡时的当前作业ID
     unsigned int ui_job_id;
+
+    // 后台认证结构
+    struct user_auth auth;
+    // 请求充电
+    struct charge_request request;
 
     // 当前正在执行的充电任务
     struct charge_job *job[CONFIG_SUPPORT_CHARGE_JOBS];
@@ -1746,6 +1868,9 @@ struct charge_task {
     volatile unsigned char single[64];
     // 系统前一次信号状态，用来做状态跳变比较
     volatile unsigned char pre_single[64];
+
+    // 代码跟踪
+    struct code_trace trace;
 
     // {{ 以下为充电桩系统监控的配置数据
     SYSTEM_TYPE sys_type;
@@ -1821,8 +1946,8 @@ struct charge_task {
     unsigned int flq_xishu;
     // 模块功率因数
     double module_power_fact;
-    // 单台模块功率
-    double single_module_power;
+    // 单台模块额定电流
+    double single_module_A;
     // 单台模块最大允许电流
     double single_module_max_I;
     // 充电触发压差
@@ -1840,8 +1965,36 @@ struct charge_task {
     double bus_read_I;
     // }}
 
+#define KAICHU_SYSCHG          0
+#define KAICHU_SYSERR          1
+#define KAICHU_GUN1_SW         2
+#define KAICHU_GUN2_SW         3
+#define KAICHU_GUN1_ASSIT_12   4
+#define KAICHU_GUN1_ASSIT_24   5
+#define KAICHU_GUN2_ASSIT_12   6
+#define KAICHU_GUN2_ASSIT_24   7
+#define KAICHU_GUN1_LOCK       8
+#define KAICHU_GUN2_LOCK       9
+#define KAICHU_AC_LED          10
+#define KAICHU_LIGHT           11
+#define KAICHU_EXT1            12
+#define KAICHU_EXT2            13
+#define KAICHU_EXT3            14
+#define KAICHU_EXT4            15
+
+    // 开出端口掩码
+    unsigned short kaichu_mask[16];
+    // 开出端口映射
+    unsigned int kaichu_map[16];
+    // 辅助电源投切方式
+    DOUBLE_ASSIT_SELECT_METHORD assit_select_methord;
+
     // 采样板输出端口功能定义
     SIMPLE_BOX_OUT_PORT ctl_port[8];
+
+    // 交流输入过欠压
+    double ac_input_lo;
+    double ac_input_hi;
 
     // 授权序号, BCD 码
     unsigned char bcd_auth_code[17];
@@ -1850,6 +2003,21 @@ struct charge_task {
 
     // 硬件软件配置映射表
     volatile unsigned char h_s_ware_config[8];
+
+    // 本机地址
+    int charger_sn;
+    // 服务器地址
+    char server_addr[32];
+    // 服务器端口
+    int server_port;
+
+    // 照明开启时间
+    char lightup_time[32];
+    // 照明时长
+    double lightup_hours;
+
+    // 交易方式
+    DEAL_METHORD deal_methord;
 };
 
 static inline unsigned int system_power(struct charge_task *tsk) {
@@ -2010,14 +2178,23 @@ static inline unsigned short load_crc(unsigned short cnt, unsigned char *dat)
     return crc;
 }
 
-// 大小端转换
+// 大小端转换, 字
 static inline unsigned short swap_hi_lo_bytes(unsigned short b)
 {
-    unsigned char h = b >> 8, l = b & 0xFF;
-    return (l << 8 | h);
+    return (((b << 8)&0xFF00) | ((b >> 8)&0x00FF));
 }
 #define b2l swap_hi_lo_bytes
 #define l2b swap_hi_lo_bytes
+// 大小端转换, 双字
+static inline unsigned int swap_hiw_low(unsigned int b)
+{
+    return  (0xFF000000&(b << 24)) |
+            (0x00FF0000&(b << 8 )) |
+            (0x0000FF00&(b >> 8 )) |
+            (0x000000FF&(b >> 24));
+}
+#define bb2ll swap_hiw_low
+#define ll2bb swap_hiw_low
 
 static inline CHARGE_GUN_SN __is_gun_phy_conn_ok(struct charge_job *thiz)
 {
@@ -2173,4 +2350,10 @@ struct charge_job* job_search(time_t ci_timestamp);
 struct charge_job * job_select_wait(struct charge_task *tsk, CHARGE_GUN_SN gun);
 struct job_commit_data *job_select_commit(struct charge_task *tsk);
 void job_detach_wait(struct charge_task *tsk);
+
+int job_wait(struct charge_task *, struct charge_job *);
+int job_standby(struct charge_task *, struct charge_job *);
+int job_working(struct charge_task *, struct charge_job *);
+int job_done(struct charge_task *, struct charge_job *);
+int job_billing(struct charge_task *, struct charge_job *);
 #endif /*_CHARGE_INCLUDED_H_*/

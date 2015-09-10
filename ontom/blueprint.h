@@ -205,6 +205,9 @@ struct bp_user {
 
     int (*user_evt_handle)(struct bp_uart *self, struct bp_user *me, BP_UART_EVENT evt,
                            struct bp_evt_param *param);
+
+    // 最后一次发送的时间戳
+    time_t last_tx_tsp;
 };
 
 typedef enum {
@@ -213,7 +216,7 @@ typedef enum {
 }UART_MODE;
 
 // 串口上最多可以绑定16个适用对象
-#define MAX_BINDER    16
+#define MAX_BINDER    32
 /*
  * 串口描述结构
  */
@@ -243,12 +246,6 @@ struct bp_uart {
     int (*bp_evt_handle)(struct bp_uart *self, BP_UART_EVENT evt,
                          struct bp_evt_param *param);
     BP_UART_ROLE role;
-    // 接收超时定时器
-    struct Hachiko_food rx_seed;
-    // 发送完成定时器
-    struct Hachiko_food tx_seed;
-    // 发送节奏定时器
-    struct Hachiko_food tx_speed;
 
     // 接收参数
     struct bp_evt_param rx_param;

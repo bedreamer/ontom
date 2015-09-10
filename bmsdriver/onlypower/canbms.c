@@ -224,8 +224,10 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CCS);
-    struct pgn4608_CCS ccs = {0};
+    struct pgn4608_CCS ccs;
     struct charge_task *tsk = thiz->tsk;
+
+    memset(&ccs, 0, sizeof(ccs));
 
     if ( thiz->job_gun_sn == GUN_SN0 ) {
         if ( tsk->measure[0] ) {
@@ -333,9 +335,62 @@ int gen_packet_PGN7936(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = gen_search(thiz->bms.generator,
                                                 thiz->bms.can_pack_gen_nr, PGN_CEM);
-    (void)thiz;
     (void)param;
     (void)gen;
+
+    struct pgn7936_CEM cem = {0};
+    int err = 0;
+
+    switch ( thiz->bms.charge_stage ) {
+    case CHARGE_STAGE_INVALID:
+        param->evt_param = EVT_RET_ERR;
+        break;
+    case CHARGE_STAGE_HANDSHACKING:
+        if ( bit_read(thiz, JS_BMS_RX_BRM_TIMEOUT) ) {
+            cem.brm_timeout = 1;
+            err ++;
+        }
+        break;
+    case CHARGE_STAGE_CONFIGURE:
+        if ( bit_read(thiz, JS_BMS_RX_BCP_TIMEOUT) ) {
+            cem.bcp_timeout = 1;
+            err ++;
+        }
+        if ( bit_read(thiz, JS_BMS_RX_BRO_TIMEOUT) ) {
+            cem.bro_timeout = 1;
+            err ++;
+        }
+        break;
+    case CHARGE_STAGE_CHARGING:
+        if ( bit_read(thiz, JS_BMS_RX_BCS_TIMEOUT) ) {
+            cem.bcp_timeout = 1;
+            err ++;
+        }
+        if ( bit_read(thiz, JS_BMS_RX_BCL_TIMEOUT) ) {
+            cem.bro_timeout = 1;
+            err ++;
+        }
+        if ( bit_read(thiz, JS_BMS_RX_BST_TIMEOUT) ) {
+            cem.bro_timeout = 1;
+            err ++;
+        }
+        break;
+    case CHARGE_STAGE_DONE:
+        if ( bit_read(thiz, JS_BMS_RX_BSD_TIMEOUT) ) {
+            cem.bro_timeout = 1;
+            err ++;
+        }
+        break;
+    default:
+        param->evt_param = EVT_RET_ERR;
+        break;
+    }
+    if ( err ) {
+        memcpy(param->buff.tx_buff, &cem, sizeof(struct pgn7936_CEM));
+        param->buff_payload = gen->datalen;
+        param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
+        param->evt_param = EVT_RET_OK;
+    }
     return 0;
 }
 
@@ -600,6 +655,8 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                                        thiz->bms.frame_speed_rx,
                                        thiz->bms.frame_speed_tx);
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                            // 设置BMS通讯超时标志
+                            bit_set(thiz, JS_BMS_COMM_ERR);
                         } else {
                             me->can_silence = 0;
                         }
@@ -616,6 +673,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                         if ( me->can_pgn == PGN_BCP && !bit_read(thiz, JS_BMS_RX_BCP_TIMEOUT) ) {
                             bit_set(thiz, JS_BMS_RX_BCP_TIMEOUT);
                             bit_clr(thiz, JF_BMS_RX_BCP);
+                            bit_set(thiz, JS_BMS_COMM_ERR);
                         } else {
                             me->can_silence = 0;
                         }
@@ -642,6 +700,7 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                                        me->can_tolerate_silence,
                                        thiz->bms.frame_speed_rx,
                                        thiz->bms.frame_speed_tx);
+                            bit_set(thiz, JS_BMS_COMM_ERR);
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
                         } else {
                             me->can_silence = 0;
@@ -683,6 +742,7 @@ int about_packet_reciev_done(struct charge_job *thiz, struct bms_event_struct *p
 {
     struct can_pack_generator *gen = NULL;
 
+    bit_clr(thiz, JS_BMS_COMM_ERR);
     switch ( param->can_id & 0x00FF00 ) {
     case PGN_BRM :// 0x000200, BMS 车辆辨识报文
         if ( bit_read(thiz, JS_BMS_RX_BRM_TIMEOUT) ) {

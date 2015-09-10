@@ -16,7 +16,7 @@ void *pandora_main_proc(void *socket_desc)
 
     while ( 1  ) {
         tv.tv_sec = 2;
-        tc.tc_usec = 0;
+        tv.tv_usec = 0;
         FD_ZERO(&rfds);
         FD_ZERO(&wrds);
 
@@ -26,17 +26,10 @@ void *pandora_main_proc(void *socket_desc)
             // 有数据可读
             if ( FD_ISSET(ss->socket_handle, &rfds) ) {
                 rd = recv(ss->socket_handle, &rx, TP_BUFF_SIZE, 0);
-                if ( rd < TP_BUFF_SIZE ) {
+                if ( rd == TP_BUFF_SIZE ) {
+                    session_push_bytes(&ss->session_rx_buff, &rx, rd);
                 } else {
-                    if ( rx.size > TP_PAYLOAD_SIZE ) {
-                    } else if ( rx.timestamp > time() ) {
-                    } else {
-                        if ( rx.pid == PID_WORKING_JOB ) {
-
-                        } else if ( rx.pid == PID_WORKING_JOB + 1 ) {
-
-                        }
-                    }
+                    log_printf(WRN, "PANDORA: recv error.");
                 }
             }
             // 可以写数据
@@ -99,7 +92,7 @@ reinit:
         if ( ss == NULL ) {
         } else {
             memset(ss, 0, sizeof(struct session_struct));
-            ss->connected_tstp = time();
+            ss->connected_tstp = time(NULL);
             ss->socket_handle = client_sock;
             ss->stype = SESSION_UNDEFINED;
             ss->session_id = session_count ++;

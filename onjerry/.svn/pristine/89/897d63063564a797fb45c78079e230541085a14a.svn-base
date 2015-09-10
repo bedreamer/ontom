@@ -1,0 +1,17 @@
+..\Output\main.o: src\main.c
+..\Output\main.o: .\inc\UART.h
+..\Output\main.o: ..\CMSIS\stm32f10x.h
+..\Output\main.o: ..\CMSIS\core_cm3.h
+..\Output\main.o: E:\Keil 4 ARM\ARM\RV31\Inc\stdint.h
+..\Output\main.o: ..\CMSIS\system_stm32f10x.h
+..\Output\main.o: .\inc\Self_Modbus.h
+..\Output\main.o: .\inc\MyTypedef.h
+..\Output\main.o: .\inc\AD_Sample.h
+..\Output\main.o: .\inc\Stat_control.h
+..\Output\main.o: .\inc\Timer.h
+..\Output\main.o: .\inc\DATA_pro.h
+..\Output\main.o: .\inc\ADS795x.h
+..\Output\main.o: .\inc\Flash.h
+..\Output\main.o: .\inc\Cal_Sampdata.h
+..\Output\main.o: .\inc\CAN.h
+..\Output\main.o: .\inc\Watchdog.h

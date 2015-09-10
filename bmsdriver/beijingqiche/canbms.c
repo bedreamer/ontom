@@ -187,11 +187,15 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
     param->buff_payload = gen->datalen;
     param->can_id =  gen->prioriy << 26 | gen->can_pgn << 8 | CAN_TX_ID_MASK | CAN_EFF_FLAG;
 
-    param->evt_param = EVT_RET_OK;
+    if ( bit_read(thiz, JF_BMS_BRO_OK) ) {
+        param->evt_param = EVT_RET_OK;
+        bit_set(thiz, JF_BMS_TX_CRO);
+    } else {
+        param->evt_param = EVT_RET_INVALID;
+    }
 
     gen->can_counter ++;
 
-    bit_set(thiz, JF_BMS_TX_CRO);
 
     if ( bit_read(thiz, JF_CHG_TRM_CHARGE) ) {
         if ( thiz->bms.charge_stage != CHARGE_STAGE_CHARGING ) {
@@ -203,6 +207,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
             gen_packet_PGN6656(thiz, param);
             gen->heartbeat = 0;
         }
+        param->evt_param = EVT_RET_OK;
     }
 
     if ( bit_read(thiz, JF_BMS_TRM_CHARGE) ) {
@@ -215,6 +220,7 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
             gen_packet_PGN6656(thiz, param);
             gen->heartbeat = 0;
         }
+        param->evt_param = EVT_RET_OK;
     }
 
     return 0;
@@ -224,8 +230,10 @@ int gen_packet_PGN2560(struct charge_job * thiz, struct bms_event_struct* param)
 int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 {
     struct can_pack_generator *gen = gen_search(thiz->bms.generator, thiz->bms.can_pack_gen_nr, PGN_CCS);
-    struct pgn4608_CCS ccs = {0};
+    struct pgn4608_CCS ccs;
     struct charge_task *tsk = thiz->tsk;
+
+    memset(&ccs, 0, sizeof(ccs));
 
     if ( thiz->job_gun_sn == GUN_SN0 ) {
         if ( tsk->measure[0] ) {
@@ -257,9 +265,15 @@ int gen_packet_PGN4608(struct charge_job * thiz, struct bms_event_struct* param)
 
     if ( !bit_read(thiz, JF_CHG_TRM_CHARGE) &&
          !bit_read(thiz, JF_BMS_TRM_CHARGE) ) {
-        param->evt_param = EVT_RET_OK;
-        gen->can_counter ++;
-        bit_set(thiz, JF_BMS_TX_CCS);
+
+        if ( bit_read(thiz, JF_BMS_RX_BCS) &&
+             bit_read(thiz, JF_BMS_RX_BCL) ) {
+            param->evt_param = EVT_RET_OK;
+            gen->can_counter ++;
+            bit_set(thiz, JF_BMS_TX_CCS);
+        } else {
+            param->evt_param = EVT_RET_INVALID;
+        }
     } else {
         param->evt_param = EVT_RET_INVALID;
     }
@@ -600,6 +614,8 @@ void heart_beart_notify_proc(Hachiko_EVT evt, void* _private, const struct Hachi
                                        thiz->bms.frame_speed_rx,
                                        thiz->bms.frame_speed_tx);
                             thiz->bms.charge_stage = CHARGE_STAGE_HANDSHACKING;
+                            // 设置BMS通讯超时标志
+                            // bit_set(thiz, JS_BMS_COMM_ERR);
                         } else {
                             me->can_silence = 0;
                         }

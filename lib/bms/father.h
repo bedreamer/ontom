@@ -166,10 +166,6 @@ struct bmsdriver {
     unsigned int can_pack_gen_nr_copy;
     // 数据包生成器数据库拷贝
     struct can_pack_generator *generator_copy;
-#ifdef _USE_NEW_FRAMEWORK
-    struct frame_node *rx_frames;
-    struct frame_node *tx_frames;
-#endif //_USE_NEW_FRAMEWORK
     struct bmsdriver *next;
 };
 

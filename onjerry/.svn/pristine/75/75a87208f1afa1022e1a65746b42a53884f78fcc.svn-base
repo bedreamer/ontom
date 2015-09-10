@@ -1,0 +1,221 @@
+#include "Timer.h"
+#include "UART.h"
+#include "ADS795x.h"
+#include "AD_Sample.h"
+#include "Stat_control.h"
+
+/*RXtimememb为接收过程使用定时器计数的成员，
+bit0表示接收状态退出功能是否加入计数，
+bit1表示接收状态恢复计时，
+*/
+/*TXtimememb为发送过程使用定时器计数的成员，
+bit0表示发送退出计时，
+bit1表示接收完到发送开始的延时定时
+*/
+/*Systimememb为当前通道定时采样定时器计数的成员，
+bit0表示AD定时采样使能
+bit1表示通讯中断计数使能
+注意:由于每位定时的功能不同，需要在外部读取写回
+操作时加锁(关全局中断或者是定时器1中断)
+*/
+uint8_t RXtimememb = 0x00;
+uint8_t TXtimememb = 0x00;
+uint8_t Systimememb = 0x00;
+//uint16_t U0_RXquittime = 0xFFFF;//接收状态退出计时
+uint16_t U1_RXresettime= 0xFFFF;//接收状态重置计时
+uint16_t U1_TXresettime = 0xFFFF;//发送状态重置计时
+//uint16_t U1_TXstarttime = U1_TXSTARTCOUNT;//发送状态开始计时
+uint16_t ADSMstartcont = SAM_CHANNEL_TIMERCOUNT;//AD采样计数
+uint16_t COMMbreaktime = U1_COMMBREAKCOUNT;//通讯中断计时
+/*typedef struct
+{
+  __IO uint16_t CR1;
+  uint16_t  RESERVED0;
+  __IO uint16_t CR2;
+  uint16_t  RESERVED1;
+  __IO uint16_t SMCR;
+  uint16_t  RESERVED2;
+  __IO uint16_t DIER;
+  uint16_t  RESERVED3;
+  __IO uint16_t SR;
+  uint16_t  RESERVED4;
+  __IO uint16_t EGR;
+  uint16_t  RESERVED5;
+  __IO uint16_t CCMR1;
+  uint16_t  RESERVED6;
+  __IO uint16_t CCMR2;
+  uint16_t  RESERVED7;
+  __IO uint16_t CCER;
+  uint16_t  RESERVED8;
+  __IO uint16_t CNT;
+  uint16_t  RESERVED9;
+  __IO uint16_t PSC;
+  uint16_t  RESERVED10;
+  __IO uint16_t ARR;
+  uint16_t  RESERVED11;
+  __IO uint16_t RCR;
+  uint16_t  RESERVED12;
+  __IO uint16_t CCR1;
+  uint16_t  RESERVED13;
+  __IO uint16_t CCR2;
+  uint16_t  RESERVED14;
+  __IO uint16_t CCR3;
+  uint16_t  RESERVED15;
+  __IO uint16_t CCR4;
+  uint16_t  RESERVED16;
+  __IO uint16_t BDTR;
+  uint16_t  RESERVED17;
+  __IO uint16_t DCR;
+  uint16_t  RESERVED18;
+  __IO uint16_t DMAR;
+  uint16_t  RESERVED19;
+} TIM_TypeDef;*/
+
+//该工程中TIMER1中断为可抢占的最高级中断，所以不需要对全局性的变量修改加锁
+__irq void TIM1_UP_IRQHandler(void)
+{
+    static uint32_t predata=0xFFFFFFFF;
+    static uint8_t cont;
+    static uint16_t cont1;
+    TIM1->SR &= 0xFFFE;
+    if(cont1++ >= (uint16_t)500)
+    {
+        GPIOC->ODR ^= GPIO_ODR_ODR13;        
+        cont1 = (uint16_t)0;
+    }
+    if((Systimememb & 0x01) == 0x01)//AD采样计数控制
+    {
+        ADSMstartcont--;
+        if(ADSMstartcont > SAM_CHANNEL_TIMERCOUNT)//超过计数部分算延时
+        {
+            ;
+        }
+        else if(ADSMstartcont != 0x0000)
+        {
+            ADS7953_SMstart();
+        }
+        else//当前这组数据采样已经结束，开始数据处理
+        {
+            if((predata - Samp_Databuff) < 100 * AD_DATA_EXPAND ||(Samp_Databuff-predata) < 100 * AD_DATA_EXPAND)//上一次采样值与当前采样值比较，可保证切换通道后电压值稳定
+            {
+                Samp_DataArr[Samp_ADdata_Stream.now].ADdata = Samp_Databuff / SAM_CHANNEL_TIMERCOUNT + (uint32_t)((Samp_Databuff % SAM_CHANNEL_TIMERCOUNT) / (uint32_t)(SAM_CHANNEL_TIMERCOUNT/2));
+                Systimememb &= 0xFE;
+                ADSMstartcont = 0x0000;
+                Samp_Databuff = 0x00000000;
+                predata = 0xFFFFFFFF;
+                cont = 0x00;
+            
+            }
+            else//当前采样值还没有稳定，继续下一次采样
+            {
+                predata =  Samp_Databuff;
+                ADSMstartcont = SAM_CHANNEL_TIMERCOUNT;
+                Samp_Databuff = 0x00000000;
+                cont++;
+                ADS7953_SMstart();
+            }
+        }
+    }
+
+    if(((Systimememb & 0x02) == 0x02) && (COMMbreaktime-- == 0x0000))//通讯中断计数
+    {
+         Samp_ADdata_Stream.SysFault |= 0x0001;
+         Systimememb &= 0xFD;
+         COMMbreaktime = U1_COMMBREAKCOUNT;
+    }
+    
+    switch(RXtimememb)
+    {
+        case 0x00://无接收状态下的计数
+        break;
+        case 0x02://字节间超时计数状态
+        if(((U1_RXfin & 0x03) == 0x00) && (U1_RXresettime-- == 0x0000))//总线接收关闭超时计数时间到或者字节间接收超时计数时间到
+        {
+            if(!(USART1->SR & USART_SR_RXNE))//判断接收是否悬起
+            {
+                U1_RXfin |= 0x01;//置位字节间超时标志,进入帧间超时计数状态，判断接收的数据帧是否为可靠帧
+                U1_RXresettime = U1_RXQUITCOUNT;//为接收状态重置计时赋值接收退出时间
+                RXtimememb = 0x01;//开启接收帧可靠确认计数(开启接收状态退出计时)
+            }
+            else//接收已经悬起，说明在字节间接收超时又收到了数据
+            {
+                U1_RXresettime = 0xFFFF;//计时时间置最大
+                RXtimememb = 0x00;//关闭UART计时，等待进入接收中断处理
+            }         
+        }
+        return;
+        case 0x01://接收状态退出计时
+         if(((U1_RXfin & 0x03) == 0x01) && (U1_RXresettime-- == 0x0000))//接收的数据帧为可靠帧
+        {
+            if(!(USART1->SR & USART_SR_RXNE))//判断接收是否悬起
+            {
+                U1_RXfin |= 0x02;//置位可靠接收到数据帧标志
+                RXtimememb = 0x00;//关闭了接收帧可靠确认计时
+                U1_RXresettime = 0xFFFF;//接收重置时间置最大
+                UART1_RXDISEN;//关闭UART接收
+                USART1->SR &= ~USART_SR_RXNE;//清可能的接收中断标志
+            }
+            else//在Timer中断处理时接收中断悬起
+            {
+                RXtimememb = 0x00;//关闭UART计时，等待进入接收中断处理
+                U1_RXresettime = 0xFFFF;//计时时间置最大
+            }
+
+        }
+        return;
+        case 0x03://接收错误总线关闭到恢复计时
+        if(((U1_RXfin & 0x03) == 0x00) && (U1_RXresettime-- == 0x0000))
+        {
+            RXtimememb &= 0xFC;
+            U1_RXfin = 0x02;//转化到重新开始接收状态
+            UART1_RXEN;//开启接收
+            U1_RXresettime = 0xFFFF;//接收重置时间置最大
+        }
+        return;
+        default:
+        break;
+    }
+   
+    switch(TXtimememb)//数据帧发送超时功能加入计数
+    {
+        case 0x00://无发送状态下的计数
+        break;
+        case 0x01:
+        if(((U1_TXfin & 0x03) == 0x01) && (U1_TXresettime -- == 0x0000))//数据帧发送超时计数时间到
+        {
+            TXtimememb = 0x00; 
+            U1_TXfin |= 0x02;//置位发送超时标志，该标志对发送无影响，只是一个告警
+            U1_TXresettime = U1_TXTIMEOUTCOUNT;
+        }
+        return;
+        case 0x02:
+        if(((U1_TXfin & 0x03) == 0x01) && (U1_TXresettime -- == 0x0000))//数据帧开始发送延时时间到
+        {
+            TXtimememb &= 0x00; 
+            U1_TXfin |= 0x08;//置位开始发送使能标志;
+            U1_TXresettime = U1_TXSTARTCOUNT;
+        }
+        return;
+        default:
+        break;
+    }
+    
+}
+
+void Timer1_Init(void)
+{
+    
+    RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;//使能Timer1时钟
+    DBGMCU->CR |= DBGMCU_CR_DBG_TIM1_STOP;//调试时停止Timer1运行
+    
+    //在计数频率为72MHz的情况下，配置使能定时器1更新中断，且周期为1ms
+    TIM1->ARR = (uint16_t)720; 
+    TIM1->PSC = (uint16_t)10;
+    TIM1->RCR = (uint16_t)10;
+    
+    TIM1->DIER = (uint16_t)0x0001;//使能更新事件中断
+    TIM1->CR1 = (uint16_t)0x0091;//配置减计数模式、边缘对齐模式、使能自动重载缓冲模式使能更新功能、更新源为UG set、上/下溢出、使能定时器
+}
+
+
+

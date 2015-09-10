@@ -27,12 +27,13 @@
 #include <linux/can/raw.h>
 #include <arpa/inet.h>
 
-#include "../../ontom/error.h"
 #include "../../thirdpart/sqlite/sqlite3.h"
-
-#include "list.h"
-#include "config.h"
-#include "Hachiko.h"
-#include "log.h"
+#include "../../ontom/error.h"
+#include "../lj/list.h"
+#include "../lj/config.h"
+#include "../lj/Hachiko.h"
+#include "../lj/log.h"
+#include "../bms/father.h"
+#include "../../ontom/charge.h"
 
 #endif// _LIB__STDAFX_H_

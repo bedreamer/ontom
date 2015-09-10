@@ -115,7 +115,7 @@ sqlite3 *database = NULL;
 // 系统操作日志初始化
 int initlize_system_log(sqlite3 *db, unsigned int maxlog, unsigned int sync_triger)
 {
-    int i;
+    unsigned int i;
     char *pool_base;
     size_t pool_size = sizeof(char *)*maxlog + (MAX_LOG_LEN+1)*maxlog;
 
@@ -176,7 +176,7 @@ int sync_system_log()
     if ( log_pool == NULL || database == NULL ) return ERR_ERR;
 
     if ( records_nr ) {
-        int i = 0, j;
+        unsigned int i = 0, j;
         char tstp[64];
         char *l = NULL;
         char sql[1024] = {0};

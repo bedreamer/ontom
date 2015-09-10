@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>综合采样盒校准</title>
+<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="js/jiaozhun.js"></script>
+<link rel="stylesheet" type="text/css" href="css/page.css" />
+</head>
+<body>
+	<div class="mainbody">
+    	<br /><br /><br />
+        <table align="center" class="show_jiaozhun">
+        	<caption>校准详情</caption>
+            <tr>
+            	<td>当前校准项</td><td>&nbsp;</td><td id="id_name">N/A</td>
+            </tr>
+            <tr>
+            	<td>校准精度</td><td>&nbsp;</td><td id="id_jingdu">5/1000</td>
+            </tr>
+            <tr>
+            	<td>校准进度</td><td>&nbsp;</td><td id="id_ps">N/A</td>
+            </tr>
+            <tr>
+            	<td>当前校准参数</td><td>&nbsp;</td><td id="id_param">N/A</td>
+            </tr>
+            <tr>
+            	<td>状态</td><td>&nbsp;</td><td id="id_status">N/A</td>
+            </tr>
+            <tr>
+            	<td>
+                <a href="#" id="id_start"><div id="id_btn_start" class="button">开始自动校准</div></a>
+                </td><td>&nbsp;</td>
+                <td>
+                <a href="#"  id="id_done"><div class="button">完成校准</div></a>
+                </td>
+            </tr>
+			<tr>
+            	<td>
+                <a href="#" id="id_test"><div id="id_btn_test" class="button">测试校准结果</div></a>
+                </td>
+				<td id="id_text_result">&nbsp;</td>
+            </tr>
+            <tr>
+            	<td>
+                	<a href="#" id="id_jingdu_add"><div class="button">降低精度(-)</div></a>
+                </td>
+				<td>
+                	<a href="#" id="id_jingdu_sub"><div class="button">增加精度(+)</div></a>
+                </td>
+            </tr>
+        </table>
+        <br />
+    </div>
+</body>
+</html>

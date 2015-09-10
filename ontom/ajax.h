@@ -16,8 +16,8 @@ struct ajax_xml_struct {
 
     // http 请求连接
     struct mg_connection *xml_conn;
-	// XML缓冲区，最大为4K
-	char iobuff[XML_IO_SIZE];
+    // XML缓冲区，最大为4K
+    char iobuff[XML_IO_SIZE];
     // 输出临时文件
     FILE * ofile;
 };
@@ -63,5 +63,6 @@ int ajax_battery_status_xml_proc(struct ajax_xml_struct *);
 int ajax_autheticate_xml_proc(struct ajax_xml_struct *);
 int ajax_alarm_xml_proc(struct ajax_xml_struct *);
 int ajax_auth_proc(struct ajax_xml_struct *thiz);
-
+int ajax_job_auth_json_proc(struct ajax_xml_struct *thiz);
+int ajax_job_request_json_proc(struct ajax_xml_struct *thiz);
 #endif /*_AJAX_DEF_INCLUDED_H*/

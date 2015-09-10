@@ -1,0 +1,15 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+E:\SVN\onjerry\USER\Changesample.uvproj
+Project File Date:  05/29/2015
+
+<h2>Output:</h2>
+Build target 'Target 1'
+linking...
+Program Size: Code=11544 RO-data=880 RW-data=604 ZI-data=2660  
+FromELF: creating hex file...
+"..\Output\Changesample.axf" - 0 Error(s), 0 Warning(s).
+"E:\stsw-link004\ST-LINK Utility\ST-LINK_CLI.exe" -P E:\SVN\onjerry\Output\Changesample.hex 0x08000000  -Rst -Run

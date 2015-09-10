@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>直流充电桩设置页面</title>
+<link href="css/twoColLiqLtHdr.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="js/settings.js"></script>
+</head>
+<body onload="javascript:setting_main_loop()" oncontextmenu="return false" ondragstart="return false" onselectstart ="return false" onselect="document.selection.empty()" oncopy="document.selection.empty()" onbeforecopy="return false" onmouseup="document.selection.empty()">
+<div class="header">
+	<div class="header_logo_areo">
+    	<a href="index.html"><img src="OEM/imgs/only.png" width="100%" height="100%" /></a>
+    </div>
+    <div class="header_title_text">
+    	<a><div class="header_titile_text_panel" id="id_title">
+        直流充电桩设置页面
+        </div></a>
+    </div>
+</div><!--头-->
+<div class="left">
+	<div class="left_panel">
+        <a href="#"><li id="id_li_system" class="left_li_tab left_li_system">
+        系&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;统</li></a>
+        <a href="#"><li id="id_li_comm" class="left_li_tab left_li_comm">
+        通&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;信</li></a>
+        <a href="#"><li id="id_li_charger" class="left_li_tab left_li_charger">
+        充&nbsp;&nbsp;电&nbsp;&nbsp;机</li></a>
+        <a href="#"><li id="id_li_personal" class="left_li_tab left_li_personal">
+        个&nbsp;&nbsp;性&nbsp;&nbsp;化</li></a>
+        <a href="#"><li id="id_li_kaichu" class="left_li_tab left_li_kaichu">
+        开&nbsp;&nbsp;出&nbsp;&nbsp;量</li></a>
+        <a href="#"><li id="id_li_about" class="left_li_tab left_li_about">关于&amp;版权</li></a>
+    </div>
+</div><!--左边框-->
+<div class="content" id="id_content">
+	<div class="content_panel">
+    	<div class="cls_content_panel cls_content_system" id="id_content_system">
+        	通讯故障!!
+        </div> <!--系统设置页面-->
+    	<div class="cls_content_panel cls_content_comm" id="id_content_comm">
+        	通讯故障!!
+        </div> <!--通信设置页面-->
+    	<div class="cls_content_panel cls_content_charger" id="id_content_charger">
+        	通讯故障!!
+        </div> <!--充电机设置页面-->
+        <div class="cls_content_panel cls_content_personal" id="id_content_personal">
+        	通讯故障!!
+        </div> <!--个性化设置页面-->
+        <div class="cls_content_panel cls_content_kaichu" id="id_content_kaichu">
+        	通讯故障!!
+        </div> <!--开出量设置页面-->
+    	<div class="cls_content_about" id="id_content_about">
+        	<div>
+            	<img style="float:left;margin:20px;top:50px;" src="imgs/back.png" width="200px" height="200px" />
+                <iframe src="OEM/about.html" width="330px;" height="260px" frameborder="0" scrolling="no" style="overflow:hidden"></iframe>
+			<a href="#" id="update"><div class="buttons rbutton cbutton" style="width:240px" align="center">检&nbsp;查&nbsp;更&nbsp;新</div></a>
+			<a href="#" id="export"><div class="buttons bbuttons cbuttons" style="width:240px"  align="center">导&nbsp;出&nbsp;日&nbsp;志</div></a>
+            </div>
+        </div> <!--关于页面-->
+    </div>
+</div><!--主体-->
+<div class="right" id="id_right">
+	<div class="right_panel">
+    <button onclick="javascript:key_push('7')" id="id_b_7" class="buttons">7</button>
+    <button onclick="javascript:key_push('8')" id="id_b_8" class="buttons">8</button>
+    <button onclick="javascript:key_push('9')" id="id_b_9" class="buttons">9</button>
+    <button onclick="javascript:key_push('4')" id="id_b_4" class="buttons">4</button>
+    <button onclick="javascript:key_push('5')" id="id_b_5" class="buttons">5</button>
+    <button onclick="javascript:key_push('6')" id="id_b_6" class="buttons">6</button>
+    <button onclick="javascript:key_push('1')" id="id_b_1" class="buttons">1</button>
+    <button onclick="javascript:key_push('2')" id="id_b_2" class="buttons">2</button>
+    <button onclick="javascript:key_push('3')" id="id_b_3" class="buttons">3</button>
+    <button onclick="javascript:key_push('0')" id="id_b_0" class="buttons">0</button>
+    <button onclick="javascript:key_push('.')" id="id_b_dot" class="buttons">.</button>
+    <button onclick="javascript:key_push('c')" id="id_b_c" class="buttons rbutton">C</button>
+    <button onclick="javascript:key_push('s')" id="id_b_s" class="buttons bbutton cbutton">完成</button>
+    <button onclick="javascript:key_push('r')" id="id_b_r" class="buttons cbutton">还原</button>
+    </div>
+</div><!--右边框-->
+<div class="select_box" id="id_select_box">
+	<div class="select_box_title">参数配置保存</div>
+    <div class="select_box_content" id="id_content_text">
+    </div>
+	<div class="button_panel">
+        <button onclick="javascript:key_push('S')" id="id_b_S" class="buttons Sbuttons">保存并返回</button>
+        <button onclick="/index.html" class="buttons Ebuttons">还原并退出</button>
+        <button onclick="javascript:key_push('C')" id="id_b_C" class="buttons Cbuttons rbutton">取消</button>
+    </div>
+</div> <!--操作选择框-->
+<div class="upgrade_box" id="id_upgrade_box">
+	<div class="select_box_title">系统更新</div>
+    <div class="select_box_content" id="id_upgrade_text"></div>
+</div> <!--更新提示框-->
+</body>
+</html>

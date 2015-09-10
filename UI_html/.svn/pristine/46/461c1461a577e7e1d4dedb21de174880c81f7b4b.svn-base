@@ -1,0 +1,371 @@
+@charset "utf-8";
+body {
+	font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+	background-color: #4E5869;
+	margin: 0;
+	padding: 0;
+	color: #000;
+	width:640px;
+	height:480px;
+	overflow:hidden;
+	background-color:rgba(255, 255, 255, 0.5);
+	background-image:url(../imgs/mainbackground.png);
+	color:#FFF;
+}
+
+/* 设置滚动条的样式 */
+::-webkit-scrollbar {
+    width: 40px;
+}
+/* 滚动槽 */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 5px;
+}
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(128, 128, 128, 0.9);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(255,0,0,0.4);
+}
+
+/*去链接下划线*/
+a, div{
+	text-decoration:none;
+	color:#FFF;
+}
+
+
+.header {
+	position:absolute;
+	left:0;
+	width:100%;
+	height:15%;
+	//background-color:#F00;
+}
+
+.header_logo_areo {
+	position:absolute;
+	left:0;
+	width:30%;
+	height:100%;
+	//background-color:#070;
+}
+
+.header_title_text {
+	position:absolute;
+	left:30%;
+	width:70%;
+	height:100%;
+	//background-color:#007;
+}
+
+.header_title_text {
+	position:absolute;
+	left:35%;
+	top:15px;
+	height:40px;
+	width:60%;
+	text-align:right;
+	font-size:30px;
+	font-weight:bold;
+}
+
+.left {
+	position:absolute;
+	left:0;
+	top:15%;
+	height:85%;
+	width:20%;
+	list-sytle:none;
+	//background-color:#770;
+}
+
+.left_panel {
+	position:absolute;
+	left:5%;
+	top:4%;
+	height:75%;
+	width:95%;
+	font-size:24px;
+	font-weight:bold;
+	//background-color:#707;
+}
+
+.left_li_tab {
+	height:50px;
+	width:100%;
+	line-height:50px;
+	background-color:rgba(0,144,255,0.5);
+	border-radius:8px, 0, 8px, 0;
+}
+
+.left_li_welcom,.left_li_system,.left_li_comm,.left_li_charger {
+	position:relative;
+	margin-bottom:14px;
+}
+
+.left_li_system,.left_li_comm,.left_li_charger,.left_li_about {
+	background-color:rgba(105,105,105,0.5);
+}
+
+.content {
+	position:absolute;
+	top:15%;
+	left:20%;
+	width:75%;
+	height:80%;
+	border-radius:6px;
+	background-color:rgba(0,144,255,0.5);
+	overflow:auto;
+}
+
+.content_panel {
+	position:absolute;
+	width:100%;
+}
+
+.cls_content_system,.cls_content_comm,.cls_content_charger,.cls_content_about, .upgrade_box  {
+	display:none;
+}
+
+.cls_content_about {
+	overflow:hidden;
+}
+
+.cls_content_panel {
+	position:absolute;
+	color:#C39;
+	font-size:24px;
+	font-weight:bold;
+	
+	height:98%;
+	//left:2%;
+	top:2%;
+	width:100%;
+}
+
+.option {
+	position:relative;
+	margin:3px;
+	margin-bottom:6px;
+	border-radius:3px;
+	background-color:rgba(7, 7, 7, 0.4);
+	-webkit-box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 2px 2px 2px rgba(255,255,255, .44);
+	height:45px;
+	line-height:45px;
+}
+
+.first_option {
+	margin-top:15px;
+}
+
+.option_name {
+	position:absolute;
+	float:left;
+	left:10px;
+	//width:40%;
+}
+
+.option_input_panel {
+	position:absolute;
+	float:right;
+	//left:43%;
+	right:2%;
+	width:57%;
+}
+
+.option_radio,.option_radio_head, .option_radio_tail {
+	position:relative;
+	float:right;
+	top:6px;
+	height:33px;
+	line-height:33px;
+	text-align:center;
+	outline-width:medium;
+	margin-left:2px;
+}
+
+.option_radio_head {
+	background-color:rgb(0,144,255);
+}
+
+.option_radio_tail {
+	color:#AAA;
+	background-color:#555;
+}
+
+.cls_input_box {
+	position:relative;
+	float:right;
+
+	margin-top:3px;
+	font-size:24px;
+	width:70px;
+	line-height:33px;
+	text-align:center;
+}
+
+.cls_input_ip {
+	width:185px;
+}
+
+.select_options {
+	position:relative;
+	float:right;
+
+	margin-top:2px;
+	font-size:30px;
+	line-height:33px;
+}
+
+.cls_content_welcom {
+	font-size:18px;
+	font-weight:bold;
+}
+
+.option_tool_box {
+	position:absolute;
+	float:left;
+	width:100%;
+	//background-color:#D49FFF;
+	text-align:center;
+}
+
+.option_tool_box_button {
+	position:absolute;
+	float:left;
+	margin:10px;
+	line-height:40px;
+	font-size:33px;
+	border-radius:8px;
+	-webkit-box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 2px 2px 2px rgba(255,255,255, .44);
+}
+
+.option_tool_box_first_button {
+	background-color:#555;
+	left:15%;
+}
+
+.option_tool_box_last_button {
+	background-color:rgb(77,144,0);
+	left:50%;
+}
+
+.right {
+	position:absolute;
+	top:15%;
+	left:70%;
+	width:30%;
+	height:70%;
+	display:none;
+	//background-color:#07F;
+}
+
+.right_panel {
+	position:absolute;
+	top:2%;
+	//background-color:#07F;
+}
+
+.buttons {
+	float:left;
+	position:relative;
+	background-color:#333;
+	width:60px;
+	height:60px;
+	line-height: 60px;
+	margin:10px;
+	margin-top:5px;
+	font-size:36px;
+	font-weight:bold;
+	text-align:center;
+	border-radius:6px;
+	color:#444;
+	background-color:#eee;
+	-webkit-box-shadow: 2px 2px 2px rgba(0,0,0, .29), inset 2px 2px 2px rgba(0,0,0, .84);
+}
+
+.buttons:active {  
+    position: relative;  
+    top: 3px;  
+}
+
+.rbutton {
+	background-color:#e77;
+}
+
+.bbutton {
+	color:#FFF;
+	background-color:rgb(0,144,255);
+}
+
+.cbutton {
+	width:100px;
+}
+
+.select_box, .upgrade_box {
+	position:absolute;
+	float:left;
+	left:8%;
+	top:15%;
+	height:70%;
+	width:84%;
+	border-radius:8px;
+	background-color:#009FFF;
+	background-image:url(../imgs/save.png);
+	background-size:150px 150px;
+	background-position:255px 85px;
+	background-repeat:no-repeat;
+	display:none;
+}
+
+.select_box_title {
+	position:absolute;
+	height:40px;
+	width:100%;
+	top:26px;
+	background-color:#FFF;
+	color:#000;
+	font-size:24px;
+	line-height:40px;
+	text-align:center;
+	font-weight:bold;
+}
+
+.select_box_content {
+	position:absolute;
+	height:100px;
+	width:100%;
+	text-align:center;
+	top:150px;
+	font-size:24px;
+}
+
+.button_panel {
+	position:absolute;
+	left:5px;
+	top:250px;
+}
+
+.Ebuttons,.Sbuttons,.Cbuttons {
+	width:200px;
+	font-size:24px;
+	line-height:60px;
+	height:60px;
+}
+
+.Ebuttons {
+}
+
+.Sbuttons {
+}
+
+.Cbuttons {
+}
+
+.operation_panel {
+}

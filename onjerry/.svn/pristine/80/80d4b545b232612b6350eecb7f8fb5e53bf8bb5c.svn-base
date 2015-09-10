@@ -1,0 +1,33 @@
+*** Creating Trace Output File '..\Output\Changesample.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '"..\output\startup_stm32f10x_cl.o"'
+### List of Objects: adding '"..\output\sys_init.o"'
+### List of Objects: adding '"..\output\uart.o"'
+### List of Objects: adding '"..\output\main.o"'
+### List of Objects: adding '"..\output\ads7953.o"'
+### List of Objects: adding '"..\output\ad_sample.o"'
+### List of Objects: adding '"..\output\stat_control.o"'
+### List of Objects: adding '"..\output\timer.o"'
+### List of Objects: adding '"..\output\crc.o"'
+### List of Objects: adding '"..\output\data_pro.o"'
+### List of Objects: adding '"..\output\flash.o"'
+### List of Objects: adding '"..\output\cal_sampdata.o"'
+### List of Objects: adding '"..\output\watchdog.o"'
+### List of Objects: adding '"..\output\core_cm3.o"'
+### List of Objects: adding '"..\output\system_stm32f10x.o"'
+### ADS-LD Command completed:
+--cpu Cortex-M3 "..\output\startup_stm32f10x_cl.o" "..\output\sys_init.o" "..\output\uart.o" "..\output\main.o" "..\output\ads7953.o" "..\output\ad_sample.o" "..\output\stat_control.o" "..\output\timer.o" "..\output\crc.o" "..\output\data_pro.o" "..\output\flash.o" "..\output\cal_sampdata.o" "..\output\watchdog.o" "..\output\core_cm3.o" "..\output\system_stm32f10x.o" --strict --scatter "..\Output\Changesample.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\Changesample.map" -o "..\Output\Changesample.axf"### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: '..\Output\Changesample.axf'
+### ADS-LD Command File: '..\Output\Changesample.lnp'
+### Checking for dirty Components...
+### Creating CmdFile '..\Output\Changesample.lnp', Handle=0x00000C5C
+### Writing '.lnp' file
+### ADS-LD Command file '..\Output\Changesample.lnp' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.

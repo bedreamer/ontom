@@ -1,0 +1,27 @@
+#ifndef _CAN_H_
+#define _CAN_H_
+
+#include "stm32f10x.h"
+
+/*CAN位时间NominalBitTime = 1 tq+tBS1+ tBS2,
+tBS1 = tq x (TS1[3:0] + 1)
+tBS2 = tq x (TS2[2:0] + 1)
+tq = (BRP[9:0] + 1) x tPCLK
+CAN外设用APB1,则这边tPCLK=1/32MHz, TS1[3:0]定为8, TS1[2:0]定为5, 
+则位时间为16个tq, BRP[9:0]定义如下*/
+
+#define CAN_BAUD_50K 44
+#define CAN_BAUD_125K 17
+#define CAN_BAUD_250K 8
+
+
+extern uint8_t fifo0[2][8];
+extern uint8_t fifo1[2][8];
+
+void CAN_Init(void);
+void CAN_Send(void);
+void CAN_Rece(void);
+
+
+#endif
+

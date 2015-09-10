@@ -1,0 +1,209 @@
+﻿概要
+=======
+zeus 控制接口(JSON 版)
+作者： 李杰
+2015/08/03
+
+
+索引
+=======
+	1. 系统状态查询
+	2. 系统信息查询
+	3. 当前故障查询
+	4. 历史故障查询
+	5. 作业查询
+	6. 创建作业
+	7. 终止作业
+	8. 模块信息查询
+	9. 操作认证
+	10. 软重启
+	
+1. 系统状态查询
+1.1 URI
+====
+	http://$IP:8081/system/query.json
+1.2 参数
+====
+	p: 当前显示页面的ID。主页(id_mainpage)刷卡创建作业，
+	   作业信息页面(id_job_working)刷卡终止作业。
+	   长度小于64字节。
+	j: 活动页面查询的作业ID(32位16进制作业ID号)。
+	   长度小于64字节。
+1.3 建议周期：
+====
+	800 ms
+1.4 描述
+====
+	提供充电枪连接状态、遥测量、遥信量等。
+1.5 详情
+====
+	{
+		"version":"$VERSION",     			// string, 版本号
+		"doreset":{false|true},   			// bool, zeus发送页面复位指令
+		"system_status":"{"故障"|"正常"}",	// string, 当前系统状态 
+		"charger_status":"{"故障"|"正常"}",	// string, 充电机组状态 
+		"bus0_institude":"{"故障"|"正常"}",	// string, 1段母线绝缘状态 
+		"bus1_institude":"{"故障"|"正常"}",	// string, 2段母线绝缘状态 
+		"Va":"$VA V",						// string, A相电压
+		"Vb":"$VB V",						// string, B相电压
+		"Vc":"$VC V",						// string, C相电压
+		"bus0_V":" V",						// string, C相电压
+		"bus1_V":" V",						// string, C相电压
+		"bus0_I":" A",						// string, C相电压
+		"bus1_I":" A",						// string, C相电压
+		"card_sn":".....",					// string, C相电压
+		"card_remain":"",					// string, C相电压
+		"card_status":"",					// string, C相电压
+		"card_passwd":"",					// string, C相电压
+		"gun0":"{"在充"|"已连接"|"未连接"}",// string, 1#枪状态
+		"gun1":"{"在充"|"已连接"|"未连接"}",// string, 2#枪状态
+		"gun2":"{"在充"|"已连接"|"未连接"}",// string, 3#枪状态
+		"gun3":"{"在充"|"已连接"|"未连接"}",// string, 4#枪状态
+		"zdcrd":"{"熔断"|"正常"}",			// string, 直流总输出熔断器状态
+		"zdctrip":"{"跳闸"|"正常"}",		// string, 直流总输出开关量
+		"dc1trip":"{"跳闸"|"正常"}",		// string, 1#枪输出开关量
+		"dc2trip":"{"跳闸"|"正常"}",		// string, 2#枪输出开关量
+		"actrip":"{"跳闸"|"正常"}",			// string, 交流输入开关量
+		"flq":"{"故障"|"正常"}",			// string, 防雷器状态
+		"halt":"{"急停"|"正常"}",			// string, 系统急停状态
+		"aczt":"{"合闸"|"分闸"}",			// string, 交流进线开关状态量
+		"bat1_R_P","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池1正对地电阻
+		"bat1_R_N","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池1负对地电阻
+		"bat2_R_P","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池2正对地电阻
+		"bat2_R_N","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池2负对地电阻
+		"tempraure":"$tempraure C°",		// string, 温度值
+		"wet_rate":"$wetrate"				// string, 湿度值
+	}
+
+	
+2. 系统信息查询
+2.1 URI
+====
+	http://$IP:8081/system/query.json
+2.2 参数
+====
+	p: 当前显示页面的ID。主页(id_mainpage)刷卡创建作业，
+	   作业信息页面(id_job_working)刷卡终止作业。
+	   长度小于64字节。
+	j: 活动页面查询的作业ID(32位16进制作业ID号)。
+	   长度小于64字节。
+2.3 建议周期：
+====
+	800 ms
+2.4 描述
+====
+	提供充电枪连接状态、遥测量、遥信量等。
+2.5 详情
+====
+	{
+		"version":"$VERSION",     			// string, 版本号
+		"doreset":{false|true},   			// bool, zeus发送页面复位指令
+		"system_status":"{"故障"|"正常"}",	// string, 当前系统状态 
+		"charger_status":"{"故障"|"正常"}",	// string, 充电机组状态 
+		"bus0_institude":"{"故障"|"正常"}",	// string, 1段母线绝缘状态 
+		"bus1_institude":"{"故障"|"正常"}",	// string, 2段母线绝缘状态 
+		"Va":"$VA V",						// string, A相电压
+		"Vb":"$VB V",						// string, B相电压
+		"Vc":"$VC V",						// string, C相电压
+		"gun0":"{"在充"|"已连接"|"未连接"}",// string, 1#枪状态
+		"gun1":"{"在充"|"已连接"|"未连接"}",// string, 2#枪状态
+		"gun2":"{"在充"|"已连接"|"未连接"}",// string, 3#枪状态
+		"gun3":"{"在充"|"已连接"|"未连接"}",// string, 4#枪状态
+		"zdcrd":"{"熔断"|"正常"}",			// string, 直流总输出熔断器状态
+		"zdctrip":"{"跳闸"|"正常"}",		// string, 直流总输出开关量
+		"dc1trip":"{"跳闸"|"正常"}",		// string, 1#枪输出开关量
+		"dc2trip":"{"跳闸"|"正常"}",		// string, 2#枪输出开关量
+		"actrip":"{"跳闸"|"正常"}",			// string, 交流输入开关量
+		"flq":"{"故障"|"正常"}",			// string, 防雷器状态
+		"halt":"{"急停"|"正常"}",			// string, 系统急停状态
+		"aczt":"{"合闸"|"分闸"}",			// string, 交流进线开关状态量
+		"bat1_R_P","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池1正对地电阻
+		"bat1_R_N","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池1负对地电阻
+		"bat2_R_P","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池2正对地电阻
+		"bat2_R_N","{"$ohm KΩ"|"> 1MΩ"}",	// string, 电池2负对地电阻
+		"tempraure":"$tempraure C°",		// string, 温度值
+		"wet_rate":"$wetrate"				// string, 湿度值
+	}
+
+5. 作业信息查询
+5.1 URI
+====
+	http://$IP:8081/job/query.json
+5.2 参数
+====
+	无
+5.3 建议周期：
+====
+	500 ms
+5.4 描述
+====
+	提供系统中所有有效作业的详细信息
+5.5 详情
+====
+	{
+		"jobs":[
+			{
+				"status":"{"等待"|"就绪"|"在充"|"因故暂停"|"正在恢复"|"正在中止"|"作业完成"}",    // string, 状态
+				"id":"$ID",       							// string, 作业ID，序号
+				"port":"{1|2}#",     						// string, 充电端口
+				"cmode":"{"自动"|"恒压"|"恒流"}",      		// string, 充电模式
+				"LV":"$LV V",     							// string, 充电限压
+				"LI":"$LI A",     							// string, 充电限流
+				"bmode":"{"自动充满"|"定额"|"定时"|"定量"}",// string, 计费方式
+				"hwk":"$kwh", 								// string, 电量
+				"time":"$time 分钟",  						// string, 时间
+				"money":"$money 元",  						// string, 金额
+				"cid":"$cid",         						// string, 卡号ID
+				"cremain":"$remain 元", 					// string, 余额
+				"CV":"$CV V",       						// string, 充电电压
+				"CI":"$CI A",       						// string, 充电电流
+				"ycdl":"$SOC %",   							// string, 充电进度
+				"kwh_price":"$price",   					// string, 充电单价
+				"used_kwh":"$used_kwh",    					// string, 已充电量
+				"used_time":"$used_time",   				// string, 已充时长
+				"used_money":"$used_money",  				// string, 已充电费
+				"gun_stat":"$gunstat",      				// string, 充电枪连接状态
+				"BRM":[
+					{"k":"电池材质","v":"$battype"},
+					{"k":"额定容量","v":"$cap A.H"},
+					{"k":"额定电压","v":"$maxV V"}
+				],
+				"BCP":[
+					{"k":"单体最高允许电压","v":"$V v"},
+					{"k":"单体最高允许电流","v":"$I A"},
+					{"k":"标称总能量","v":"$cap"},
+					{"k":"最高允许充电电压","v":"$maxV V"},
+					{"k":"最高允许温度","v":"$maxT 度"},
+					{"k":"初始SOC","v":"$soc %"},
+					{"k":"初始总电压","v":"$maxV V"}
+				],
+				"BRO":[
+					{"k":"BMS充电状态","v":"{"就绪"|"等待"}"}
+				],
+				"BCS":[
+					{"k":"BMS充电电压","v":"$battype"},
+					{"k":"BMS充电电流","v":"$cap A.H"},
+					{"k":"最高单体电压电池电压","v":"$battype"},
+					{"k":"SOC","v":"$soc %"},
+					{"k":"剩余充电时间","v":"$t 分"}
+				],
+				"BCL":[
+					{"k":"BMS电压需求","v":"$battype"},
+					{"k":"BMS电流需求","v":"$cap A.H"},
+					{"k":"BMS充电模式","v":"{"恒压"|"恒流"|"N/A"}"}
+				]
+			}
+		]
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

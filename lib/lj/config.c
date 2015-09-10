@@ -44,9 +44,9 @@ const char *value_type[] = {"STRING", "INT", "FLOAT", "BOOL", "N/A"};
 CONFIG_DOMAIN_BEGIN
 //数据名称                   |数据类型| 用户配置项？|nnn数据状态|数据默认值|	数据值
 // ! 下面这一项需要在初始化时手动设置
-{"xmlsrv_port",					C_INT,		no,		C_INVALID,	.cuv.i=8081,	{"8081"}},
-{"socket_config", 				C_BOOL,		no,		C_INVALID,  .cuv.b=true,    {"TRUE"}},
-{"socket_config_port", 			C_INT,		no,		C_INVALID,  .cuv.i=9990,    {"9990"}},
+{"charger_name",		C_STRING,   no,		C_INVALID,	.cuv.i=0,	{"ON-DC-0001"}},
+{"socket_config", 		C_BOOL,		no,		C_INVALID,  .cuv.b=true,    {"TRUE"}},
+{"socket_config_port",          C_INT,		no,		C_INVALID,  .cuv.i=9990,    {"9990"}},
 {"socket_config_autheticate", 	C_BOOL,     no,		C_INVALID,  .cuv.n=0,       {"TRUE"}},
 
 {"manual_passwd",               C_STRING,   no,     C_INVALID,  .cuv.n=0,       {"00000"}},
@@ -90,6 +90,8 @@ CONFIG_DOMAIN_BEGIN
 {"super_card_sn",               C_STRING,  yes,     C_INVALID,  .cuv.i=0,       {"N/A"}},
 {"socket_config_username", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
 {"socket_config_passwd", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"god"}},
+{"server_addr", 		C_STRING,  yes,		C_INVALID,  .cuv.n=0,       {"127.0.0.1"}},
+{"server_port", 		C_INT,  yes,		C_INVALID,  .cuv.n=0,       {"10000"}},
 CONFIG_DOMAIN_END
 //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 

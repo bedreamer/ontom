@@ -1,0 +1,228 @@
+#include "CAN.h"
+
+uint8_t fifo0[2][8]={0};
+uint8_t fifo1[2][8]={0};
+uint8_t cont0;
+uint8_t cont1,flag = 0x01;
+uint32_t id = 0x00000002,TX_cont0,TX_cont1;
+uint8_t CAN_FrameSend(uint8_t *buff, uint32_t Txdatalen, CAN_TypeDef * Txcan)
+{
+    if(Txcan == CAN1 || Txcan == CAN2)
+    {
+        if(Txcan->TSR & CAN_TSR_TME)
+        {
+            Txcan->sTxMailBox[(Txcan->TSR & CAN_TSR_CODE) >> 24].TDTR= ;//装载DLC
+            Txcan->sTxMailBox[(Txcan->TSR & CAN_TSR_CODE) >> 24].TDLR= ;//装载低4字节
+            Txcan->sTxMailBox[(Txcan->TSR & CAN_TSR_CODE) >> 24].TDHR= ;//装载高4字节
+            Txcan->sTxMailBox[(Txcan->TSR & CAN_TSR_CODE) >> 24].TIR = ;//装载ID并触发发送
+        }
+        else
+        {
+            return 0x02;
+        }
+    }
+    else
+    {
+        return 0x01;
+    }
+    return 0x00;
+}
+void USB_HP_CAN1_TX_IRQHandler(void)
+{
+    if(CAN1->TSR & CAN_TSR_TXOK0) //是否发送成功
+    {
+        CAN1->TSR |= CAN_TSR_RQCP0;
+        
+    }
+    else//Abort 触发
+    {
+        ;
+    }
+
+    if(CAN1->TSR & CAN_TSR_TXOK1) //是否发送成功
+    {
+        CAN1->TSR |= CAN_TSR_RQCP1;
+        
+    }
+    else//Abort 触发
+    {
+        ;
+    }
+
+    if(CAN1->TSR & CAN_TSR_TXOK2) //是否发送成功
+    {
+        CAN1->TSR |= CAN_TSR_RQCP2;
+        
+    }
+    else//Abort 触发
+    {
+        ;
+    }
+}
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
+    static uint8_t cont;
+    if(CAN1->RF0R & CAN_RF0R_FMP0)
+    {
+        CAN1->RF0R ^= CAN_RF0R_RFOM0;//释放当前fifo0输出mailbox
+        if(cont++ >=100)
+        {
+            GPIOC->ODR ^= GPIO_ODR_ODR13; 
+            cont = 0;
+        }
+
+    }
+ 
+}
+void CAN1_RX1_IRQHandler(void)
+{
+    static uint8_t cont;
+    if(CAN1->RF1R & CAN_RF1R_FMP1)
+    {
+        if((CAN1->sFIFOMailBox[1].RDTR & CAN_RDT1R_FMI) == 0x00000000)
+        cont0++;
+        else if((CAN1->sFIFOMailBox[1].RDTR & CAN_RDT1R_FMI) == 0x00000100)
+        cont1++;
+        
+        CAN1->RF1R ^= CAN_RF1R_RFOM1;//释放当前fifo1输出mailbox
+        if(cont++ >=100)
+        {
+            GPIOC->ODR ^= GPIO_ODR_ODR14; 
+            cont = 0;
+        }
+        flag = 0x01;
+    }
+}
+
+void CAN_Send(void)
+{
+    if(!(CAN1->sTxMailBox[0].TIR &  CAN_TI0R_TXRQ) )
+    {
+        CAN1->sTxMailBox[0].TDTR = 0x00000008;
+        CAN1->sTxMailBox[0].TDLR = 0x03020100;
+        CAN1->sTxMailBox[0].TDHR = 0x07060504;
+        CAN1->sTxMailBox[0].TIR = (id << 3) | CAN_TI0R_IDE | CAN_TI0R_TXRQ; 
+        if(id == 0x00000002)
+        {
+            if(TX_cont0++ >= 100)
+            {
+                TX_cont0 = 0;
+                id = 0x00000002;
+                GPIOC->BSRR = GPIO_BSRR_BS13;
+            }
+            
+        }
+        else if(id == 0x00000003)
+        {
+            if(TX_cont1++ >= 100)
+            {
+                TX_cont1 = 0;
+                id = 0x00000002;
+                GPIOC->BSRR = GPIO_BSRR_BR13;
+            }
+            
+        }
+        
+    while(!(CAN1->TSR & CAN_TSR_TXOK0)); //是否发送成功
+    flag = 0x00;
+    }
+
+}
+
+void CAN_Rece(void)
+{
+    static uint8_t cont;
+    if(CAN1->RF0R & CAN_RF0R_FMP0)
+    {
+        * (uint32_t*)(fifo0[((CAN1->sFIFOMailBox[0]).RDTR & CAN_RDT0R_FMI )>> 8])= CAN1->sFIFOMailBox[0].RDLR;
+        * (uint32_t*)(fifo0[((CAN1->sFIFOMailBox[0]).RDTR & CAN_RDT0R_FMI )>> 8] + 4)= CAN1->sFIFOMailBox[0].RDHR;
+        CAN1->RF0R ^= CAN_RF0R_RFOM0;//释放当前fifo0输出mailbox
+        if(cont++ >=100)
+        {
+            GPIOC->ODR ^= GPIO_ODR_ODR13; 
+            cont = 0;
+        }
+
+    }
+    if(CAN1->RF1R & CAN_RF1R_FMP1)
+    {
+        * (uint32_t*)(fifo1[((CAN1->sFIFOMailBox[1]).RDTR & CAN_RDT0R_FMI )>> 8])= CAN1->sFIFOMailBox[1].RDLR;
+        * (uint32_t*)(fifo1[((CAN1->sFIFOMailBox[1]).RDTR & CAN_RDT0R_FMI )>> 8] + 4)= CAN1->sFIFOMailBox[1].RDHR;
+        CAN1->RF1R ^= CAN_RF1R_RFOM1;//释放当前fifo1输出mailbox
+    }
+}
+
+
+void CAN_Init(void)
+{
+     //CAN1相关外设时钟使能
+    RCC->APB1ENR |= (RCC_APB1ENR_CAN1EN);//使能CAN1
+    RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN |RCC_APB2ENR_AFIOEN);//使能GPIOA、AFIO时钟
+    //配置CAN1对应的GPIO
+    GPIOA->CRH &= ~(GPIO_CRH_MODE & 0x000FF000);
+    GPIOA->CRH |= GPIO_CRH_MODE12;//设置CAN1的TX引脚为50MHz输出模式，RX为输入模式
+    GPIOA->BSRR = GPIO_BSRR_BS11;
+    GPIOA->CRH &=~(GPIO_CRL_CNF & 0x000FF000);
+    GPIOA->CRH |= (GPIO_CRH_CNF12_1|GPIO_CRH_CNF11_1);//设置CAN1的TX引脚为复用推挽输出模式,RX引脚为上拉输入
+
+    CAN1->MCR ^= (CAN_MCR_INRQ | CAN_MCR_SLEEP);//退出sleep mode, 进入initialization mode请求
+    while((CAN1->MSR & (CAN_MSR_SLAK | CAN_MSR_INAK)) != 0x0000001);//等待退出sleep mode, 进入initialization mode请求响应
+    CAN1->MCR |=  (CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP);//配置自动恢复bus-off状态、自动唤醒、自动重发、按发送请求的顺序发送数据帧
+    CAN1->BTR = (((uint32_t)8<<16) | ((uint32_t)5<<20) | ((uint32_t)1<<24) | (uint32_t)CAN_BAUD_125K);//配置波特率
+    //CAN1->BTR = (CAN_BTR_LBKM | ((uint32_t)8<<16) | ((uint32_t)5<<20) | ((uint32_t)1<<24) | (uint32_t)CAN_BAUD_125K);//配置波特率、回环测试模式
+
+    CAN1->IER |= CAN_IER_FMPIE0 |CAN_IER_FMPIE1;//使能发送请求响应且TXMailBox Empty中断(由TXOK标志区别Abort或者成功发送)、FIFO0 Pending中断(FMP0不为00b)、FIFO1 Pending中断(FMP1不为00b)
+    
+    CAN1->FMR |= CAN_FMR_FINIT;//初始化滤波块
+    CAN1->FA1R &= CAN_FA1R_FACT;//禁用所有CAN1滤波块
+    CAN1->FS1R |= CAN_FS1R_FSC0 | CAN_FS1R_FSC1;//将filter bank0和filter bank1配置为 Single 32-bit scale 
+    CAN1->FM1R |= CAN_FM1R_FBM0 | CAN_FM1R_FBM1;//将filter bank0和filter bank1配置为identifier list mode
+    CAN1->sFilterRegister[0].FR1 = 0x00000000;
+    CAN1->sFilterRegister[0].FR1 |= CAN_F0R1_FB2;
+    CAN1->sFilterRegister[0].FR2 = 0x00000000;
+    CAN1->sFilterRegister[0].FR2 |= CAN_F0R2_FB2 | CAN_F0R2_FB3;//filter bank0为两个扩展帧ID为0x00和0x01
+    CAN1->sFilterRegister[1].FR1 = 0x00000000;
+    CAN1->sFilterRegister[1].FR1 |= CAN_F1R1_FB2 | CAN_F1R1_FB4;
+    CAN1->sFilterRegister[1].FR2 = 0x00000000;
+    CAN1->sFilterRegister[1].FR2 |= CAN_F1R2_FB2 | CAN_F1R2_FB3 | CAN_F1R1_FB4;//filter bank1为两个扩展帧ID为0x02和0x03
+    CAN1->FFA1R |= CAN_FFA1R_FFA1;//将filter bank1分配给FIFO1
+    CAN1->FA1R |= CAN_FA1R_FACT0 | CAN_FA1R_FACT1;
+    CAN1->FMR &= ~CAN_FMR_FINIT;//退出初始化滤波块
+    CAN1->MCR &= ~CAN_MCR_INRQ;//退出initialization mode
+    
+    #if defined STM32F10X_CL
+    //CAN2相关外设时钟使能
+    RCC->APB1ENR |= (RCC_APB1ENR_CAN2EN);//使能CAN2、GPIOA、AFIO时钟
+    RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN |RCC_APB2ENR_AFIOEN);//使能GPIOA、AFIO时钟
+    //配置CAN2对应的GPIO
+
+
+    CAN2->MCR ^= (CAN_MCR_INRQ | CAN_MCR_SLEEP);//退出sleep mode, 进入initialization mode请求
+    while((CAN2->MSR & (CAN_MSR_SLAK | CAN_MSR_INAK)) != 0x0000001);//等待退出sleep mode, 进入initialization mode请求响应
+    CAN2->MCR |=  (CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP);//配置自动恢复bus-off状态、自动唤醒、自动重发、按发送请求的顺序发送数据帧
+    CAN2->BTR = (((uint32_t)8<<16) | ((uint32_t)5<<20) | ((uint32_t)1<<24) | (uint32_t)CAN_BAUD_125K);//配置波特率
+    
+    CAN2->IER |= CAN_IER_TMEIE | CAN_IER_FMPIE0 |CAN_IER_FMPIE1;//使能发送请求响应且TXMailBox Empty中断(由TXOK标志区别Abort或者成功发送)、FIFO0 Pending中断(FMP0不为00b)、FIFO1 Pending中断(FMP1不为00b)
+    
+    CAN2->FMR |= CAN_FMR_FINIT;//初始化滤波块
+    CAN2->FA1R &= CAN_FA1R_FACT;//禁用所有CAN1滤波块
+    CAN2->FS1R |= CAN_FS1R_FSC0 | CAN_FS1R_FSC1;//将filter bank0和filter bank1配置为 Single 32-bit scale 
+    CAN2->FM1R |= CAN_FM1R_FBM0 | CAN_FM1R_FBM1;//将filter bank0和filter bank1配置为identifier list mode
+    CAN2->sFilterRegister[0].FR1 = 0x00000000;
+    CAN2->sFilterRegister[0].FR1 |= CAN_F0R1_FB2 | CAN_F0R1_FB3;
+    CAN2->sFilterRegister[0].FR2 = 0x00000000;
+    CAN2->sFilterRegister[0].FR2 |= CAN_F0R2_FB2 | CAN_F0R2_FB4;//filter bank0为两个扩展帧ID为0x01和0x02
+    CAN2->sFilterRegister[1].FR1 = 0x00000000;
+    CAN2->sFilterRegister[1].FR1 |= CAN_F1R1_FB2 | CAN_F1R1_FB5;
+    CAN2->sFilterRegister[1].FR2 = 0x00000000;
+    CAN2->sFilterRegister[1].FR2 |= CAN_F1R2_FB2 | CAN_F1R2_FB6;//filter bank1为两个扩展帧ID为0x04和0x08
+    CAN2->FFA1R |= CAN_FFA1R_FFA1;//将filter bank1分配给FIFO1
+    CAN2->FA1R |= CAN_FA1R_FACT0 | CAN_FA1R_FACT1;
+    CAN2->FMR &= ~CAN_FMR_FINIT;//退出初始化滤波块
+    CAN2->MCR &= ~CAN_MCR_INRQ;//退出initialization mode
+    #endif
+}
+
+
+
+

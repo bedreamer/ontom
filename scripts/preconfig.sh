@@ -12,9 +12,17 @@ SYSTYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='system_type
 MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'"`
 NEED_KWH_METER=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='sys_need_kwh_meter'"`
 METER_TYPE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='kwh_meter_type'"`
+NEED_CARD_READER=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='need_card_reader'"`
+SERV_ADDR=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='server_addr'"`
+LOCAL_IP=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='local_ip'"`
+NETMASK=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='network_mask'"`
+
+if [ $LOCAL_IP != "127.0.0.1" ];then
+	ifconfig eth1 $LOCAL_IP netmask $NETMASK
+fi
 
 # 先移动默认的文件
-if [ -e "OEM.man" ];then
+if [ -e "/usr/zeus/OEM.man" ];then
 	OEM=`cat OEM.man`
 else
 	OEM='default'
@@ -31,6 +39,39 @@ if [ $SYSTYPE -eq 0 ]; then
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000004'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000005'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000006'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000019'"
+	
+	# 再次选择系统中配置的模块型号
+	MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'"`
+	# 根据模块型号选择要使用的串口模组
+	if [ $MODULE -eq 0 ];then
+		# AN10750 模块
+		echo "系统采用AN10750模块"
+		echo "    打开     奥能协议转换盒"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000007'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000008'"
+		echo "关闭冲突的串口模组..."
+		echo "    关闭     英瑞克模块协议转换盒模组"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000009'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='M000000A'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='M0000015'"
+
+	elif [ $MODULE -eq 4 ];then
+		# 英瑞克 EVR400-7500
+		echo "系统采用英瑞克 EVR400-7500模块，选择协议转换盒"
+		echo "    打开     英瑞克模块协议转换盒模组"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000009'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='M000000A'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='M0000015'"
+		
+		echo "关闭冲突的串口模组..."
+		echo "    关闭     奥能协议转换盒模组"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000007'"
+		$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000008'"
+	else
+		echo "预配置系统出问题了"
+		exit 1;
+	fi
 else
 	# 分体式
 	# 目前只支持公司自产模块的分体式充电桩
@@ -39,6 +80,8 @@ else
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000004'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000005'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000006'"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000019'"
+
 	echo "    关闭     奥能协议转换盒"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000007'"
 	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000008'"
@@ -49,45 +92,13 @@ else
 	echo "分体式系统预配置完成."
 fi
 
-# 再次选择系统中配置的模块型号
-MODULE=`$SQLITE3 $DB "SELECT current_value FROM settings WHERE key='module_kind'"`
-
-# 根据模块型号选择要使用的串口模组
-if [ $MODULE -eq 0 ];then
-	# AN10750 模块
-	echo "系统采用AN10750模块"
-	echo "    打开     奥能协议转换盒"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000007'"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000008'"
-	echo "关闭冲突的串口模组..."
-	echo "    关闭     英瑞克模块协议转换盒模组"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000009'"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='M000000A'"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='M0000015'"
-
-elif [ $MODULE -eq 4 ];then
-	# 英瑞克 EVR400-7500
-	echo "系统采用英瑞克 EVR400-7500模块，选择协议转换盒"
-	echo "    打开     英瑞克模块协议转换盒模组"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000009'"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='M000000A'"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='M0000015'"
-	
-	echo "关闭冲突的串口模组..."
-	echo "    关闭     奥能协议转换盒模组"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000007'"
-	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000008'"
+if [ $NEED_CARD_READER -eq 1 ];then
+	echo "    打开     周立功-7816读卡器"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000002'"
 else
-	echo "预配置系统出问题了"
-	exit 1;
+	echo "    关闭     周立功-7816读卡器"
+	$SQLITE3 $DB "UPDATE RS485_config set disabled='true' where id='00000002'"
 fi
-
-echo "默认配置项..."
-echo "    打开     奥能-综合采样盒"
-$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000001'"
-$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='0000000E'"
-echo "    打开     周立功-7816读卡器"
-$SQLITE3 $DB "UPDATE RS485_config set disabled='false' where id='00000002'"
 
 if [ $NEED_KWH_METER -eq 1 ];then
 	if [ $METER_TYPE -eq 1 ];then

@@ -36,8 +36,9 @@ LDFLAGS=-L$(WORKDIR) -L/home/tom/workspace/qt-4.8.2-arm/lib \
 	-L/home/tom/workspace/tslib/lib -L$(WORKDIR)/lib \
 	-L$(WORKDIR)/thirdpart/mongoose \
 	-L$(WORKDIR)/thirdpart/sqlite \
-	-L$(WORKDIR)/thirdpart/extso
-LDEXFLAGS=-lrt -lpthread -ldl -llj -lmongoose -lsqlite3 -lexso -lbms
+        -L$(WORKDIR)/thirdpart/extso \
+        -L$(WORKDIR)/pandora
+LDEXFLAGS=-lrt -lpthread -ldl -llj -lmongoose -lsqlite3 -lexso -lbms -lpandora
 # build-in objects.
 y-objs=
 yobjs-list:=$(WORKDIR)/.yobjs
@@ -56,9 +57,10 @@ EXPORTS+=KERNELFILE VERSION CC CXX AS LD AR RM MAKE MAKEPARAM OMIT \
 SEP-DIRS=thirdpart/mongoose thirdpart/sqlite thirdpart/extso
 # must be the last one.
 LAST-DIR=
-BMSDRVIVER=bmsdriver/GB-T-27930-2011 bmsdriver/onlypower bmsdriver/beijingqiche bmsdriver/guoxuangaoke
-PLUGINS=plugins/default plugins/104 plugins/demo plugins/buzzer plugins/Q-GDW-11177.2-2014
-LIBDIR=lib/lj lib/bms
+BMSDRVIVER=bmsdriver/GB-T-27930-2011 bmsdriver/onlypower bmsdriver/beijingqiche\
+	 bmsdriver/guoxuangaoke bmsdriver/guoxuangaoke-v2
+PLUGINS=plugins/default plugins/104 plugins/demo plugins/buzzer plugins/Q-GDW-11177.2-2014 plugins/sim
+LIBDIR=lib/lj lib/bms lib/job
 SUB-DIRS=$(LIBDIR) $(BMSDRVIVER) $(PLUGINS) ontom pandora 
 EX-OBJS=
 PHONY+=EX-OBJS
@@ -113,7 +115,7 @@ watchdog:
 	$(Q)$(MAKE) $(MAKEPARAM) -C watchdog all;
 	
 clean:list-clean
-	$(Q)$(OMIT)for d in $(SEP-DIRS) $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
+	$(Q)$(OMIT)for d in $(SUB-DIRS) $(LAST-DIR);do $(MAKE) $(MAKEPARAM) -C $$d clean 2>/dev/null;done;
 PHONY+=clean
 list-clean:
 	$(Q)for f in $(yobjs-list) $(mobjs-list) $(sobjs-list);do echo "    RM        $$f";done;

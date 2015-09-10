@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>直流充电桩内部调试工具-串口统计</title>
+
+</head>
+<style>
+.table {
+	font-size:"8px";
+	font-weight:100;
+}
+</style>
+<!-- script type="text/javascript" src="jquery.min.js"></script -->
+<script>
+function ajax_state_change()
+{
+	if (ajax_card.readyState==4)
+	{// 4 = "loaded"
+		if (ajax_card.status==200)
+		{// 200 = "OK"
+			var obj = eval("(" + ajax_card.responseText + ")");
+			var new_table_text = "<tr><td>串口用户</td>" +
+									 "<td>发送速率</td>" +
+									 "<td>当前发送速率计数</td>" +
+									 "<td>通信故障鉴别次数</td>" +
+									 "<td>超时错误</td>" +
+									 "<td>超时错误累计</td>" +
+									 "<td>已发送帧次数</td>" +
+									 "<td>校验错误</td>" +
+									 "<td>校验错误累计</td>" +
+									 "<td>正确接受帧数</td>" +
+								     "<td>通信质量</td></tr>";
+			for ( var i = 0; i < obj.uartusers.length; i ++ ) {
+				new_table_text = new_table_text + "<tr>"
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].obj + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].freq + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].seed + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].died_line + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].died + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].died_total + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].sent + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].checkerr + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].check_err_total + "</td>";
+				new_table_text = new_table_text + "<td>" + obj.uartusers[i].recv_cnt + "</td>";
+				if ( obj.uartusers[i].died == 0 ) {
+					new_table_text = new_table_text + "<td><img height=\"16px\" width=\"16px\"  src=\"ok.png\" /></td>";
+				} else if ( obj.uartusers[i].died < obj.uartusers[i].died_line ) {
+					new_table_text = new_table_text + "<td><img height=\"16px\" width=\"16px\"  src=\"wrn.png\" /></td>";
+				} else {
+					new_table_text = new_table_text + "<td><img height=\"16px\" width=\"16px\"  src=\"err.png\" /></td>";
+				}
+				new_table_text = new_table_text + "</tr>";
+			}
+			document.getElementById("uarts").innerHTML = new_table_text;
+			
+			// 充电机组信息
+			new_table_text="<table border=\"1px\" style=\"text-align:center\">";
+			new_table_text=new_table_text+"<tr><td>充电机编号</td>" +
+										"<td>充电状态</td>" +
+										"<td>充电机自身状态</td>" +
+										"<td>最高输出电压值</td>" +
+										"<td>最低输出电压值</td>" +
+										"<td>最大输出电流值</td>" +
+										"<td>实际输出电压值</td>" +
+										"<td>实际输出电流值</td></tr>";
+			new_table_text =new_table_text + "<tr>"
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_sn + "</td>";
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_status + "</td>";
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_self_status + "</td>";
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_max_v_out + "</td>";
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_min_v_out + "</td>";
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_max_i_out + "</td>";
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_v_out + "</td>";
+			new_table_text =new_table_text + "<td>" + obj.chargers.charger_i_out + "</td>";
+			new_table_text =new_table_text + "</tr></table>";
+			
+			// 模块1-7
+			new_table_text=new_table_text+
+			"<a style=\"font-weight:bold\">充电机模块信息</a>";
+			new_table_text =
+	new_table_text+"<table border=\"1px\" style=\"text-align:center\">";
+			new_table_text=new_table_text+"<tr><td>模块编号</td>"
+			for (var j=0; j<7; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + (j + 1).toString() + "#</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块输出电压</td>"
+			for (var j=0; j<7; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].voltage + "</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块输出电流</td>"
+			for (var j=0; j<7; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].current + "</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块温度</td>"
+			for (var j=0; j<7; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].temp + "</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块序列号</td>"
+			for (var j=0; j<7; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].sn + "</td>";
+			}
+			new_table_text=new_table_text+"</tr></table>";
+			
+			// 模块8-14
+						new_table_text =
+	new_table_text+"<table border=\"1px\" style=\"text-align:center\">";
+			new_table_text=new_table_text+"<tr><td>模块编号</td>"
+			for (var j=7; j<14; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + (j + 1).toString() + "#</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块输出电压</td>"
+			for (var j=7; j<14; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].voltage + "</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块输出电流</td>"
+			for (var j=7; j<14; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].current + "</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块温度</td>"
+			for (var j=7; j<14; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].temp + "</td>";
+			}
+			new_table_text=new_table_text+"</tr>";
+			new_table_text=new_table_text+"<tr><td>模块序列号</td>"
+			for (var j=7; j<14; j++) {
+				new_table_text =new_table_text + 
+				"<td>" + obj.chargers.modules[j].sn + "</td>";
+			}
+			new_table_text=new_table_text+"</tr></table>";
+			// 综合采样盒			
+			document.getElementById("chargers").innerHTML = new_table_text;
+
+			new_table_text="";
+			for (var j=0; j < obj.errors.length; j ++) {
+				new_table_text=new_table_text+obj.errors[j].error + "&nbsp;&nbsp;"
+			}
+			document.getElementById("errors").innerHTML = new_table_text;
+
+			new_table_text="<table border=\"1px\"><tr>";
+			for (var j=0; j < obj.yaoxin.length; j ++) {
+
+				new_table_text=new_table_text+"<td>"+obj.yaoxin[j].stat
+				if ( obj.yaoxin[j].color == "red" ) {
+					new_table_text=new_table_text+"<img  height=\"16px\" width=\"16px\" src=\"err.png\" />";
+				} else if ( obj.yaoxin[j].color == "yellow" ) {
+					new_table_text=new_table_text+"<img  height=\"16px\" width=\"16px\" src=\"wrn.png\" />";
+				} else if ( obj.yaoxin[j].color == "green" ) {
+					new_table_text=new_table_text+"<img  height=\"16px\" width=\"16px\" src=\"ok.png\" />";
+				} else {
+					new_table_text=new_table_text+"<img  height=\"16px\" width=\"16px\" src=\"err.png\" />";
+				}
+				new_table_text=new_table_text+"<td>";
+			}
+			new_table_text=new_table_text+"</tr></table>";
+			document.getElementById("yaoxin").innerHTML = new_table_text;
+
+		}
+		else
+		{
+		}
+	}
+}
+
+// 获取query.xml文件函数
+function ajax_card_request() {
+	var host = document.getElementById("hostip").value;
+	ajax_card = new XMLHttpRequest();
+	if ('withCredentials' in ajax_card ) {
+		/* supports cross-domain requests */
+	} else {
+		return;
+	}
+	ajax_card.onreadystatechange=ajax_state_change;
+	ajax_card.open("GET", "http://" + host + "/debug/uart.json", true);
+	ajax_card.send();
+	setTimeout("ajax_card_request()", 800);
+}
+
+</script>
+
+<body onload="ajax_card_request();" style="font-size:10px">
+<a style="font-weight:bold">通信地址</a>
+<input id="hostip" type="text" title="调试主机地址" value="127.0.0.1:8081" />
+<a href="http://127.1.1.1:8080/index.html"><div style="height:30px;weight:60px;background-color:#0A0"></div></a>
+<a href="http://127.0.0.1:8080/IP.html">查看IP</a>
+<br /><br />
+<!-- input type="button" name="??" value="??" title="fdfafasdf" onclick="javascript:ajax_card_request();"  /-->
+<a style="font-weight:bold">串口通信质量统计</a>
+<table id="uarts" border="1px" style="text-align:center">
+</table>
+<a style="font-weight:bold">充电机组遥测遥信量</a>
+<div id="chargers">等待数据.....</div>
+<a style="font-weight:bold">综合采样盒数据</a>
+<div id="errors">等待故障数据.....</div>
+</body>
+<div id="yaoxin">等待遥信数据.....</div>
+</body>
+</html>
+

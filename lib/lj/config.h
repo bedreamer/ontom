@@ -36,7 +36,7 @@
 #define CONFIG_SUPPORT_BMS_NR          4
 #define CONFIG_SUPPORT_SIMPLE_BOX_NR   CONFIG_SUPPORT_BMS_NR
 /*系统支持的485串口设备个数*/
-#define CONFIG_SUPPORT_RS485_NR        2
+#define CONFIG_SUPPORT_RS485_NR        4
 // 系统支持的充电机组数
 #define CONFIG_SUPPORT_CHARGE_GRP_NR   2
 //}}}}}}}}}}}}}

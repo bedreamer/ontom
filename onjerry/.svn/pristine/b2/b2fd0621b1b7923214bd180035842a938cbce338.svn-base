@@ -1,0 +1,11 @@
+---- Systimememb Matches (10 in 5 files) ----
+AD_Sample.c:        Systimememb |= 0x01;//开启定时采样
+DATA_pro.c:        Systimememb &= 0xFD;//通讯中断计数关闭
+DATA_pro.c:    Systimememb |= 0x02;//通讯中断计数使能
+Main.c:        if(!(Systimememb & 0x01))//上一次数据采样完成
+Timer.c:uint8_t Systimememb = 0x00;
+Timer.c:    if((Systimememb & 0x01) == 0x01)//AD采样计数控制
+Timer.c:                Systimememb &= 0xFE;
+Timer.c:    if(((Systimememb & 0x02) == 0x02) && (COMMbreaktime-- == 0x0000))//通讯中断计数
+Timer.c:         Systimememb &= 0xFD;
+Timer.h (e:\work\充电桩采样\sproject\user\inc):extern uint8_t Systimememb;
